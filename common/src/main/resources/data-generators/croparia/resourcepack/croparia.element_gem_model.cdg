@@ -1,0 +1,9 @@
+@startup=true;
+@registry=croparia:elements;
+@path={id_namespace}/models/item/{gem_path}.json;
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "{id_namespace}:item/{gem_path}"
+    }
+}

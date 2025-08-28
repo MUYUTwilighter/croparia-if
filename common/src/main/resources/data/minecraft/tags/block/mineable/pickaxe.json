@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "croparia:elematilius_ore",
+    "croparia:deepslate_elematilius_ore",
+    "croparia:elemental_stone",
+    "croparia:infusor",
+    "croparia:ritual_stand",
+    "croparia:ritual_stand_2",
+    "croparia:ritual_stand_3"
+  ]
+}

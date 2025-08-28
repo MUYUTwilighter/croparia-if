@@ -1,0 +1,21 @@
+@registry=croparia:crops;
+@path=modern_industrialization/recipe/croparia/packer/{id_namespace}/{id_path}.json;
+@dependencies=modern_industrialization;
+{
+  "type": "modern_industrialization:packer",
+  "duration": 100,
+  "eu": 2,
+  "item_inputs": [
+    {
+      "item": "{fruit}",
+      "count": 1
+    }
+  ],
+  "item_outputs": [
+    {
+      "item": "{result}",
+      "count": {result_count.2},
+      "components": {material_components}
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "package": "cool.muyucloud.croparia.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "client": [
+  ],
+  "mixins": [
+    "AbstractFurnaceBlockEntityMixin",
+    "BlockMixin",
+    "CropBlockMixin",
+    "DropperBlockMixin",
+    "ItemStackMixin",
+    "MinecraftServerMixin",
+    "PackRepositoryMixin",
+    "ReloadableResourceManagerImplMixin",
+    "StateHolderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

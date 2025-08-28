@@ -1,0 +1,22 @@
+@registry=croparia:crops;
+@path=thermal/recipe/croparia/insolator/{id_namespace}/{id_path}.json;
+@dependencies=thermal_cultivation;
+{
+  "type": "thermal:insolator",
+  "ingredient": {
+    "item": "{seed}"
+  },
+  "result": [
+    {
+      "item": "{seed}",
+      "chance": 0.0
+    },
+    {
+      "item": "{fruit}",
+      "chance": 1.0
+    }
+  ],
+  "energy_mod": 1.5,
+  "water_mod": 1.5,
+  "experience": 0.2
+}

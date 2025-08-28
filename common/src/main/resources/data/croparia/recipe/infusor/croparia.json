@@ -1,0 +1,12 @@
+{
+  "type": "croparia:infusor",
+  "element": "croparia:elemental",
+  "ingredient": {
+    "id": "minecraft:wheat_seeds",
+    "amount": 4
+  },
+  "result": {
+    "id": "croparia:croparia",
+    "amount": 1
+  }
+}

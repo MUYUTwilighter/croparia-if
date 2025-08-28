@@ -1,0 +1,95 @@
+{
+  "type": "croparia:ritual_structure",
+  "keys": {
+    "E": "croparia:elemental_stone",
+    "S": "croparia:activated_shrieker",
+    "T": "minecraft:tuff",
+    "P": "minecraft:prismarine_bricks",
+    "L": "minecraft:sea_lantern",
+    "X": {
+      "id": "croparia:block_crop_elemental",
+      "properties": {
+        "age": "7"
+      }
+    },
+    "Y": {
+      "id": "croparia:block_crop_earth",
+      "properties": {
+        "age": "7"
+      }
+    },
+    "Z": {
+      "id": "croparia:block_crop_water",
+      "properties": {
+        "age": "7"
+      }
+    }
+  },
+  "pattern": [
+    [
+      "           ",
+      "           ",
+      "           ",
+      "           ",
+      "    $ $    ",
+      "           ",
+      "    $ $    ",
+      "           ",
+      "           ",
+      "           ",
+      "           "
+    ],
+    [
+      "   P.Z.P   ",
+      " T.......T ",
+      " .X.....X. ",
+      "P..E...E..P",
+      ".....S.....",
+      "Y...S S...Y",
+      ".....S.....",
+      "P..E...E..P",
+      " .X.....X. ",
+      " T.......T ",
+      "   P.Z.P   "
+    ],
+    [
+      "   P...P   ",
+      " T.......T ",
+      " ......... ",
+      "P.........P",
+      "..... .....",
+      ".... * ....",
+      "..... .....",
+      "P.........P",
+      " ......... ",
+      " T.......T ",
+      "   P...P   "
+    ],
+    [
+      "   P...P   ",
+      " T.......T ",
+      " ......... ",
+      "P.........P",
+      "..... .....",
+      "....   ....",
+      "..... .....",
+      "P.........P",
+      " ......... ",
+      " T.......T ",
+      "   P...P   "
+    ],
+    [
+      "    PLP    ",
+      " ......... ",
+      " ......... ",
+      " ......... ",
+      "P.... ....P",
+      "L...   ...L",
+      "P.... ....P",
+      " ......... ",
+      " ......... ",
+      " ......... ",
+      "    PLP    "
+    ]
+  ]
+}

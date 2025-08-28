@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "croparia",
+  "version": "${version}",
+  "name": "Croparia-If",
+  "description": "A completely rewritten project from Dalarion's Croparia 4.5.\nYou should only install either Croparia or Croparia-If at the same time.",
+  "authors": [
+    "MUYU_Twilighter",
+    "xwjcool"
+  ],
+  "contact": {
+    "original": "https://www.curseforge.com/minecraft/mc-mods/croparia",
+    "homepage": "https://modrinth.com/mod/croparia-if",
+    "sources": "https://github.com/MUYUTwilighter/Croparia"
+  },
+  "license": "MIT",
+  "icon": "assets/croparia/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "cool.muyucloud.croparia.fabric.CropariaIfFabric"
+    ],
+    "client": [
+      "cool.muyucloud.croparia.fabric.CropariaIfClientFabric"
+    ],
+    "rei_common": [
+      "cool.muyucloud.croparia.compat.rei.ReiCommon"
+    ],
+    "rei_client": [
+      "cool.muyucloud.croparia.compat.rei.ReiClient"
+    ]
+  },
+  "mixins": [
+    "croparia-if-common.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "minecraft": "~1.21",
+    "architectury": "*"
+  }
+}

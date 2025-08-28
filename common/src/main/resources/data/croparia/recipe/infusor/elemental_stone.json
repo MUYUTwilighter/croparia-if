@@ -1,0 +1,12 @@
+{
+  "type": "croparia:infusor",
+  "element": "croparia:elemental",
+  "ingredient": {
+    "id": "minecraft:stone",
+    "amount": 1
+  },
+  "result": {
+    "id": "croparia:elemental_stone",
+    "amount": 1
+  }
+}

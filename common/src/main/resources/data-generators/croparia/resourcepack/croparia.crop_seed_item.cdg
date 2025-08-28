@@ -1,0 +1,15 @@
+@startup=true;
+@registry=croparia:crops;
+@path={id_namespace}/items/{seed_path}.json;
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "croparia:item/template_seed",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": {color}
+      }
+    ]
+  }
+}

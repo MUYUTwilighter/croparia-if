@@ -1,0 +1,14 @@
+{
+  "type": "croparia:ritual",
+  "tier": 1,
+  "ingredient": {
+    "id": "croparia:gem_elemental"
+  },
+  "block": {
+    "id": "minecraft:prismarine"
+  },
+  "result": {
+    "id": "croparia:gem_water",
+    "amount": 1
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "minecraft:stone_bricks"
+  },
+  "pattern": [
+    "P P",
+    "PPP"
+  ],
+  "result": {
+    "id": "croparia:infusor"
+  }
+}

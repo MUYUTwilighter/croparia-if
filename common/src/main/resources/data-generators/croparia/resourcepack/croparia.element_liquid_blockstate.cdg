@@ -1,0 +1,10 @@
+@startup=true;
+@registry=croparia:elements;
+@path={id_namespace}/blockstates/{liquid_block_path}.json;
+{
+  "variants": {
+    "": {
+      "model": "{id_namespace}:block/{liquid_block_path}"
+    }
+  }
+}

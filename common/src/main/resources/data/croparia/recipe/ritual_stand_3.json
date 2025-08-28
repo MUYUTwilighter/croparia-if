@@ -1,0 +1,150 @@
+{
+  "type": "croparia:ritual_structure",
+  "keys": {
+    "A": "#minecraft:beacon_base_blocks",
+    "B": "minecraft:beacon",
+    "C": "croparia:activated_shrieker",
+    "D": "minecraft:sculk_sensor",
+    "E": "minecraft:purpur_block",
+    "F": "minecraft:nether_bricks",
+    "G": "minecraft:prismarine_bricks",
+    "H": "minecraft:andesite",
+    "I": "croparia:elemental_stone",
+    "J": {
+      "id": "croparia:infusor",
+      "properties": {
+        "element": "croparia_air"
+      }
+    },
+    "K": {
+      "id": "croparia:infusor",
+      "properties": {
+        "element": "croparia_earth"
+      }
+    },
+    "L": {
+      "id": "croparia:infusor",
+      "properties": {
+        "element": "croparia_fire"
+      }
+    },
+    "M": {
+      "id": "croparia:infusor",
+      "properties": {
+        "element": "croparia_water"
+      }
+    },
+    "N": "minecraft:white_stained_glass",
+    "O": "minecraft:brown_stained_glass",
+    "P": "minecraft:light_blue_stained_glass",
+    "Q": "minecraft:red_stained_glass",
+    "R": "minecraft:jack_o_lantern",
+    "S": "minecraft:glowstone",
+    "T": "minecraft:sea_lantern",
+    "U": "minecraft:shroomlight"
+  },
+  "pattern": [
+    [
+      "               ",
+      "               ",
+      "  AAA     AAA  ",
+      "  AAA     AAA  ",
+      "  AAA     AAA  ",
+      "               ",
+      "      $ $      ",
+      "               ",
+      "      $ $      ",
+      "               ",
+      "  AAA     AAA  ",
+      "  AAA     AAA  ",
+      "  AAA     AAA  ",
+      "               ",
+      "               "
+    ],
+    [
+      "   .E.....H.   ",
+      " J...........K ",
+      " ......D...... ",
+      "...B.......B...",
+      "E.............H",
+      "...............",
+      ".......C.......",
+      "..D...C C...D..",
+      ".......C.......",
+      "...............",
+      "F.............G",
+      "...B.......B...",
+      " ......D...... ",
+      " L...........M ",
+      "   .F.....G.   "
+    ],
+    [
+      "   .E.....H.   ",
+      "  ...........  ",
+      " ............. ",
+      "...N.......O...",
+      "E.............H",
+      "...............",
+      "....... .......",
+      "...... * ......",
+      "....... .......",
+      "...............",
+      "F.............G",
+      "...Q.......P...",
+      " ............. ",
+      "  ...........  ",
+      "   .F.....G.   "
+    ],
+    [
+      "   .E.....H.   ",
+      "  ...........  ",
+      " ............. ",
+      "...............",
+      "E.............H",
+      "...............",
+      "....... .......",
+      "...... * ......",
+      "....... .......",
+      "...............",
+      "F.............G",
+      "...............",
+      " ............. ",
+      "  ...........  ",
+      "   .F.....G.   "
+    ],
+    [
+      "   .R.....S.   ",
+      "  ...........  ",
+      " ............. ",
+      "...............",
+      "R.............S",
+      "...............",
+      "....... .......",
+      "...... * ......",
+      "....... .......",
+      "...............",
+      "U.............T",
+      "...............",
+      " ............. ",
+      "  ...........  ",
+      "   .U.....T.   "
+    ],
+    [
+      "   EEEEHHHHH   ",
+      "  EE.......HH  ",
+      " EE.........HH ",
+      "EE...........HH",
+      "E.............H",
+      "E.............H",
+      "E...... ......H",
+      "E.....   .....G",
+      "F...... ......G",
+      "F.............G",
+      "F.............G",
+      "FF...........GG",
+      " FF.........GG ",
+      "  FF.......GG  ",
+      "   FFFFFGGGG   "
+    ]
+  ]
+}

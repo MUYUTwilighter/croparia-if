@@ -1,0 +1,12 @@
+{
+  "type": "croparia:infusor",
+  "element": "croparia:water",
+  "ingredient": {
+    "id": "croparia:croparia2",
+    "amount": 2
+  },
+  "result": {
+    "id": "croparia:croparia3",
+    "amount": 1
+  }
+}

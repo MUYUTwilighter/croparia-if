@@ -1,0 +1,10 @@
+{
+  "type": "croparia:ritual",
+  "tier": 1,
+  "ingredient": "croparia:gem_elemental",
+  "block": "minecraft:podzol",
+  "result": {
+    "id": "croparia:gem_earth",
+    "amount": 1
+  }
+}
