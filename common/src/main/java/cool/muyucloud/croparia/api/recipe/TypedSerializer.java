@@ -19,7 +19,6 @@ import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class TypedSerializer<R extends DisplayableRecipe<? extends RecipeInput>>
     extends RecipeBookCategory implements RecipeType<R>, RecipeSerializer<R> {

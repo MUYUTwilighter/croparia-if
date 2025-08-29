@@ -9,7 +9,6 @@ import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
 import cool.muyucloud.croparia.registry.CropariaItems;
-import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.Item;

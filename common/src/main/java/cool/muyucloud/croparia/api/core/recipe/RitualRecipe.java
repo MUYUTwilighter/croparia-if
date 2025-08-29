@@ -9,7 +9,6 @@ import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemInput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import cool.muyucloud.croparia.registry.CropariaItems;
-import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.codec.StreamCodec;
@@ -21,7 +20,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Objects;
 
 public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
