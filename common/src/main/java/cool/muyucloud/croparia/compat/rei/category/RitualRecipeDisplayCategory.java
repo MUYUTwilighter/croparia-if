@@ -85,7 +85,7 @@ public class RitualRecipeDisplayCategory extends SimpleCategory<RitualRecipe> {
         );
         Widget resultInteract = Widgets.createArrow(new Point(bounds.getCenterX() + 8, bounds.getCenterY() + 8));
         Widget ritual = Widgets.createSlot(new Point(bounds.getCenterX() - 8, bounds.getCenterY() + 8))
-            .entry(EntryStack.of(VanillaEntryTypes.ITEM, display.getRecipe().craftingStation().item().value().getDefaultInstance())).disableBackground().markInput().disableHighlight();
+            .entry(EntryStack.of(VanillaEntryTypes.ITEM, display.getRecipe().craftingStation().stack())).disableBackground().markInput().disableHighlight();
         Widget block = Widgets.createSlot(new Point(bounds.getCenterX() - 40, bounds.getCenterY() + 8))
             .entries(display.getInput("block")).markInput().disableBackground();
         Widget ingredient = Widgets.createSlot(new Point(bounds.getCenterX() - 8, bounds.getCenterY() - 24))

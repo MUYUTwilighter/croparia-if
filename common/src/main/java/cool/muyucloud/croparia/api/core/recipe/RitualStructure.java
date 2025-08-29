@@ -10,10 +10,13 @@ import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.structure.Char3D;
 import cool.muyucloud.croparia.api.recipe.structure.MarkedChar3D;
 import cool.muyucloud.croparia.api.recipe.structure.MarkedTransformableChar3D;
+import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.codec.CodecUtil;
+import cool.muyucloud.croparia.util.supplier.Mappable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,12 +27,16 @@ import java.util.*;
 
 @SuppressWarnings("unused")
 public class RitualStructure implements DisplayableRecipe<RitualStructureContainer> {
-    public static final TypedSerializer<RitualStructure> TYPED_SERIALIZER = new TypedSerializer<>(RecordCodecBuilder.mapCodec(
-        instance -> instance.group(
+    public static final TypedSerializer<RitualStructure> TYPED_SERIALIZER = new TypedSerializer<>(
+        RitualStructure.class,
+        RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.unboundedMap(CodecUtil.CHAR, BlockInput.CODEC).fieldOf("keys").forGetter(RitualStructure::getKeys),
             Char3D.CODEC.fieldOf("pattern").forGetter(RitualStructure::getPattern)
-        ).apply(instance, RitualStructure::new)
-    ));
+        ).apply(instance, RitualStructure::new)),
+        Mappable.of(CropariaItems.RITUAL_STAND, Item::getDefaultInstance),
+        Mappable.of(CropariaItems.RITUAL_STAND_2, Item::getDefaultInstance),
+        Mappable.of(CropariaItems.RITUAL_STAND_3, Item::getDefaultInstance)
+    );
 
     @NotNull
     private final ImmutableMap<Character, BlockInput> keys;
@@ -46,9 +53,11 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
         this.keys = ImmutableMap.copyOf(keys);
         // Validate pattern keys
         for (char c : rawPattern.chars()) {
-            if (!this.keys.containsKey(c) && c != '$' && c != '*' && c != '.' && c != ' ') throw new IllegalArgumentException("Unknown key: " + c);
+            if (!this.keys.containsKey(c) && c != '$' && c != '*' && c != '.' && c != ' ')
+                throw new IllegalArgumentException("Unknown key: " + c);
         }
-        if (!rawPattern.contains('$')) throw new IllegalArgumentException("Ritual structure must contains a block input ($).");
+        if (!rawPattern.contains('$'))
+            throw new IllegalArgumentException("Ritual structure must contains a block input ($).");
         // Validate pattern structure
         Vec3i mark = rawPattern.find('*').orElseThrow(() -> new IllegalArgumentException("Ritual structure must contains a ritual mark (*)."));
         this.patterns = new MarkedTransformableChar3D(rawPattern, mark);

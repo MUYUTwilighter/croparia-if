@@ -10,7 +10,9 @@ import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
+import cool.muyucloud.croparia.util.supplier.Mappable;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
@@ -18,14 +20,15 @@ import org.jetbrains.annotations.NotNull;
 
 public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
     public static final TypedSerializer<SoakRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
+        SoakRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Element.CODEC.fieldOf("element").forGetter(SoakRecipe::getElement),
             Codec.FLOAT.fieldOf("probability").forGetter(SoakRecipe::getProbability),
             BlockInput.CODEC.fieldOf("input").forGetter(SoakRecipe::getInput),
-            BlockOutput.CODEC.fieldOf("output").forGetter(SoakRecipe::getOutput)).apply(instance, SoakRecipe::new)
-        )
+            BlockOutput.CODEC.fieldOf("output").forGetter(SoakRecipe::getOutput)
+        ).apply(instance, SoakRecipe::new)),
+        Mappable.of(CropariaItems.ELEMENTAL_STONE, Item::getDefaultInstance)
     );
-    public static final LazySupplier<SlotDisplay> STATION = LazySupplier.of(() -> new SlotDisplay.ItemSlotDisplay(CropariaItems.ELEMENTAL_STONE.get()));
 
     private final Element element;
     private final float probability;
@@ -78,6 +81,6 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
 
     @Override
     public @NotNull SlotDisplay craftingStation() {
-        return STATION.get();
+        return new SlotDisplay.ItemStackSlotDisplay(this.getTypedSerializer().getStations().getFirst().get());
     }
 }

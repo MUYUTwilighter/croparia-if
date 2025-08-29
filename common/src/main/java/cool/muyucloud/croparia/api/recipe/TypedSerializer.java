@@ -1,13 +1,16 @@
 package cool.muyucloud.croparia.api.recipe;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import cool.muyucloud.croparia.util.codec.CodecUtil;
+import cool.muyucloud.croparia.util.supplier.Mappable;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -16,30 +19,49 @@ import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class TypedSerializer<R extends DisplayableRecipe<? extends RecipeInput>>
     extends RecipeBookCategory implements RecipeType<R>, RecipeSerializer<R> {
+    private final ImmutableList<Mappable<ItemStack>> stations;
+    private final Class<? extends R> recipeClass;
     private final Codec<R> codec;
     private final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec;
     private transient final RecipeDisplay.Type<R> displayType;
 
-    public TypedSerializer(final MapCodec<R> codec) {
-        this(codec.codec(), CodecUtil.toStream(codec));
+    @SafeVarargs
+    public TypedSerializer(Class<? extends R> recipeClass, final MapCodec<R> codec, Mappable<ItemStack>... stations) {
+        this(recipeClass, codec.codec(), CodecUtil.toStream(codec), stations);
     }
 
-    public TypedSerializer(final MapCodec<R> codec, final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec) {
-        this(codec.codec(), streamCodec);
+    @SafeVarargs
+    public TypedSerializer(Class<? extends R> recipeClass, final MapCodec<R> codec,
+                           final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec, Mappable<ItemStack>... stations) {
+        this(recipeClass, codec.codec(), streamCodec, stations);
     }
 
+    @SafeVarargs
     @SuppressWarnings("unused")
-    public TypedSerializer(final Codec<R> codec) {
-        this(codec, CodecUtil.toStream(codec));
+    public TypedSerializer(Class<? extends R> clazz, final Codec<R> codec, Mappable<ItemStack>... stations) {
+        this(clazz, codec, CodecUtil.toStream(codec), stations);
     }
 
-    public TypedSerializer(final Codec<R> codec, final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec) {
+    @SafeVarargs
+    public TypedSerializer(Class<? extends R> recipeClass, final Codec<R> codec,
+                           final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec, Mappable<ItemStack>... stations) {
+        this.stations = ImmutableList.copyOf(stations);
+        this.recipeClass = recipeClass;
         this.codec = codec;
         this.streamCodec = streamCodec;
         this.displayType = new RecipeDisplay.Type<>(CodecUtil.toMap(codec), streamCodec);
+    }
+
+    public ImmutableList<Mappable<ItemStack>> getStations() {
+        return stations;
+    }
+
+    public Class<? extends R> getRecipeClass() {
+        return recipeClass;
     }
 
     @Override

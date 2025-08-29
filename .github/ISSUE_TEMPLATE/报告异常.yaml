@@ -1,0 +1,74 @@
+name: 🐞 报告异常
+description: 告诉我们发生了什么不对劲的事
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: checkboxes
+    attributes:
+      label: 我已经检查过以下事项
+      description: 请确保你已经检查所有事项
+      options:
+        - label: 我已经搜索并确认问题未被发布过
+          required: true
+        - label: 问题发生在长期支持版本或最新支持版本
+          required: true
+        - label: 我已做过仅包含相关模组的测试
+          required: true
+  - type: textarea
+    attributes:
+      label: 问题描述
+      description: 仔细描述遇到的问题
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 预期行为
+      description: 详细描述期望的行为
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: 重现步骤
+      description: 告诉我们如何重现问题
+      placeholder: |
+        1.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 运行环境
+      description: |
+        示例：
+          - **系统**: Windows 10
+          - **MC与模组加载器**: 1.20.1 Fabric
+          - **模组列表或整合包来源**: Croparia IF 0.2.7, Architectury API 14.0.4
+      value: |
+        - **系统**:
+        - **MC与平台**:
+        - **模组列表或整合包来源**:
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 日志与错误报告
+      description: |
+        你可以借助 [HasteBin](https://hastebin.com/) 或 [Pastebin](https://pastebin.com/) 生成文件链接。
+        
+        示例： 
+          - **日志**: https**://hastebin.com/log.txt
+          - **错误报告**: https://hastebin.com/log.txt
+      value: |
+        - **日志**: 
+        - **错误报告**:
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 其他
+      description: |
+        其他相关的信息
+        
+        Tip: 你可以将文件拖进这里
+    validations:
+      required: false

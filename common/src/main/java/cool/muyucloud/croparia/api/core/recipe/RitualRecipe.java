@@ -10,9 +10,11 @@ import cool.muyucloud.croparia.api.recipe.entry.ItemInput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
+import cool.muyucloud.croparia.util.supplier.Mappable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
@@ -23,13 +25,20 @@ import java.util.List;
 import java.util.Objects;
 
 public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
-    public static final TypedSerializer<RitualRecipe> TYPED_SERIALIZER = new TypedSerializer<>(RecordCodecBuilder.mapCodec(instance -> instance.group(
-        Codec.INT.fieldOf("tier").orElse(1).forGetter(RitualRecipe::getTier),
-        BlockInput.CODEC.fieldOf("block").forGetter(RitualRecipe::getBlock),
-        ItemInput.CODEC.fieldOf("ingredient").forGetter(RitualRecipe::getIngredient),
-        ItemOutput.CODEC.fieldOf("result").forGetter(RitualRecipe::getResult)
-    ).apply(instance, RitualRecipe::new)));
+    public static final TypedSerializer<RitualRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
+        RitualRecipe.class,
+        RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.INT.fieldOf("tier").orElse(1).forGetter(RitualRecipe::getTier),
+            BlockInput.CODEC.fieldOf("block").forGetter(RitualRecipe::getBlock),
+            ItemInput.CODEC.fieldOf("ingredient").forGetter(RitualRecipe::getIngredient),
+            ItemOutput.CODEC.fieldOf("result").forGetter(RitualRecipe::getResult)
+        ).apply(instance, RitualRecipe::new)),
+        Mappable.of(CropariaItems.RITUAL_STAND, Item::getDefaultInstance),
+        Mappable.of(CropariaItems.RITUAL_STAND_2, Item::getDefaultInstance),
+        Mappable.of(CropariaItems.RITUAL_STAND_3, Item::getDefaultInstance)
+    );
     public static final TypedSerializer<RitualRecipe> OLD_TYPED_SERIALIZER = new TypedSerializer<>(
+        RitualRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.INT.fieldOf("tier").forGetter(RitualRecipe::getTier),
             ResourceLocation.CODEC.fieldOf("block").forGetter(recipe -> recipe.getBlock().getDisplayId()),
@@ -50,13 +59,11 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
             int count = buf.readInt();
             stack.setCount(count);
             return new RitualRecipe(tier, BlockInput.create(Objects.requireNonNull(block)), new ItemInput(stack), new ItemOutput(stack));
-        })
+        }),
+        Mappable.of(CropariaItems.RITUAL_STAND, Item::getDefaultInstance),
+        Mappable.of(CropariaItems.RITUAL_STAND_2, Item::getDefaultInstance),
+        Mappable.of(CropariaItems.RITUAL_STAND_3, Item::getDefaultInstance)
     );
-    public static final LazySupplier<List<SlotDisplay.ItemSlotDisplay>> STATIONS = LazySupplier.of(() -> List.of(
-        new SlotDisplay.ItemSlotDisplay(CropariaItems.RITUAL_STAND.get()),
-        new SlotDisplay.ItemSlotDisplay(CropariaItems.RITUAL_STAND_2.get()),
-        new SlotDisplay.ItemSlotDisplay(CropariaItems.RITUAL_STAND_3.get())
-    ));
 
     private final int tier;
     @NotNull
@@ -129,8 +136,8 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
 
     @Override
     @NotNull
-    public SlotDisplay.ItemSlotDisplay craftingStation() {
-        return STATIONS.get().get(this.getTier() - 1);
+    public SlotDisplay.ItemStackSlotDisplay craftingStation() {
+        return new SlotDisplay.ItemStackSlotDisplay(this.getTypedSerializer().getStations().get(this.getTier() - 1).get());
     }
 
     @Override

@@ -52,6 +52,11 @@ dependencies {
     modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:$rei_version"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:$rei_version"
+
+    // JEI
+    compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
+    runtimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
+
     // EMI: waiting for update to 1.21.4
 //    modCompileOnly "dev.emi:emi-neoforge:${emi_version}:api"
 //    modRuntimeOnly "dev.emi:emi-neoforge:${emi_version}"

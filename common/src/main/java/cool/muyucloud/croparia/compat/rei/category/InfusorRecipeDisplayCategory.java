@@ -50,11 +50,6 @@ public class InfusorRecipeDisplayCategory extends SimpleCategory<InfusorRecipe> 
     }
 
     @Override
-    public EntryIngredient[] stations() {
-        return new EntryIngredient[]{EntryIngredient.of(STATION.get())};
-    }
-
-    @Override
     public Component getTitle() {
         return Constants.INFUSOR_TITLE;
     }

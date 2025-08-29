@@ -1,5 +1,6 @@
 package cool.muyucloud.croparia.util.supplier;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -16,6 +17,11 @@ public class SemiSupplier<T> extends LazySupplier<T> {
 
     public SemiSupplier(Supplier<T> creator) {
         super(creator);
+    }
+
+    @Override
+    public <O, M extends O> SemiSupplier<O> map(Function<T, M> mapper) {
+        return new SemiSupplier<>(() -> mapper.apply(creator.get()));
     }
 
     public void refresh() {

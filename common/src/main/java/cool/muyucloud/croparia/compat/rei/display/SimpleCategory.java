@@ -3,12 +3,15 @@ package cool.muyucloud.croparia.compat.rei.display;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
+import cool.muyucloud.croparia.util.supplier.Mappable;
 import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
+import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.Map;
@@ -63,7 +66,15 @@ public abstract class SimpleCategory<R extends DisplayableRecipe<?>> implements 
 
     public abstract Map<String, Supplier<EntryIngredient>> outputEntries(RecipeHolder<R> holder);
 
-    public abstract EntryIngredient[] stations();
+    public EntryIngredient[] stations() {
+        EntryIngredient[] array = new EntryIngredient[this.getRecipeType().getStations().size()];
+        int i = 0;
+        for (Mappable<ItemStack> stack : this.getRecipeType().getStations()) {
+            array[i] = EntryIngredients.of(stack.get());
+            i++;
+        }
+        return array;
+    }
 
     @Override
     public CategoryIdentifier<SimpleDisplay<R>> getCategoryIdentifier() {

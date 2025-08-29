@@ -14,37 +14,36 @@ import java.util.function.Supplier;
  * A supplier that provides a value from a registry with given ID and registration methods.
  */
 public class HolderSupplier<T> implements DeferredSupplier<T> {
-    @SuppressWarnings("unchecked")
     public static <T> HolderSupplier<T> of(Supplier<T> value, ResourceLocation location, Registry<? super T> registry) {
-        return new HolderSupplier<>(value, (ResourceKey<T>) ResourceKey.create(registry.key(), location));
+        return new HolderSupplier<>(value, ResourceKey.create(registry.key(), location));
     }
 
-    @SuppressWarnings("unchecked")
     public static <S, T extends S> HolderSupplier<T> of(Supplier<T> value, ResourceLocation location, ResourceKey<Registry<S>> registry) {
-        return new HolderSupplier<>(value, (ResourceKey<T>) ResourceKey.create(registry, location));
+        return new HolderSupplier<>(value, ResourceKey.create(registry, location));
     }
 
     @NotNull
-    private final ResourceKey<T> key;
+    private final ResourceKey<? super T> key;
     @NotNull
-    private final Registry<T> registry;
+    private final Registry<? super T> registry;
     @NotNull
     private final LazySupplier<T> value;
 
     @SuppressWarnings("unchecked")
-    public HolderSupplier(@NotNull Supplier<T> value, @NotNull ResourceKey<T> key) {
-        this.value = value instanceof LazySupplier<T> lazy ? lazy : LazySupplier.of(value);
+    public HolderSupplier(@NotNull Supplier<T> value, @NotNull ResourceKey<? super T> key) {
+        this.value = LazySupplier.of(value);
         this.key = key;
         this.registry = (Registry<T>) BuiltInRegistries.REGISTRY.getValue(this.getRegistryId());
         if (this.registry == null) throw new IllegalArgumentException("Invalid registry id: " + this.getRegistryId());
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public @NotNull ResourceKey<T> getKey() {
-        return this.key;
+        return (ResourceKey<T>) this.key;
     }
 
-    public @NotNull Registry<T> getRegistry() {
+    public @NotNull Registry<? super T> getRegistry() {
         return this.registry;
     }
 
@@ -70,8 +69,9 @@ public class HolderSupplier<T> implements DeferredSupplier<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T get() {
-        return this.getRegistry().getValue(this.getId());
+        return (T) this.getRegistry().getValue(this.getId());
     }
 
     public void register() {
