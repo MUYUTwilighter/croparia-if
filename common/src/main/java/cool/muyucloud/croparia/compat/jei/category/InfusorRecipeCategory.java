@@ -17,5 +17,7 @@ public class InfusorRecipeCategory extends SimpleCategory<InfusorRecipe> {
     @Override
     public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull InfusorRecipe recipe, @NotNull IFocusGroup focuses) {
         builder.addInputSlot(0, 0).add(recipe.getIngredient());
+        builder.addInputSlot(1, 0).add(recipe.getPotion());
+        builder.addOutputSlot(2, 0).add(recipe.getResult());
     }
 }
