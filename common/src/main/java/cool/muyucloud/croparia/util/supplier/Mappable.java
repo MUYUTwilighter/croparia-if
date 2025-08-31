@@ -29,4 +29,13 @@ public interface Mappable<T> extends Supplier<T> {
             return null;
         }
     }
+
+    default T getOr(T def) {
+        try {
+            T v = this.get();
+            return v == null ? def : v;
+        } catch (Throwable t) {
+            return def;
+        }
+    }
 }

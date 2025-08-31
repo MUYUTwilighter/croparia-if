@@ -16,7 +16,7 @@ import cool.muyucloud.croparia.api.crop.util.TierAccess;
 import cool.muyucloud.croparia.api.generator.util.DgElement;
 import cool.muyucloud.croparia.api.generator.util.Placeholder;
 import cool.muyucloud.croparia.registry.CropariaItems;
-import cool.muyucloud.croparia.util.Util;
+import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.codec.AnyCodec;
 import cool.muyucloud.croparia.util.supplier.HolderSupplier;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
@@ -154,9 +154,9 @@ public class Crop extends AbstractCrop implements TierAccess {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         this.translations = builder.put("en_us", this.getDefaultTranslation()).putAll(translations == null ? Collections.emptyMap() : translations).build();
         this.type = type == null ? DEFAULT_TYPE : type;
-        this.block = HolderSupplier.of(() -> new CropariaCropBlock(this), Util.formatId("block_crop_%s", this.getKey()), Registries.BLOCK);
-        this.seed = HolderSupplier.of(() -> new CropSeed(this), Util.formatId("crop_seed_%s", this.getKey()), Registries.ITEM);
-        this.fruit = HolderSupplier.of(() -> new CropFruit(this), Util.formatId("fruit_%s", this.getKey()), Registries.ITEM);
+        this.block = HolderSupplier.of(() -> new CropariaCropBlock(this), CifUtil.formatId("block_crop_%s", this.getKey()), Registries.BLOCK);
+        this.seed = HolderSupplier.of(() -> new CropSeed(this), CifUtil.formatId("crop_seed_%s", this.getKey()), Registries.ITEM);
+        this.fruit = HolderSupplier.of(() -> new CropFruit(this), CifUtil.formatId("fruit_%s", this.getKey()), Registries.ITEM);
     }
 
     @Override

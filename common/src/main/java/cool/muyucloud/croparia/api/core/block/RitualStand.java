@@ -7,8 +7,8 @@ import cool.muyucloud.croparia.api.core.recipe.container.RitualContainer;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualStructureContainer;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.registry.Recipes;
+import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.ItemPlaceable;
-import cool.muyucloud.croparia.util.Util;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -52,7 +52,7 @@ public class RitualStand extends Block implements ItemPlaceable {
             if (itemStack.getItem() == CropariaItems.RECIPE_WIZARD.get()) {
                 return InteractionResult.PASS;
             }
-            Util.placeItem(world, pos, itemStack);
+            CifUtil.placeItem(world, pos, itemStack);
             return InteractionResult.CONSUME;
         }
         return super.useItemOn(itemStack, blockState, world, pos, player, hand, blockHitResult);
@@ -102,7 +102,7 @@ public class RitualStand extends Block implements ItemPlaceable {
             if (result.getItem() instanceof SpawnEggItem) {
                 FakePlayer.useAllItemsOn(world, pos, result);
             } else {
-                Util.exportItem(world, pos, result, player);
+                CifUtil.exportItem(world, pos, result, player);
             }
         }, () -> {
             if (player != null) {
@@ -133,6 +133,6 @@ public class RitualStand extends Block implements ItemPlaceable {
 
     @Override
     public void placeItem(Level world, BlockPos pos, ItemStack stack) {
-        Util.placeItem(world, pos, stack);
+        CifUtil.placeItem(world, pos, stack);
     }
 }

@@ -9,9 +9,9 @@ import cool.muyucloud.croparia.api.element.item.ElementalPotion;
 import cool.muyucloud.croparia.registry.CropariaBlocks;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.registry.Recipes;
+import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.DynamicProperty;
 import cool.muyucloud.croparia.util.ItemPlaceable;
-import cool.muyucloud.croparia.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -65,7 +65,7 @@ public class Infusor extends Block implements ItemPlaceable {
             ) {
                 return InteractionResult.SUCCESS;
             } else if (!(item instanceof RecipeWizard) && hand == InteractionHand.MAIN_HAND) {
-                Util.placeItem(world, pos, itemStack);
+                CifUtil.placeItem(world, pos, itemStack);
                 return InteractionResult.CONSUME;
             }
         }
@@ -85,7 +85,7 @@ public class Infusor extends Block implements ItemPlaceable {
         }
         stack.shrink(1);
         ItemStack returnStack = potion.getCraftingRemainder();
-        Util.exportItem(world, pos, returnStack, player);
+        CifUtil.exportItem(world, pos, returnStack, player);
         return true;
     }
 
@@ -112,7 +112,7 @@ public class Infusor extends Block implements ItemPlaceable {
             stack.shrink(1);
         }
         ItemStack returnStack = ElementalPotion.fromElement(element).orElseThrow().getDefaultInstance();
-        Util.exportItem(world, pos, returnStack, player);
+        CifUtil.exportItem(world, pos, returnStack, player);
         return false;
     }
 
@@ -122,7 +122,7 @@ public class Infusor extends Block implements ItemPlaceable {
 
     public void onCrafting(InfusorRecipe recipe, InfusorContainer container, Level world, BlockPos pos, @Nullable Player player) {
         ItemStack stack = recipe.assemble(container);
-        Util.exportItem(world, pos, stack, player);
+        CifUtil.exportItem(world, pos, stack, player);
         world.setBlockAndUpdate(pos, this.defaultBlockState());
         world.playSound(null, pos, SoundEvent.createVariableRangeEvent(CropariaIf.of("block.infusor.craft")), SoundSource.BLOCKS, 1.0F, 1.0F);
     }
@@ -166,6 +166,6 @@ public class Infusor extends Block implements ItemPlaceable {
 
     @Override
     public void placeItem(Level world, BlockPos pos, ItemStack stack) {
-        Util.placeItem(world, pos, stack);
+        CifUtil.placeItem(world, pos, stack);
     }
 }

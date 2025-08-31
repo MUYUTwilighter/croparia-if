@@ -6,8 +6,8 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
 import cool.muyucloud.croparia.registry.CropariaItems;
+import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.TagUtil;
-import cool.muyucloud.croparia.util.Util;
 import cool.muyucloud.croparia.util.codec.AnyCodec;
 import cool.muyucloud.croparia.util.codec.CodecUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
@@ -50,6 +51,31 @@ public class ItemInput implements SlotDisplay {
     public static final AnyCodec<ItemInput> CODEC = new AnyCodec<>(CODEC_COMP.codec(), CODEC_SINGLE);
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemInput> STREAM_CODEC = CodecUtil.toStream(CODEC);
     public static final Type<ItemInput> TYPE = new Type<>(CODEC_COMP, STREAM_CODEC);
+
+    public static AnyCodec<ItemInput> codec(Consumer<ItemStack> displayProcessor) {
+        return new AnyCodec<>(RecordCodecBuilder.create(instance -> instance.group(
+                ResourceLocation.CODEC.optionalFieldOf("id").forGetter(ItemInput::getId),
+                TagKey.codec(Registries.ITEM).optionalFieldOf("tag").forGetter(ItemInput::getTag),
+                DataComponentPredicate.CODEC.optionalFieldOf("components")
+                    .forGetter(itemInput -> Optional.of(itemInput.getComponentsPredicate())),
+                Codec.LONG.optionalFieldOf("amount").forGetter(entry -> Optional.of(entry.getAmount()))
+            ).apply(instance, (id, tag, components, amount) -> new ItemInput(id.orElse(null), tag.orElse(null),
+                components.orElse(DataComponentPredicate.EMPTY), amount.orElse(1L), displayProcessor))
+        ), Codec.STRING.xmap(s -> s.startsWith("#") ?
+                new ItemInput(null, TagKey.create(Registries.ITEM, ResourceLocation.parse(s.substring(1))),
+                    DataComponentPredicate.EMPTY, 1L, displayProcessor) :
+                new ItemInput(ResourceLocation.parse(s), null, DataComponentPredicate.EMPTY, 1L, displayProcessor),
+            input -> input.getId().map(String::valueOf).orElse("#" + input.getTag().orElseThrow().location()))
+        );
+    }
+
+    public static ItemInput of(ResourceLocation id) {
+        return new ItemInput(id, null, DataComponentPredicate.EMPTY, 1L);
+    }
+
+    public static ItemInput ofTag(ResourceLocation id) {
+        return new ItemInput(null, TagKey.create(Registries.ITEM, id), DataComponentPredicate.EMPTY, 1L);
+    }
 
     public static ItemInput of(final ItemStack stack) {
         DataComponentPredicate.Builder builder = DataComponentPredicate.builder();
@@ -77,10 +103,15 @@ public class ItemInput implements SlotDisplay {
     }
 
     public ItemInput(@NotNull ItemStack stack) {
-        this(stack.getItem().arch$registryName(), null, Util.extractPredicate(stack.getComponentsPatch()), stack.getCount());
+        this(stack.getItem().arch$registryName(), null, CifUtil.extractPredicate(stack.getComponentsPatch()), stack.getCount());
     }
 
     public ItemInput(@Nullable ResourceLocation id, @Nullable TagKey<Item> tag, @NotNull DataComponentPredicate componentPredicate, long amount) {
+        this(id, tag, componentPredicate, amount, stack -> {
+        });
+    }
+
+    public ItemInput(@Nullable ResourceLocation id, @Nullable TagKey<Item> tag, @NotNull DataComponentPredicate componentPredicate, long amount, Consumer<ItemStack> displayProcessor) {
         this.id = id;
         this.tag = tag;
         if (this.id != null && this.tag != null)
@@ -92,13 +123,23 @@ public class ItemInput implements SlotDisplay {
             if (this.getId().isPresent()) {
                 ItemStack stack = new ItemStack(Holder.direct(BuiltInRegistries.ITEM.getValue(this.getId().get())),
                     (int) Math.min(this.getAmount(), Integer.MAX_VALUE), this.getComponentsPredicate().asPatch());
+                displayProcessor.accept(stack);
                 return ImmutableList.of(stack);
             } else if (this.getTag().isPresent()) {
                 LinkedList<ItemStack> stacks = new LinkedList<>();
-                TagUtil.forEntries(this.getTag().get()).forEach(entry -> stacks.addLast(new ItemStack(entry, (int) Math.min(this.getAmount(), Integer.MAX_VALUE), this.getComponentsPredicate().asPatch())));
+                TagUtil.forEntries(this.getTag().get()).forEach(entry -> {
+                    ItemStack stack = new ItemStack(entry, (int) Math.min(this.getAmount(), Integer.MAX_VALUE),
+                        this.getComponentsPredicate().asPatch());
+                    displayProcessor.accept(stack);
+                    stacks.addLast(stack);
+                });
                 return ImmutableList.copyOf(stacks);
             } else {
-                return ImmutableList.of(new ItemStack(Holder.direct(CropariaItems.PLACEHOLDER.get()), (int) Math.min(this.getAmount(), Integer.MAX_VALUE), this.getComponentsPredicate().asPatch()));
+                ItemStack stack = new ItemStack(Holder.direct(CropariaItems.PLACEHOLDER.get()),
+                    (int) Math.min(this.getAmount(), Integer.MAX_VALUE),
+                    this.getComponentsPredicate().asPatch());
+                displayProcessor.accept(stack);
+                return ImmutableList.of(stack);
             }
         });
     }

@@ -11,7 +11,7 @@ public interface ItemPlaceable {
      * @param world the world to place the item in
      * @param pos   the position to place the item at
      * @param stack the item stack to place
-     * @see Util#placeItem(Level, BlockPos, ItemStack)
+     * @see CifUtil#placeItem(Level, BlockPos, ItemStack)
      */
     void placeItem(Level world, BlockPos pos, ItemStack stack);
 }

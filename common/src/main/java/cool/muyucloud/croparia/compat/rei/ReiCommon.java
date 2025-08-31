@@ -11,36 +11,35 @@ import cool.muyucloud.croparia.compat.rei.display.SimpleDisplay;
 import me.shedaniel.rei.api.common.display.DisplaySerializerRegistry;
 import me.shedaniel.rei.api.common.plugins.REICommonPlugin;
 import me.shedaniel.rei.api.common.registry.display.ServerDisplayRegistry;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
 public class ReiCommon implements REICommonPlugin {
-    private static final Set<SimpleCategory<? extends DisplayableRecipe<?>>> SERIALIZERS = new HashSet<>();
+    private static final Set<SimpleCategory<?>> CATEGORIES = new HashSet<>();
 
     public static void forEach(Consumer<SimpleCategory<? extends DisplayableRecipe<?>>> consumer) {
-        SERIALIZERS.forEach(consumer);
+        CATEGORIES.forEach(consumer);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void registerDisplays(ServerDisplayRegistry registry) {
         CropariaIf.LOGGER.info("Registering rei recipe fillers...");
-        forEach(serializer -> registerDisplay(registry, serializer));
-    }
-
-    private static <R extends DisplayableRecipe<?>> void registerDisplay(ServerDisplayRegistry registry, SimpleCategory<R> serializer) {
-        registry.beginRecipeFiller(serializer.getRecipeClass())
-            .filterType(serializer.getRecipeType())
-            .fill(holder -> new SimpleDisplay<>(holder, serializer));
+        forEach(serializer -> registry.beginRecipeFiller(serializer.getRecipeClass())
+            .filterType((RecipeType<DisplayableRecipe<?>>) serializer.getRecipeType())
+            .fill(holder -> new SimpleDisplay<>((RecipeHolder<DisplayableRecipe<?>>) holder, (SimpleCategory<DisplayableRecipe<?>>) serializer)));
     }
 
     @Override
     public void registerDisplaySerializer(DisplaySerializerRegistry registry) {
-        SERIALIZERS.add(InfusorRecipeDisplayCategory.INSTANCE);
-        SERIALIZERS.add(RitualRecipeDisplayCategory.INSTANCE);
-        SERIALIZERS.add(RitualStructureDisplayCategory.INSTANCE);
-        SERIALIZERS.add(SoakRecipeDisplayCategory.INSTANCE);
+        CATEGORIES.add(InfusorRecipeDisplayCategory.INSTANCE);
+        CATEGORIES.add(RitualRecipeDisplayCategory.INSTANCE);
+        CATEGORIES.add(RitualStructureDisplayCategory.INSTANCE);
+        CATEGORIES.add(SoakRecipeDisplayCategory.INSTANCE);
         CropariaIf.LOGGER.info("Registering rei recipe display serializers...");
         forEach(serializer -> registry.register(serializer.getId(), serializer.getSerializer()));
     }

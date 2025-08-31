@@ -8,13 +8,18 @@ import cool.muyucloud.croparia.registry.*;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import dev.architectury.event.events.common.LifecycleEvent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+
+import java.util.function.Consumer;
 
 public class CropariaIf {
     public static final String MOD_ID = "croparia";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final Config CONFIG = ConfigFileHandler.load();
     private static Boolean SERVER_STARTED = false;
+    private static MinecraftServer SERVER = null;
 
     public static void init() {
         CropariaIf.LOGGER.info("=== Croparia common setup ===");
@@ -35,7 +40,10 @@ public class CropariaIf {
         CommonCommandRoot.register();
         PlacedFeatures.register();
         LOGGER.info("Event registration");
-        LifecycleEvent.SERVER_STARTING.register(server -> ConfigFileHandler.reload(CONFIG));
+        LifecycleEvent.SERVER_STARTING.register(server -> {
+            SERVER = server;
+            ConfigFileHandler.reload(CONFIG);
+        });
         LifecycleEvent.SERVER_STARTED.register(server -> {
             SERVER_STARTED = true;
             OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
@@ -48,7 +56,17 @@ public class CropariaIf {
             SERVER_STARTED = false;
             ConfigFileHandler.save(CONFIG);
         });
+        LifecycleEvent.SERVER_STOPPED.register(server -> SERVER = null);
         CropariaIf.LOGGER.info("=== Croparia common setup done ===");
+    }
+
+    @Nullable
+    public static MinecraftServer getServer() {
+        return SERVER;
+    }
+
+    public static void ifServer(Consumer<MinecraftServer> consumer) {
+        if (SERVER != null) consumer.accept(SERVER);
     }
 
     public static ResourceLocation of(String path) {

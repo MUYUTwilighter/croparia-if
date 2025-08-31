@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.compat.rei.category;
 
 import cool.muyucloud.croparia.api.core.recipe.SoakRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
-import cool.muyucloud.croparia.compat.rei.Util;
+import cool.muyucloud.croparia.compat.rei.ReiUtil;
 import cool.muyucloud.croparia.compat.rei.display.SimpleCategory;
 import cool.muyucloud.croparia.compat.rei.display.SimpleDisplay;
 import cool.muyucloud.croparia.registry.CropariaItems;
@@ -11,14 +11,13 @@ import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
-import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
+import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
@@ -27,42 +26,28 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class SoakRecipeDisplayCategory extends SimpleCategory<SoakRecipe> {
-    public static final SoakRecipeDisplayCategory INSTANCE = new SoakRecipeDisplayCategory(SoakRecipe.class, SoakRecipe.TYPED_SERIALIZER);
+    public static final SoakRecipeDisplayCategory INSTANCE = new SoakRecipeDisplayCategory();
     public static final LazySupplier<EntryStack<ItemStack>> STATION = LazySupplier.of(
         () -> EntryStack.of(VanillaEntryTypes.ITEM, CropariaItems.ELEMENTAL_STONE.get().getDefaultInstance())
     );
 
-    public SoakRecipeDisplayCategory(Class<SoakRecipe> recipeClass, TypedSerializer<SoakRecipe> recipeType) {
-        super(recipeClass, recipeType);
-    }
-
     @Override
-    public Component getTitle() {
-        return Texts.translatable("gui.croparia.soak.title");
-    }
-
-    @Override
-    public Renderer getIcon() {
-        return STATION.get();
-    }
-
-    @Override
-    public EntryIngredient[] stations() {
-        return new EntryIngredient[]{EntryIngredient.of(STATION.get())};
+    public TypedSerializer<SoakRecipe> getRecipeType() {
+        return SoakRecipe.TYPED_SERIALIZER;
     }
 
     @Override
     public Map<String, Supplier<EntryIngredient>> inputEntries(RecipeHolder<SoakRecipe> holder) {
         SoakRecipe recipe = holder.value();
         return Map.of(
-            "element", () -> Util.toIngredient(recipe.getElement().getPotion().get(), stack -> stack.tooltip(Constants.ELEM_INFUSE_TOOLTIP)),
-            "input", () -> Util.toIngredient(recipe.getInput(), stack -> stack.tooltip(Texts.translatable("tooltip.croparia.soak.input")))
+            "element", () -> EntryIngredients.of(recipe.getPotion()),
+            "input", () -> ReiUtil.toIngredient(recipe.getInput())
         );
     }
 
     @Override
     public Map<String, Supplier<EntryIngredient>> outputEntries(RecipeHolder<SoakRecipe> holder) {
-        return Map.of("output", () -> Util.toIngredient(holder.value().getOutput()));
+        return Map.of("output", () -> ReiUtil.toIngredient(holder.value().getOutput()));
     }
 
     @Override

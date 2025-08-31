@@ -13,6 +13,7 @@ import cool.muyucloud.croparia.util.codec.AnyCodec;
 import cool.muyucloud.croparia.util.codec.CodecUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
+import net.jcip.annotations.Immutable;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -34,31 +35,94 @@ import org.jetbrains.annotations.Nullable;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+@Immutable
 @SuppressWarnings("unused")
 public class BlockInput implements SlotDisplay {
-    public static final Codec<BlockInput> CODEC_SINGLE = Codec.STRING.xmap(BlockInput::create, BlockInput::getTaggable);
     public static final MapCodec<BlockInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
         ResourceLocation.CODEC.optionalFieldOf("id").forGetter(BlockInput::getId),
         TagKey.codec(Registries.BLOCK).optionalFieldOf("tag").forGetter(BlockInput::getTag),
         BlockProperties.CODEC.optionalFieldOf("properties").forGetter(blockInput -> Optional.of(blockInput.getProperties()))
-    ).apply(instance, (id, tag, properties) -> create(id.orElse(null), tag.orElse(null), properties.orElse(BlockProperties.EMPTY))));
-    public static final AnyCodec<BlockInput> CODEC = AnyCodec.of(CODEC_COMP.codec(), CODEC_SINGLE);
+    ).apply(instance, (id, tag, properties) -> new BlockInput(id.orElse(null), tag.orElse(null),
+        properties.orElse(BlockProperties.EMPTY), stack -> {})
+    ));
+    public static final AnyCodec<BlockInput> CODEC = codec(stack -> {});
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockInput> STREAM_CODEC = CodecUtil.toStream(CODEC);
     public static final Type<BlockInput> TYPE = new Type<>(CODEC_COMP, STREAM_CODEC);
     public static final ItemStack STACK_UNKNOWN = Items.BEDROCK.getDefaultInstance();
     public static final ItemStack STACK_AIR = Items.BARRIER.getDefaultInstance();
     public static final ItemStack STACK_ANY = Items.LIGHT_GRAY_STAINED_GLASS_PANE.getDefaultInstance();
     public static final Supplier<ItemStack> STACK_PLACEHOLDER = () -> CropariaItems.PLACEHOLDER_BLOCK.get().getDefaultInstance();
-    public static final BlockInput UNKNOWN = new BlockInput(CropariaIf.of("unknown"), null, BlockProperties.EMPTY);
-    public static final BlockInput ANY = new BlockInput(null, null, BlockProperties.EMPTY);
+    public static final BlockInput UNKNOWN = BlockInput.create(CropariaIf.of("unknown"));
+    public static final BlockInput ANY = new BlockInput(null, null, BlockProperties.EMPTY, stack -> {
+    });
 
     static {
         STACK_UNKNOWN.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.unknown"));
         STACK_AIR.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.air"));
         STACK_ANY.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.any"));
+    }
+
+    public static AnyCodec<BlockInput> codec(Consumer<ItemStack> displayProcessor) {
+        return new AnyCodec<>(RecordCodecBuilder.create(instance -> instance.group(
+            ResourceLocation.CODEC.optionalFieldOf("id").forGetter(BlockInput::getId),
+            TagKey.codec(Registries.BLOCK).optionalFieldOf("tag").forGetter(BlockInput::getTag),
+            BlockProperties.CODEC.optionalFieldOf("properties").forGetter(blockInput -> Optional.of(blockInput.getProperties()))
+        ).apply(instance, (id, tag, properties) -> new BlockInput(
+            id.orElse(null), tag.orElse(null), properties.orElse(BlockProperties.EMPTY), displayProcessor
+        ))), Codec.STRING.xmap(
+            s -> s.startsWith("#") ?
+                new BlockInput(null,
+                    TagKey.create(Registries.BLOCK, ResourceLocation.parse(s.substring(1))),
+                    BlockProperties.EMPTY, displayProcessor) :
+                new BlockInput(ResourceLocation.parse(s), null, BlockProperties.EMPTY, displayProcessor),
+            input -> input.getId().map(String::valueOf).orElse("#" + input.getTag().orElseThrow().location())
+        ));
+    }
+
+    public static BlockInput create(String s) {
+        if (s.startsWith("#")) {
+            s = s.substring(1);
+            TagKey<Block> tag = TagKey.create(Registries.BLOCK, ResourceLocation.parse(s));
+            return create(tag);
+        } else {
+            return create(ResourceLocation.parse(s));
+        }
+    }
+
+    public static BlockInput create(@NotNull ResourceLocation id) {
+        return create(id, BlockProperties.EMPTY);
+    }
+
+    public static BlockInput create(@NotNull ResourceLocation id, BlockProperties properties) {
+        return new BlockInput(id, null, properties, stack -> {
+        });
+    }
+
+    public static BlockInput create(TagKey<Block> tag) {
+        return BlockInput.create(tag, BlockProperties.EMPTY);
+    }
+
+    public static BlockInput create(TagKey<Block> tag, BlockProperties properties) {
+        return new BlockInput(null, tag, properties, stack -> {});
+    }
+
+    protected static BlockInput create(@Nullable ResourceLocation id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties) {
+        BlockInput blockInput = new BlockInput(id, tag, properties, stack -> {
+        });
+        if (blockInput.isAny()) return ANY;
+        else return blockInput;
+    }
+
+    public static BlockInput of(@NotNull Block block) {
+        return create(Objects.requireNonNull(block.arch$registryName()));
+    }
+
+    public static BlockInput of(@NotNull BlockState state) {
+        return new BlockInput(Objects.requireNonNull(state.getBlock().arch$registryName()), null, BlockProperties.create(state), stack -> {});
     }
 
     @Nullable
@@ -69,35 +133,7 @@ public class BlockInput implements SlotDisplay {
     private final BlockProperties properties;
     private final transient OnLoadSupplier<ImmutableList<ItemStack>> displayStacks;
 
-    public static BlockInput of(@NotNull Block block) {
-        return create(Objects.requireNonNull(block.arch$registryName()));
-    }
-
-    public static BlockInput of(@NotNull BlockState state) {
-        return create(Objects.requireNonNull(state.getBlock().arch$registryName()), null, BlockProperties.create(state));
-    }
-
-    public static BlockInput create(String s) {
-        if (s.startsWith("#")) {
-            s = s.substring(1);
-            TagKey<Block> tag = TagKey.create(Registries.BLOCK, ResourceLocation.parse(s));
-            return create(null, tag, BlockProperties.EMPTY);
-        } else {
-            return create(ResourceLocation.parse(s), null, BlockProperties.EMPTY);
-        }
-    }
-
-    public static BlockInput create(@NotNull ResourceLocation id) {
-        return create(id, null, BlockProperties.EMPTY);
-    }
-
-    protected static BlockInput create(@Nullable ResourceLocation id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties) {
-        BlockInput blockInput = new BlockInput(id, tag, properties);
-        if (blockInput.isAny()) return ANY;
-        else return blockInput;
-    }
-
-    protected BlockInput(@Nullable ResourceLocation id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties) {
+    protected BlockInput(@Nullable ResourceLocation id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties, Consumer<ItemStack> displayProcessor) {
         this.id = id;
         this.tag = tag;
         if (this.id != null && this.tag != null)
@@ -108,6 +144,7 @@ public class BlockInput implements SlotDisplay {
                 ItemStack displayStack = BuiltInRegistries.BLOCK.getOptional(this.getId().get()).map(block -> {
                     ItemStack stack = block.asItem().getDefaultInstance();
                     stack.set(BlockProperties.TYPE, this.getProperties());
+                    displayProcessor.accept(stack);
                     return stack;
                 }).orElseThrow(() -> new IllegalArgumentException("Unknown block: %s".formatted(this.getId())));
                 return ImmutableList.of(displayStack);
@@ -116,6 +153,7 @@ public class BlockInput implements SlotDisplay {
                 for (Holder<Block> holder : TagUtil.forEntries(this.getTag().get())) {
                     ItemStack stack = holder.value().asItem().getDefaultInstance();
                     stack.set(BlockProperties.TYPE, this.getProperties());
+                    displayProcessor.accept(stack);
                     stacks.add(stack);
                 }
                 if (stacks.isEmpty()) stacks.add(STACK_UNKNOWN);
@@ -125,6 +163,7 @@ public class BlockInput implements SlotDisplay {
             } else {
                 ItemStack stack = STACK_PLACEHOLDER.get();
                 stack.set(BlockProperties.TYPE, this.getProperties());
+                displayProcessor.accept(stack);
                 return ImmutableList.of(stack);
             }
         });
@@ -156,6 +195,11 @@ public class BlockInput implements SlotDisplay {
         Optional<String> id = this.getId().map(ResourceLocation::toString);
         Optional<String> tag = this.getTag().map(TagKey::location).map(ResourceLocation::toString);
         return id.orElse(tag.orElse(null));
+    }
+
+    public boolean isVirtualRender() {
+        ItemStack stack = this.getDisplayStacks().getFirst();
+        return stack == STACK_UNKNOWN || stack.getItem() == CropariaItems.PLACEHOLDER_BLOCK.get();
     }
 
     public boolean isAny() {

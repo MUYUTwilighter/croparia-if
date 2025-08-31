@@ -4,11 +4,14 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.util.supplier.Mappable;
+import cool.muyucloud.croparia.util.text.Texts;
+import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -18,39 +21,44 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public abstract class SimpleCategory<R extends DisplayableRecipe<?>> implements DisplayCategory<SimpleDisplay<R>> {
-    private final Class<R> recipeClass;
-    private final TypedSerializer<R> recipeType;
+    private final Class<? extends R> recipeClass;
     private final CategoryIdentifier<SimpleDisplay<R>> categoryIdentifier;
     private final DisplaySerializer<SimpleDisplay<R>> serializer;
 
-    public SimpleCategory(
-        Class<R> recipeClass,
-        TypedSerializer<R> recipeType
-    ) {
-        this.recipeClass = recipeClass;
-        this.recipeType = recipeType;
-        this.categoryIdentifier = CategoryIdentifier.of(recipeType.getId().orElseThrow());
+    public SimpleCategory() {
+        this.recipeClass = this.getRecipeType().getRecipeClass();
+        this.categoryIdentifier = CategoryIdentifier.of(this.getRecipeType().getId().orElseThrow());
         this.serializer = DisplaySerializer.of(
             RecordCodecBuilder.mapCodec(instance -> instance.group(
-                recipeType.codec().fieldOf("recipe").forGetter(SimpleDisplay::getRecipe),
+                this.getRecipeType().codec().fieldOf("recipe").forGetter(SimpleDisplay::getRecipe),
                 ResourceLocation.CODEC.fieldOf("id").forGetter(SimpleDisplay::getId)
             ).apply(instance, (recipe, id) -> new SimpleDisplay<>(recipe, id, this))),
             StreamCodec.of((buf, display) -> {
-                buf.writeJsonWithCodec(recipeType.codec().codec(), display.getRecipe());
+                buf.writeJsonWithCodec(this.getRecipeType().codec().codec(), display.getRecipe());
                 buf.writeResourceLocation(display.getId());
             }, buf -> {
-                R recipe = buf.readJsonWithCodec(recipeType.codec().codec());
+                R recipe = buf.readJsonWithCodec(this.getRecipeType().codec().codec());
                 ResourceLocation id = buf.readResourceLocation();
                 return new SimpleDisplay<>(recipe, id, this);
             })
         );
     }
 
-    public TypedSerializer<R> getRecipeType() {
-        return recipeType;
+    @Override
+    public Component getTitle() {
+        return Texts.literal("gui.%s.%s.title".formatted(this.getId().getNamespace(), this.getId().getPath()));
     }
 
-    public Class<R> getRecipeClass() {
+    @Override
+    public Renderer getIcon() {
+        EntryIngredient[] stations = this.stations();
+        if (stations.length > 0) return stations[0].getFirst();
+        else throw new RuntimeException("Override is required if no stations are provided for " + this.getRecipeType().getId());
+    }
+
+    public abstract TypedSerializer<R> getRecipeType();
+
+    public Class<? extends R> getRecipeClass() {
         return recipeClass;
     }
 

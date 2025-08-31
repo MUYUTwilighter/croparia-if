@@ -9,11 +9,12 @@ import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemInput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import cool.muyucloud.croparia.registry.CropariaItems;
+import cool.muyucloud.croparia.util.CifUtil;
+import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
@@ -27,13 +28,15 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         RitualRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.INT.fieldOf("tier").orElse(1).forGetter(RitualRecipe::getTier),
-            BlockInput.CODEC.fieldOf("block").forGetter(RitualRecipe::getBlock),
-            ItemInput.CODEC.fieldOf("ingredient").forGetter(RitualRecipe::getIngredient),
+            BlockInput.codec(stack -> CifUtil.addTooltip(stack, Constants.BLOCK_PLACE_TOOLTIP))
+                .fieldOf("block").forGetter(RitualRecipe::getBlock),
+            ItemInput.codec(stack -> CifUtil.addTooltip(stack, Constants.ITEM_DROP_TOOLTIP))
+                .fieldOf("ingredient").forGetter(RitualRecipe::getIngredient),
             ItemOutput.CODEC.fieldOf("result").forGetter(RitualRecipe::getResult)
         ).apply(instance, RitualRecipe::new)),
-        Mappable.of(CropariaItems.RITUAL_STAND, Item::getDefaultInstance),
-        Mappable.of(CropariaItems.RITUAL_STAND_2, Item::getDefaultInstance),
-        Mappable.of(CropariaItems.RITUAL_STAND_3, Item::getDefaultInstance)
+        Mappable.of(CropariaItems.RITUAL_STAND, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
+        Mappable.of(CropariaItems.RITUAL_STAND_2, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
+        Mappable.of(CropariaItems.RITUAL_STAND_3, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL))
     );
     public static final TypedSerializer<RitualRecipe> OLD_TYPED_SERIALIZER = new TypedSerializer<>(
         RitualRecipe.class,
@@ -58,9 +61,9 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
             stack.setCount(count);
             return new RitualRecipe(tier, BlockInput.create(Objects.requireNonNull(block)), new ItemInput(stack), new ItemOutput(stack));
         }),
-        Mappable.of(CropariaItems.RITUAL_STAND, Item::getDefaultInstance),
-        Mappable.of(CropariaItems.RITUAL_STAND_2, Item::getDefaultInstance),
-        Mappable.of(CropariaItems.RITUAL_STAND_3, Item::getDefaultInstance)
+        Mappable.of(CropariaItems.RITUAL_STAND, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
+        Mappable.of(CropariaItems.RITUAL_STAND_2, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
+        Mappable.of(CropariaItems.RITUAL_STAND_3, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL))
     );
 
     private final int tier;

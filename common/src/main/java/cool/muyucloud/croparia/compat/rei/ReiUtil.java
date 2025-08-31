@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Consumer;
 
-public class Util {
+public class ReiUtil {
     public static EntryIngredient toIngredient(Item input, Consumer<EntryStack<ItemStack>> processor) {
         EntryStack<ItemStack> stack = EntryStack.of(VanillaEntryTypes.ITEM, input.getDefaultInstance());
         processor.accept(stack);

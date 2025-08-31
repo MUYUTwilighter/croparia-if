@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
-import cool.muyucloud.croparia.compat.rei.Util;
+import cool.muyucloud.croparia.compat.rei.ReiUtil;
 import cool.muyucloud.croparia.compat.rei.display.SimpleCategory;
 import cool.muyucloud.croparia.compat.rei.display.SimpleDisplay;
 import cool.muyucloud.croparia.compat.rei.widget.Item2DWidget;
@@ -21,7 +21,6 @@ import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -38,26 +37,20 @@ public class RitualStructureDisplayCategory extends SimpleCategory<RitualStructu
         INPUT.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.input"));
     }
 
-    public static final SimpleCategory<RitualStructure> INSTANCE = new RitualStructureDisplayCategory(
-        RitualStructure.class, RitualStructure.TYPED_SERIALIZER
-    );
+    public static final SimpleCategory<RitualStructure> INSTANCE = new RitualStructureDisplayCategory();
     public static final int SLOT_SIZE = 18;
     public static final int LABEL_MARGIN = 6;
     public static final int FRAME_PADDING = 9;
     public static final int BUTTON_SIZE = 10;
 
-    public RitualStructureDisplayCategory(Class<RitualStructure> recipeClass, TypedSerializer<RitualStructure> recipeType) {
-        super(recipeClass, recipeType);
-    }
-
-    @Override
-    public Component getTitle() {
-        return Constants.RITUAL_STRUCTURE_TITLE;
-    }
-
     @Override
     public Renderer getIcon() {
         return EntryStacks.of(CropariaItems.RITUAL_STAND.get().getDefaultInstance());
+    }
+
+    @Override
+    public TypedSerializer<RitualStructure> getRecipeType() {
+        return RitualStructure.TYPED_SERIALIZER;
     }
 
     @Override
@@ -110,7 +103,7 @@ public class RitualStructureDisplayCategory extends SimpleCategory<RitualStructu
                 } else if (c == ' ') {
                     return Collections.singleton(EntryStacks.of(BlockInput.STACK_ANY));
                 } else {
-                    return Util.toIngredient(recipe.getKeys().get(c));
+                    return ReiUtil.toIngredient(recipe.getKeys().get(c));
                 }
             }).cols(slotSize.getX()).rows(slotSize.getZ()));
         }
@@ -135,20 +128,15 @@ public class RitualStructureDisplayCategory extends SimpleCategory<RitualStructu
         Map<String, Supplier<EntryIngredient>> map = new HashMap<>();
         for (Map.Entry<Character, BlockInput> entry : recipe.getKeys().entrySet()) {
             char c = entry.getKey();
-            map.put(String.valueOf(c), () -> Util.toIngredient(entry.getValue(), recipe.getPattern().count(c)));
+            map.put(String.valueOf(c), () -> ReiUtil.toIngredient(entry.getValue(), recipe.getPattern().count(c)));
         }
         ResourceLocation id = holder.id().location();
-        map.put("*", () -> Util.toIngredient(BuiltInRegistries.ITEM.getValue(id)));
+        map.put("*", () -> ReiUtil.toIngredient(BuiltInRegistries.ITEM.getValue(id)));
         return ImmutableMap.copyOf(map);
     }
 
     @Override
     public Map<String, Supplier<EntryIngredient>> outputEntries(RecipeHolder<RitualStructure> holder) {
-        return Map.of("*", () -> Util.toIngredient(BuiltInRegistries.ITEM.getValue(holder.id().location())));
-    }
-
-    @Override
-    public EntryIngredient[] stations() {
-        return new EntryIngredient[0];
+        return Map.of("*", () -> ReiUtil.toIngredient(BuiltInRegistries.ITEM.getValue(holder.id().location())));
     }
 }

@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.compat.rei.category;
 
 import cool.muyucloud.croparia.api.core.recipe.InfusorRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
-import cool.muyucloud.croparia.compat.rei.Util;
+import cool.muyucloud.croparia.compat.rei.ReiUtil;
 import cool.muyucloud.croparia.compat.rei.display.SimpleCategory;
 import cool.muyucloud.croparia.compat.rei.display.SimpleDisplay;
 import cool.muyucloud.croparia.registry.CropariaItems;
@@ -10,14 +10,12 @@ import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
-import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
-import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
+import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
@@ -26,37 +24,26 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class InfusorRecipeDisplayCategory extends SimpleCategory<InfusorRecipe> {
-    public static final InfusorRecipeDisplayCategory INSTANCE = new InfusorRecipeDisplayCategory(
-        InfusorRecipe.class, InfusorRecipe.TYPED_SERIALIZER
-    );
+    public static final InfusorRecipeDisplayCategory INSTANCE = new InfusorRecipeDisplayCategory();
     public static final LazySupplier<EntryStack<ItemStack>> STATION = LazySupplier.of(() -> EntryStacks.of(CropariaItems.INFUSOR.get()));
 
-    public InfusorRecipeDisplayCategory(Class<InfusorRecipe> recipeClass, TypedSerializer<InfusorRecipe> recipeSerializer) {
-        super(recipeClass, recipeSerializer);
+    @Override
+    public TypedSerializer<InfusorRecipe> getRecipeType() {
+        return InfusorRecipe.TYPED_SERIALIZER;
     }
 
     @Override
     public Map<String, Supplier<EntryIngredient>> inputEntries(RecipeHolder<InfusorRecipe> holder) {
         InfusorRecipe recipe = holder.value();
         return Map.of(
-            "element", () -> Util.toIngredient(recipe.getPotion(), stack -> stack.tooltip(Constants.ELEM_INFUSE_TOOLTIP)),
-            "ingredient", () -> Util.toIngredient(recipe.getIngredient(), stack -> stack.tooltip(Constants.ITEM_DROP_TOOLTIP))
+            "element", () -> EntryIngredients.of(recipe.getPotion()),
+            "ingredient", () -> ReiUtil.toIngredient(recipe.getIngredient(), stack -> stack.tooltip(Constants.ITEM_DROP_TOOLTIP))
         );
     }
 
     @Override
     public Map<String, Supplier<EntryIngredient>> outputEntries(RecipeHolder<InfusorRecipe> holder) {
-        return Map.of("result", () -> Util.toIngredient(holder.value().getResult()));
-    }
-
-    @Override
-    public Component getTitle() {
-        return Constants.INFUSOR_TITLE;
-    }
-
-    @Override
-    public Renderer getIcon() {
-        return EntryStack.of(VanillaEntryTypes.ITEM, CropariaItems.INFUSOR.get().getDefaultInstance());
+        return Map.of("result", () -> ReiUtil.toIngredient(holder.value().getResult()));
     }
 
     @Override

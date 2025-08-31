@@ -1,8 +1,8 @@
 package cool.muyucloud.croparia.api.core.item.relic;
 
+import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.PostConstants;
-import cool.muyucloud.croparia.util.Util;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -40,7 +40,7 @@ public class HornPlenty extends Item {
         if (food == null) {
             return InteractionResult.FAIL;
         }
-        @NotNull FoodProperties properties = Objects.requireNonNull(Util.getFoodProperties(food));
+        @NotNull FoodProperties properties = Objects.requireNonNull(CifUtil.getFoodProperties(food));
         int xp = properties.nutrition();
         if (xp > player.totalExperience) {
             Texts.overlay(player, Constants.INSUFFICIENT_XP);

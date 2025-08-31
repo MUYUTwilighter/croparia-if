@@ -17,7 +17,7 @@ public class TagUtil {
         Optional<? extends Registry<?>> maybeRegistry = BuiltInRegistries.REGISTRY.getOptional(key.location());
         if (maybeRegistry.isEmpty()) return Optional.empty();
         try {
-            if (key.isFor(maybeRegistry.get().key())) {
+            if (key.equals(maybeRegistry.get().key())) {
                 @SuppressWarnings("unchecked")
                 Registry<T> registry = (Registry<T>) maybeRegistry.get();
                 return Optional.of(registry);

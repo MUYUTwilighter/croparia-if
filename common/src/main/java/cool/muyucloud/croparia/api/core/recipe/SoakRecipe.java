@@ -9,6 +9,8 @@ import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
 import cool.muyucloud.croparia.registry.CropariaItems;
+import cool.muyucloud.croparia.util.CifUtil;
+import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.Item;
@@ -23,7 +25,7 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Element.CODEC.fieldOf("element").forGetter(SoakRecipe::getElement),
             Codec.FLOAT.fieldOf("probability").forGetter(SoakRecipe::getProbability),
-            BlockInput.CODEC.fieldOf("input").forGetter(SoakRecipe::getInput),
+            BlockInput.codec(stack -> CifUtil.addTooltip(stack, Constants.SOAK_BLOCK_INPUT)).fieldOf("input").forGetter(SoakRecipe::getInput),
             BlockOutput.CODEC.fieldOf("output").forGetter(SoakRecipe::getOutput)
         ).apply(instance, SoakRecipe::new)),
         Mappable.of(CropariaItems.ELEMENTAL_STONE, Item::getDefaultInstance)
@@ -43,6 +45,10 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
 
     public Element getElement() {
         return element;
+    }
+
+    public ItemStack getPotion() {
+        return CifUtil.addTooltip(this.getElement().getPotion().get().getDefaultInstance(), Constants.ELEM_INFUSE_TOOLTIP);
     }
 
     public float getProbability() {

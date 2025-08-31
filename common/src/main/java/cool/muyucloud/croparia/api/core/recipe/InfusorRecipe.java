@@ -10,7 +10,8 @@ import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.ItemInput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import cool.muyucloud.croparia.registry.CropariaItems;
-import cool.muyucloud.croparia.util.supplier.LazySupplier;
+import cool.muyucloud.croparia.util.CifUtil;
+import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
@@ -26,12 +27,12 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
         InfusorRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Element.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
-            ItemInput.CODEC.fieldOf("ingredient").forGetter(InfusorRecipe::getIngredient),
+            ItemInput.codec(stack -> CifUtil.addTooltip(stack, Constants.ITEM_DROP_TOOLTIP))
+                .fieldOf("ingredient").forGetter(InfusorRecipe::getIngredient),
             ItemOutput.CODEC.fieldOf("result").forGetter(InfusorRecipe::getResult)
         ).apply(instance, InfusorRecipe::new)),
         Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance)
     );
-    public static final LazySupplier<SlotDisplay.ItemStackSlotDisplay> STATION = LazySupplier.of(() -> new SlotDisplay.ItemStackSlotDisplay(CropariaItems.INFUSOR.get().getDefaultInstance()));
     public static final TypedSerializer<InfusorRecipe> OLD_TYPED_SERIALIZER = new TypedSerializer<>(
         InfusorRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -80,9 +81,13 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
         }
     }
 
-    public Item getPotion() {
-        return ElementalPotion.fromElement(getElement()).orElseThrow();
+    public ItemStack getPotion() {
+        return CifUtil.addTooltip(ElementalPotion.fromElement(getElement()).orElseThrow().getDefaultInstance(), Constants.ELEM_INFUSE_TOOLTIP);
     }
+
+//    public Item getPotion() {
+//        return ElementalPotion.fromElement(getElement()).orElseThrow();
+//    }
 
     @Override
     public boolean matches(@NotNull InfusorContainer container, @Nullable Level level) {
@@ -102,8 +107,8 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
 
     @Override
     @NotNull
-    public SlotDisplay craftingStation() {
-        return STATION.get();
+    public SlotDisplay.ItemStackSlotDisplay craftingStation() {
+        return new SlotDisplay.ItemStackSlotDisplay(CropariaItems.INFUSOR.get().getDefaultInstance());
     }
 
     @Override

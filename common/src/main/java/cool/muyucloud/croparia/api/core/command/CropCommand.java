@@ -7,7 +7,7 @@ import cool.muyucloud.croparia.api.crop.block.CropariaCropBlock;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.registry.Crops;
 import cool.muyucloud.croparia.registry.DgRegistries;
-import cool.muyucloud.croparia.util.Util;
+import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.text.FailureMessenger;
 import cool.muyucloud.croparia.util.text.SuccessMessenger;
 import cool.muyucloud.croparia.util.text.Texts;
@@ -55,7 +55,7 @@ public class CropCommand {
         Crop crop = null;
         if (player.getWeaponItem().getItem() instanceof CropAccess<?> access) {
             crop = CropAccess.tryGet(access);
-        } else if (world.getBlockState(Util.lookingAt(player)).getBlock() instanceof CropAccess<?> access) {
+        } else if (world.getBlockState(CifUtil.lookingAt(player)).getBlock() instanceof CropAccess<?> access) {
             crop = CropAccess.tryGet(access);
         }
         if (crop == null) {

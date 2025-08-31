@@ -16,7 +16,7 @@ import cool.muyucloud.croparia.api.element.item.ElementalPotion;
 import cool.muyucloud.croparia.api.generator.util.DgElement;
 import cool.muyucloud.croparia.api.generator.util.Placeholder;
 import cool.muyucloud.croparia.registry.Tabs;
-import cool.muyucloud.croparia.util.Util;
+import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.codec.CodecUtil;
 import cool.muyucloud.croparia.util.supplier.HolderSupplier;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
@@ -170,7 +170,7 @@ public class Element implements StringRepresentable, Comparable<Element>, DgElem
     }
 
     public ResourceLocation parseId(String pattern) {
-        return Util.formatId(pattern, this.getKey());
+        return CifUtil.formatId(pattern, this.getKey());
     }
 
     public Color getColor() {

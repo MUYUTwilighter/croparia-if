@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.api.core.recipe;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualStructureContainer;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
@@ -11,13 +12,21 @@ import cool.muyucloud.croparia.api.recipe.structure.Char3D;
 import cool.muyucloud.croparia.api.recipe.structure.MarkedChar3D;
 import cool.muyucloud.croparia.api.recipe.structure.MarkedTransformableChar3D;
 import cool.muyucloud.croparia.registry.CropariaItems;
+import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.codec.CodecUtil;
+import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.supplier.Mappable;
+import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -27,16 +36,22 @@ import java.util.*;
 
 @SuppressWarnings("unused")
 public class RitualStructure implements DisplayableRecipe<RitualStructureContainer> {
-    public static final TypedSerializer<RitualStructure> TYPED_SERIALIZER = new TypedSerializer<>(
-        RitualStructure.class,
-        RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.unboundedMap(CodecUtil.CHAR, BlockInput.CODEC).fieldOf("keys").forGetter(RitualStructure::getKeys),
-            Char3D.CODEC.fieldOf("pattern").forGetter(RitualStructure::getPattern)
-        ).apply(instance, RitualStructure::new)),
-        Mappable.of(CropariaItems.RITUAL_STAND, Item::getDefaultInstance),
-        Mappable.of(CropariaItems.RITUAL_STAND_2, Item::getDefaultInstance),
-        Mappable.of(CropariaItems.RITUAL_STAND_3, Item::getDefaultInstance)
-    );
+    public static final TypedSerializer<RitualStructure> TYPED_SERIALIZER = new TypedSerializer<>(RitualStructure.class, RecordCodecBuilder.mapCodec(instance -> instance.group(Codec.unboundedMap(CodecUtil.CHAR, BlockInput.CODEC).fieldOf("keys").forGetter(RitualStructure::getKeys), Char3D.CODEC.fieldOf("pattern").forGetter(RitualStructure::getPattern)).apply(instance, RitualStructure::new)), Mappable.of(CropariaItems.RITUAL_STAND, Item::getDefaultInstance), Mappable.of(CropariaItems.RITUAL_STAND_2, Item::getDefaultInstance), Mappable.of(CropariaItems.RITUAL_STAND_3, Item::getDefaultInstance));
+    public static final OnLoadSupplier<Map<RitualStructure, Mappable<ItemStack>>> STRUCTURES = OnLoadSupplier.of(() -> {
+        ImmutableMap.Builder<RitualStructure, Mappable<ItemStack>> builder = ImmutableMap.builder();
+        TYPED_SERIALIZER.getStations().forEach(mappable -> {
+            ResourceLocation id = mappable.get().getItem().arch$registryName();
+            CropariaIf.ifServer(server -> server.getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE, id)).map(RecipeHolder::value).ifPresent(recipe -> {
+                if (recipe instanceof RitualStructure structure) builder.put(structure, mappable);
+            }));
+        });
+        return builder.build();
+    });
+    public static final LazySupplier<ItemStack> STACK_INPUT = LazySupplier.of(() -> {
+        ItemStack stack = CropariaItems.PLACEHOLDER.get().getDefaultInstance();
+        stack.set(DataComponents.CUSTOM_NAME, Constants.INPUT_BLOCK);
+        return stack;
+    });
 
     @NotNull
     private final ImmutableMap<Character, BlockInput> keys;
@@ -133,6 +148,26 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
 
     public MarkedChar3D getPattern() {
         return this.patterns.getOriginal();
+    }
+
+    public List<ItemStack> displaySlot(int x, int y, int z) {
+        return switch (this.getPattern().get(x, y, z)) {
+            case ' ' -> List.of(BlockInput.STACK_ANY);
+            case '$' -> List.of(STACK_INPUT.get());
+            case '*' ->
+                List.of(STRUCTURES.get().getOrDefault(this, () -> BlockInput.STACK_UNKNOWN).getOr(BlockInput.STACK_UNKNOWN));
+            case '.' -> List.of(BlockInput.STACK_AIR);
+            default -> {
+                BlockInput input = this.keys.get(this.getPattern().get(x, y, z));
+                if (input != null) yield input.getDisplayStacks();
+                else yield List.of();
+            }
+        };
+    }
+
+    public boolean isVirtualRender(int x, int y, int z) {
+        char c = this.getPattern().get(x, y, z);
+        return c == ' ' || c == '$' || c == '.' || Objects.requireNonNull(this.keys.get(c)).isVirtualRender();
     }
 
     public Vec3i size() {
