@@ -22,6 +22,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Objects;
 
 public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
@@ -101,6 +102,19 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
 
     public int getTier() {
         return tier;
+    }
+
+    @Override
+    public @NotNull List<List<ItemStack>> getInputs() {
+        return List.of(
+            this.getIngredient().getDisplayStacks(),
+            this.getBlock().getDisplayStacks()
+        );
+    }
+
+    @Override
+    public @NotNull List<List<ItemStack>> getOutputs() {
+        return List.of(List.of(this.getResult().getDisplayStack()));
     }
 
     public ItemStack assemble(RitualContainer recipeInput) {

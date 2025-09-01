@@ -20,6 +20,8 @@ import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
     public static final TypedSerializer<SoakRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
         CropariaIf.of("soak"), SoakRecipe.class,
@@ -62,6 +64,16 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
 
     public BlockOutput getOutput() {
         return output;
+    }
+
+    @Override
+    public @NotNull List<List<ItemStack>> getInputs() {
+        return List.of(this.getInput().getDisplayStacks());
+    }
+
+    @Override
+    public @NotNull List<List<ItemStack>> getOutputs() {
+        return List.of(List.of(this.getOutput().getDisplayStack()));
     }
 
     @Override

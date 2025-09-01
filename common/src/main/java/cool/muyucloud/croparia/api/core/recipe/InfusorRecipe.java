@@ -23,6 +23,8 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     public static final TypedSerializer<InfusorRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
         CropariaIf.of("infusor"), InfusorRecipe.class,
@@ -86,9 +88,17 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
         return CifUtil.addTooltip(ElementalPotion.fromElement(getElement()).orElseThrow().getDefaultInstance(), Constants.ELEM_INFUSE_TOOLTIP);
     }
 
-//    public Item getPotion() {
-//        return ElementalPotion.fromElement(getElement()).orElseThrow();
-//    }
+    @Override
+    public @NotNull List<List<ItemStack>> getInputs() {
+        return List.of(
+            this.getIngredient().getDisplayStacks(),
+            List.of(this.getPotion())
+        );
+    }
+
+    public @NotNull List<List<ItemStack>> getOutputs() {
+        return List.of(List.of(this.getResult().getDisplayStack()));
+    }
 
     @Override
     public boolean matches(@NotNull InfusorContainer container, @Nullable Level level) {

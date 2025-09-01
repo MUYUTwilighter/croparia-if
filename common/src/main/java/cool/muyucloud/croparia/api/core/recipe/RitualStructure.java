@@ -1,5 +1,6 @@
 package cool.muyucloud.croparia.api.core.recipe;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -66,6 +67,19 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     private final ImmutableMap<Character, BlockInput> keys;
     @NotNull
     private final MarkedTransformableChar3D patterns;
+    private final transient LazySupplier<List<List<ItemStack>>> inputsCache = LazySupplier.of(() -> {
+        ImmutableList.Builder<List<ItemStack>> builder = ImmutableList.builder();
+        this.getPattern().forEachChar((key, count) -> {
+            if (key == '*') {
+                builder.add(List.of(STRUCTURES.get().getOrDefault(this, () -> BlockInput.STACK_UNKNOWN).getOr(BlockInput.STACK_UNKNOWN)));
+            } else if (key != '.' && key != ' ' && key != '$') {
+                BlockInput input = this.getKeys().get(key);
+                if (input != null) builder.add(input.getDisplayStacks().stream().map(stack -> stack.copyWithCount(count)).toList());
+                else builder.add(List.of());
+            }
+        });
+        return builder.build();
+    });
 
     public RitualStructure(@NotNull Map<Character, BlockInput> keyDeclarations, Char3D rawPattern) {
         // Validate key declarations
@@ -85,6 +99,11 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
         // Validate pattern structure
         Vec3i mark = rawPattern.find('*').orElseThrow(() -> new IllegalArgumentException("Ritual structure must contains a ritual mark (*)."));
         this.patterns = new MarkedTransformableChar3D(rawPattern, mark);
+    }
+
+    @Override
+    public @NotNull List<List<ItemStack>> getInputs() {
+        return this.inputsCache.get();
     }
 
     public @Nullable BlockState matchTransformed(BlockPos origin, Level level, Char3D pattern, BlockState ritualBlock, boolean destroy) {
