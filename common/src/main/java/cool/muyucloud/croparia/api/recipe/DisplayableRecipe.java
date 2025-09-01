@@ -1,6 +1,7 @@
 package cool.muyucloud.croparia.api.recipe;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeInput;
@@ -18,6 +19,14 @@ public interface DisplayableRecipe<C extends RecipeInput> extends Recipe<C>, Rec
     Logger LOGGER = LogUtils.getLogger();
 
     TypedSerializer<? extends DisplayableRecipe<C>> getTypedSerializer();
+
+    default @NotNull List<List<ItemStack>> getInputs() {
+        return List.of();
+    }
+
+    default @NotNull List<List<ItemStack>> getOutputs() {
+        return List.of();
+    }
 
     @Override
     default @NotNull TypedSerializer<? extends DisplayableRecipe<C>> getType() {

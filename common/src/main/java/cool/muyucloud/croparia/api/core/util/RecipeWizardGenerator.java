@@ -428,7 +428,7 @@ public class RecipeWizardGenerator {
         }
     );
     public static final Placeholder<UseOnContext> INFUSOR_ELEMENT = register(
-        CropariaIf.of("infusor"), "\\{infuser_element}", context -> {
+        CropariaIf.of("infusor"), "\\{infusor_element}", context -> {
             BlockState state = context.getLevel().getBlockState(context.getClickedPos());
             if (state.getBlock() instanceof Infusor) {
                 Element element = state.getValue(Infusor.ELEMENT);
@@ -704,7 +704,9 @@ public class RecipeWizardGenerator {
                 }
                 Path result = CropariaIf.CONFIG.getFilePath().resolve("recipe_wizard/dumped").resolve(path);
                 FileUtil.write(result.toFile(), template, true);
-                Texts.chat(player, (Texts.translatable("chat.croparia.recipe_wizard.success", result)));
+                Texts.chat(player, (Texts.translatable("chat.croparia.recipe_wizard.success", result.toString())));
+            } catch (IllegalStateException ignored) {
+                // Termination caused by missing data, message already sent in placeholder
             } catch (Throwable t) {
                 CropariaIf.LOGGER.error("Failed to generate recipe", t);
             }

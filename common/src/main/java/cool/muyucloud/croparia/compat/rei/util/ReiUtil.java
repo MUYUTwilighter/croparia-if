@@ -1,4 +1,4 @@
-package cool.muyucloud.croparia.compat.rei;
+package cool.muyucloud.croparia.compat.rei.util;
 
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
@@ -15,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Consumer;
 
+@SuppressWarnings("unused")
 public class ReiUtil {
     public static EntryIngredient toIngredient(Item input, Consumer<EntryStack<ItemStack>> processor) {
         EntryStack<ItemStack> stack = EntryStack.of(VanillaEntryTypes.ITEM, input.getDefaultInstance());

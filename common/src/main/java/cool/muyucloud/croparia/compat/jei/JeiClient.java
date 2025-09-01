@@ -19,7 +19,7 @@ import java.util.List;
 
 @JeiPlugin
 @SuppressWarnings("unused")
-public class JeiCommon implements IModPlugin {
+public class JeiClient implements IModPlugin {
     public static final List<JeiCategory<?>> CATEGORIES = List.of(
         JeiInfusorRecipe.INSTANCE,
         JeiRitualRecipe.INSTANCE,

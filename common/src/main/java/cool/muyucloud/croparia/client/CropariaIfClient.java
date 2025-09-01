@@ -6,7 +6,12 @@ import cool.muyucloud.croparia.registry.CropariaBlocks;
 import cool.muyucloud.croparia.registry.DgRegistries;
 import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
+import net.minecraft.client.ClientRecipeBook;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
+
+import java.util.Optional;
 
 public class CropariaIfClient {
     public static void init() {
@@ -20,5 +25,14 @@ public class CropariaIfClient {
         CropariaIf.LOGGER.debug("Registering cutout rendering");
         RenderTypeRegistry.register(RenderType.cutout(), CropariaBlocks.GREENHOUSE.get());
         RenderTypeRegistry.register(RenderType.cutout(), CropariaBlocks.ACTIVATED_SHRIEKER.get());
+//        getClientRecipeBook().ifPresent(book -> book.getCollections());
+    }
+
+    public static Optional<LocalPlayer> getLocalPlayer() {
+        return Optional.ofNullable(Minecraft.getInstance().player);
+    }
+
+    public static Optional<ClientRecipeBook> getClientRecipeBook() {
+        return getLocalPlayer().map(LocalPlayer::getRecipeBook);
     }
 }

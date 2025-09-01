@@ -1,12 +1,11 @@
 package cool.muyucloud.croparia.compat.rei.category;
 
-import com.google.common.collect.ImmutableMap;
 import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
-import cool.muyucloud.croparia.compat.rei.ReiUtil;
-import cool.muyucloud.croparia.compat.rei.display.SimpleCategory;
-import cool.muyucloud.croparia.compat.rei.display.SimpleDisplay;
+import cool.muyucloud.croparia.compat.rei.util.ProxyCategory;
+import cool.muyucloud.croparia.compat.rei.util.ReiUtil;
+import cool.muyucloud.croparia.compat.rei.util.SimpleDisplay;
 import cool.muyucloud.croparia.compat.rei.widget.Item2DWidget;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
@@ -16,32 +15,32 @@ import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
-import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 @SuppressWarnings("UnstableApiUsage")
-public class RitualStructureDisplayCategory extends SimpleCategory<RitualStructure> {
+public class ReiRitualStructure extends SimpleCategory<RitualStructure> {
     private static final ItemStack INPUT = CropariaItems.PLACEHOLDER.get().getDefaultInstance();
 
     static {
         INPUT.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.input"));
     }
 
-    public static final SimpleCategory<RitualStructure> INSTANCE = new RitualStructureDisplayCategory();
     public static final int SLOT_SIZE = 18;
     public static final int LABEL_MARGIN = 6;
     public static final int FRAME_PADDING = 9;
     public static final int BUTTON_SIZE = 10;
+
+    public ReiRitualStructure(ProxyCategory<RitualStructure> proxy) {
+        super(proxy);
+    }
 
     @Override
     public Renderer getIcon() {
@@ -99,7 +98,7 @@ public class RitualStructureDisplayCategory extends SimpleCategory<RitualStructu
                 } else if (c == '$') {
                     return Collections.singleton(EntryStacks.of(INPUT));
                 } else if (c == '*') {
-                    return display.getInput("*");
+                    return Collections.singleton(EntryStacks.of(RitualStructure.STRUCTURES.get().get(display.getRecipe()).get()));
                 } else if (c == ' ') {
                     return Collections.singleton(EntryStacks.of(BlockInput.STACK_ANY));
                 } else {
@@ -120,23 +119,5 @@ public class RitualStructureDisplayCategory extends SimpleCategory<RitualStructu
     @Override
     public int getDisplayHeight() {
         return super.getDisplayHeight() * 2 + FRAME_PADDING * 2;
-    }
-
-    @Override
-    public Map<String, Supplier<EntryIngredient>> inputEntries(RecipeHolder<RitualStructure> holder) {
-        RitualStructure recipe = holder.value();
-        Map<String, Supplier<EntryIngredient>> map = new HashMap<>();
-        for (Map.Entry<Character, BlockInput> entry : recipe.getKeys().entrySet()) {
-            char c = entry.getKey();
-            map.put(String.valueOf(c), () -> ReiUtil.toIngredient(entry.getValue(), recipe.getPattern().count(c)));
-        }
-        ResourceLocation id = holder.id().location();
-        map.put("*", () -> ReiUtil.toIngredient(BuiltInRegistries.ITEM.getValue(id)));
-        return ImmutableMap.copyOf(map);
-    }
-
-    @Override
-    public Map<String, Supplier<EntryIngredient>> outputEntries(RecipeHolder<RitualStructure> holder) {
-        return Map.of("*", () -> ReiUtil.toIngredient(BuiltInRegistries.ITEM.getValue(holder.id().location())));
     }
 }

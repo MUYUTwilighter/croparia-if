@@ -31,7 +31,7 @@ public class RecipeWizard extends Item {
             String prefix = "data-generators/%s/%s/".formatted(PACK_ID.getNamespace(), PACK_ID.getPath());
             String finalName = name.substring(prefix.length());
             entry.forInputStream(inputStream -> {
-                try (FileOutputStream outputStream = new FileOutputStream(CropariaIf.CONFIG.getFilePath().resolve(finalName).toFile())) {
+                try (FileOutputStream outputStream = new FileOutputStream(CropariaIf.CONFIG.getFilePath().resolve("recipe_wizard/generators").resolve(finalName).toFile())) {
                     inputStream.transferTo(outputStream);
                     outputStream.flush();
                 } catch (Throwable t) {

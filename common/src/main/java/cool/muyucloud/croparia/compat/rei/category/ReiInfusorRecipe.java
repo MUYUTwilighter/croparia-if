@@ -2,9 +2,9 @@ package cool.muyucloud.croparia.compat.rei.category;
 
 import cool.muyucloud.croparia.api.core.recipe.InfusorRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
-import cool.muyucloud.croparia.compat.rei.ReiUtil;
-import cool.muyucloud.croparia.compat.rei.display.SimpleCategory;
-import cool.muyucloud.croparia.compat.rei.display.SimpleDisplay;
+import cool.muyucloud.croparia.compat.rei.util.ProxyCategory;
+import cool.muyucloud.croparia.compat.rei.util.ReiUtil;
+import cool.muyucloud.croparia.compat.rei.util.SimpleDisplay;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
@@ -12,38 +12,23 @@ import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
-import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 
-public class InfusorRecipeDisplayCategory extends SimpleCategory<InfusorRecipe> {
-    public static final InfusorRecipeDisplayCategory INSTANCE = new InfusorRecipeDisplayCategory();
+public class ReiInfusorRecipe extends SimpleCategory<InfusorRecipe> {
     public static final LazySupplier<EntryStack<ItemStack>> STATION = LazySupplier.of(() -> EntryStacks.of(CropariaItems.INFUSOR.get()));
+
+    public ReiInfusorRecipe(ProxyCategory<InfusorRecipe> proxy) {
+        super(proxy);
+    }
 
     @Override
     public TypedSerializer<InfusorRecipe> getRecipeType() {
         return InfusorRecipe.TYPED_SERIALIZER;
-    }
-
-    @Override
-    public Map<String, Supplier<EntryIngredient>> inputEntries(RecipeHolder<InfusorRecipe> holder) {
-        InfusorRecipe recipe = holder.value();
-        return Map.of(
-            "element", () -> EntryIngredients.of(recipe.getPotion()),
-            "ingredient", () -> ReiUtil.toIngredient(recipe.getIngredient(), stack -> stack.tooltip(Constants.ITEM_DROP_TOOLTIP))
-        );
-    }
-
-    @Override
-    public Map<String, Supplier<EntryIngredient>> outputEntries(RecipeHolder<InfusorRecipe> holder) {
-        return Map.of("result", () -> ReiUtil.toIngredient(holder.value().getResult()));
     }
 
     @Override
@@ -54,13 +39,13 @@ public class InfusorRecipeDisplayCategory extends SimpleCategory<InfusorRecipe> 
         ).entry(STATION.get()).disableBackground().markInput().disableHighlight();
         Widget ingredient = Widgets.createSlot(
             new Point(bounds.getCenterX() - 8, bounds.getCenterY() - 24)
-        ).entries(display.getInput("ingredient")).markInput().disableBackground();
+        ).entries(ReiUtil.toIngredient(display.getRecipe().getIngredient())).markInput().disableBackground();
         Widget element = Widgets.createSlot(
             new Point(bounds.getCenterX() - 40, bounds.getCenterY() + 8)
-        ).entries(display.getInput("element")).markInput().disableBackground();
+        ).entries(EntryIngredients.of(display.getRecipe().getPotion())).markInput().disableBackground();
         Widget result = Widgets.createSlot(
             new Point(bounds.getCenterX() + 34, bounds.getCenterY() + 8)
-        ).entries(display.getOutput("result")).markOutput().disableBackground();
+        ).entries(ReiUtil.toIngredient(display.getRecipe().getResult())).markOutput().disableBackground();
         Widget itemDrop = Widgets.createTexturedWidget(
             Constants.ITEM_DROP, bounds.getCenterX() - 8, bounds.getCenterY() - 8,
             0, 0, 16, 16, 16, 16

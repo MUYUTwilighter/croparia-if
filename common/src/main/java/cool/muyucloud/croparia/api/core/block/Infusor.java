@@ -52,22 +52,20 @@ public class Infusor extends Block implements ItemPlaceable {
         ItemStack itemStack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
         BlockHitResult blockHitResult
     ) {
-        if (!world.isClientSide) {
-            Item item = itemStack.getItem();
-            if (item instanceof ElementalPotion potion && this.tryInfuse(world, pos, potion, itemStack, player)) {
-                if (world instanceof ServerLevel serverWorld) {
-                    this.forceCraft(serverWorld, pos, player);
-                }
-                return InteractionResult.SUCCESS;
-            } else if (
-                ElementalPotion.fromElement(state.getValue(ELEMENT)).map(potion -> potion.getCraftingRemainder().getItem() == item).orElse(false)
-                    && this.tryDefuse(world, pos, itemStack, player)
-            ) {
-                return InteractionResult.SUCCESS;
-            } else if (!(item instanceof RecipeWizard) && hand == InteractionHand.MAIN_HAND) {
-                CifUtil.placeItem(world, pos, itemStack);
-                return InteractionResult.CONSUME;
+        Item item = itemStack.getItem();
+        if (item instanceof ElementalPotion potion && this.tryInfuse(world, pos, potion, itemStack, player)) {
+            if (world instanceof ServerLevel serverWorld) {
+                this.forceCraft(serverWorld, pos, player);
             }
+            return InteractionResult.SUCCESS;
+        } else if (
+            ElementalPotion.fromElement(state.getValue(ELEMENT)).map(potion -> potion.getCraftingRemainder().getItem() == item).orElse(false)
+                && this.tryDefuse(world, pos, itemStack, player)
+        ) {
+            return InteractionResult.SUCCESS;
+        } else if (!(item instanceof RecipeWizard) && hand == InteractionHand.MAIN_HAND) {
+            CifUtil.placeItem(world, pos, itemStack);
+            return InteractionResult.CONSUME;
         }
         return InteractionResult.PASS;
     }

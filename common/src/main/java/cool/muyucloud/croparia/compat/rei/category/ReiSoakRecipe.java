@@ -2,9 +2,9 @@ package cool.muyucloud.croparia.compat.rei.category;
 
 import cool.muyucloud.croparia.api.core.recipe.SoakRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
-import cool.muyucloud.croparia.compat.rei.ReiUtil;
-import cool.muyucloud.croparia.compat.rei.display.SimpleCategory;
-import cool.muyucloud.croparia.compat.rei.display.SimpleDisplay;
+import cool.muyucloud.croparia.compat.rei.util.ProxyCategory;
+import cool.muyucloud.croparia.compat.rei.util.ReiUtil;
+import cool.muyucloud.croparia.compat.rei.util.SimpleDisplay;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
@@ -19,35 +19,21 @@ import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 
-public class SoakRecipeDisplayCategory extends SimpleCategory<SoakRecipe> {
-    public static final SoakRecipeDisplayCategory INSTANCE = new SoakRecipeDisplayCategory();
+public class ReiSoakRecipe extends SimpleCategory<SoakRecipe> {
     public static final LazySupplier<EntryStack<ItemStack>> STATION = LazySupplier.of(
         () -> EntryStack.of(VanillaEntryTypes.ITEM, CropariaItems.ELEMENTAL_STONE.get().getDefaultInstance())
     );
 
+    public ReiSoakRecipe(ProxyCategory<SoakRecipe> proxy) {
+        super(proxy);
+    }
+
     @Override
     public TypedSerializer<SoakRecipe> getRecipeType() {
         return SoakRecipe.TYPED_SERIALIZER;
-    }
-
-    @Override
-    public Map<String, Supplier<EntryIngredient>> inputEntries(RecipeHolder<SoakRecipe> holder) {
-        SoakRecipe recipe = holder.value();
-        return Map.of(
-            "element", () -> EntryIngredients.of(recipe.getPotion()),
-            "input", () -> ReiUtil.toIngredient(recipe.getInput())
-        );
-    }
-
-    @Override
-    public Map<String, Supplier<EntryIngredient>> outputEntries(RecipeHolder<SoakRecipe> holder) {
-        return Map.of("output", () -> ReiUtil.toIngredient(holder.value().getOutput()));
     }
 
     @Override
@@ -64,14 +50,14 @@ public class SoakRecipeDisplayCategory extends SimpleCategory<SoakRecipe> {
         );
         Widget input = Widgets.createSlot(
             new Point(bounds.getCenterX() - 40, bounds.getCenterY() + 8)
-        ).entries(display.getInput("input")).markInput().disableBackground();
+        ).entries(ReiUtil.toIngredient(display.getRecipe().getInput())).markInput().disableBackground();
         Widget inputArr = Widgets.createTexturedWidget(
             Constants.BLOCK_PLACE, bounds.getCenterX() - 24, bounds.getCenterY() + 8,
             0, 0, 16, 16, 16, 16
         );
         Widget element = Widgets.createSlot(
             new Point(bounds.getCenterX() - 40, bounds.getCenterY() - 24)
-        ).entries(display.getInput("element")).markInput().disableBackground();
+        ).entries(EntryIngredients.of(display.getRecipe().getPotion())).markInput().disableBackground();
         Widget elemArr = Widgets.createTexturedWidget(
             Constants.ELEM_INFUSE, bounds.getCenterX() - 24, bounds.getCenterY() - 24,
             0, 0, 16, 16, 16, 16
@@ -84,7 +70,7 @@ public class SoakRecipeDisplayCategory extends SimpleCategory<SoakRecipe> {
             Texts.literal(display.getRecipe().getProbability() * 100 + "%"));
         Widget output = Widgets.createSlot(
             new Point(bounds.getCenterX() + 34, bounds.getCenterY() + 8)
-        ).entries(display.getOutput("output")).markOutput().disableBackground();
+        ).entries(ReiUtil.toIngredient(display.getRecipe().getOutput())).markOutput().disableBackground();
         Widget outputArr = Widgets.createArrow(new Point(bounds.getCenterX() + 8, bounds.getCenterY() + 8));
         return List.of(background, infusor, infusorArr, input, inputArr, element, elemArr, output, outputArr, probability, station);
     }
