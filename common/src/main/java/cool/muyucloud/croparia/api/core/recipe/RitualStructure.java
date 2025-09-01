@@ -36,7 +36,16 @@ import java.util.*;
 
 @SuppressWarnings("unused")
 public class RitualStructure implements DisplayableRecipe<RitualStructureContainer> {
-    public static final TypedSerializer<RitualStructure> TYPED_SERIALIZER = new TypedSerializer<>(RitualStructure.class, RecordCodecBuilder.mapCodec(instance -> instance.group(Codec.unboundedMap(CodecUtil.CHAR, BlockInput.CODEC).fieldOf("keys").forGetter(RitualStructure::getKeys), Char3D.CODEC.fieldOf("pattern").forGetter(RitualStructure::getPattern)).apply(instance, RitualStructure::new)), Mappable.of(CropariaItems.RITUAL_STAND, Item::getDefaultInstance), Mappable.of(CropariaItems.RITUAL_STAND_2, Item::getDefaultInstance), Mappable.of(CropariaItems.RITUAL_STAND_3, Item::getDefaultInstance));
+    public static final TypedSerializer<RitualStructure> TYPED_SERIALIZER = new TypedSerializer<>(
+        CropariaIf.of("ritual_structure"), RitualStructure.class,
+        RecordCodecBuilder.mapCodec(instance -> instance.group(
+            Codec.unboundedMap(CodecUtil.CHAR, BlockInput.CODEC).fieldOf("keys").forGetter(RitualStructure::getKeys),
+            Char3D.CODEC.fieldOf("pattern").forGetter(RitualStructure::getPattern)
+        ).apply(instance, RitualStructure::new)),
+        Mappable.of(CropariaItems.RITUAL_STAND, Item::getDefaultInstance),
+        Mappable.of(CropariaItems.RITUAL_STAND_2, Item::getDefaultInstance),
+        Mappable.of(CropariaItems.RITUAL_STAND_3, Item::getDefaultInstance)
+    );
     public static final OnLoadSupplier<Map<RitualStructure, Mappable<ItemStack>>> STRUCTURES = OnLoadSupplier.of(() -> {
         ImmutableMap.Builder<RitualStructure, Mappable<ItemStack>> builder = ImmutableMap.builder();
         TYPED_SERIALIZER.getStations().forEach(mappable -> {

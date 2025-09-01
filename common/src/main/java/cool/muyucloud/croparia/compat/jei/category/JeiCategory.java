@@ -49,7 +49,7 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
 
     @Override
     public @NotNull ResourceLocation getUid() {
-        return this.getTypedSerializer().getId().orElseThrow();
+        return this.getTypedSerializer().getId();
     }
 
     @Override

@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ReiCommon implements REICommonPlugin {
     private static final Set<ProxyCategory<?>> PROXIES = new HashSet<>();
@@ -29,8 +30,8 @@ public class ReiCommon implements REICommonPlugin {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public static <R extends DisplayableRecipe<?>> ProxyCategory<R> addProxy(TypedSerializer<R> type, Function<ProxyCategory<R>, ? extends SimpleCategory<R>> category) {
-        ProxyCategory<R> proxy = ProxyCategory.of(type, category);
+    public static <R extends DisplayableRecipe<?>> ProxyCategory<R> addProxy(TypedSerializer<R> type, Function<ProxyCategory<R>, Supplier<? extends SimpleCategory<R>>> category) {
+        ProxyCategory<R> proxy = new ProxyCategory<>(type, category);
         PROXIES.add(proxy);
         return proxy;
     }
@@ -38,7 +39,7 @@ public class ReiCommon implements REICommonPlugin {
     @Override
     @SuppressWarnings("unchecked")
     public void registerDisplays(ServerDisplayRegistry registry) {
-        CropariaIf.LOGGER.info("Registering rei recipe fillers...");
+        CropariaIf.LOGGER.debug("Registering rei recipe fillers...");
         forEach(proxy -> registry.beginRecipeFiller(proxy.getType().getRecipeClass())
             .filterType((RecipeType<DisplayableRecipe<?>>) proxy.getType())
             .fill(holder -> new SimpleDisplay<>(
@@ -47,14 +48,12 @@ public class ReiCommon implements REICommonPlugin {
     }
 
     @Override
-    @SuppressWarnings("Convert2MethodRef")
     public void registerDisplaySerializer(DisplaySerializerRegistry registry) {
-        addProxy(InfusorRecipe.TYPED_SERIALIZER, proxy -> new ReiInfusorRecipe(proxy));
-        addProxy(RitualRecipe.TYPED_SERIALIZER, proxy -> new ReiRitualRecipe(proxy));
-        PROXIES.add(ProxyCategory.of(RitualRecipe.TYPED_SERIALIZER, proxy -> new ReiRitualRecipe(proxy)));
-        PROXIES.add(ProxyCategory.of(RitualStructure.TYPED_SERIALIZER, proxy -> new ReiRitualStructure(proxy)));
-        PROXIES.add(ProxyCategory.of(SoakRecipe.TYPED_SERIALIZER, proxy -> new ReiSoakRecipe(proxy)));
-        CropariaIf.LOGGER.info("Registering rei recipe display serializers...");
-        forEach(proxy -> registry.register(proxy.getType().getId().orElseThrow(), proxy.getSerializer()));
+        addProxy(InfusorRecipe.TYPED_SERIALIZER, proxy -> () -> new ReiInfusorRecipe(proxy));
+        addProxy(RitualRecipe.TYPED_SERIALIZER, proxy -> () -> new ReiRitualRecipe(proxy));
+        addProxy(RitualStructure.TYPED_SERIALIZER, proxy -> () -> new ReiRitualStructure(proxy));
+        addProxy(SoakRecipe.TYPED_SERIALIZER, proxy -> () -> new ReiSoakRecipe(proxy));
+        CropariaIf.LOGGER.debug("Registering rei recipe display serializers...");
+        forEach(proxy -> registry.register(proxy.getType().getId(), proxy.getSerializer()));
     }
 }

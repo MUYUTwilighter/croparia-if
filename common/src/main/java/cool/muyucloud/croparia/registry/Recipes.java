@@ -19,7 +19,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class Recipes {
     private static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(CropariaIf.MOD_ID, Registries.RECIPE_TYPE);
@@ -27,21 +26,21 @@ public class Recipes {
     private static final DeferredRegister<RecipeDisplay.Type<?>> RECIPE_DISPLAYS = DeferredRegister.create(CropariaIf.MOD_ID, Registries.RECIPE_DISPLAY);
     private static final DeferredRegister<RecipeBookCategory> RECIPE_BOOK_CATEGORIES = DeferredRegister.create(CropariaIf.MOD_ID, Registries.RECIPE_BOOK_CATEGORY);
 
-    public static final RegistrySupplier<TypedSerializer<InfusorRecipe>> INFUSOR = register("infusor", () -> InfusorRecipe.TYPED_SERIALIZER);
+    public static final RegistrySupplier<TypedSerializer<InfusorRecipe>> INFUSOR = register(InfusorRecipe.TYPED_SERIALIZER);
     @SuppressWarnings("unused")
-    public static final RegistrySupplier<TypedSerializer<InfusorRecipe>> INFUSOR_OLD = register("infusor_type", () -> InfusorRecipe.OLD_TYPED_SERIALIZER);
-    public static final RegistrySupplier<TypedSerializer<RitualRecipe>> RITUAL = register("ritual", () -> RitualRecipe.TYPED_SERIALIZER);
+    public static final RegistrySupplier<TypedSerializer<InfusorRecipe>> INFUSOR_OLD = register(InfusorRecipe.OLD_TYPED_SERIALIZER);
+    public static final RegistrySupplier<TypedSerializer<RitualRecipe>> RITUAL = register(RitualRecipe.TYPED_SERIALIZER);
     @SuppressWarnings("unused")
-    public static final RegistrySupplier<TypedSerializer<RitualRecipe>> RITUAL_OLD = register("ritual_type", () -> RitualRecipe.OLD_TYPED_SERIALIZER);
-    public static final RegistrySupplier<TypedSerializer<RitualStructure>> RITUAL_STRUCTURE = register("ritual_structure", () -> RitualStructure.TYPED_SERIALIZER);
+    public static final RegistrySupplier<TypedSerializer<RitualRecipe>> RITUAL_OLD = register(RitualRecipe.OLD_TYPED_SERIALIZER);
+    public static final RegistrySupplier<TypedSerializer<RitualStructure>> RITUAL_STRUCTURE = register(RitualStructure.TYPED_SERIALIZER);
     @SuppressWarnings("unused")
-    public static final RegistrySupplier<TypedSerializer<SoakRecipe>> SOAK = register("soak", () -> SoakRecipe.TYPED_SERIALIZER);
+    public static final RegistrySupplier<TypedSerializer<SoakRecipe>> SOAK = register(SoakRecipe.TYPED_SERIALIZER);
 
-    public static <R extends DisplayableRecipe<?>> RegistrySupplier<TypedSerializer<R>> register(String path, Supplier<TypedSerializer<R>> supplier) {
-        RegistrySupplier<TypedSerializer<R>> type = RECIPE_TYPES.register(path, supplier);
-        RECIPE_SERIALIZERS.register(path, supplier);
-        RECIPE_BOOK_CATEGORIES.register(path, supplier);
-        RECIPE_DISPLAYS.register(path, () -> supplier.get().displayType());
+    public static <R extends DisplayableRecipe<?>> RegistrySupplier<TypedSerializer<R>> register(TypedSerializer<R> typedSerializer) {
+        RegistrySupplier<TypedSerializer<R>> type = RECIPE_TYPES.register(typedSerializer.getId(), () -> typedSerializer);
+        RECIPE_SERIALIZERS.register(typedSerializer.getId(), () -> typedSerializer);
+        RECIPE_BOOK_CATEGORIES.register(typedSerializer.getId(), () -> typedSerializer);
+        RECIPE_DISPLAYS.register(typedSerializer.getId(), typedSerializer::displayType);
         return type;
     }
 

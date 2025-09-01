@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.core.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualContainer;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
@@ -25,7 +26,7 @@ import java.util.Objects;
 
 public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     public static final TypedSerializer<RitualRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
-        RitualRecipe.class,
+        CropariaIf.of("ritual"), RitualRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.INT.fieldOf("tier").orElse(1).forGetter(RitualRecipe::getTier),
             BlockInput.codec(stack -> CifUtil.addTooltip(stack, Constants.BLOCK_PLACE_TOOLTIP))
@@ -39,7 +40,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         Mappable.of(CropariaItems.RITUAL_STAND_3, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL))
     );
     public static final TypedSerializer<RitualRecipe> OLD_TYPED_SERIALIZER = new TypedSerializer<>(
-        RitualRecipe.class,
+        CropariaIf.of("ritual_type"), RitualRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.INT.fieldOf("tier").forGetter(RitualRecipe::getTier),
             ResourceLocation.CODEC.fieldOf("block").forGetter(recipe -> recipe.getBlock().getDisplayId()),

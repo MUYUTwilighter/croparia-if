@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.core.recipe;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.recipe.container.InfusorContainer;
 import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.element.item.ElementalPotion;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     public static final TypedSerializer<InfusorRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
-        InfusorRecipe.class,
+        CropariaIf.of("infusor"), InfusorRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Element.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
             ItemInput.codec(stack -> CifUtil.addTooltip(stack, Constants.ITEM_DROP_TOOLTIP))
@@ -34,7 +35,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
         Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance)
     );
     public static final TypedSerializer<InfusorRecipe> OLD_TYPED_SERIALIZER = new TypedSerializer<>(
-        InfusorRecipe.class,
+        CropariaIf.of("infusor_type"), InfusorRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Element.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
             ResourceLocation.CODEC.fieldOf("input").forGetter(recipe -> recipe.getResult().getId()),

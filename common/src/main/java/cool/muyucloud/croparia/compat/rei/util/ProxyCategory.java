@@ -9,28 +9,25 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import net.fabricmc.api.EnvType;
 
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ProxyCategory<R extends DisplayableRecipe<?>> {
-    public static <R extends DisplayableRecipe<?>> ProxyCategory<R> of(TypedSerializer<R> type, Function<ProxyCategory<R>, ? extends SimpleCategory<R>> category) {
-        return new ProxyCategory<>(type, category);
-    }
-
     private final TypedSerializer<R> type;
     private final DisplaySerializer<SimpleDisplay<R>> serializer;
     private final CategoryIdentifier<SimpleDisplay<R>> id;
-    private final LazySupplier<? extends SimpleCategory<R>> category;
+    private final LazySupplier<Optional<? extends SimpleCategory<R>>> category;
 
-    public ProxyCategory(TypedSerializer<R> type, Function<ProxyCategory<R>, ? extends SimpleCategory<R>> category) {
+    public ProxyCategory(TypedSerializer<R> type, Function<ProxyCategory<R>, Supplier<? extends SimpleCategory<R>>> category) {
         this.type = type;
-        this.id = CategoryIdentifier.of(type.getId().orElseThrow());
+        this.id = CategoryIdentifier.of(type.getId());
         this.serializer = SimpleDisplay.serializer(this);
         this.category = LazySupplier.of(() -> {
             if (Platform.getEnv() == EnvType.SERVER) {
-                return null;
+                return Optional.empty();
             } else {
-                return category.apply(this);
+                return Optional.ofNullable(category.apply(this).get());
             }
         });
     }
@@ -39,7 +36,7 @@ public class ProxyCategory<R extends DisplayableRecipe<?>> {
         return type;
     }
 
-    public Supplier<? extends SimpleCategory<R>> getCategory() {
+    public Supplier<Optional<? extends SimpleCategory<R>>> getCategory() {
         return category;
     }
 
