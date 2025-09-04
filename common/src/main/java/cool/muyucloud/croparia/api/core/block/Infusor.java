@@ -131,7 +131,7 @@ public class Infusor extends Block implements ItemPlaceable {
         }
         RecipeManager manager = world.getServer().getRecipeManager();
         InfusorContainer container = InfusorContainer.of(element, input);
-        manager.getRecipeFor(Recipes.INFUSOR.get(), container, world).ifPresent(
+        manager.getRecipeFor(Recipes.INFUSOR, container, world).ifPresent(
             recipe -> onCrafting(recipe.value(), container, world, pos, player)
         );
     }

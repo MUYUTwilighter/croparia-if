@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A structure with a mark position in it, this mark position is used for locating the center of the structure.
@@ -51,5 +52,17 @@ public class MarkedChar3D extends Char3D {
 
     public BlockPos getOriginInWorld(BlockPos markInWorld) {
         return markInWorld.subtract(mark);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof MarkedChar3D char2DS)) return false;
+        if (!super.equals(o)) return false;
+        return Objects.equals(mark, char2DS.mark);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), mark);
     }
 }

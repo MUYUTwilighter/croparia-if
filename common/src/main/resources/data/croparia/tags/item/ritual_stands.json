@@ -2,7 +2,6 @@
   "replace": false,
   "values": [
     "croparia:ritual_stand",
-    "croparia:ritual_stand_2",
-    "croparia:ritual_stand_3"
+    "#croparia:ritual_stands_2"
   ]
 }

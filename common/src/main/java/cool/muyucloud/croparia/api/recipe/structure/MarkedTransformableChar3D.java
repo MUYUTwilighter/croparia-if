@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.util.ArrayIterator;
 import net.minecraft.core.Vec3i;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 public class MarkedTransformableChar3D implements Iterable<MarkedChar3D> {
     private final transient MarkedChar3D[] transformed;
@@ -38,5 +36,16 @@ public class MarkedTransformableChar3D implements Iterable<MarkedChar3D> {
     @Override
     public Iterator<MarkedChar3D> iterator() {
         return new ArrayIterator<>(transformed);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof MarkedTransformableChar3D that)) return false;
+        return Objects.deepEquals(transformed, that.transformed);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(transformed);
     }
 }

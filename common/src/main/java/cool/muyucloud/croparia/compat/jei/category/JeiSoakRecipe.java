@@ -3,8 +3,8 @@ package cool.muyucloud.croparia.compat.jei.category;
 import cool.muyucloud.croparia.api.core.recipe.SoakRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.registry.CropariaItems;
-import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.Constants;
+import cool.muyucloud.croparia.util.text.Texts;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.recipe.IFocusGroup;
@@ -23,7 +23,7 @@ public class JeiSoakRecipe extends JeiCategory<SoakRecipe> {
     @Override
     public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull SoakRecipe recipe, @NotNull IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 40).add(recipe.craftingStation());
-        builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 8).add(CifUtil.addTooltip(CropariaItems.INFUSOR.get().getDefaultInstance(), Constants.SOAK_INFUSOR));
+        builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 8).add(Texts.tooltip(CropariaItems.INFUSOR.get().getDefaultInstance(), Constants.SOAK_INFUSOR));
         builder.addInputSlot(40, 40).add(recipe.getInput());
         builder.addInputSlot(40, 8).add(recipe.getPotion());
         builder.addOutputSlot(114, 40).add(recipe.getOutput());

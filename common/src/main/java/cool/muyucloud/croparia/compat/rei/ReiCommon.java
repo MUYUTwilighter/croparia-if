@@ -32,7 +32,7 @@ public class ReiCommon implements REICommonPlugin {
 
     @SuppressWarnings("UnusedReturnValue")
     public static <R extends DisplayableRecipe<?>> LazySupplier<ProxyCategory<R>> addProxy(
-        TypedSerializer<R> type, Function<ProxyCategory<R>, ? extends SimpleCategory<R>> category
+        TypedSerializer<R> type, Function<ProxyCategory<R>, ? extends ReiCategory<R>> category
     ) {
         LazySupplier<ProxyCategory<R>> proxy = LazySupplier.of(() -> new ProxyCategory<>(type, category));
         PROXIES.add(proxy);

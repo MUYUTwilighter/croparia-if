@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public abstract class PackRepositoryMixin {
     @ModifyVariable(method = "<init>", at = @At("HEAD"), argsOnly = true)
     private static RepositorySource[] insertProviders(RepositorySource... providers) {
-//        OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
         RepositorySource[] newProviders = new RepositorySource[providers.length + DataPackHandler.REGISTRY.size()];
         int i = 0;
         for (DataPackHandler pack : DataPackHandler.REGISTRY.values()) {

@@ -1,6 +1,6 @@
 {
   "type": "croparia:ritual",
-  "tier": 3,
+  "ritual": "#croparia:ritual_stands_3",
   "ingredient": {
     "id": "minecraft:brewing_stand"
   },

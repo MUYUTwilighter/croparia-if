@@ -1,6 +1,6 @@
 {
   "type": "croparia:ritual",
-  "tier": 1,
+  "ritual": "#croparia:ritual_stands",
   "ingredient": "croparia:gem_elemental",
   "block": "minecraft:podzol",
   "result": {

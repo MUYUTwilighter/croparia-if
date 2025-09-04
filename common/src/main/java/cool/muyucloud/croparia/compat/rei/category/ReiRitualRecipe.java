@@ -10,12 +10,10 @@ import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
-import me.shedaniel.rei.api.common.entry.EntryStack;
-import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes;
 
 import java.util.List;
 
-public class ReiRitualRecipe extends SimpleCategory<RitualRecipe> {
+public class ReiRitualRecipe extends ReiCategory<RitualRecipe> {
     public ReiRitualRecipe(ProxyCategory<RitualRecipe> proxy) {
         super(proxy);
     }
@@ -38,7 +36,7 @@ public class ReiRitualRecipe extends SimpleCategory<RitualRecipe> {
         );
         Widget resultInteract = Widgets.createArrow(new Point(bounds.getCenterX() + 8, bounds.getCenterY() + 8));
         Widget ritual = Widgets.createSlot(new Point(bounds.getCenterX() - 8, bounds.getCenterY() + 8))
-            .entry(EntryStack.of(VanillaEntryTypes.ITEM, display.getRecipe().craftingStation().stack())).disableBackground().markInput().disableHighlight();
+            .entries(ReiUtil.toIngredient(display.getRecipe().getRitual())).disableBackground().markInput().disableHighlight();
         Widget block = Widgets.createSlot(new Point(bounds.getCenterX() - 40, bounds.getCenterY() + 8))
             .entries(ReiUtil.toIngredient(display.getRecipe().getBlock())).markInput().disableBackground();
         Widget ingredient = Widgets.createSlot(new Point(bounds.getCenterX() - 8, bounds.getCenterY() - 24))

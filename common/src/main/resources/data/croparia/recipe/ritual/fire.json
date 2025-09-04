@@ -1,6 +1,6 @@
 {
   "type": "croparia:ritual",
-  "tier": 1,
+  "ritual": "#croparia:ritual_stands",
   "ingredient": {
     "id": "croparia:gem_elemental"
   },

@@ -4,12 +4,13 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
+import cool.muyucloud.croparia.api.codec.MultiCodec;
+import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.TagUtil;
-import cool.muyucloud.croparia.util.codec.AnyCodec;
-import cool.muyucloud.croparia.util.codec.CodecUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentMap;
@@ -30,44 +31,39 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
 public class ItemInput implements SlotDisplay {
-    public static final Codec<ItemInput> CODEC_SINGLE = Codec.STRING.xmap(
-        s -> new ItemInput(s, 1),
-        input -> input.getId().map(String::valueOf).orElse("#" + input.getTag().orElseThrow().location())
+    public static final ItemInput EMPTY = new ItemInput(null, null, DataComponentPredicate.EMPTY, 0);
+    public static final Codec<ItemInput> CODEC_STR = Codec.STRING.xmap(
+        s -> s.isEmpty() ? EMPTY : new ItemInput(s, 1),
+        input -> input.getTag().map(tag -> "#" + tag.location())
+            .orElse(input.getId().map(ResourceLocation::toString).orElse(""))
     );
     public static final MapCodec<ItemInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.optionalFieldOf("id").forGetter(ItemInput::getId),
-        TagKey.codec(Registries.ITEM).optionalFieldOf("tag").forGetter(ItemInput::getTag),
-        DataComponentPredicate.CODEC.optionalFieldOf("components").forGetter(itemInput -> Optional.of(itemInput.getComponentsPredicate())),
-        Codec.LONG.optionalFieldOf("amount").forGetter(entry -> Optional.of(entry.getAmount()))).apply(
-        instance, (id, tag, components, amount) -> new ItemInput(id.orElse(null), tag.orElse(null),
-            components.orElse(DataComponentPredicate.EMPTY), amount.orElse(1L))
-    ));
-    public static final AnyCodec<ItemInput> CODEC = new AnyCodec<>(CODEC_COMP.codec(), CODEC_SINGLE);
+        ResourceLocation.CODEC.optionalFieldOf("id", null)
+            .forGetter(input -> input.getId().orElse(null)),
+        TagKey.codec(Registries.ITEM).optionalFieldOf("tag", null)
+            .forGetter(input -> input.getTag().orElse(null)),
+        DataComponentPredicate.CODEC.optionalFieldOf("components", DataComponentPredicate.EMPTY)
+            .forGetter(ItemInput::getComponentsPredicate),
+        Codec.LONG.optionalFieldOf("amount", 1L).forGetter(ItemInput::getAmount)
+    ).apply(instance, (id, tag, components, amount) ->
+        id == null && tag == null && components.equals(DataComponentPredicate.EMPTY) || amount <= 0 ? EMPTY :
+            new ItemInput(id, tag, components, amount)));
+    public static final MultiCodec<ItemInput> CODEC = MultiCodec.of(TestedCodec.of(CODEC_COMP.codec(), toEncode -> {
+        if (toEncode.getComponentsPredicate().equals(DataComponentPredicate.EMPTY) && toEncode.getAmount() == 1 || toEncode.equals(EMPTY)) {
+            return TestedCodec.fail(() -> "Can be encoded as string");
+        } else {
+            return TestedCodec.success();
+        }
+    }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemInput> STREAM_CODEC = CodecUtil.toStream(CODEC);
     public static final Type<ItemInput> TYPE = new Type<>(CODEC_COMP, STREAM_CODEC);
-
-    public static AnyCodec<ItemInput> codec(Consumer<ItemStack> displayProcessor) {
-        return new AnyCodec<>(RecordCodecBuilder.create(instance -> instance.group(
-                ResourceLocation.CODEC.optionalFieldOf("id").forGetter(ItemInput::getId),
-                TagKey.codec(Registries.ITEM).optionalFieldOf("tag").forGetter(ItemInput::getTag),
-                DataComponentPredicate.CODEC.optionalFieldOf("components")
-                    .forGetter(itemInput -> Optional.of(itemInput.getComponentsPredicate())),
-                Codec.LONG.optionalFieldOf("amount").forGetter(entry -> Optional.of(entry.getAmount()))
-            ).apply(instance, (id, tag, components, amount) -> new ItemInput(id.orElse(null), tag.orElse(null),
-                components.orElse(DataComponentPredicate.EMPTY), amount.orElse(1L), displayProcessor))
-        ), Codec.STRING.xmap(s -> s.startsWith("#") ?
-                new ItemInput(null, TagKey.create(Registries.ITEM, ResourceLocation.parse(s.substring(1))),
-                    DataComponentPredicate.EMPTY, 1L, displayProcessor) :
-                new ItemInput(ResourceLocation.parse(s), null, DataComponentPredicate.EMPTY, 1L, displayProcessor),
-            input -> input.getId().map(String::valueOf).orElse("#" + input.getTag().orElseThrow().location()))
-        );
-    }
 
     public static ItemInput of(ResourceLocation id) {
         return new ItemInput(id, null, DataComponentPredicate.EMPTY, 1L);
@@ -90,7 +86,7 @@ public class ItemInput implements SlotDisplay {
     @NotNull
     private final DataComponentPredicate componentPredicate;
     private final long amount;
-    private final transient OnLoadSupplier<ImmutableList<ItemStack>> displayStacks;
+    private transient OnLoadSupplier<ImmutableList<ItemStack>> displayStacks;
 
     public ItemInput(String s, int amount) {
         this(s.startsWith("#") ? null : ResourceLocation.parse(s),
@@ -106,31 +102,24 @@ public class ItemInput implements SlotDisplay {
         this(stack.getItem().arch$registryName(), null, CifUtil.extractPredicate(stack.getComponentsPatch()), stack.getCount());
     }
 
-    public ItemInput(@Nullable ResourceLocation id, @Nullable TagKey<Item> tag, @NotNull DataComponentPredicate componentPredicate, long amount) {
-        this(id, tag, componentPredicate, amount, stack -> {
-        });
-    }
-
-    public ItemInput(@Nullable ResourceLocation id, @Nullable TagKey<Item> tag, @NotNull DataComponentPredicate componentPredicate, long amount, Consumer<ItemStack> displayProcessor) {
+    public ItemInput(@Nullable ResourceLocation id, @Nullable TagKey<Item> tag,
+                     @NotNull DataComponentPredicate componentPredicate, long amount) {
         this.id = id;
         this.tag = tag;
         if (this.id != null && this.tag != null)
             throw new IllegalArgumentException("id and tag cannot be set at the same time");
         this.componentPredicate = componentPredicate;
         this.amount = amount;
-        if (this.amount <= 0) throw new IllegalArgumentException("amount must be greater than 0");
         this.displayStacks = OnLoadSupplier.of(() -> {
             if (this.getId().isPresent()) {
                 ItemStack stack = new ItemStack(Holder.direct(BuiltInRegistries.ITEM.getValue(this.getId().get())),
                     (int) Math.min(this.getAmount(), Integer.MAX_VALUE), this.getComponentsPredicate().asPatch());
-                displayProcessor.accept(stack);
                 return ImmutableList.of(stack);
             } else if (this.getTag().isPresent()) {
                 LinkedList<ItemStack> stacks = new LinkedList<>();
                 TagUtil.forEntries(this.getTag().get()).forEach(entry -> {
                     ItemStack stack = new ItemStack(entry, (int) Math.min(this.getAmount(), Integer.MAX_VALUE),
                         this.getComponentsPredicate().asPatch());
-                    displayProcessor.accept(stack);
                     stacks.addLast(stack);
                 });
                 return ImmutableList.copyOf(stacks);
@@ -138,7 +127,6 @@ public class ItemInput implements SlotDisplay {
                 ItemStack stack = new ItemStack(Holder.direct(CropariaItems.PLACEHOLDER.get()),
                     (int) Math.min(this.getAmount(), Integer.MAX_VALUE),
                     this.getComponentsPredicate().asPatch());
-                displayProcessor.accept(stack);
                 return ImmutableList.of(stack);
             }
         });
@@ -161,12 +149,21 @@ public class ItemInput implements SlotDisplay {
         return this.componentPredicate;
     }
 
+    public Optional<DataComponentPredicate> optionalComponents() {
+        if (this.componentPredicate == DataComponentPredicate.EMPTY) return Optional.empty();
+        return Optional.of(this.componentPredicate);
+    }
+
     public long getAmount() {
         return amount;
     }
 
     public ImmutableList<ItemStack> getDisplayStacks() {
         return this.displayStacks.get();
+    }
+
+    public void mapStacks(Function<ImmutableList<ItemStack>, ImmutableList<ItemStack>> mapper) {
+        this.displayStacks = displayStacks.map(mapper);
     }
 
     public boolean matches(@NotNull Item item) {
@@ -196,7 +193,15 @@ public class ItemInput implements SlotDisplay {
      * Whether the specified item stack matches the input, considering the type of the item, components and amount
      */
     public boolean matches(@NotNull ItemStack stack) {
-        return this.matches(stack.getItem()) && this.matches(stack.getComponents()) && this.getAmount() <= stack.getCount();
+        return this.matchType(stack) && this.getAmount() <= stack.getCount();
+    }
+
+    /**
+     * Whether the specified item stack matches the input, considering the type of the item, components
+     *
+     */
+    public boolean matchType(@NotNull ItemStack stack) {
+        return this.matches(stack.getItem()) && this.matches(stack.getComponents());
     }
 
     public boolean matches(@NotNull ItemSpec item, long amount) {
@@ -216,5 +221,17 @@ public class ItemInput implements SlotDisplay {
     @NotNull
     public Type<? extends SlotDisplay> type() {
         return TYPE;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ItemInput itemInput)) return false;
+        return amount == itemInput.amount && Objects.equals(id, itemInput.id) && Objects.equals(tag, itemInput.tag)
+            && Objects.equals(componentPredicate, itemInput.componentPredicate) && Objects.equals(displayStacks, itemInput.displayStacks);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, tag, componentPredicate, amount, displayStacks);
     }
 }

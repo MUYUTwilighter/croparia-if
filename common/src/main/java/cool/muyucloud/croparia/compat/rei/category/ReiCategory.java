@@ -15,16 +15,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-public abstract class SimpleCategory<R extends DisplayableRecipe<?>> implements DisplayCategory<SimpleDisplay<R>> {
+public abstract class ReiCategory<R extends DisplayableRecipe<?>> implements DisplayCategory<SimpleDisplay<R>> {
     private final CategoryIdentifier<SimpleDisplay<R>> categoryIdentifier;
 
-    public SimpleCategory(ProxyCategory<R> proxy) {
+    public ReiCategory(ProxyCategory<R> proxy) {
         this.categoryIdentifier = proxy.getId();
     }
 
     @Override
     public Component getTitle() {
-        return Texts.literal("gui.%s.%s.title".formatted(this.getId().getNamespace(), this.getId().getPath()));
+        return Texts.translatable("gui.%s.%s.title".formatted(this.getId().getNamespace(), this.getId().getPath()));
     }
 
     @Override

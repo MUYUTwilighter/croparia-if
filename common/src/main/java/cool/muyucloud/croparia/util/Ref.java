@@ -2,12 +2,17 @@ package cool.muyucloud.croparia.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class Ref<T> {
     private T value;
     private final List<BiConsumer<T, T>> onChanged = new ArrayList<>();
+
+    public Ref() {
+        this.value = null;
+    }
 
     public Ref(T value) {
         this.value = value;
@@ -44,5 +49,9 @@ public class Ref<T> {
     public Ref<T> onChanged(BiConsumer<T, T> consumer) {
         onChanged.add(consumer);
         return this;
+    }
+
+    public Optional<T> optional() {
+        return Optional.ofNullable(this.value);
     }
 }

@@ -3,9 +3,10 @@ package cool.muyucloud.croparia.api.recipe.entry;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
+import cool.muyucloud.croparia.api.codec.MultiCodec;
+import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
-import cool.muyucloud.croparia.util.codec.AnyCodec;
-import cool.muyucloud.croparia.util.codec.CodecUtil;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -23,7 +24,7 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
 public class ItemOutput implements SlotDisplay {
-    public static final Codec<ItemOutput> CODEC_SINGLE = ResourceLocation.CODEC.xmap(
+    public static final Codec<ItemOutput> CODEC_STR = ResourceLocation.CODEC.xmap(
         id -> new ItemOutput(id, 1), ItemOutput::getId
     );
     public static final MapCodec<ItemOutput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -31,7 +32,10 @@ public class ItemOutput implements SlotDisplay {
         DataComponentPatch.CODEC.optionalFieldOf("components").forGetter(itemOutput -> Optional.of(itemOutput.getComponentsPatch())),
         Codec.LONG.optionalFieldOf("amount").forGetter(result -> Optional.of(result.getAmount()))
     ).apply(instance, (id, components, amount) -> new ItemOutput(id, components.orElse(DataComponentPatch.EMPTY), amount.orElse(1L))));
-    public static final AnyCodec<ItemOutput> CODEC = new AnyCodec<>(CODEC_COMP.codec(), CODEC_SINGLE);
+    public static final MultiCodec<ItemOutput> CODEC = MultiCodec.of(TestedCodec.of(CODEC_COMP.codec(), toEncode -> {
+        if (toEncode.getComponentsPatch().isEmpty() && toEncode.getAmount() == 1L) return TestedCodec.fail(() -> "Can be encoded as string");
+        return TestedCodec.success();
+    }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemOutput> STREAM_CODEC = CodecUtil.toStream(CODEC);
     public static final Type<ItemOutput> TYPE = new Type<>(CODEC_COMP, STREAM_CODEC);
 
@@ -102,5 +106,16 @@ public class ItemOutput implements SlotDisplay {
     @NotNull
     public Type<? extends SlotDisplay> type() {
         return TYPE;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ItemOutput that)) return false;
+        return amount == that.amount && Objects.equals(id, that.id) && Objects.equals(components, that.components) && Objects.equals(itemSpec, that.itemSpec) && Objects.equals(displayStack, that.displayStack);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, components, amount, itemSpec, displayStack);
     }
 }

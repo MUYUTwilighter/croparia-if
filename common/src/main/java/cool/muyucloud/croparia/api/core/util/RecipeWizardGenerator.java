@@ -9,25 +9,23 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.access.AbstractFurnaceBlockEntityAccess;
 import cool.muyucloud.croparia.access.StateHolderAccess;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.core.block.Infusor;
 import cool.muyucloud.croparia.api.core.block.RitualStand;
+import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualStructureContainer;
 import cool.muyucloud.croparia.api.element.Element;
-import cool.muyucloud.croparia.api.generator.util.Dependencies;
 import cool.muyucloud.croparia.api.generator.util.DgCompiler;
 import cool.muyucloud.croparia.api.generator.util.Placeholder;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.registry.Recipes;
+import cool.muyucloud.croparia.util.Dependencies;
 import cool.muyucloud.croparia.util.FileUtil;
-import cool.muyucloud.croparia.util.codec.CodecUtil;
-import cool.muyucloud.croparia.util.codec.GenericListCodec;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -462,17 +460,17 @@ public class RecipeWizardGenerator {
             BlockPos pos = context.getClickedPos();
             BlockState state = level.getBlockState(pos);
             if (state.getBlock() instanceof RitualStand) {
-                return Objects.requireNonNull(context.getLevel().getServer()).getRecipeManager().getRecipeFor(
-                    Recipes.RITUAL_STRUCTURE.get(), RitualStructureContainer.INSTANCE, null,
-                    ResourceKey.create(Registries.RECIPE, Recipes.RITUAL_STRUCTURE.getId())
-                ).flatMap(holder -> holder.value().matches(pos, level)).map(
-                    block -> CodecUtil.encodeJson(BlockInput.of(block), BlockInput.CODEC).toString()
-                ).orElseThrow();
+                RitualStructureContainer container = new RitualStructureContainer(state);
+                Optional<RitualStructure> structure = Recipes.RITUAL_STRUCTURE.find(container, level);
+                Optional<BlockState> input = structure.flatMap(s ->
+                    s.validate(pos, level).getStates().stream().filter(candidate -> !candidate.isAir()).findFirst());
+                if (input.isPresent()) {
+                    return CodecUtil.encodeJson(BlockInput.of(input.get()), BlockInput.CODEC).toString();
+                }
             }
             assert context.getPlayer() != null;
             Texts.overlay(context.getPlayer(),
-                Texts.translatable("overlay.croparia.recipe_wizard.ritual.missing.block")
-            );
+                Texts.translatable("overlay.croparia.recipe_wizard.ritual.missing.block"));
             throw new IllegalStateException();
         }
     );
@@ -611,18 +609,14 @@ public class RecipeWizardGenerator {
         return EXTENSIONS.getOrDefault(id, new ArrayList<>());
     }
 
-    public static final GenericListCodec<ResourceLocation> CODEC_EXTENSIONS = GenericListCodec.of(ResourceLocation.CODEC);
     public static final MapCodec<RecipeWizardGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        Codec.BOOL.optionalFieldOf("enabled").forGetter(RecipeWizardGenerator::optionalEnabled),
-        Dependencies.CODEC.optionalFieldOf("dependencies").forGetter(RecipeWizardGenerator::optionalDependencies),
+        Codec.BOOL.optionalFieldOf("enabled", true).forGetter(RecipeWizardGenerator::isEnabled),
+        Dependencies.CODEC.optionalFieldOf("dependencies", Dependencies.EMPTY).forGetter(RecipeWizardGenerator::getDependencies),
         BlockInput.CODEC.fieldOf("block").forGetter(RecipeWizardGenerator::getBlock),
         Codec.STRING.fieldOf("path").forGetter(RecipeWizardGenerator::getPath),
-        CODEC_EXTENSIONS.optionalFieldOf("extensions").forGetter(RecipeWizardGenerator::optionalExtensions),
+        CodecUtil.listOf(ResourceLocation.CODEC).optionalFieldOf("extensions", List.of()).forGetter(RecipeWizardGenerator::getExtensions),
         Codec.STRING.fieldOf("template").forGetter(RecipeWizardGenerator::getTemplate)
-    ).apply(instance, (enabled, dependencies, block, path, extensions, template) -> new RecipeWizardGenerator(
-        enabled.orElse(true), dependencies.orElse(Dependencies.EMPTY), block, path,
-        extensions.orElse(ImmutableList.of()), template
-    )));
+    ).apply(instance, RecipeWizardGenerator::new));
 
     private final boolean enabled;
     private final Dependencies dependencies;
@@ -645,10 +639,6 @@ public class RecipeWizardGenerator {
         return enabled;
     }
 
-    public Optional<Boolean> optionalEnabled() {
-        return this.isEnabled() ? Optional.empty() : Optional.of(false);
-    }
-
     public BlockInput getBlock() {
         return block;
     }
@@ -661,20 +651,12 @@ public class RecipeWizardGenerator {
         return dependencies;
     }
 
-    public Optional<Dependencies> optionalDependencies() {
-        return this.getDependencies().isEmpty() ? Optional.empty() : Optional.of(this.getDependencies());
-    }
-
     public boolean isDependenciesAvailable() {
         return this.dependenciesAvailable.get();
     }
 
     public List<ResourceLocation> getExtensions() {
         return extensions;
-    }
-
-    public Optional<List<ResourceLocation>> optionalExtensions() {
-        return this.getExtensions().isEmpty() ? Optional.empty() : Optional.of(this.getExtensions());
     }
 
     public String getTemplate() {

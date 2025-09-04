@@ -28,6 +28,11 @@ import java.util.Objects;
 
 @SuppressWarnings("unused")
 public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeInput>> implements IRecipeCategory<R>, IRecipeType<R> {
+    @SuppressWarnings("unchecked")
+    public <I extends RecipeInput, T extends DisplayableRecipe<I>> JeiCategory<T> adapt() {
+        return (JeiCategory<T>) this;
+    }
+
     public abstract TypedSerializer<R> getTypedSerializer();
 
     @Override

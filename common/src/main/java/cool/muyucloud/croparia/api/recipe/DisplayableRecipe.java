@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.recipe;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeInput;
@@ -14,7 +15,8 @@ import java.util.List;
 
 /**
  * A generic interface for recipes that can be displayed in the recipe book, can be polymorphic to many types required
- * */
+ *
+ */
 public interface DisplayableRecipe<C extends RecipeInput> extends Recipe<C>, RecipeDisplay {
     Logger LOGGER = LogUtils.getLogger();
 
@@ -45,12 +47,15 @@ public interface DisplayableRecipe<C extends RecipeInput> extends Recipe<C>, Rec
 
     @Override
     default @NotNull PlacementInfo placementInfo() {
-        return PlacementInfo.NOT_PLACEABLE;
+        if (this.getInputs().isEmpty()) {
+            return PlacementInfo.NOT_PLACEABLE;
+        }
+        return PlacementInfo.create(this.getInputs().stream().map(slot -> Ingredient.of(slot.stream().map(ItemStack::getItem))).toList());
     }
 
     @Override
     default boolean isSpecial() {
-        return true;
+        return false;
     }
 
     @Override
@@ -69,7 +74,12 @@ public interface DisplayableRecipe<C extends RecipeInput> extends Recipe<C>, Rec
     }
 
     @Override
-    default @NotNull Type<? extends RecipeDisplay> type() {
+    default @NotNull Type<? extends DisplayableRecipe<?>> type() {
         return getTypedSerializer().displayType();
+    }
+
+    @SuppressWarnings("unchecked")
+    default <T extends RecipeInput, R extends Recipe<T>> R adapt() {
+        return (R) this;
     }
 }

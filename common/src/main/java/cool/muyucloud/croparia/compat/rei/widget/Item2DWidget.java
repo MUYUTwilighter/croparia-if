@@ -8,10 +8,10 @@ import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -96,8 +96,19 @@ public class Item2DWidget extends WidgetWithBounds {
     }
 
     @Override
-    public @NotNull List<? extends GuiEventListener> children() {
-        return List.of();
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        return false;
+    }
+
+    @Override
+    public @NotNull List<Slot> children() {
+        List<Slot> slots = new ArrayList<>(rows * cols);
+        for (int x = 0; x < rows; x++) {
+            for (int y = 0; y < cols; y++) {
+                slots.add(this.get(x, y));
+            }
+        }
+        return slots;
     }
 
     public static Item2DWidget create() {

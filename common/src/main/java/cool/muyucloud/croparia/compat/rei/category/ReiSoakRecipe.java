@@ -22,7 +22,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-public class ReiSoakRecipe extends SimpleCategory<SoakRecipe> {
+public class ReiSoakRecipe extends ReiCategory<SoakRecipe> {
     public static final LazySupplier<EntryStack<ItemStack>> STATION = LazySupplier.of(
         () -> EntryStack.of(VanillaEntryTypes.ITEM, CropariaItems.ELEMENTAL_STONE.get().getDefaultInstance())
     );

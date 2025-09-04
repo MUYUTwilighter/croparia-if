@@ -1,15 +1,15 @@
-package cool.muyucloud.croparia.api.generator.util;
+package cool.muyucloud.croparia.util;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
-import cool.muyucloud.croparia.util.codec.GenericListCodec;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
 import dev.architectury.platform.Platform;
 
 import java.util.List;
 
 public class Dependencies {
-    public static final Codec<Dependencies> CODEC = GenericListCodec.of(GenericListCodec.of(Codec.STRING)).xmap(
-        Dependencies::new, Dependencies::getDependencies);
+    public static final Codec<Dependencies> CODEC = CodecUtil.listOf(CodecUtil.listOf(Codec.STRING))
+        .xmap(Dependencies::new, Dependencies::getDependencies);
     public static final Dependencies EMPTY = new Dependencies(List.of());
 
     private final List<List<String>> dependencies;

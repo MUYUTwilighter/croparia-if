@@ -13,6 +13,8 @@
     "ItemStackMixin",
     "MinecraftServerMixin",
     "PackRepositoryMixin",
+    "PlayerListMixin",
+    "RecipeManagerMixin",
     "ReloadableResourceManagerImplMixin",
     "StateHolderMixin"
   ],

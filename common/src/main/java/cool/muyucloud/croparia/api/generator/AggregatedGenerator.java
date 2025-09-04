@@ -2,11 +2,11 @@ package cool.muyucloud.croparia.api.generator;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
-import cool.muyucloud.croparia.api.generator.util.Dependencies;
 import cool.muyucloud.croparia.api.generator.util.DgElement;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
+import cool.muyucloud.croparia.util.Dependencies;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
@@ -18,19 +18,14 @@ import java.util.Map;
  *
  **/
 public class AggregatedGenerator extends DataGenerator {
-    public static final MapCodec<AggregatedGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        Codec.BOOL.optionalFieldOf("enabled").forGetter(AggregatedGenerator::optionalEnabled),
-        Codec.BOOL.optionalFieldOf("startup").forGetter(AggregatedGenerator::optionalStartup),
-        Dependencies.CODEC.optionalFieldOf("dependencies").forGetter(AggregatedGenerator::optionalDependencies),
-        ResourceLocation.CODEC.listOf().optionalFieldOf("whitelist").forGetter(AggregatedGenerator::optionalWhitelist),
-        Codec.STRING.fieldOf("path").forGetter(AggregatedGenerator::getPath),
-        DgRegistry.CODEC.fieldOf("registry").forGetter(AggregatedGenerator::getRegistry),
+    public static final MapCodec<AggregatedGenerator> CODEC = CodecUtil.extend(
+        DataGenerator.CODEC,
         Codec.STRING.fieldOf("content").forGetter(AggregatedGenerator::getContent),
-        Codec.STRING.fieldOf("template").forGetter(AggregatedGenerator::getTemplate)
-    ).apply(instance, (enabled, startup, dependencies, whitelist, path, iterable, content, template) -> new AggregatedGenerator(
-        enabled.orElse(true), startup.orElse(false), dependencies.orElse(Dependencies.EMPTY),
-        whitelist.orElse(List.of()), path, iterable, content, template
-    )));
+        (base, content) -> new AggregatedGenerator(
+            base.isEnabled(), base.isStartup(), base.getDependencies(), base.getWhitelist(),
+            base.getPath(), base.getRegistry(), content, base.getTemplate()
+        )
+    );
 
     private final String content;
     protected final transient Map<String, List<String>> cache = new HashMap<>();

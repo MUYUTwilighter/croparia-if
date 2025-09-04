@@ -4,10 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.access.StateHolderAccess;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
+import cool.muyucloud.croparia.api.codec.MultiCodec;
+import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.api.core.component.BlockProperties;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
-import cool.muyucloud.croparia.util.codec.AnyCodec;
-import cool.muyucloud.croparia.util.codec.CodecUtil;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -38,7 +39,10 @@ public class BlockOutput implements SlotDisplay {
         ResourceLocation.CODEC.fieldOf("id").forGetter(BlockOutput::getId),
         BlockProperties.CODEC.optionalFieldOf("properties").forGetter(blockOutput -> Optional.of(blockOutput.getProperties()))
     ).apply(instance, (id, properties) -> create(id, properties.orElse(BlockProperties.EMPTY))));
-    public static final AnyCodec<BlockOutput> CODEC = AnyCodec.of(CODEC_COMP.codec(), CODEC_SINGLE);
+    public static final MultiCodec<BlockOutput> CODEC = MultiCodec.of(TestedCodec.of(CODEC_COMP.codec(), toEncode -> {
+        if (toEncode.getProperties().isEmpty()) return TestedCodec.fail(() -> "Can be encoded as string");
+        return TestedCodec.success();
+    }), CODEC_SINGLE);
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockOutput> STREAM_CODEC = CodecUtil.toStream(CODEC);
     public static final SlotDisplay.Type<BlockOutput> TYPE = new SlotDisplay.Type<>(CODEC_COMP, STREAM_CODEC);
     public static final ItemStack STACK_UNKNOWN = Items.BEDROCK.getDefaultInstance();
@@ -122,5 +126,16 @@ public class BlockOutput implements SlotDisplay {
     @NotNull
     public SlotDisplay.Type<? extends SlotDisplay> type() {
         return TYPE;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof BlockOutput that)) return false;
+        return Objects.equals(id, that.id) && Objects.equals(properties, that.properties) && Objects.equals(displayStack, that.displayStack);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, properties, displayStack);
     }
 }

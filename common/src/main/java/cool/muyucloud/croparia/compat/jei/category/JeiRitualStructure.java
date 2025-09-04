@@ -1,20 +1,19 @@
 package cool.muyucloud.croparia.compat.jei.category;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
-import cool.muyucloud.croparia.api.recipe.entry.ItemInput;
 import cool.muyucloud.croparia.compat.jei.drawable.Drawer;
 import cool.muyucloud.croparia.compat.jei.drawable.DynamicSlot;
 import cool.muyucloud.croparia.compat.jei.drawable.InputManager;
+import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.RangedVec3i;
 import cool.muyucloud.croparia.util.Ref;
 import cool.muyucloud.croparia.util.Vec2i;
-import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.supplier.SemiSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -24,6 +23,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,18 +48,20 @@ public class JeiRitualStructure extends JeiCategory<RitualStructure> {
     }
 
     @Override
+    public @Nullable IDrawable getIcon() {
+        return toDrawable(CropariaItems.RITUAL_STAND.get().getDefaultInstance());
+    }
+
+    @Override
     public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull RitualStructure recipe, @NotNull IFocusGroup focuses) {
-        Mappable<ItemStack> ritualStand = RitualStructure.STRUCTURES.get().get(recipe);
-        if (ritualStand == null) return;
-        builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).add(ritualStand.get());
+        builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).add(recipe.getRitual());
         for (int x = 0; x < recipe.size().getX(); x++) {
             for (int y = 0; y < recipe.size().getY(); y++) {
                 for (int z = 0; z < recipe.size().getZ(); z++) {
                     char key = recipe.getPattern().get(x, y, z);
-                    if (key == '$') builder.addInvisibleIngredients(RecipeIngredientRole.RENDER_ONLY);
-                    else if (key == '*')
-                        builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).add(ItemInput.ofTag(CropariaIf.of("ritual_stands")));
-                    else if (key != ' ' && key != '.')
+                    if (key == '*')
+                        builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).add(recipe.getRitual());
+                    else if (key != ' ' && key != '.' && key != '$')
                         builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).add(recipe.getKeys().get(key));
                 }
             }
@@ -68,8 +70,6 @@ public class JeiRitualStructure extends JeiCategory<RitualStructure> {
 
     @Override
     public void createRecipeExtras(@NotNull IRecipeExtrasBuilder builder, @NotNull RitualStructure recipe, @NotNull IFocusGroup focuses) {
-        Mappable<ItemStack> ritualStand = RitualStructure.STRUCTURES.get().get(recipe);
-        if (ritualStand == null) return;
         Vec3i displaySize = new Vec3i(
             Math.min(recipe.size().getX(), MAX_DISPLAY_SIZE.x()),
             recipe.size().getY(),

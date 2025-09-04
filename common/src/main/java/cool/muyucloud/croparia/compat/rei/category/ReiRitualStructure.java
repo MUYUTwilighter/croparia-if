@@ -7,6 +7,7 @@ import cool.muyucloud.croparia.compat.rei.util.ProxyCategory;
 import cool.muyucloud.croparia.compat.rei.util.ReiUtil;
 import cool.muyucloud.croparia.compat.rei.util.SimpleDisplay;
 import cool.muyucloud.croparia.compat.rei.widget.Item2DWidget;
+import cool.muyucloud.croparia.compat.rei.widget.PatchedOverflow;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.text.Texts;
@@ -25,8 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@SuppressWarnings("UnstableApiUsage")
-public class ReiRitualStructure extends SimpleCategory<RitualStructure> {
+public class ReiRitualStructure extends ReiCategory<RitualStructure> {
     private static final ItemStack INPUT = CropariaItems.PLACEHOLDER.get().getDefaultInstance();
 
     static {
@@ -98,7 +98,7 @@ public class ReiRitualStructure extends SimpleCategory<RitualStructure> {
                 } else if (c == '$') {
                     return Collections.singleton(EntryStacks.of(INPUT));
                 } else if (c == '*') {
-                    return Collections.singleton(EntryStacks.of(RitualStructure.STRUCTURES.get().get(display.getRecipe()).get()));
+                    return ReiUtil.toIngredient(recipe.getRitual());
                 } else if (c == ' ') {
                     return Collections.singleton(EntryStacks.of(BlockInput.STACK_ANY));
                 } else {
@@ -106,7 +106,7 @@ public class ReiRitualStructure extends SimpleCategory<RitualStructure> {
                 }
             }).cols(slotSize.getX()).rows(slotSize.getZ()));
         }
-        Widget layer = Widgets.overflowed(
+        Widget layer = new PatchedOverflow(
             new Rectangle(
                 bounds.x + FRAME_PADDING, bounds.y + FRAME_PADDING, bounds.width - 2 * FRAME_PADDING,
                 bounds.height - 2 * FRAME_PADDING - SLOT_SIZE

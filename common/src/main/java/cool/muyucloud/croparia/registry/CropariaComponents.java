@@ -1,10 +1,10 @@
 package cool.muyucloud.croparia.registry;
 
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.core.component.BlockProperties;
 import cool.muyucloud.croparia.api.core.component.TargetPos;
 import cool.muyucloud.croparia.api.core.component.Text;
-import cool.muyucloud.croparia.util.codec.CodecUtil;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.component.DataComponentType;

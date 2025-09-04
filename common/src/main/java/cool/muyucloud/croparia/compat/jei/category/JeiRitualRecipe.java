@@ -2,11 +2,14 @@ package cool.muyucloud.croparia.compat.jei.category;
 
 import cool.muyucloud.croparia.api.core.recipe.RitualRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
+import cool.muyucloud.croparia.registry.CropariaItems;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class JeiRitualRecipe extends JeiCategory<RitualRecipe> {
     public static final JeiRitualRecipe INSTANCE = new JeiRitualRecipe();
@@ -14,6 +17,11 @@ public class JeiRitualRecipe extends JeiCategory<RitualRecipe> {
     @Override
     public TypedSerializer<RitualRecipe> getTypedSerializer() {
         return RitualRecipe.TYPED_SERIALIZER;
+    }
+
+    @Override
+    public @Nullable IDrawable getIcon() {
+        return toDrawable(CropariaItems.RITUAL_STAND.get().getDefaultInstance());
     }
 
     @Override

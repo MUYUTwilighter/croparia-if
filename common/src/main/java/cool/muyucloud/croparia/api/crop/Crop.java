@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.crop.block.CropariaCropBlock;
 import cool.muyucloud.croparia.api.crop.item.CropFruit;
 import cool.muyucloud.croparia.api.crop.item.CropSeed;
@@ -17,7 +18,6 @@ import cool.muyucloud.croparia.api.generator.util.DgElement;
 import cool.muyucloud.croparia.api.generator.util.Placeholder;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.CifUtil;
-import cool.muyucloud.croparia.util.codec.AnyCodec;
 import cool.muyucloud.croparia.util.supplier.HolderSupplier;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
@@ -46,31 +46,17 @@ public class Crop extends AbstractCrop implements TierAccess {
         return type;
     }
 
-    public static final MapCodec<Crop> CODEC_NEW = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.fieldOf("id").forGetter(Crop::getKey),
-        Material.CODEC.fieldOf("material").forGetter(Crop::getMaterial),
+    public static final MapCodec<Crop> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        CodecUtil.fieldsOf(ResourceLocation.CODEC, "id", "name").forGetter(Crop::getKey),
+        CodecUtil.fieldsOf(Material.CODEC, "material", "tag").forGetter(Crop::getMaterial),
         Color.CODEC.fieldOf("color").forGetter(Crop::getColor),
         Codec.INT.fieldOf("tier").forGetter(Crop::getTier),
-        Codec.STRING.optionalFieldOf("type").forGetter(Crop::getTypeOptional),
+        Codec.STRING.optionalFieldOf("type", "crop").forGetter(Crop::getType),
         Codec.unboundedMap(Codec.STRING, Codec.STRING).optionalFieldOf("translations").forGetter(Crop::getTranslationsOptional),
         CropDependencies.CODEC_ANY.optionalFieldOf("dependencies").forGetter(Crop::getDependenciesOptional)
     ).apply(instance, (name, material, color, tier, type, translations, dependencies) -> new Crop(name, material, color, tier,
-        type.orElse(null), translations.orElse(null), dependencies.orElse(null))
+        type, translations.orElse(null), dependencies.orElse(null))
     ));
-    public static final MapCodec<Crop> CODEC_OLD = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.fieldOf("name").forGetter(Crop::getKey),
-        Codec.STRING.fieldOf("tag").forGetter(Crop::getMaterialName),
-        Color.CODEC.fieldOf("color").forGetter(Crop::getColor),
-        Codec.INT.fieldOf("tier").forGetter(Crop::getTier),
-        Codec.STRING.optionalFieldOf("type").forGetter(Crop::getTypeOptional),
-        Codec.unboundedMap(Codec.STRING, Codec.STRING).optionalFieldOf("translations").forGetter(Crop::getTranslationsOptional),
-        CropDependencies.CODEC_ANY.optionalFieldOf("dependencies").forGetter(Crop::getDependenciesOptional)
-    ).apply(instance,
-        (name, material, color, tier, type, translations, dependencies)
-            -> new Crop(name, new Material("#" + material), color, tier, type.orElse(DEFAULT_TYPE),
-            translations.orElse(null), dependencies.orElse(null))
-    ));
-    public static final AnyCodec<Crop> CODEC = new AnyCodec<>(CODEC_NEW.codec(), CODEC_OLD.codec());
 
     public static final Placeholder<Crop> COLOR = Placeholder.of("\\{color}", Crop::getColorDec);
     public static final Placeholder<Crop> COLOR_HEX = Placeholder.of("\\{color_hex}", Crop::getColorHex);
@@ -204,7 +190,7 @@ public class Crop extends AbstractCrop implements TierAccess {
     }
 
     public @NotNull String getTranslationKey() {
-        return dependencies.getKey();
+        return dependencies.getChosen();
     }
 
     public Optional<String> getTranslationKeyOptional() {

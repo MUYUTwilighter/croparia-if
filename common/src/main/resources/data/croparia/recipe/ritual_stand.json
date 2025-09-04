@@ -1,5 +1,6 @@
 {
   "type": "croparia:ritual_structure",
+  "ritual": "croparia:ritual_stand",
   "keys": {
     "A": "minecraft:andesite",
     "D": "minecraft:diorite",

@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.element.block.ElementalLiquidBlock;
 import cool.muyucloud.croparia.api.element.fluid.ElementalFlowing;
@@ -17,7 +18,6 @@ import cool.muyucloud.croparia.api.generator.util.DgElement;
 import cool.muyucloud.croparia.api.generator.util.Placeholder;
 import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.CifUtil;
-import cool.muyucloud.croparia.util.codec.CodecUtil;
 import cool.muyucloud.croparia.util.supplier.HolderSupplier;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.supplier.SemiSupplier;
@@ -243,5 +243,16 @@ public class Element implements StringRepresentable, Comparable<Element>, DgElem
     @Override
     public int compareTo(@NotNull Element o) {
         return this.getKey().compareTo(o.getKey());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Element element)) return false;
+        return Objects.equals(id, element.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

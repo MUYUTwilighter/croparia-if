@@ -1,5 +1,6 @@
 {
   "type": "croparia:ritual_structure",
+  "ritual": "croparia:ritual_stand_2",
   "keys": {
     "E": "croparia:elemental_stone",
     "S": "croparia:activated_shrieker",

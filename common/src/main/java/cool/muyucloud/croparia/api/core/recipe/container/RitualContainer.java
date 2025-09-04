@@ -1,15 +1,28 @@
 package cool.muyucloud.croparia.api.core.recipe.container;
 
+import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
-public record RitualContainer(
-    int tier, @NotNull ItemStack item, @NotNull BlockState state
-) implements RecipeInput {
-    public static RitualContainer of(int tier, @NotNull ItemStack input, BlockState state) {
-        return new RitualContainer(tier, input, state);
+import java.util.List;
+
+public record RitualContainer(BlockState ritual, @NotNull List<ItemStack> stacks,
+                              @NotNull RitualStructure.Result matched) implements RecipeInput {
+    public static RitualContainer of(BlockState ritual, @NotNull List<ItemEntity> stacks, @NotNull RitualStructure.Result matched) {
+        return new RitualContainer(ritual, stacks.stream().map(ItemEntity::getItem).toList(), matched);
+    }
+
+    public static RitualContainer of(Level level, BlockPos pos, @NotNull RitualStructure.Result matched) {
+        return new RitualContainer(level.getBlockState(pos), level.getEntitiesOfClass(
+            ItemEntity.class, AABB.unitCubeFromLowerCorner(pos.getBottomCenter()),
+            entity -> !entity.getItem().isEmpty()
+        ).stream().map(ItemEntity::getItem).toList(), matched);
     }
 
     @Override
@@ -19,11 +32,11 @@ public record RitualContainer(
 
     @Override
     public @NotNull ItemStack getItem(int i) {
-        return i == 0 ? item : ItemStack.EMPTY;
+        return i < stacks.size() ? stacks.get(i) : ItemStack.EMPTY;
     }
 
     @Override
     public int size() {
-        return 1;
+        return stacks.size();
     }
 }

@@ -1,8 +1,6 @@
 package cool.muyucloud.croparia.api.core.block;
 
 import cool.muyucloud.croparia.CropariaIf;
-import cool.muyucloud.croparia.api.core.entity.FakePlayer;
-import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualContainer;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualStructureContainer;
 import cool.muyucloud.croparia.registry.CropariaItems;
@@ -11,16 +9,17 @@ import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.ItemPlaceable;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -30,16 +29,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class RitualStand extends Block implements ItemPlaceable {
     protected final VoxelShape SHAPE = Block.box(0.0, 0.3, 0.0, 16.0, 6.0, 16.0);
     private final int tier;
-    private LinkedList<ItemEntity> items = new LinkedList<>();
+    private ItemEntity lastCalled = null;
+    private long last = 0;
 
     public RitualStand(int tier, Properties properties) {
         super(properties);
@@ -60,63 +55,39 @@ public class RitualStand extends Block implements ItemPlaceable {
 
     @Override
     public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
-        LinkedList<ItemEntity> filtered = new LinkedList<>();
-        items.stream().filter(item -> !item.isRemoved()).forEach(filtered::add);
-        items = filtered;
-        if (entity instanceof ItemEntity itemEntity && !this.items.contains(itemEntity)
-            && world instanceof ServerLevel serverWorld && CropariaIf.CONFIG.getRitual()) {
-            this.items.add(itemEntity);
-            ItemStack stack = itemEntity.getItem();
-            RecipeManager recipeManager = serverWorld.getServer().getRecipeManager();
-            this.getRitualStructure(recipeManager).flatMap(
-                structure -> structure.matchesAndDestroy(pos, world)
-            ).ifPresentOrElse(inputBlock -> {
-                RitualContainer container = this.getRitualContainer(stack, inputBlock);
-                if (itemEntity.getOwner() instanceof Player player) {
-                    this.tryCraft(container, serverWorld, pos, player);
-                } else {
-                    this.tryCraft(container, serverWorld, pos, null);
-                }
-            }, () -> {
-                if (itemEntity.getOwner() != null && itemEntity.getOwner() instanceof Player player) {
-                    this.bad("overlay.croparia.ritual.bad", player);
-                }
-            });
+        long now = (long) (System.currentTimeMillis() / world.tickRateManager().millisecondsPerTick());
+        if (entity instanceof ItemEntity itemEntity &&
+            (lastCalled == null || lastCalled.getOnPos().equals(pos) || now != last)
+            && world instanceof ServerLevel level && CropariaIf.CONFIG.getRitual()) {
+            float offset = pos.hashCode() % level.tickRateManager().tickrate();
+            if (offset != (System.currentTimeMillis() / level.tickRateManager().millisecondsPerTick())) {
+                return;
+            }
+            lastCalled = itemEntity;
+            last = now;
+            RecipeManager recipeManager = level.getServer().getRecipeManager();
+            recipeManager.getRecipeFor(
+                Recipes.RITUAL_STRUCTURE, new RitualStructureContainer(level.getBlockState(pos)), level
+            ).map(RecipeHolder::value).map(structure -> structure.validate(pos, level)).ifPresentOrElse(
+                r -> r.ifSuccessOrElse(matched -> {
+                    RitualContainer matcher = RitualContainer.of(level, pos, matched);
+                    recipeManager.getRecipeFor(Recipes.RITUAL, matcher, level).map(RecipeHolder::value).ifPresentOrElse(ritual -> {
+                        ItemStack result = ritual.assemble(matcher);
+                        CifUtil.exportItem(level, pos, result, itemEntity.getOwner() instanceof Player player ? player : null);
+                        this.playSound(level, pos);
+                    }, () -> this.tryTell(itemEntity, Texts.translatable("overlay.croparia.ritual.rejected")));
+                }, () -> this.tryTell(itemEntity, Texts.translatable("overlay.croparia.ritual.bad"))),
+                () -> this.tryTell(itemEntity, Texts.translatable("overlay.croparia.ritual.404"))
+            );
         }
     }
 
-    protected Optional<RitualStructure> getRitualStructure(@NotNull RecipeManager recipeManager) {
-        AtomicReference<RitualStructure> recipe = new AtomicReference<>();
-        recipeManager.getRecipeFor(
-            Recipes.RITUAL_STRUCTURE.get(), RitualStructureContainer.INSTANCE, null, ResourceKey.create(Registries.RECIPE, Recipes.RITUAL_STRUCTURE.getId())
-        ).ifPresent(result -> recipe.set(result.value()));
-        return Optional.ofNullable(recipe.get());
+    protected void tryTell(ItemEntity item, Component msg) {
+        if (item.getOwner() instanceof Player player) Texts.overlay(player, msg);
     }
 
-    protected void tryCraft(@NotNull RitualContainer container, @NotNull ServerLevel world, @NotNull BlockPos pos, @Nullable Player player) {
-        if (!CropariaIf.CONFIG.getInfusor()) {
-            return;
-        }
-        world.getServer().getRecipeManager().getRecipeFor(Recipes.RITUAL.get(), container, world).ifPresentOrElse(recipe -> {
-            ItemStack result = recipe.value().assemble(container);
-            if (result.getItem() instanceof SpawnEggItem) {
-                FakePlayer.useAllItemsOn(world, pos, result);
-            } else {
-                CifUtil.exportItem(world, pos, result, player);
-            }
-        }, () -> {
-            if (player != null) {
-                this.bad("overlay.croparia.ritual.rejected", player);
-            }
-        });
-    }
-
-    public @NotNull RitualContainer getRitualContainer(@NotNull ItemStack input, @NotNull BlockState block) {
-        return new RitualContainer(this.tier, input, block);
-    }
-
-    public void bad(@NotNull String translationKey, @NotNull Player player) {
-        Texts.overlay(player, Texts.translatable(translationKey));
+    protected void playSound(@NotNull ServerLevel level, @NotNull BlockPos pos) {
+        level.playSound(null, pos, SoundEvent.createVariableRangeEvent(CropariaIf.of("")), SoundSource.BLOCKS);
     }
 
     public @NotNull VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {

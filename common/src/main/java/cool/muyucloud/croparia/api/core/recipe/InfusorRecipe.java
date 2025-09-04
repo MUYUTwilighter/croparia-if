@@ -11,11 +11,10 @@ import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.ItemInput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import cool.muyucloud.croparia.registry.CropariaItems;
-import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
+import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
@@ -24,27 +23,28 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     public static final TypedSerializer<InfusorRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
         CropariaIf.of("infusor"), InfusorRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Element.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
-            ItemInput.codec(stack -> CifUtil.addTooltip(stack, Constants.ITEM_DROP_TOOLTIP))
-                .fieldOf("ingredient").forGetter(InfusorRecipe::getIngredient),
+            ItemInput.CODEC.fieldOf("ingredient").forGetter(InfusorRecipe::getIngredient),
             ItemOutput.CODEC.fieldOf("result").forGetter(InfusorRecipe::getResult)
-        ).apply(instance, InfusorRecipe::new)),
+        ).apply(instance, InfusorRecipe::new)), TypedSerializer.JEI,
         Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance)
     );
     public static final TypedSerializer<InfusorRecipe> OLD_TYPED_SERIALIZER = new TypedSerializer<>(
         CropariaIf.of("infusor_type"), InfusorRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Element.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
-            ResourceLocation.CODEC.fieldOf("input").forGetter(recipe -> recipe.getResult().getId()),
-            ResourceLocation.CODEC.fieldOf("output").forGetter(recipe -> recipe.getResult().getId()),
+            ItemInput.CODEC.fieldOf("input").forGetter(InfusorRecipe::getIngredient),
+            ItemOutput.CODEC.fieldOf("output").forGetter(InfusorRecipe::getResult),
             Codec.INT.fieldOf("count").forGetter(recipe -> Math.toIntExact(recipe.getResult().getAmount()))
-        ).apply(instance, (element, input, output, count) -> new InfusorRecipe(element, new ItemInput(input, 1), new ItemOutput(output, count)))),
-        Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance)
+        ).apply(instance, (element, input, output, count) ->
+            new InfusorRecipe(element, input, new ItemOutput(output.getId(), output.getComponentsPatch(), count)))),
+        TypedSerializer.JEI, Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance)
     );
 
     protected final Element element;
@@ -55,6 +55,10 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
         this.element = element;
         this.ingredient = ingredient;
         this.result = result;
+        this.ingredient.mapStacks(stacks -> {
+            stacks.forEach(stack -> Texts.tooltip(stack, Constants.ITEM_DROP_TOOLTIP));
+            return stacks;
+        });
     }
 
     public ItemInput getIngredient() {
@@ -85,7 +89,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     }
 
     public ItemStack getPotion() {
-        return CifUtil.addTooltip(ElementalPotion.fromElement(getElement()).orElseThrow().getDefaultInstance(), Constants.ELEM_INFUSE_TOOLTIP);
+        return Texts.tooltip(ElementalPotion.fromElement(getElement()).orElseThrow().getDefaultInstance(), Constants.ELEM_INFUSE_TOOLTIP);
     }
 
     @Override
@@ -125,5 +129,16 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     @Override
     public TypedSerializer<? extends InfusorRecipe> getTypedSerializer() {
         return TYPED_SERIALIZER;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof InfusorRecipe that)) return false;
+        return Objects.equals(element, that.element) && Objects.equals(ingredient, that.ingredient) && Objects.equals(result, that.result);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(element, ingredient, result);
     }
 }

@@ -4,8 +4,9 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import cool.muyucloud.croparia.api.codec.MultiCodec;
+import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.util.TagUtil;
-import cool.muyucloud.croparia.util.codec.AnyCodec;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPatch;
@@ -19,19 +20,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class Material {
     public static final Codec<Material> CODEC_STR = Codec.STRING.xmap(Material::new, Material::getName);
     public static final MapCodec<Material> CODEC_COMP = RecordCodecBuilder.mapCodec(
         instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(Material::getName),
-            DataComponentPatch.CODEC.optionalFieldOf("components").forGetter(Material::getComponentsOptional)
-        ).apply(instance, (name, components) -> new Material(name, components.orElse(DataComponentPatch.EMPTY)))
+            DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY).forGetter(Material::getComponents)
+        ).apply(instance, Material::new)
     );
-    public static final AnyCodec<Material> CODEC = new AnyCodec<>(
-        logs -> "Failed to decode material via neither \"%s\" or \"%s\"".formatted(logs.getFirst(), logs.get(1)),
-        CODEC_COMP.codec(), CODEC_STR
+    public static final MultiCodec<Material> CODEC = MultiCodec.of(
+        TestedCodec.of(CODEC_COMP.codec(), toDecode -> toDecode.components.equals(DataComponentPatch.EMPTY)
+            ? TestedCodec.fail(() -> "No components, proceed to string codec") : TestedCodec.success()), CODEC_STR
     );
 
     private final boolean tag;
@@ -88,11 +88,6 @@ public class Material {
 
     public @NotNull DataComponentPatch getComponents() {
         return components;
-    }
-
-    public Optional<DataComponentPatch> getComponentsOptional() {
-        if (DataComponentPatch.EMPTY.equals(components)) return Optional.empty();
-        return Optional.of(components);
     }
 
     public String getName() {

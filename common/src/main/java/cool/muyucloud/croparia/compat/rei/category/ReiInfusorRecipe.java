@@ -19,7 +19,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-public class ReiInfusorRecipe extends SimpleCategory<InfusorRecipe> {
+public class ReiInfusorRecipe extends ReiCategory<InfusorRecipe> {
     public static final LazySupplier<EntryStack<ItemStack>> STATION = LazySupplier.of(() -> EntryStacks.of(CropariaItems.INFUSOR.get()));
 
     public ReiInfusorRecipe(ProxyCategory<InfusorRecipe> proxy) {

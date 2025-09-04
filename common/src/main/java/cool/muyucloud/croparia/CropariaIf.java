@@ -9,9 +9,9 @@ import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import dev.architectury.event.events.common.LifecycleEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class CropariaIf {
@@ -22,14 +22,16 @@ public class CropariaIf {
     private static MinecraftServer SERVER = null;
 
     public static void init() {
+        OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
         CropariaIf.LOGGER.info("=== Croparia common setup ===");
-        LOGGER.info("Customize registration");
+        LOGGER.info("Croparia IF customize registration");
         DgRegistries.register();
         DataGenerators.register();
         PackHandlers.register();
         Crops.register();
         Elements.register();
-        LOGGER.info("Vanilla registration");
+        LOGGER.info("Croparia IF vanilla registration");
+        NetworkHandlers.register();
         CropariaComponents.register();
         CropariaBlocks.register();
         BlockEntities.register();
@@ -39,11 +41,9 @@ public class CropariaIf {
         Tabs.register();
         CommonCommandRoot.register();
         PlacedFeatures.register();
-        LOGGER.info("Event registration");
-        LifecycleEvent.SERVER_STARTING.register(server -> {
-            SERVER = server;
-            ConfigFileHandler.reload(CONFIG);
-        });
+        LOGGER.info("Croparia IF event registration");
+        LifecycleEvent.SERVER_BEFORE_START.register(server -> SERVER = server);
+        LifecycleEvent.SERVER_STARTING.register(server -> ConfigFileHandler.reload(CONFIG));
         LifecycleEvent.SERVER_STARTED.register(server -> {
             SERVER_STARTED = true;
             OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
@@ -60,9 +60,8 @@ public class CropariaIf {
         CropariaIf.LOGGER.info("=== Croparia common setup done ===");
     }
 
-    @Nullable
-    public static MinecraftServer getServer() {
-        return SERVER;
+    public static Optional<MinecraftServer> getServer() {
+        return Optional.ofNullable(SERVER);
     }
 
     public static void ifServer(Consumer<MinecraftServer> consumer) {

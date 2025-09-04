@@ -1,6 +1,5 @@
 package cool.muyucloud.croparia.api.core.recipe;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualContainer;
@@ -10,16 +9,12 @@ import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemInput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import cool.muyucloud.croparia.registry.CropariaItems;
-import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
+import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -29,46 +24,17 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     public static final TypedSerializer<RitualRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
         CropariaIf.of("ritual"), RitualRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.INT.fieldOf("tier").orElse(1).forGetter(RitualRecipe::getTier),
-            BlockInput.codec(stack -> CifUtil.addTooltip(stack, Constants.BLOCK_PLACE_TOOLTIP))
-                .fieldOf("block").forGetter(RitualRecipe::getBlock),
-            ItemInput.codec(stack -> CifUtil.addTooltip(stack, Constants.ITEM_DROP_TOOLTIP))
-                .fieldOf("ingredient").forGetter(RitualRecipe::getIngredient),
+            BlockInput.CODEC.fieldOf("ritual").forGetter(RitualRecipe::getRitual),
+            BlockInput.CODEC.fieldOf("block").forGetter(RitualRecipe::getBlock),
+            ItemInput.CODEC.fieldOf("ingredient").forGetter(RitualRecipe::getIngredient),
             ItemOutput.CODEC.fieldOf("result").forGetter(RitualRecipe::getResult)
-        ).apply(instance, RitualRecipe::new)),
-        Mappable.of(CropariaItems.RITUAL_STAND, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
-        Mappable.of(CropariaItems.RITUAL_STAND_2, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
-        Mappable.of(CropariaItems.RITUAL_STAND_3, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL))
-    );
-    public static final TypedSerializer<RitualRecipe> OLD_TYPED_SERIALIZER = new TypedSerializer<>(
-        CropariaIf.of("ritual_type"), RitualRecipe.class,
-        RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.INT.fieldOf("tier").forGetter(RitualRecipe::getTier),
-            ResourceLocation.CODEC.fieldOf("block").forGetter(recipe -> recipe.getBlock().getDisplayId()),
-            ResourceLocation.CODEC.fieldOf("input").forGetter(recipe -> recipe.getIngredient().getDisplayId()),
-            ResourceLocation.CODEC.fieldOf("output").forGetter(recipe -> recipe.getResult().getId()),
-            Codec.INT.fieldOf("count").forGetter(recipe -> Math.toIntExact(recipe.getResult().getAmount()))
-        ).apply(instance, (tier, block, input, output, count) -> new RitualRecipe(tier, BlockInput.create(block), new ItemInput(input, 1), new ItemOutput(output, count)))),
-        StreamCodec.of((buf, recipe) -> {
-            buf.writeInt(recipe.getTier());
-            ItemStack stack = recipe.getIngredient().getDisplayStacks().getFirst();
-            buf.writeJsonWithCodec(ItemStack.CODEC, stack);
-            buf.writeJsonWithCodec(ItemStack.CODEC, recipe.getBlock().getDisplayStacks().getFirst());
-            buf.writeInt(Math.toIntExact(recipe.getResult().getAmount()));
-        }, buf -> {
-            int tier = buf.readInt();
-            ItemStack stack = buf.readJsonWithCodec(ItemStack.CODEC);
-            ResourceLocation block = buf.readJsonWithCodec(ItemStack.CODEC).getItem().arch$registryName();
-            int count = buf.readInt();
-            stack.setCount(count);
-            return new RitualRecipe(tier, BlockInput.create(Objects.requireNonNull(block)), new ItemInput(stack), new ItemOutput(stack));
-        }),
-        Mappable.of(CropariaItems.RITUAL_STAND, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
-        Mappable.of(CropariaItems.RITUAL_STAND_2, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
-        Mappable.of(CropariaItems.RITUAL_STAND_3, item -> CifUtil.addTooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL))
+        ).apply(instance, RitualRecipe::new)), TypedSerializer.JEI,
+        Mappable.of(CropariaItems.RITUAL_STAND, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
+        Mappable.of(CropariaItems.RITUAL_STAND_2, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
+        Mappable.of(CropariaItems.RITUAL_STAND_3, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL))
     );
 
-    private final int tier;
+    private final BlockInput ritual;
     @NotNull
     private final BlockInput block;
     @NotNull
@@ -77,15 +43,24 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     private final ItemOutput result;
 
     public RitualRecipe(
-        int tier, @NotNull BlockInput state, @NotNull ItemInput ingredient, @NotNull ItemOutput result
+        BlockInput ritual, @NotNull BlockInput state, @NotNull ItemInput ingredient, @NotNull ItemOutput result
     ) {
-        if (tier < 1) {
-            throw new IllegalArgumentException("Tier must be at least 1");
-        }
-        this.tier = tier;
+        this.ritual = ritual;
         this.block = state;
         this.ingredient = ingredient;
         this.result = result;
+        this.ritual.mapStacks(stacks -> {
+            stacks.forEach(stack -> Texts.tooltip(stack, Constants.TOOLTIP_RITUAL));
+            return stacks;
+        });
+        this.ingredient.mapStacks(stacks -> {
+            stacks.forEach(stack -> Texts.tooltip(stack, Constants.ITEM_DROP_TOOLTIP));
+            return stacks;
+        });
+        this.block.mapStacks(stacks -> {
+            stacks.forEach(stack -> Texts.tooltip(stack, Constants.BLOCK_PLACE_TOOLTIP));
+            return stacks;
+        });
     }
 
     public @NotNull ItemInput getIngredient() {
@@ -100,8 +75,8 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         return block;
     }
 
-    public int getTier() {
-        return tier;
+    public @NotNull BlockInput getRitual() {
+        return this.ritual;
     }
 
     @Override
@@ -117,21 +92,33 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         return List.of(List.of(this.getResult().getDisplayStack()));
     }
 
-    public ItemStack assemble(RitualContainer recipeInput) {
-        if (matches(recipeInput)) {
-            recipeInput.item().shrink(Math.toIntExact(this.getIngredient().getAmount()));
-            return this.getResult().createStack();
+    public ItemStack assemble(RitualContainer matcher) {
+        long consumed = 0;
+        for (ItemStack stack : matcher.stacks()) {
+            if (this.getIngredient().matchType(stack)) {
+                long toConsume = Math.min(stack.getCount(), this.getIngredient().getAmount() - consumed);
+                stack.shrink(Math.toIntExact(toConsume));
+                consumed += toConsume;
+            }
+            if (consumed >= this.getIngredient().getAmount()) {
+                return this.getResult().createStack();
+            }
         }
         return ItemStack.EMPTY;
     }
 
-    public boolean matches(RitualContainer container) {
-        int tier = container.tier();
-        ItemStack input = container.item();
-        BlockState state = container.state();
-        return this.getIngredient().matches(input)
-            && this.getBlock().matches(state)
-            && tier >= this.getTier();
+    public boolean matches(RitualContainer matcher) {
+        long accumulated = 0;
+        for (ItemStack stack : matcher.stacks()) {
+            if (this.getIngredient().matchType(stack)) {
+                accumulated += stack.getCount();
+            }
+            if (accumulated > this.getIngredient().getAmount()) {
+                return matcher.matched().getStates().stream().allMatch(state -> this.getBlock().matches(state))
+                    && this.getRitual().matches(matcher.ritual());
+            }
+        }
+        return false;
     }
 
     @Override
@@ -152,12 +139,23 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
 
     @Override
     @NotNull
-    public SlotDisplay.ItemStackSlotDisplay craftingStation() {
-        return new SlotDisplay.ItemStackSlotDisplay(this.getTypedSerializer().getStations().get(this.getTier() - 1).get());
+    public BlockInput craftingStation() {
+        return this.getRitual();
     }
 
     @Override
     public TypedSerializer<? extends DisplayableRecipe<RitualContainer>> getTypedSerializer() {
         return TYPED_SERIALIZER;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof RitualRecipe that)) return false;
+        return Objects.equals(ritual, that.ritual) && Objects.equals(block, that.block) && Objects.equals(ingredient, that.ingredient) && Objects.equals(result, that.result);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ritual, block, ingredient, result);
     }
 }

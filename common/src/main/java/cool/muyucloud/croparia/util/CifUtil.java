@@ -1,7 +1,5 @@
 package cool.muyucloud.croparia.util;
 
-import cool.muyucloud.croparia.api.core.component.Text;
-import cool.muyucloud.croparia.registry.CropariaComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
@@ -9,7 +7,6 @@ import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -18,7 +15,6 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -34,15 +30,6 @@ import java.util.Objects;
 public class CifUtil {
     public static ResourceLocation formatId(String pattern, ResourceLocation id) {
         return ResourceLocation.tryBuild(id.getNamespace(), pattern.formatted(id.getPath()));
-    }
-
-    public static ItemStack addTooltip(Item item, Component component) {
-        return addTooltip(item.getDefaultInstance(), component);
-    }
-
-    public static ItemStack addTooltip(ItemStack stack, Component component) {
-        stack.set(CropariaComponents.TEXT.get(), new Text(component));
-        return stack;
     }
 
     @SuppressWarnings("unused")

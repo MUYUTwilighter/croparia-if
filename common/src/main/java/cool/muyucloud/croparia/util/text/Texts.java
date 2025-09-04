@@ -1,5 +1,7 @@
 package cool.muyucloud.croparia.util.text;
 
+import cool.muyucloud.croparia.api.core.component.Text;
+import cool.muyucloud.croparia.registry.CropariaComponents;
 import dev.architectury.event.events.client.ClientCommandRegistrationEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -13,8 +15,23 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 public class Texts {
+    public static ItemStack tooltip(Item item, MutableComponent component) {
+        return tooltip(item.getDefaultInstance(), component);
+    }
+
+    public static ItemStack tooltip(ItemStack stack, MutableComponent component) {
+        Text text = stack.getOrDefault(CropariaComponents.TEXT.get(), new Text());
+        text.append(component);
+        stack.set(CropariaComponents.TEXT.get(), text);
+        return stack;
+    }
+
     public static MutableComponent literal(String text, Style... styles) {
         return forStyles(Component.literal(text), styles);
+    }
+
+    public static MutableComponent literal() {
+        return forStyles(Component.empty());
     }
 
     public static MutableComponent translatable(String key, Object... args) {

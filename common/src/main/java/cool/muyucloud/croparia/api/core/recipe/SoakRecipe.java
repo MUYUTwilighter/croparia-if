@@ -10,9 +10,9 @@ import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
 import cool.muyucloud.croparia.registry.CropariaItems;
-import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
+import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +21,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
     public static final TypedSerializer<SoakRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
@@ -28,9 +29,9 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
         RecordCodecBuilder.mapCodec(instance -> instance.group(
             Element.CODEC.fieldOf("element").forGetter(SoakRecipe::getElement),
             Codec.FLOAT.fieldOf("probability").forGetter(SoakRecipe::getProbability),
-            BlockInput.codec(stack -> CifUtil.addTooltip(stack, Constants.SOAK_BLOCK_INPUT)).fieldOf("input").forGetter(SoakRecipe::getInput),
+            BlockInput.CODEC.fieldOf("input").forGetter(SoakRecipe::getInput),
             BlockOutput.CODEC.fieldOf("output").forGetter(SoakRecipe::getOutput)
-        ).apply(instance, SoakRecipe::new)),
+        ).apply(instance, SoakRecipe::new)), TypedSerializer.JEI,
         Mappable.of(CropariaItems.ELEMENTAL_STONE, Item::getDefaultInstance)
     );
 
@@ -44,6 +45,10 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
         this.probability = probability;
         this.input = input;
         this.output = output;
+        this.input.mapStacks(stacks -> {
+            stacks.forEach(stack -> Texts.tooltip(stack, Constants.SOAK_BLOCK_INPUT));
+            return stacks;
+        });
     }
 
     public Element getElement() {
@@ -51,7 +56,7 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
     }
 
     public ItemStack getPotion() {
-        return CifUtil.addTooltip(this.getElement().getPotion().get().getDefaultInstance(), Constants.ELEM_INFUSE_TOOLTIP);
+        return Texts.tooltip(this.getElement().getPotion().get().getDefaultInstance(), Constants.ELEM_INFUSE_TOOLTIP);
     }
 
     public float getProbability() {
@@ -100,5 +105,16 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
     @Override
     public @NotNull SlotDisplay craftingStation() {
         return new SlotDisplay.ItemStackSlotDisplay(this.getTypedSerializer().getStations().getFirst().get());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof SoakRecipe that)) return false;
+        return Float.compare(probability, that.probability) == 0 && Objects.equals(element, that.element) && Objects.equals(input, that.input) && Objects.equals(output, that.output);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(element, probability, input, output);
     }
 }

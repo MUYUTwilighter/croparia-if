@@ -8,9 +8,13 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
-import cool.muyucloud.croparia.api.generator.util.*;
-import cool.muyucloud.croparia.util.codec.CodecUtil;
+import cool.muyucloud.croparia.api.generator.util.DgCompiler;
+import cool.muyucloud.croparia.api.generator.util.DgElement;
+import cool.muyucloud.croparia.api.generator.util.DgRegistry;
+import cool.muyucloud.croparia.api.generator.util.Placeholder;
+import cool.muyucloud.croparia.util.Dependencies;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
@@ -26,6 +30,7 @@ import java.util.Optional;
  * <p>Basic data generator, used to generate "per element" files like recipes, loot tables, etc.</p>
  * <p>To generate aggregated files like lang, tags, etc. use {@link LangGenerator} or {@link AggregatedGenerator}.</p>
  */
+@SuppressWarnings("unused")
 public class DataGenerator {
     public static final Logger LOGGER = LogUtils.getLogger();
     private static final Map<ResourceLocation, MapCodec<? extends DataGenerator>> REGISTRY = new HashMap<>();
@@ -184,5 +189,11 @@ public class DataGenerator {
             template = placeholder.mapAll(template, element);
         }
         return template;
+    }
+
+    public void onGenerated(PackHandler handler) {
+    }
+
+    public void onDumped(PackHandler handler) {
     }
 }

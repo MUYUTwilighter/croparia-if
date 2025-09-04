@@ -63,7 +63,17 @@ public abstract class PackHandler {
         this.moveBuiltInGenerators();
         this.refreshGenerators();
         this.generate();
+        this.onGenerated();
         this.dump();
+        this.onDumped();
+    }
+
+    protected void onGenerated() {
+        this.generators.forEach(generator -> generator.onGenerated(this));
+    }
+
+    protected void onDumped() {
+        this.generators.forEach(generator -> generator.onDumped(this));
     }
 
     protected void moveBuiltInGenerators() {
