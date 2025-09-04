@@ -45,16 +45,13 @@ public class ItemInput implements SlotDisplay {
             .orElse(input.getId().map(ResourceLocation::toString).orElse(""))
     );
     public static final MapCodec<ItemInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.optionalFieldOf("id", null)
-            .forGetter(input -> input.getId().orElse(null)),
-        TagKey.codec(Registries.ITEM).optionalFieldOf("tag", null)
-            .forGetter(input -> input.getTag().orElse(null)),
-        DataComponentPredicate.CODEC.optionalFieldOf("components", DataComponentPredicate.EMPTY)
-            .forGetter(ItemInput::getComponentsPredicate),
+        ResourceLocation.CODEC.optionalFieldOf("id").forGetter(ItemInput::getId),
+        TagKey.codec(Registries.ITEM).optionalFieldOf("tag").forGetter(ItemInput::getTag),
+        DataComponentPredicate.CODEC.optionalFieldOf("components", DataComponentPredicate.EMPTY).forGetter(ItemInput::getComponentsPredicate),
         Codec.LONG.optionalFieldOf("amount", 1L).forGetter(ItemInput::getAmount)
     ).apply(instance, (id, tag, components, amount) ->
-        id == null && tag == null && components.equals(DataComponentPredicate.EMPTY) || amount <= 0 ? EMPTY :
-            new ItemInput(id, tag, components, amount)));
+        id.isEmpty() && tag.isEmpty() && components.equals(DataComponentPredicate.EMPTY) || amount <= 0 ? EMPTY :
+            new ItemInput(id.orElse(null), tag.orElse(null), components, amount)));
     public static final MultiCodec<ItemInput> CODEC = MultiCodec.of(TestedCodec.of(CODEC_COMP.codec(), toEncode -> {
         if (toEncode.getComponentsPredicate().equals(DataComponentPredicate.EMPTY) && toEncode.getAmount() == 1 || toEncode.equals(EMPTY)) {
             return TestedCodec.fail(() -> "Can be encoded as string");

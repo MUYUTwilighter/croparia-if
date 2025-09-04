@@ -175,7 +175,7 @@ public class BlockInput implements SlotDisplay {
     }
 
     public void mapStacks(Function<ImmutableList<ItemStack>, ImmutableList<ItemStack>> mapper) {
-        this.displayStacks = OnLoadSupplier.of(() -> mapper.apply(this.getDisplayStacks()));
+        this.displayStacks = displayStacks.map(mapper);
     }
 
     public String getTaggable() {
