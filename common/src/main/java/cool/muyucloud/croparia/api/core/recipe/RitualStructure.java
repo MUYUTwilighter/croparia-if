@@ -13,6 +13,7 @@ import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.structure.Char3D;
 import cool.muyucloud.croparia.api.recipe.structure.MarkedChar3D;
 import cool.muyucloud.croparia.api.recipe.structure.MarkedTransformableChar3D;
+import cool.muyucloud.croparia.registry.CropariaBlocks;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
@@ -28,6 +29,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
@@ -187,6 +189,25 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     public boolean isVirtualRender(int x, int y, int z) {
         char c = this.getPattern().get(x, y, z);
         return c == ' ' || c == '$' || c == '.' || (c != '*' && Objects.requireNonNull(this.keys.get(c)).isVirtualRender());
+    }
+
+    public void tryBuild(Level level, BlockPos origin) {
+        MarkedChar3D pattern = this.getPattern();
+        origin = pattern.getOriginInWorld(origin);
+        for (int x = 0; x < pattern.maxX(); x++) {
+            for (int y = 0; y < pattern.maxY(); y++) {
+                for (int z = 0; z < pattern.maxZ(); z++) {
+                    char key = pattern.get(x, y, z);
+                    if (key == '.') {
+                        level.setBlockAndUpdate(origin.offset(x, y, z), Blocks.AIR.defaultBlockState());
+                    } else if (key == '$') {
+                        level.setBlockAndUpdate(origin.offset(x, y, z), CropariaBlocks.PLACEHOLDER.get().defaultBlockState());
+                    } else if (key != ' ' && key != '*') {
+                        level.setBlockAndUpdate(origin.offset(x, y, z), this.getKeys().get(key).getExampleState());
+                    }
+                }
+            }
+        }
     }
 
     public Vec3i size() {

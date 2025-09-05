@@ -11,6 +11,7 @@ import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.api.core.component.BlockProperties;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
+import cool.muyucloud.croparia.registry.CropariaBlocks;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.TagUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
@@ -30,6 +31,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.display.DisplayContentsFactory;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +50,7 @@ public class BlockInput implements SlotDisplay {
     public static final ItemStack STACK_AIR = Items.BARRIER.getDefaultInstance();
     public static final ItemStack STACK_ANY = Items.LIGHT_GRAY_STAINED_GLASS_PANE.getDefaultInstance();
     public static final Supplier<ItemStack> STACK_PLACEHOLDER = () -> CropariaItems.PLACEHOLDER_BLOCK.get().getDefaultInstance();
-    public static final BlockInput UNKNOWN = BlockInput.create(CropariaIf.of("unknown"));
+    public static final BlockInput UNKNOWN = BlockInput.of(CropariaIf.of("unknown"));
     public static final BlockInput ANY = new BlockInput(null, null, BlockProperties.EMPTY);
     public static final MapCodec<BlockInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(ResourceLocation.CODEC.optionalFieldOf("id").forGetter(BlockInput::getId), TagKey.codec(Registries.BLOCK).optionalFieldOf("tag").forGetter(BlockInput::getTag), BlockProperties.CODEC.optionalFieldOf("properties", BlockProperties.EMPTY).forGetter(BlockInput::getProperties)).apply(instance, (id, tag, properties) -> create(id.orElse(null), tag.orElse(null), properties)));
     public static final Codec<BlockInput> CODEC_STR = Codec.STRING.xmap(BlockInput::create, BlockInput::getTaggable);
@@ -71,28 +73,12 @@ public class BlockInput implements SlotDisplay {
         if (s.startsWith("#")) {
             s = s.substring(1);
             TagKey<Block> tag = TagKey.create(Registries.BLOCK, ResourceLocation.parse(s));
-            return create(tag);
+            return ofTag(tag);
         } else if (s.isEmpty()) {
             return ANY;
         } else {
-            return create(ResourceLocation.parse(s));
+            return of(ResourceLocation.parse(s));
         }
-    }
-
-    public static BlockInput create(@NotNull ResourceLocation id) {
-        return create(id, BlockProperties.EMPTY);
-    }
-
-    public static BlockInput create(@NotNull ResourceLocation id, BlockProperties properties) {
-        return new BlockInput(id, null, properties);
-    }
-
-    public static BlockInput create(TagKey<Block> tag) {
-        return BlockInput.create(tag, BlockProperties.EMPTY);
-    }
-
-    public static BlockInput create(TagKey<Block> tag, BlockProperties properties) {
-        return new BlockInput(null, tag, properties);
     }
 
     protected static BlockInput create(@Nullable ResourceLocation id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties) {
@@ -101,8 +87,32 @@ public class BlockInput implements SlotDisplay {
         else return blockInput;
     }
 
+    public static BlockInput ofTag(ResourceLocation id) {
+        return ofTag(TagKey.create(Registries.BLOCK, id));
+    }
+
+    public static BlockInput ofTag(ResourceLocation id, BlockProperties properties) {
+        return ofTag(TagKey.create(Registries.BLOCK, id), properties);
+    }
+
+    public static BlockInput ofTag(TagKey<Block> tag) {
+        return BlockInput.ofTag(tag, BlockProperties.EMPTY);
+    }
+
+    public static BlockInput ofTag(TagKey<Block> tag, BlockProperties properties) {
+        return new BlockInput(null, tag, properties);
+    }
+
+    public static BlockInput of(@NotNull ResourceLocation id) {
+        return of(id, BlockProperties.EMPTY);
+    }
+
+    public static BlockInput of(@NotNull ResourceLocation id, BlockProperties properties) {
+        return new BlockInput(id, null, properties);
+    }
+
     public static BlockInput of(@NotNull Block block) {
-        return create(Objects.requireNonNull(block.arch$registryName()));
+        return of(Objects.requireNonNull(block.arch$registryName()));
     }
 
     public static BlockInput of(@NotNull BlockState state) {
@@ -176,6 +186,27 @@ public class BlockInput implements SlotDisplay {
         return properties;
     }
 
+    @SuppressWarnings("unchecked")
+    public BlockState getExampleState() {
+        BlockState state;
+        if (this.getId().isPresent()) {
+            state = BuiltInRegistries.BLOCK.getValue(this.getId().get()).defaultBlockState();
+        } else if (this.getTag().isPresent()) {
+            Iterable<Holder<Block>> candidates = TagUtil.forEntries(this.getTag().get());
+            if (candidates.iterator().hasNext()) {
+                state = candidates.iterator().next().value().defaultBlockState();
+            } else {
+                state = Blocks.BEDROCK.defaultBlockState();
+            }
+        } else {
+            state = CropariaBlocks.PLACEHOLDER.get().defaultBlockState();
+        }
+        for (var entry : this.getProperties()) {
+            state = ((StateHolderAccess<BlockState>) state).cif$setValue(entry.getKey(), entry.getValue());
+        }
+        return state;
+    }
+
     @NotNull
     public ImmutableList<ItemStack> getDisplayStacks() {
         return displayStacks.get();
@@ -210,8 +241,9 @@ public class BlockInput implements SlotDisplay {
         else return true;
     }
 
+    @SuppressWarnings("unchecked")
     public boolean matches(@NotNull BlockState state) {
-        return this.matches(state.getBlock()) && this.getProperties().isSubsetOf((StateHolderAccess) state);
+        return this.matches(state.getBlock()) && this.getProperties().isSubsetOf((StateHolderAccess<BlockState>) state);
     }
 
     @Override

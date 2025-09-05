@@ -8,7 +8,6 @@ import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.api.core.component.BlockProperties;
-import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -102,19 +101,17 @@ public class BlockOutput implements SlotDisplay {
         return Objects.equals(block.arch$registryName(), this.getId());
     }
 
+    @SuppressWarnings("unchecked")
     public boolean matches(@NotNull BlockState state) {
-        return this.matches(state.getBlock()) && this.getProperties().isSubsetOf((StateHolderAccess) state);
+        return this.matches(state.getBlock()) && this.getProperties().isSubsetOf((StateHolderAccess<BlockState>) state);
     }
 
+    @SuppressWarnings("unchecked")
     public void setBlock(ServerLevel level, BlockPos pos) {
-        try {
-            BlockState state = this.getBlock().defaultBlockState();
-            StateHolderAccess access = (StateHolderAccess) state;
-            this.getProperties().forEach(entry -> access.cif$setValue(entry.getKey(), entry.getValue()));
-            level.setBlock(pos, state, 3);
-        } catch (Throwable t) {
-            DisplayableRecipe.LOGGER.error("Failed to set block", t);
-        }
+        BlockState state = this.getBlock().defaultBlockState();
+        StateHolderAccess<BlockState> access = (StateHolderAccess<BlockState>) state;
+        this.getProperties().forEach(entry -> access.cif$setValue(entry.getKey(), entry.getValue()));
+        level.setBlock(pos, state, 3);
     }
 
     @Override

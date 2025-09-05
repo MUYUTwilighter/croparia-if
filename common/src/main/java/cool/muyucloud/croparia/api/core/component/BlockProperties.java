@@ -34,8 +34,9 @@ public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<Stri
         TYPE = builder.build();
     }
 
+    @SuppressWarnings("unchecked")
     public static BlockProperties create(@NotNull BlockState state) {
-        return create(((StateHolderAccess) state).cif$getProperties());
+        return create(((StateHolderAccess<BlockState>) state).cif$getProperties());
     }
 
     @NotNull
@@ -66,7 +67,7 @@ public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<Stri
         this.getProperties().forEach((key, value) -> consumer.accept(Texts.literal("%s=%s".formatted(key, value))));
     }
 
-    public boolean isSubsetOf(StateHolderAccess access) {
+    public boolean isSubsetOf(StateHolderAccess<BlockState> access) {
         for (Map.Entry<String, String> entry : this.getProperties().entrySet()) {
             @NotNull String key = entry.getKey();
             @Nullable String value = entry.getValue();

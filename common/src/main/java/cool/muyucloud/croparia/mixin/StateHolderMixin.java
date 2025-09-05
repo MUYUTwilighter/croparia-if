@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.mixin;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.MapCodec;
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.access.StateHolderAccess;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import net.minecraft.util.StringRepresentable;
@@ -20,13 +21,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Mixin(StateHolder.class)
-public abstract class StateHolderMixin<O, S> implements StateHolderAccess {
+public abstract class StateHolderMixin<O, S> implements StateHolderAccess< S> {
     @Shadow
     @Final
     private Reference2ObjectArrayMap<Property<?>, Comparable<?>> values;
 
-    @Shadow public abstract <T extends Comparable<T>, V extends T> S setValue(Property<T> property, V comparable);
+    @Shadow
+    public abstract <T extends Comparable<T>, V extends T> S setValue(Property<T> property, V comparable);
 
+    @Shadow
+    private Map<Property<?>, S[]> neighbours;
     @Unique
     private Map<String, Property<?>> croparia_if$properties;
 
@@ -62,31 +66,41 @@ public abstract class StateHolderMixin<O, S> implements StateHolderAccess {
     }
 
     @Override
-    public void cif$setValue(String key, String value) {
-        Property<? extends Comparable<?>> property = this.cif$getProperty(key);
-        Class<? extends Comparable<?>> cls = property.getValueClass();
-        if (Integer.class.isAssignableFrom(cls)) {
-            @SuppressWarnings("unchecked")
-            Property<Integer> intProp = (Property<Integer>) property;
-            setValue(intProp, Integer.parseInt(value));
-        } else if (Boolean.class.isAssignableFrom(cls)) {
-            @SuppressWarnings("unchecked")
-            Property<Boolean> boolProp = (Property<Boolean>) property;
-            setValue(boolProp, Boolean.parseBoolean(value));
-        } else if (Enum.class.isAssignableFrom(cls)) {
-            for (Comparable<?> o : cls.getEnumConstants()) {
-                StringRepresentable enumVal = (StringRepresentable) o;
-                if (enumVal.getSerializedName().equals(value)) {
-                    this.values.put(property, o);
+    @SuppressWarnings("unchecked")
+    public S cif$setValue(String key, String value) {
+        Property<?> property = this.cif$getProperty(key);
+        Class<?> cls = property.getValueClass();
+        try {
+            if (Integer.class.isAssignableFrom(cls)) {
+                Property<Integer> intProp = (Property<Integer>) property;
+                return setValue(intProp, Integer.parseInt(value));
+            } else if (Boolean.class.isAssignableFrom(cls)) {
+                Property<Boolean> boolProp = (Property<Boolean>) property;
+                return setValue(boolProp, Boolean.parseBoolean(value));
+            } else if (String.class.isAssignableFrom(cls)) {
+                Property<String> stringProp = (Property<String>) property;
+                return setValue(stringProp, value);
+            } else if (StringRepresentable.class.isAssignableFrom(cls)) {
+                for (Comparable<?> o : property.getPossibleValues()) {
+                    StringRepresentable enumVal = (StringRepresentable) o;
+                    if (enumVal.getSerializedName().equals(value)) {
+                        return cif$ofProperty(property, enumVal);
+                    }
                 }
+                return (S) this;
+            } else {
+                throw new UnsupportedOperationException();
             }
-        } else if (String.class.isAssignableFrom(cls)) {
-            @SuppressWarnings("unchecked")
-            Property<String> stringProp = (Property<String>) property;
-            setValue(stringProp, value);
-        } else {
-            throw new UnsupportedOperationException();
+        } catch (Throwable t) {
+            CropariaIf.LOGGER.error("Failed to set property %s to %s".formatted(key, value), t);
+            return (S) this;
         }
+    }
+
+    @Unique
+    @SuppressWarnings("unchecked")
+    private <T extends Comparable<T>> S cif$ofProperty(Property<T> property, Object value) {
+        return (S)((Object[])this.neighbours.get(property))[property.getInternalIndex((T) value)];
     }
 
     @Override

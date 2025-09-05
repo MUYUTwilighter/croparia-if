@@ -371,7 +371,8 @@ public class RecipeWizardGenerator {
                 );
                 throw new IllegalStateException();
             }
-            StateHolderAccess access = (StateHolderAccess) level.getBlockState(context.getClickedPos());
+            @SuppressWarnings("unchecked")
+            StateHolderAccess<BlockState> access = (StateHolderAccess<BlockState>) level.getBlockState(context.getClickedPos());
             JsonObject json = new JsonObject();
             access.cif$getProperties().forEach(json::addProperty);
             return json.toString();
@@ -441,6 +442,7 @@ public class RecipeWizardGenerator {
             throw new IllegalStateException();
         }
     );
+    @SuppressWarnings("unchecked")
     public static final Placeholder<UseOnContext> NEIGHBOR_PROPERTIES = register(
         ResourceLocation.tryParse("default"), "\\{neighbor_properties}", context -> {
             Level level = context.getLevel();
@@ -449,7 +451,7 @@ public class RecipeWizardGenerator {
                 BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getUnitVec3i()));
                 if (!state.isAir()) {
                     JsonObject properties = new JsonObject();
-                    ((StateHolderAccess) state).cif$getProperties().forEach(properties::addProperty);
+                    ((StateHolderAccess<BlockState>) state).cif$getProperties().forEach(properties::addProperty);
                     return properties.toString();
                 }
             }
@@ -530,7 +532,8 @@ public class RecipeWizardGenerator {
                 );
                 throw new IllegalStateException();
             }
-            StateHolderAccess access = (StateHolderAccess) level.getBlockState(context.getClickedPos());
+            @SuppressWarnings("unchecked")
+            StateHolderAccess<BlockState> access = (StateHolderAccess<BlockState>) level.getBlockState(context.getClickedPos());
             JsonObject json = new JsonObject();
             access.cif$getProperties().forEach(json::addProperty);
             return json.toString();

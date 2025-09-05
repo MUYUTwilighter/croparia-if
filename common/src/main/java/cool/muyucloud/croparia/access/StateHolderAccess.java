@@ -5,13 +5,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-public interface StateHolderAccess {
+public interface StateHolderAccess<S> {
     Property<?> cif$getProperty(String key);
 
     @Nullable
     String cif$getValue(String key);
 
-    void cif$setValue(String key, String value);
+    S cif$setValue(String key, String value);
 
     Map<String, String> cif$getProperties();
 }
