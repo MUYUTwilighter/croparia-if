@@ -1,17 +1,9 @@
 @block=croparia:infusor;
-@path=croparia/infusor_{target_item_namespace}_{target_item_path}.json;
+@path=croparia/infusor_{datetime}.json;
 @extensions=croparia:infusor;
 {
   "type": "croparia:infusor",
   "element": "{infusor_element}",
-  "ingredient": {
-    "id": "{target_item}",
-    "amount": {target_item_count},
-    "components": {target_item_components}
-  },
-  "result": {
-    "id": "{off_hand}",
-    "amount": {off_hand_count},
-    "components": {off_hand_components}
-  }
+  "ingredient": {item},
+  "result": {off_hand}
 }

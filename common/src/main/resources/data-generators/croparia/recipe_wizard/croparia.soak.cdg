@@ -1,16 +1,10 @@
 @block=croparia:elemental_stone;
-@path=croparia/soak_{opposite_block_namespace}_{opposite_block_path}.json;
+@path=croparia/soak_{datetime}.json;
 @extensions=croparia:soak;
 {
   "type": "croparia:soak",
   "element": "{soak_element}",
-  "input": {
-    "id": "{neighbor}",
-    "components": {neighbor_properties}
-  },
-  "output": {
-    "id": "{below}",
-    "components": {below_properties}
-  },
+  "input": {neighbor},
+  "output": {below},
   "probability": 1.0
 }

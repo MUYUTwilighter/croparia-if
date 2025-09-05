@@ -18,6 +18,7 @@ import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.generator.util.DgCompiler;
 import cool.muyucloud.croparia.api.generator.util.Placeholder;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
+import cool.muyucloud.croparia.api.recipe.entry.ItemInput;
 import cool.muyucloud.croparia.registry.Recipes;
 import cool.muyucloud.croparia.util.Dependencies;
 import cool.muyucloud.croparia.util.FileUtil;
@@ -26,6 +27,7 @@ import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -44,6 +46,8 @@ import net.minecraft.world.phys.AABB;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -51,6 +55,8 @@ import java.util.regex.Matcher;
 
 @SuppressWarnings("unused")
 public class RecipeWizardGenerator {
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
+
     public static Optional<RecipeWizardGenerator> read(File file) {
         try {
             JsonElement json = DgCompiler.compile(file);
@@ -62,8 +68,22 @@ public class RecipeWizardGenerator {
     }
 
     protected static final Map<ResourceLocation, ArrayList<Placeholder<UseOnContext>>> EXTENSIONS = new HashMap<>();
+    public static final Placeholder<UseOnContext> TIMESTAMP = register(
+        ResourceLocation.parse("datetime"), "\\{datetime}", context -> LocalDateTime.now().format(FORMATTER)
+    );
     public static final Placeholder<UseOnContext> MAIN_HAND = register(
         ResourceLocation.tryParse("default"), "\\{main_hand}", context -> {
+            ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.MAIN_HAND);
+            if (stack.isEmpty()) {
+                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.main_hand"));
+                throw new IllegalStateException();
+            } else {
+                return CodecUtil.encodeJson(ItemInput.of(stack), ItemInput.CODEC).toString();
+            }
+        }
+    );
+    public static final Placeholder<UseOnContext> MAIN_HAND_ID = register(
+        ResourceLocation.tryParse("default"), "\\{main_hand_id}", context -> {
             ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.MAIN_HAND);
             if (stack.isEmpty()) {
                 Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.main_hand"));
@@ -107,13 +127,24 @@ public class RecipeWizardGenerator {
             } else return CodecUtil.encodeJson(stack.getComponentsPatch(), DataComponentPatch.CODEC).toString();
         }
     );
+    public static final Placeholder<UseOnContext> OFF_HAND_ID = register(
+        ResourceLocation.tryParse("default"), "\\{off_hand_id}", context -> {
+            ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.OFF_HAND);
+            if (stack.isEmpty()) {
+                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.off_hand"));
+                throw new IllegalStateException();
+            } else return Objects.requireNonNull(stack.getItem().arch$registryName()).toString();
+        }
+    );
     public static final Placeholder<UseOnContext> OFF_HAND = register(
         ResourceLocation.tryParse("default"), "\\{off_hand}", context -> {
             ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.OFF_HAND);
             if (stack.isEmpty()) {
                 Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.off_hand"));
                 throw new IllegalStateException();
-            } else return Objects.requireNonNull(stack.getItem().arch$registryName()).toString();
+            } else {
+                return CodecUtil.encodeJson(ItemInput.of(stack), ItemInput.CODEC).toString();
+            }
         }
     );
     public static final Placeholder<UseOnContext> OFF_HAND_COUNT = register(
@@ -152,8 +183,26 @@ public class RecipeWizardGenerator {
             } else return CodecUtil.encodeJson(stack.getComponentsPatch(), DataComponentPatch.CODEC).toString();
         }
     );
-    public static final Placeholder<UseOnContext> TARGET_ITEM = register(
-        ResourceLocation.tryParse("default"), "\\{target_item}", context -> {
+    public static final Placeholder<UseOnContext> ITEM = register(
+        ResourceLocation.tryParse("default"), "\\{item}", context -> {
+            List<ItemEntity> entities = context.getLevel().getEntities(
+                EntityTypeTest.forClass(ItemEntity.class),
+                AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
+                item -> !item.getItem().isEmpty()
+            );
+            if (entities.isEmpty()) {
+                assert context.getPlayer() != null;
+                Texts.overlay(context.getPlayer(),
+                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.target_item")
+                );
+                throw new IllegalStateException();
+            } else {
+                return CodecUtil.encodeJson(ItemInput.of(entities.getFirst().getItem()), ItemInput.CODEC).toString();
+            }
+        }
+    );
+    public static final Placeholder<UseOnContext> ITEM_ID = register(
+        ResourceLocation.tryParse("default"), "\\{item}", context -> {
             List<ItemEntity> entities = context.getLevel().getEntities(
                 EntityTypeTest.forClass(ItemEntity.class),
                 AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
@@ -169,8 +218,8 @@ public class RecipeWizardGenerator {
                 return Objects.requireNonNull(entities.getFirst().getItem().getItem().arch$registryName()).toString();
         }
     );
-    public static final Placeholder<UseOnContext> TARGET_ITEM_COUNT = register(
-        ResourceLocation.tryParse("default"), "\\{target_item_count}", context -> {
+    public static final Placeholder<UseOnContext> ITEM_COUNT = register(
+        ResourceLocation.tryParse("default"), "\\{item_count}", context -> {
             List<ItemEntity> entities = context.getLevel().getEntities(
                 EntityTypeTest.forClass(ItemEntity.class),
                 AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
@@ -186,8 +235,8 @@ public class RecipeWizardGenerator {
                 return String.valueOf(entities.getFirst().getItem().getCount());
         }
     );
-    public static final Placeholder<UseOnContext> TARGET_ITEM_NAMESPACE = register(
-        ResourceLocation.tryParse("default"), "\\{target_item_namespace}", context -> {
+    public static final Placeholder<UseOnContext> ITEM_NAMESPACE = register(
+        ResourceLocation.tryParse("default"), "\\{item_namespace}", context -> {
             List<ItemEntity> entities = context.getLevel().getEntities(
                 EntityTypeTest.forClass(ItemEntity.class),
                 AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
@@ -204,8 +253,8 @@ public class RecipeWizardGenerator {
             ).getNamespace();
         }
     );
-    public static final Placeholder<UseOnContext> TARGET_ITEM_PATH = register(
-        ResourceLocation.tryParse("default"), "\\{target_item_path}", context -> {
+    public static final Placeholder<UseOnContext> ITEM_PATH = register(
+        ResourceLocation.tryParse("default"), "\\{item_path}", context -> {
             List<ItemEntity> entities = context.getLevel().getEntities(
                 EntityTypeTest.forClass(ItemEntity.class),
                 AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
@@ -220,8 +269,8 @@ public class RecipeWizardGenerator {
             } else return Objects.requireNonNull(entities.getFirst().getItem().getItem().arch$registryName()).getPath();
         }
     );
-    public static final Placeholder<UseOnContext> TARGET_ITEM_COMPONENTS = register(
-        ResourceLocation.tryParse("default"), "\\{target_item_components}", context -> {
+    public static final Placeholder<UseOnContext> ITEM_COMPONENTS = register(
+        ResourceLocation.tryParse("default"), "\\{item_components}", context -> {
             List<ItemEntity> entities = context.getLevel().getEntities(
                 EntityTypeTest.forClass(ItemEntity.class),
                 AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
@@ -239,6 +288,20 @@ public class RecipeWizardGenerator {
     );
     public static final Placeholder<UseOnContext> BLOCK = register(
         ResourceLocation.tryParse("default"), "\\{block}", context -> {
+            Level level = context.getLevel();
+            BlockState block = level.getBlockState(context.getClickedPos());
+            if (block.isAir()) {
+                assert context.getPlayer() != null;
+                Texts.overlay(context.getPlayer(),
+                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block")
+                );
+                throw new IllegalStateException();
+            }
+            return CodecUtil.encodeJson(BlockInput.of(block), BlockInput.CODEC).toString();
+        }
+    );
+    public static final Placeholder<UseOnContext> BLOCK_ID = register(
+        ResourceLocation.tryParse("default"), "\\{block_id}", context -> {
             Level level = context.getLevel();
             Block block = level.getBlockState(context.getClickedPos()).getBlock();
             if (block == Blocks.AIR) {
@@ -298,6 +361,22 @@ public class RecipeWizardGenerator {
     );
     public static final Placeholder<UseOnContext> NEIGHBOR = register(
         ResourceLocation.tryParse("default"), "\\{neighbor}", context -> {
+            Level level = context.getLevel();
+            for (Direction direction : Direction.values()) {
+                if (direction == Direction.UP || direction == Direction.DOWN) continue;
+                BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getUnitVec3i()));
+                if (!state.isAir()) {
+                    return CodecUtil.encodeJson(BlockInput.of(state), BlockInput.CODEC).toString();
+                }
+            }
+            assert context.getPlayer() != null;
+            Texts.overlay(context.getPlayer(),
+                Texts.translatable("overlay.croparia.recipe_wizard.default.missing.neighbor"));
+            throw new IllegalStateException();
+        }
+    );
+    public static final Placeholder<UseOnContext> NEIGHBOR_ID = register(
+        ResourceLocation.tryParse("default"), "\\{neighbor_id}", context -> {
             Level level = context.getLevel();
             for (Direction direction : Direction.values()) {
                 if (direction == Direction.UP || direction == Direction.DOWN) continue;
@@ -364,6 +443,20 @@ public class RecipeWizardGenerator {
     );
     public static final Placeholder<UseOnContext> BELOW = register(
         ResourceLocation.tryParse("default"), "\\{below}", context -> {
+            Level level = context.getLevel();
+            BlockState state = level.getBlockState(context.getClickedPos().below());
+            if (state.isAir()) {
+                assert context.getPlayer() != null;
+                Texts.overlay(context.getPlayer(),
+                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block")
+                );
+                throw new IllegalStateException();
+            }
+            return CodecUtil.encodeJson(BlockInput.of(state), BlockInput.CODEC).toString();
+        }
+    );
+    public static final Placeholder<UseOnContext> BELOW_ID = register(
+        ResourceLocation.tryParse("default"), "\\{below_id}", context -> {
             Level level = context.getLevel();
             BlockState state = level.getBlockState(context.getClickedPos().below());
             Block block = state.getBlock();
@@ -441,21 +534,8 @@ public class RecipeWizardGenerator {
             throw new IllegalStateException();
         }
     );
-    public static final Placeholder<UseOnContext> RITUAL_TIER = register(
-        CropariaIf.of("ritual"), "\\{ritual_tier}", context -> {
-            Block block = context.getLevel().getBlockState(context.getClickedPos()).getBlock();
-            if (block instanceof RitualStand ritual) {
-                return String.valueOf(ritual.getTier());
-            } else {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.ritual.missing.ritual"));
-                throw new IllegalStateException();
-            }
-        }
-    );
-    public static final Placeholder<UseOnContext> RITUAL_BLOCK = register(
-        CropariaIf.of("ritual"), "\\{ritual_block}", context -> {
+    public static final Placeholder<UseOnContext> RITUAL_INPUT = register(
+        CropariaIf.of("ritual"), "\\{ritual_input}", context -> {
             Level level = context.getLevel();
             BlockPos pos = context.getClickedPos();
             BlockState state = level.getBlockState(pos);
@@ -491,6 +571,22 @@ public class RecipeWizardGenerator {
     );
     public static final Placeholder<UseOnContext> FURNACE_INPUT = register(
         ResourceLocation.parse("furnace"), "\\{furnace_input}", context -> {
+            BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
+            if (be instanceof AbstractFurnaceBlockEntity furnace) {
+                ItemStack stack = furnace.getItem(0);
+                if (!stack.isEmpty()) {
+                    return CodecUtil.encodeJson(ItemInput.of(stack), ItemInput.CODEC).toString();
+                } else {
+                    Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_input"));
+                }
+            } else {
+                Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_furnace"));
+            }
+            throw new IllegalStateException();
+        }
+    );
+    public static final Placeholder<UseOnContext> FURNACE_INPUT_ID = register(
+        ResourceLocation.parse("furnace"), "\\{furnace_input_id}", context -> {
             BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
             if (be instanceof AbstractFurnaceBlockEntity furnace) {
                 ItemStack stack = furnace.getItem(0);
@@ -686,7 +782,9 @@ public class RecipeWizardGenerator {
                 }
                 Path result = CropariaIf.CONFIG.getFilePath().resolve("recipe_wizard/dumped").resolve(path);
                 FileUtil.write(result.toFile(), template, true);
-                Texts.chat(player, (Texts.translatable("chat.croparia.recipe_wizard.success", result.toString())));
+                String s = result.toString();
+                Component c = Texts.literal(s).withStyle(Texts.openFile(s)).withStyle(Texts.inlineMouseBehavior());
+                Texts.chat(player, Texts.translatable("chat.croparia.recipe_wizard.success", c));
             } catch (IllegalStateException ignored) {
                 // Termination caused by missing data, message already sent in placeholder
             } catch (Throwable t) {

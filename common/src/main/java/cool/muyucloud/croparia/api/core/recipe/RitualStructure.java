@@ -115,7 +115,8 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
         return List.of(this.getRitual().getDisplayStacks());
     }
 
-    public @NotNull Result matchTransformed(BlockPos origin, Level level, Char3D pattern, BlockState ritualBlock) {
+    public @NotNull Result matchTransformed(BlockPos origin, Level level, MarkedChar3D pattern, BlockState ritualBlock) {
+        origin = pattern.getOriginInWorld(origin);
         List<BlockPos> inputPositions = new ArrayList<>();
         List<BlockState> inputBlocks = new ArrayList<>();
         for (int x = 0; x < pattern.maxX(); x++) {

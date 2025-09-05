@@ -1,18 +1,10 @@
 @block=#croparia:ritual_stands;
-@path=croparia/ritual_{target_item_namespace}_{target_item_path}.json;
+@path=croparia/ritual_{datetime}.json;
 @extensions=croparia:ritual;
 {
   "type": "croparia:ritual",
-  "tier": "{ritual_tier}",
-  "ingredient": {
-    "id": "{target_item}",
-    "amount": {target_item_count},
-    "components": {target_item_components}
-  },
-  "block": {ritual_block},
-  "result": {
-    "id": "{off_hand}",
-    "amount": {off_hand_count},
-    "components": {off_hand_components}
-  }
+  "ritual": {block},
+  "ingredient": {item},
+  "block": {ritual_input},
+  "result": {off_hand}
 }
