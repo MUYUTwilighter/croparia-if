@@ -7,10 +7,13 @@ import com.mojang.datafixers.util.*;
 import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.reflection.RecordCodecBuilderReflection;
 import cool.muyucloud.croparia.util.FileUtil;
+import cool.muyucloud.croparia.util.Ref;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.RegistryOps;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.File;
@@ -174,7 +177,12 @@ public class CodecUtil {
     }
 
     public static <T> JsonElement encodeJson(T object, Codec<T> codec) {
-        return codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow();
+        Ref<JsonElement> elementRef = new Ref<>();
+        CropariaIf.getRegistryAccess().ifPresentOrElse(
+            access -> elementRef.set(codec.encodeStart(RegistryOps.create(JsonOps.INSTANCE, access), object).getOrThrow()),
+            () -> elementRef.set(codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow())
+        );
+        return elementRef.get();
     }
 
     public static <T> JsonElement encodeJson(T object, MapCodec<T> codec) {

@@ -13,9 +13,11 @@ import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -103,14 +105,15 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     public ItemStack assemble(RitualContainer matcher) {
         ItemStack result = this.getResult().createStack();
         // Handle enchanted book special case
+        ItemEnchantments enchantments = result.get(DataComponents.STORED_ENCHANTMENTS);
         if (this.getIngredient().getAmount() == 1L && this.getResult().getAmount() == 1L
-            && result.getItem() == Items.ENCHANTED_BOOK) {
+            && result.getItem() == Items.ENCHANTED_BOOK && enchantments != null) {
             for (ItemStack stack : matcher.stacks()) {
                 if (this.getIngredient().matchType(stack)) {
                     matcher.matched().destroy();
-                    stack.shrink(1);
                     ItemStack toEnchant = stack.copyWithCount(1);
-                    for (var entry : result.getEnchantments().entrySet()) {
+                    stack.shrink(1);
+                    for (var entry : enchantments.entrySet()) {
                         int level = toEnchant.getEnchantments().getLevel(entry.getKey());
                         toEnchant.enchant(entry.getKey(), level + entry.getIntValue());
                     }

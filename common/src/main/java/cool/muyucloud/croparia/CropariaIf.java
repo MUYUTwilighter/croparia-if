@@ -5,8 +5,13 @@ import cool.muyucloud.croparia.api.core.command.CommonCommandRoot;
 import cool.muyucloud.croparia.config.Config;
 import cool.muyucloud.croparia.config.ConfigFileHandler;
 import cool.muyucloud.croparia.registry.*;
+import cool.muyucloud.croparia.util.Ref;
+import cool.muyucloud.croparia.util.SidedRef;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import dev.architectury.event.events.common.LifecycleEvent;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
@@ -79,5 +84,19 @@ public class CropariaIf {
 
     public static boolean isServerStarted() {
         return SERVER_STARTED;
+    }
+
+    public static Optional<RegistryAccess> getRegistryAccess() {
+        Ref<RegistryAccess> accessRef = new Ref<>();
+        SidedRef.ifServerOrElse(
+            () -> CropariaIf.ifServer(server -> accessRef.set(server.registryAccess())),
+            () -> {
+                ClientLevel level = Minecraft.getInstance().level;
+                if (level != null) {
+                    accessRef.set(level.registryAccess());
+                }
+            }
+        );
+        return Optional.ofNullable(accessRef.get());
     }
 }
