@@ -3,8 +3,8 @@ package cool.muyucloud.croparia.compat.rei.category;
 import cool.muyucloud.croparia.api.core.recipe.SoakRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.compat.rei.util.ProxyCategory;
+import cool.muyucloud.croparia.compat.rei.util.ReiDisplay;
 import cool.muyucloud.croparia.compat.rei.util.ReiUtil;
-import cool.muyucloud.croparia.compat.rei.util.SimpleDisplay;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
@@ -37,7 +37,7 @@ public class ReiSoakRecipe extends ReiCategory<SoakRecipe> {
     }
 
     @Override
-    public List<Widget> setupDisplay(SimpleDisplay<SoakRecipe> display, Rectangle bounds) {
+    public List<Widget> setupDisplay(ReiDisplay<SoakRecipe> display, Rectangle bounds) {
         Widget background = Widgets.createRecipeBase(bounds);
         Widget infusor = Widgets.createSlot(
             new Point(bounds.getCenterX() - 8, bounds.getCenterY() - 24)

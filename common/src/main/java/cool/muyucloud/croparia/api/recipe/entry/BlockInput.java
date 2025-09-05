@@ -180,7 +180,7 @@ public class BlockInput implements SlotDisplay {
 
     public String getTaggable() {
         Optional<String> id = this.getId().map(ResourceLocation::toString);
-        Optional<String> tag = this.getTag().map(TagKey::location).map(ResourceLocation::toString);
+        Optional<String> tag = this.getTag().map(t -> "#" + t.location());
         return id.orElse(tag.orElse(""));
     }
 

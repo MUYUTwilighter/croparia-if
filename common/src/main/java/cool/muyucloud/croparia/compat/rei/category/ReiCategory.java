@@ -3,7 +3,7 @@ package cool.muyucloud.croparia.compat.rei.category;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.compat.rei.util.ProxyCategory;
-import cool.muyucloud.croparia.compat.rei.util.SimpleDisplay;
+import cool.muyucloud.croparia.compat.rei.util.ReiDisplay;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
 import me.shedaniel.rei.api.client.gui.Renderer;
@@ -15,8 +15,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-public abstract class ReiCategory<R extends DisplayableRecipe<?>> implements DisplayCategory<SimpleDisplay<R>> {
-    private final CategoryIdentifier<SimpleDisplay<R>> categoryIdentifier;
+public abstract class ReiCategory<R extends DisplayableRecipe<?>> implements DisplayCategory<ReiDisplay<R>> {
+    private final CategoryIdentifier<ReiDisplay<R>> categoryIdentifier;
 
     public ReiCategory(ProxyCategory<R> proxy) {
         this.categoryIdentifier = proxy.getId();
@@ -51,7 +51,7 @@ public abstract class ReiCategory<R extends DisplayableRecipe<?>> implements Dis
     }
 
     @Override
-    public CategoryIdentifier<SimpleDisplay<R>> getCategoryIdentifier() {
+    public CategoryIdentifier<ReiDisplay<R>> getCategoryIdentifier() {
         return categoryIdentifier;
     }
 }

@@ -3,8 +3,8 @@ package cool.muyucloud.croparia.compat.rei.category;
 import cool.muyucloud.croparia.api.core.recipe.RitualRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.compat.rei.util.ProxyCategory;
+import cool.muyucloud.croparia.compat.rei.util.ReiDisplay;
 import cool.muyucloud.croparia.compat.rei.util.ReiUtil;
-import cool.muyucloud.croparia.compat.rei.util.SimpleDisplay;
 import cool.muyucloud.croparia.util.Constants;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
@@ -24,7 +24,7 @@ public class ReiRitualRecipe extends ReiCategory<RitualRecipe> {
     }
 
     @Override
-    public List<Widget> setupDisplay(SimpleDisplay<RitualRecipe> display, Rectangle bounds) {
+    public List<Widget> setupDisplay(ReiDisplay<RitualRecipe> display, Rectangle bounds) {
         Widget background = Widgets.createRecipeBase(bounds);
         Widget blockArrow = Widgets.createTexturedWidget(
             Constants.BLOCK_PLACE, bounds.getCenterX() - 24, bounds.getCenterY() + 8,

@@ -9,7 +9,7 @@ import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.compat.rei.category.*;
 import cool.muyucloud.croparia.compat.rei.util.ProxyCategory;
-import cool.muyucloud.croparia.compat.rei.util.SimpleDisplay;
+import cool.muyucloud.croparia.compat.rei.util.ReiDisplay;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import me.shedaniel.rei.api.common.display.DisplaySerializerRegistry;
 import me.shedaniel.rei.api.common.plugins.REICommonPlugin;
@@ -58,7 +58,7 @@ public class ReiCommon implements REICommonPlugin {
         CropariaIf.LOGGER.debug("Registering rei recipe fillers...");
         forEach(proxy -> registry.beginRecipeFiller(proxy.getType().getRecipeClass())
             .filterType((RecipeType<DisplayableRecipe<?>>) proxy.getType())
-            .fill(holder -> new SimpleDisplay<>(
+            .fill(holder -> new ReiDisplay<>(
                 (RecipeHolder<DisplayableRecipe<?>>) holder, (ProxyCategory<DisplayableRecipe<?>>) proxy
             )));
     }

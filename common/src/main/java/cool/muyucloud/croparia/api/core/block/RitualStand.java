@@ -59,8 +59,9 @@ public class RitualStand extends Block implements ItemPlaceable {
         if (entity instanceof ItemEntity itemEntity &&
             (lastCalled == null || lastCalled.getOnPos().equals(pos) || now != last)
             && world instanceof ServerLevel level && CropariaIf.CONFIG.getRitual()) {
-            float offset = pos.hashCode() % level.tickRateManager().tickrate();
-            if (offset != (System.currentTimeMillis() / level.tickRateManager().millisecondsPerTick())) {
+            int hashed = (int) (Math.abs(pos.hashCode()) % level.tickRateManager().tickrate());
+            int offset = (int) (now % level.tickRateManager().tickrate());
+            if (hashed != offset) {
                 return;
             }
             lastCalled = itemEntity;

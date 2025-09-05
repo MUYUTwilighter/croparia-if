@@ -4,8 +4,8 @@ import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.compat.rei.util.ProxyCategory;
+import cool.muyucloud.croparia.compat.rei.util.ReiDisplay;
 import cool.muyucloud.croparia.compat.rei.util.ReiUtil;
-import cool.muyucloud.croparia.compat.rei.util.SimpleDisplay;
 import cool.muyucloud.croparia.compat.rei.widget.Item2DWidget;
 import cool.muyucloud.croparia.compat.rei.widget.PatchedOverflow;
 import cool.muyucloud.croparia.registry.CropariaItems;
@@ -53,7 +53,7 @@ public class ReiRitualStructure extends ReiCategory<RitualStructure> {
     }
 
     @Override
-    public List<Widget> setupDisplay(SimpleDisplay<RitualStructure> display, Rectangle bounds) {
+    public List<Widget> setupDisplay(ReiDisplay<RitualStructure> display, Rectangle bounds) {
         RitualStructure recipe = display.getRecipe();
         AtomicInteger y = new AtomicInteger();
         Vec3i slotSize = display.getRecipe().size();

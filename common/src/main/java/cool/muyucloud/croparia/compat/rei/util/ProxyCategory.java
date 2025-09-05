@@ -11,14 +11,14 @@ import java.util.function.Function;
 
 public class ProxyCategory<R extends DisplayableRecipe<?>> {
     private final TypedSerializer<R> type;
-    private final DisplaySerializer<SimpleDisplay<R>> serializer;
-    private final CategoryIdentifier<SimpleDisplay<R>> id;
+    private final DisplaySerializer<ReiDisplay<R>> serializer;
+    private final CategoryIdentifier<ReiDisplay<R>> id;
     private final SidedRef<ReiCategory<R>> category;
 
     public ProxyCategory(TypedSerializer<R> type, Function<ProxyCategory<R>, ? extends ReiCategory<R>> category) {
         this.type = type;
         this.id = CategoryIdentifier.of(type.getId());
-        this.serializer = SimpleDisplay.serializer(this);
+        this.serializer = ReiDisplay.serializer(this);
         this.category = SidedRef.ofClient(() -> category.apply(this));
     }
 
@@ -30,11 +30,11 @@ public class ProxyCategory<R extends DisplayableRecipe<?>> {
         return category;
     }
 
-    public DisplaySerializer<SimpleDisplay<R>> getSerializer() {
+    public DisplaySerializer<ReiDisplay<R>> getSerializer() {
         return serializer;
     }
 
-    public CategoryIdentifier<SimpleDisplay<R>> getId() {
+    public CategoryIdentifier<ReiDisplay<R>> getId() {
         return id;
     }
 }

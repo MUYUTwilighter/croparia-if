@@ -17,20 +17,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class SimpleDisplay<R extends DisplayableRecipe<?>> implements Display {
-    public static <R extends DisplayableRecipe<?>> DisplaySerializer<SimpleDisplay<R>> serializer(ProxyCategory<R> category) {
+public class ReiDisplay<R extends DisplayableRecipe<?>> implements Display {
+    public static <R extends DisplayableRecipe<?>> DisplaySerializer<ReiDisplay<R>> serializer(ProxyCategory<R> category) {
         return DisplaySerializer.of(
             RecordCodecBuilder.mapCodec(instance -> instance.group(
-                category.getType().codec().fieldOf("recipe").forGetter(SimpleDisplay::getRecipe),
-                ResourceLocation.CODEC.fieldOf("id").forGetter(SimpleDisplay::getId)
-            ).apply(instance, (recipe, id) -> new SimpleDisplay<>(recipe, id, category))),
+                category.getType().codec().fieldOf("recipe").forGetter(ReiDisplay::getRecipe),
+                ResourceLocation.CODEC.fieldOf("id").forGetter(ReiDisplay::getId)
+            ).apply(instance, (recipe, id) -> new ReiDisplay<>(recipe, id, category))),
             StreamCodec.of((buf, display) -> {
                 category.getType().streamCodec().encode(buf, display.getRecipe());
                 buf.writeResourceLocation(display.getId());
             }, buf -> {
                 R recipe = category.getType().streamCodec().decode(buf);
                 ResourceLocation id = buf.readResourceLocation();
-                return new SimpleDisplay<>(recipe, id, category);
+                return new ReiDisplay<>(recipe, id, category);
             })
         );
     }
@@ -41,7 +41,7 @@ public class SimpleDisplay<R extends DisplayableRecipe<?>> implements Display {
     private final List<EntryIngredient> inputs;
     private final List<EntryIngredient> outputs;
 
-    public SimpleDisplay(RecipeHolder<R> holder, ProxyCategory<R> category) {
+    public ReiDisplay(RecipeHolder<R> holder, ProxyCategory<R> category) {
         this.recipe = holder.value();
         this.id = holder.id().location();
         this.category = category;
@@ -49,7 +49,7 @@ public class SimpleDisplay<R extends DisplayableRecipe<?>> implements Display {
         this.outputs = this.recipe.getOutputs().stream().map(EntryIngredients::ofItemStacks).toList();
     }
 
-    public SimpleDisplay(R recipe, ResourceLocation id, ProxyCategory<R> category) {
+    public ReiDisplay(R recipe, ResourceLocation id, ProxyCategory<R> category) {
         this(new RecipeHolder<>(ResourceKey.create(Registries.RECIPE, id), recipe), category);
     }
 
@@ -72,7 +72,7 @@ public class SimpleDisplay<R extends DisplayableRecipe<?>> implements Display {
     }
 
     @Override
-    public CategoryIdentifier<SimpleDisplay<R>> getCategoryIdentifier() {
+    public CategoryIdentifier<ReiDisplay<R>> getCategoryIdentifier() {
         return this.category.getId();
     }
 
@@ -82,7 +82,7 @@ public class SimpleDisplay<R extends DisplayableRecipe<?>> implements Display {
     }
 
     @Override
-    public @Nullable DisplaySerializer<SimpleDisplay<R>> getSerializer() {
+    public @Nullable DisplaySerializer<ReiDisplay<R>> getSerializer() {
         return category.getSerializer();
     }
 }
