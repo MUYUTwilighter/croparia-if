@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:elemental",
+  "input": "minecraft:dead_bush",
+  "output": "minecraft:brain_coral",
+  "probability": 1.0
+}

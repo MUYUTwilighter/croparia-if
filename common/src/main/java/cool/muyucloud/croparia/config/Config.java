@@ -37,6 +37,7 @@ public class Config {
 
     @NotNull
     private Path filePath;
+    private Path recipeWizard;
     @NotNull
     private Boolean override;
     @NotNull
@@ -58,6 +59,7 @@ public class Config {
      */
     public Config() {
         this.filePath = Platform.getGameFolder().resolve("croparia");
+        this.recipeWizard = Platform.getGameFolder().resolve("croparia/recipe_wizard/dump");
         this.autoReload = 20;
         this.override = true;
         this.fruitUse = 2;
@@ -73,6 +75,7 @@ public class Config {
      */
     public Config(RawConfig raw) {
         this.filePath = parsePath(raw.filePath()).orElse(Platform.getGameFolder().resolve("croparia"));
+        this.recipeWizard = parsePath(raw.recipeWizard()).orElse(Platform.getGameFolder().resolve("croparia/recipe_wizard/dump"));
         this.autoReload = raw.autoReload() != null ? raw.autoReload() : 20;
         this.override = raw.override() != null ? raw.override() : true;
         this.fruitUse = raw.fruitUse() != null ? raw.fruitUse() : 2;
@@ -85,7 +88,7 @@ public class Config {
     }
 
     public RawConfig toRaw() {
-        return new RawConfig(resolvePath(filePath), override, infusor, ritual, autoReload, soakAttempts, fruitUse, this.getBlacklist());
+        return new RawConfig(resolvePath(filePath), resolvePath(recipeWizard), override, infusor, ritual, autoReload, soakAttempts, fruitUse, this.getBlacklist());
     }
 
     public @NotNull Path getFilePath() {
@@ -94,6 +97,14 @@ public class Config {
 
     public void setFilePath(@NotNull Path filePath) {
         this.filePath = filePath;
+    }
+
+    public @NotNull Path getRecipeWizard() {
+        return recipeWizard;
+    }
+
+    public void setRecipeWizard(@NotNull Path recipeWizard) {
+        this.recipeWizard = recipeWizard;
     }
 
     public @NotNull Integer getAutoReload() {

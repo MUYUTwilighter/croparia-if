@@ -39,10 +39,10 @@ public class ElementalPotion extends Item implements ElementAccess {
             Block targetBlock = targetState.getBlock();
             if (targetBlock instanceof Infusor infusor) {
                 if (!infusor.tryInfuse(world, targetPos, this, itemStack, null)) {
-                    infusor.placeItem(world, targetPos, itemStack.split(1));
+                    infusor.placeItem(world, targetPos, itemStack.split(1), null);
                 }
             } else if (targetBlock instanceof ItemPlaceable placeable) {
-                placeable.placeItem(world, targetPos, itemStack.split(1));
+                placeable.placeItem(world, targetPos, itemStack.split(1), null);
             } else {
                 DefaultDispenseItemBehavior.spawnItem(world, itemStack.split(1), 1, direction, targetPos.getCenter());
             }

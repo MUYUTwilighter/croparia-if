@@ -41,6 +41,7 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
     private final BlockOutput output;
 
     public SoakRecipe(Element element, float probability, BlockInput input, BlockOutput output) {
+        if (element == Element.EMPTY) throw new IllegalArgumentException("Element cannot be EMPTY");
         this.element = element;
         this.probability = probability;
         this.input = input;
@@ -73,7 +74,7 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
 
     @Override
     public @NotNull List<List<ItemStack>> getInputs() {
-        return List.of(this.getInput().getDisplayStacks());
+        return List.of(this.getInput().getDisplayStacks(), List.of(this.getPotion()));
     }
 
     @Override

@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:water",
+  "input": "minecraft:ice",
+  "output": "minecraft:packed_ice",
+  "probability": 1.0
+}

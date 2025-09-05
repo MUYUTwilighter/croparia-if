@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:air",
+  "input": "#minecraft:flowers",
+  "output": "minecraft:wither_rose",
+  "probability": 0.01
+}

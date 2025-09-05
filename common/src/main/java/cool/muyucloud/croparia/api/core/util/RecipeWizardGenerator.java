@@ -24,6 +24,7 @@ import cool.muyucloud.croparia.util.Dependencies;
 import cool.muyucloud.croparia.util.FileUtil;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.text.Texts;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
@@ -68,8 +69,24 @@ public class RecipeWizardGenerator {
     }
 
     protected static final Map<ResourceLocation, ArrayList<Placeholder<UseOnContext>>> EXTENSIONS = new HashMap<>();
+
+    public static Placeholder<UseOnContext> register(ResourceLocation id, String regex, Function<UseOnContext, String> mapper) {
+        return register(id, regex, (matcher, context) -> mapper.apply(context));
+    }
+
+    public static Placeholder<UseOnContext> register(ResourceLocation id, String regex, BiFunction<Matcher, UseOnContext, String> mapper) {
+        return register(id, Placeholder.of(regex, mapper));
+    }
+
+    public static Placeholder<UseOnContext> register(ResourceLocation id, Placeholder<UseOnContext> placeholder) {
+        ArrayList<Placeholder<UseOnContext>> list = EXTENSIONS.computeIfAbsent(id, k -> new ArrayList<>());
+        list.add(placeholder);
+        list.trimToSize();
+        return placeholder;
+    }
+
     public static final Placeholder<UseOnContext> TIMESTAMP = register(
-        ResourceLocation.parse("datetime"), "\\{datetime}", context -> LocalDateTime.now().format(FORMATTER)
+        ResourceLocation.parse("default"), "\\{datetime}", context -> LocalDateTime.now().format(FORMATTER)
     );
     public static final Placeholder<UseOnContext> MAIN_HAND = register(
         ResourceLocation.tryParse("default"), "\\{main_hand}", context -> {
@@ -686,21 +703,6 @@ public class RecipeWizardGenerator {
         }
     );
 
-    public static Placeholder<UseOnContext> register(ResourceLocation id, String regex, Function<UseOnContext, String> mapper) {
-        return register(id, regex, (matcher, context) -> mapper.apply(context));
-    }
-
-    public static Placeholder<UseOnContext> register(ResourceLocation id, String regex, BiFunction<Matcher, UseOnContext, String> mapper) {
-        return register(id, Placeholder.of(regex, mapper));
-    }
-
-    public static Placeholder<UseOnContext> register(ResourceLocation id, Placeholder<UseOnContext> placeholder) {
-        ArrayList<Placeholder<UseOnContext>> list = EXTENSIONS.computeIfAbsent(id, k -> new ArrayList<>());
-        list.add(placeholder);
-        list.trimToSize();
-        return placeholder;
-    }
-
     protected static Collection<Placeholder<UseOnContext>> getExtensions(ResourceLocation id) {
         return EXTENSIONS.getOrDefault(id, new ArrayList<>());
     }
@@ -780,7 +782,7 @@ public class RecipeWizardGenerator {
                     template = placeholder.mapAll(template, context);
                     path = placeholder.mapAll(path, context);
                 }
-                Path result = CropariaIf.CONFIG.getFilePath().resolve("recipe_wizard/dumped").resolve(path);
+                Path result = CropariaIf.CONFIG.getRecipeWizard().resolve(path);
                 FileUtil.write(result.toFile(), template, true);
                 String s = result.toString();
                 Component c = Texts.literal(s).withStyle(Texts.openFile(s)).withStyle(Texts.inlineMouseBehavior());
@@ -788,6 +790,7 @@ public class RecipeWizardGenerator {
             } catch (IllegalStateException ignored) {
                 // Termination caused by missing data, message already sent in placeholder
             } catch (Throwable t) {
+                Texts.chat(player, Texts.translatable("overlay.croparia.recipe_wizard.failed").withStyle(ChatFormatting.RED));
                 CropariaIf.LOGGER.error("Failed to generate recipe", t);
             }
         }

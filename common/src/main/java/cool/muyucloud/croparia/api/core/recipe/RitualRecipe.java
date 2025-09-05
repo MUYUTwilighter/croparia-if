@@ -101,6 +101,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
                 consumed += toConsume;
             }
             if (consumed >= this.getIngredient().getAmount()) {
+                matcher.matched().destroy();
                 return this.getResult().createStack();
             }
         }
@@ -113,7 +114,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
             if (this.getIngredient().matchType(stack)) {
                 accumulated += stack.getCount();
             }
-            if (accumulated > this.getIngredient().getAmount()) {
+            if (accumulated >= this.getIngredient().getAmount()) {
                 return matcher.matched().getStates().stream().allMatch(state -> this.getBlock().matches(state))
                     && this.getRitual().matches(matcher.ritual());
             }

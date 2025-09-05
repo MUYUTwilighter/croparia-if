@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:fire",
+  "input": "#minecraft:sand",
+  "output": "minecraft:soul_sand",
+  "probability": 1.0
+}

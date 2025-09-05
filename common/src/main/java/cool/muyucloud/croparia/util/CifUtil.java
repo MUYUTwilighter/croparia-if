@@ -68,18 +68,6 @@ public class CifUtil {
     }
 
     /**
-     * Places an item at the specified position in the world.
-     *
-     * @param world The world where the item will be placed.
-     * @param pos   The position where the item will be placed.
-     * @param stack The item stack to be placed.
-     */
-    public static void placeItem(Level world, BlockPos pos, ItemStack stack) {
-        ItemStack newStack = stack.copyAndClear();
-        world.addFreshEntity(new ItemEntity(world, (double) pos.getX() + 0.5, (double) pos.getY() + 0.6, (double) pos.getZ() + 0.5, newStack, 0, 0, 0));
-    }
-
-    /**
      * Attempts to store an item stack in a container below the specified position.
      *
      * @param world The world where the item will be stored.

@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:fire",
+  "input": "minecraft:dead_bush",
+  "output": "minecraft:fire_coral",
+  "probability": 1.0
+}

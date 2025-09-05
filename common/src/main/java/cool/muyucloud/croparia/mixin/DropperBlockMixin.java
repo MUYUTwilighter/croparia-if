@@ -23,7 +23,7 @@ public class DropperBlockMixin {
         pos = pos.offset(blockState.getValue(DropperBlock.FACING).getUnitVec3i());
         Block block = world.getBlockState(pos).getBlock();
         if (block instanceof ItemPlaceable placeable) {
-            placeable.placeItem(world, pos, itemStack.split(1));
+            placeable.placeItem(world, pos, itemStack.split(1), null);
             ci.cancel();
         }
     }

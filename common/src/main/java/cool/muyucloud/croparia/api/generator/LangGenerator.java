@@ -1,8 +1,6 @@
 package cool.muyucloud.croparia.api.generator;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.api.generator.util.DgElement;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
@@ -17,30 +15,22 @@ import java.util.Map;
 
 
 public class LangGenerator extends DataGenerator {
-    public static final MapCodec<LangGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        Codec.BOOL.optionalFieldOf("enabled").forGetter(LangGenerator::optionalEnabled),
-        Codec.BOOL.optionalFieldOf("startup").forGetter(LangGenerator::optionalEnabled),
-        Dependencies.CODEC.optionalFieldOf("dependencies").forGetter(LangGenerator::optionalDependencies),
-        ResourceLocation.CODEC.listOf().optionalFieldOf("whitelist").forGetter(LangGenerator::optionalWhitelist),
-        Codec.STRING.fieldOf("path").forGetter(LangGenerator::getPath),
-        DgRegistry.CODEC.fieldOf("registry").forGetter(LangGenerator::getRegistry),
-        Codec.STRING.fieldOf("template").forGetter(LangGenerator::getTemplate)
-    ).apply(instance, (enabled, startup, dependencies, whitelist, path, iterable, template) -> {
+    public static final MapCodec<LangGenerator> CODEC = DataGenerator.CODEC.xmap(dg -> {
         try {
             @SuppressWarnings("unchecked")
-            DgRegistry<? extends TranslatableElement> translatable = (DgRegistry<? extends TranslatableElement>) iterable;
+            DgRegistry<? extends TranslatableElement> translatable = (DgRegistry<? extends TranslatableElement>) dg.getRegistry();
             for (TranslatableElement element : translatable) {
                 element.translate("en_us");
                 break;
             }
             return new LangGenerator(
-                enabled.orElse(true), startup.orElse(false), dependencies.orElse(Dependencies.EMPTY),
-                whitelist.orElse(List.of()), path, translatable, template
+                dg.isEnabled(), dg.isStartup(), dg.getDependencies(), dg.getWhitelist(),
+                dg.getPath(), translatable, dg.getTemplate()
             );
         } catch (Throwable t) {
-            throw new IllegalArgumentException("Iterable %s is not translatable".formatted(iterable), t);
+            throw new IllegalArgumentException("Iterable %s is not translatable".formatted(dg.getRegistry()), t);
         }
-    }));
+    }, lg -> lg);
 
     private static final Map<String, List<String>> TRANSLATIONS = new HashMap<>();
 

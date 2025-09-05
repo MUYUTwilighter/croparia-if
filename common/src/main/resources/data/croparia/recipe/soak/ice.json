@@ -1,0 +1,12 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:elemental",
+  "input": {
+    "id": "minecraft:water",
+    "properties": {
+      "level": "0"
+    }
+  },
+  "output": "minecraft:ice",
+  "probability": 1.0
+}

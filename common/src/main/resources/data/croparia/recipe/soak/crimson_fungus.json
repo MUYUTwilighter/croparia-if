@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:fire",
+  "input": "minecraft:red_mushroom",
+  "output": "minecraft:crimson_fungus",
+  "probability": 1.0
+}

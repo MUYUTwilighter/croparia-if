@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:water",
+  "input": "minecraft:stone",
+  "output": "minecraft:dripstone_block",
+  "probability": 1.0
+}

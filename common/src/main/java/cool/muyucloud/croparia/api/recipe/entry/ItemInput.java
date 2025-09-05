@@ -7,11 +7,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.api.codec.TestedCodec;
+import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.TagUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
+import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPredicate;
@@ -41,8 +43,7 @@ public class ItemInput implements SlotDisplay {
     public static final ItemInput EMPTY = new ItemInput(null, null, DataComponentPredicate.EMPTY, 0);
     public static final Codec<ItemInput> CODEC_STR = Codec.STRING.xmap(
         s -> s.isEmpty() ? EMPTY : new ItemInput(s, 1),
-        input -> input.getTag().map(tag -> "#" + tag.location())
-            .orElse(input.getId().map(ResourceLocation::toString).orElse(""))
+        ItemInput::getTaggable
     );
     public static final MapCodec<ItemInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
         ResourceLocation.CODEC.optionalFieldOf("id").forGetter(ItemInput::getId),
@@ -110,7 +111,11 @@ public class ItemInput implements SlotDisplay {
         this.displayStacks = OnLoadSupplier.of(() -> {
             if (this.getId().isPresent()) {
                 ItemStack stack = new ItemStack(Holder.direct(BuiltInRegistries.ITEM.getValue(this.getId().get())),
-                    (int) Math.min(this.getAmount(), Integer.MAX_VALUE), this.getComponentsPredicate().asPatch());
+                    Math.toIntExact(this.getAmount()), this.getComponentsPredicate().asPatch());
+                if (stack.isEmpty()) {
+                    DisplayableRecipe.LOGGER.error("Item with id '{}' not found, using placeholder", this.getId().get());
+                    return ImmutableList.of(Texts.tooltip(BlockInput.STACK_UNKNOWN.copy(), Texts.literal(this.getTaggable())));
+                }
                 return ImmutableList.of(stack);
             } else if (this.getTag().isPresent()) {
                 LinkedList<ItemStack> stacks = new LinkedList<>();
@@ -119,6 +124,10 @@ public class ItemInput implements SlotDisplay {
                         this.getComponentsPredicate().asPatch());
                     stacks.addLast(stack);
                 });
+                if (stacks.isEmpty()) {
+                    DisplayableRecipe.LOGGER.error("Item tag with id '{}' is empty, using placeholder", this.getTag().get().location());
+                    return ImmutableList.of(Texts.tooltip(BlockInput.STACK_UNKNOWN.copy(), Texts.literal(this.getTaggable())));
+                }
                 return ImmutableList.copyOf(stacks);
             } else {
                 ItemStack stack = new ItemStack(Holder.direct(CropariaItems.PLACEHOLDER.get()),
@@ -127,6 +136,12 @@ public class ItemInput implements SlotDisplay {
                 return ImmutableList.of(stack);
             }
         });
+    }
+
+    public String getTaggable() {
+        return this.getTag().map(tag -> "#" + tag.location()).orElseGet(
+            () -> this.getId().map(ResourceLocation::toString).orElse("")
+        );
     }
 
     public Optional<ResourceLocation> getId() {

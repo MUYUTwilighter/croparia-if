@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:earth",
+  "input": "minecraft:amethyst_block",
+  "output": "minecraft:budding_amethyst",
+  "probability": 1.0
+}

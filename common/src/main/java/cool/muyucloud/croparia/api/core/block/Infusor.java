@@ -64,7 +64,7 @@ public class Infusor extends Block implements ItemPlaceable {
         ) {
             return InteractionResult.SUCCESS;
         } else if (!(item instanceof RecipeWizard) && hand == InteractionHand.MAIN_HAND) {
-            CifUtil.placeItem(world, pos, itemStack);
+            this.placeItem(world, pos, itemStack, player);
             return InteractionResult.CONSUME;
         }
         return InteractionResult.PASS;
@@ -160,10 +160,5 @@ public class Infusor extends Block implements ItemPlaceable {
     @Override
     public @NotNull Item asItem() {
         return CropariaItems.INFUSOR.get();
-    }
-
-    @Override
-    public void placeItem(Level world, BlockPos pos, ItemStack stack) {
-        CifUtil.placeItem(world, pos, stack);
     }
 }

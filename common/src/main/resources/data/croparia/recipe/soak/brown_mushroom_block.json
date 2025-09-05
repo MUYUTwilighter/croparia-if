@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:earth",
+  "input": "minecraft:warped_wart_block",
+  "output": "minecraft:brown_mushroom_block",
+  "probability": 1.0
+}

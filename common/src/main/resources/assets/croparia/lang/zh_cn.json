@@ -125,6 +125,7 @@
   "overlay.croparia.recipe_wizard.furnace.no_fuel": "燃料栏位是空的",
   "overlay.croparia.recipe_wizard.error.no_match": "没有匹配目标方块的配方模板",
   "overlay.croparia.recipe_wizard.soak.missing.element": "将注魔台放置在元素石上并注魔",
+  "overlay.croparia.recipe_wizard.failed": "发生错误，请检查日志",
   "tooltip.croparia.block_place": "放置方块",
   "tooltip.croparia.elem_infuse": "对注魔台使用以注魔",
   "tooltip.croparia.item_drop": "丢出物品",

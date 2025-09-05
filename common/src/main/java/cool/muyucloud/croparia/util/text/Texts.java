@@ -5,6 +5,7 @@ import cool.muyucloud.croparia.registry.CropariaComponents;
 import dev.architectury.event.events.client.ClientCommandRegistrationEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +16,15 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 public class Texts {
+    public static ItemStack rename(Item item, Component name) {
+        return rename(item.getDefaultInstance(), name);
+    }
+
+    public static ItemStack rename(ItemStack stack, Component name) {
+        stack.set(DataComponents.CUSTOM_NAME, name);
+        return stack;
+    }
+
     public static ItemStack tooltip(Item item, MutableComponent component) {
         return tooltip(item.getDefaultInstance(), component);
     }

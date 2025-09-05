@@ -1,6 +1,8 @@
 package cool.muyucloud.croparia.util;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -11,7 +13,12 @@ public interface ItemPlaceable {
      * @param world the world to place the item in
      * @param pos   the position to place the item at
      * @param stack the item stack to place
-     * @see CifUtil#placeItem(Level, BlockPos, ItemStack)
+     * @param owner the entity that owns the item (can be null)
      */
-    void placeItem(Level world, BlockPos pos, ItemStack stack);
+    default void placeItem(Level world, BlockPos pos, ItemStack stack, Entity owner) {
+        ItemStack newStack = stack.copyAndClear();
+        ItemEntity entity = new ItemEntity(world, (double) pos.getX() + 0.5, (double) pos.getY() + 0.6, (double) pos.getZ() + 0.5, newStack, 0, 0, 0);
+        entity.setThrower(owner);
+        world.addFreshEntity(entity);
+    }
 }

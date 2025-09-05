@@ -125,6 +125,7 @@
   "overlay.croparia.recipe_wizard.furnace.no_fuel": "Fuel slot is empty",
   "overlay.croparia.magic_rope.no_target": "No target bounded",
   "overlay.croparia.xp": "Not enough XP",
+  "overlay.croparia.recipe_wizard.failed": "Error occurred, please check the log",
   "tooltip.croparia.block_place": "Place the block(s)",
   "tooltip.croparia.elem_infuse": "Use it towards the infusor to infuse",
   "tooltip.croparia.item_drop": "Drop the item(s)",

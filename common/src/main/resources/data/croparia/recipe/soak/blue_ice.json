@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:earth",
+  "input": "minecraft:ice",
+  "output": "minecraft:blue_ice",
+  "probability": 1.0
+}

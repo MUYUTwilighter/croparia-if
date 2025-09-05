@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:earth",
+  "input": "minecraft:warped_fungus",
+  "output": "minecraft:brown_mushroom",
+  "probability": 1.0
+}

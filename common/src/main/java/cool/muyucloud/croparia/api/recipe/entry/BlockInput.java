@@ -10,6 +10,7 @@ import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.api.core.component.BlockProperties;
+import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.TagUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
@@ -49,15 +50,12 @@ public class BlockInput implements SlotDisplay {
     public static final Supplier<ItemStack> STACK_PLACEHOLDER = () -> CropariaItems.PLACEHOLDER_BLOCK.get().getDefaultInstance();
     public static final BlockInput UNKNOWN = BlockInput.create(CropariaIf.of("unknown"));
     public static final BlockInput ANY = new BlockInput(null, null, BlockProperties.EMPTY);
-    public static final MapCodec<BlockInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.optionalFieldOf("id").forGetter(BlockInput::getId),
-        TagKey.codec(Registries.BLOCK).optionalFieldOf("tag").forGetter(BlockInput::getTag),
-        BlockProperties.CODEC.optionalFieldOf("properties", BlockProperties.EMPTY).forGetter(BlockInput::getProperties)
-    ).apply(instance, (id, tag, properties) -> create(id.orElse(null), tag.orElse(null), properties)));
+    public static final MapCodec<BlockInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(ResourceLocation.CODEC.optionalFieldOf("id").forGetter(BlockInput::getId), TagKey.codec(Registries.BLOCK).optionalFieldOf("tag").forGetter(BlockInput::getTag), BlockProperties.CODEC.optionalFieldOf("properties", BlockProperties.EMPTY).forGetter(BlockInput::getProperties)).apply(instance, (id, tag, properties) -> create(id.orElse(null), tag.orElse(null), properties)));
     public static final Codec<BlockInput> CODEC_STR = Codec.STRING.xmap(BlockInput::create, BlockInput::getTaggable);
     public static final MultiCodec<BlockInput> CODEC = MultiCodec.of(TestedCodec.of(CODEC_COMP.codec(), toEncode -> {
         if (toEncode.isAny()) return TestedCodec.fail(() -> "Can be encoded as empty string");
-        if (toEncode.getProperties().equals(BlockProperties.EMPTY)) return TestedCodec.fail(() -> "Can be encoded as simple id or tag");
+        if (toEncode.getProperties().equals(BlockProperties.EMPTY))
+            return TestedCodec.fail(() -> "Can be encoded as simple id or tag");
         return TestedCodec.success();
     }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockInput> STREAM_CODEC = CodecUtil.toStream(CODEC);
@@ -129,18 +127,27 @@ public class BlockInput implements SlotDisplay {
             if (this.getId().isPresent()) {
                 ItemStack displayStack = BuiltInRegistries.BLOCK.getOptional(this.getId().get()).map(block -> {
                     ItemStack stack = block.asItem().getDefaultInstance();
+                    if (stack.isEmpty()) stack = Texts.rename(STACK_PLACEHOLDER.get(), Texts.translatable(block.getDescriptionId()));
                     stack.set(BlockProperties.TYPE, this.getProperties());
                     return stack;
-                }).orElseThrow(() -> new IllegalArgumentException("Unknown block: %s".formatted(this.getId())));
+                }).orElseGet(() -> {
+                    DisplayableRecipe.LOGGER.error("Block with id '{}' not found, using placeholder", this.getId().get());
+                    return Texts.tooltip(STACK_UNKNOWN.copy(), Texts.literal(this.getTaggable()));
+                });
                 return ImmutableList.of(displayStack);
             } else if (this.getTag().isPresent()) {
                 LinkedList<ItemStack> stacks = new LinkedList<>();
                 for (Holder<Block> holder : TagUtil.forEntries(this.getTag().get())) {
-                    ItemStack stack = holder.value().asItem().getDefaultInstance();
+                    Block block = holder.value();
+                    ItemStack stack = block.asItem().getDefaultInstance();
+                    if (stack.isEmpty()) stack = Texts.rename(STACK_PLACEHOLDER.get(), Texts.translatable(block.getDescriptionId()));
                     stack.set(BlockProperties.TYPE, this.getProperties());
                     stacks.add(stack);
                 }
-                if (stacks.isEmpty()) stacks.add(STACK_UNKNOWN);
+                if (stacks.isEmpty()) {
+                    DisplayableRecipe.LOGGER.error("Block tag '{}' is empty, using placeholder", this.getTag().get().location());
+                    stacks.add(Texts.tooltip(STACK_UNKNOWN.copy(), Texts.literal(this.getTaggable())));
+                }
                 return ImmutableList.copyOf(stacks);
             } else if (this.getProperties().isEmpty()) {
                 return ImmutableList.of(STACK_ANY);

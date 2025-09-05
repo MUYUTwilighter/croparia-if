@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:fire",
+  "input": "minecraft:red_mushroom_block",
+  "output": "minecraft:nether_wart_block",
+  "probability": 1.0
+}

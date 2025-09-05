@@ -28,7 +28,7 @@ public class CropFruit extends Item implements CropAccess<Crop> {
     }
 
     public @NotNull InteractionResult useOn(@NotNull UseOnContext context) {
-        if (CropariaIf.CONFIG.getFruitUse() > 0) {
+        if (CropariaIf.CONFIG.getFruitUse() <= 0) {
             return InteractionResult.PASS;
         }
         if (!context.getLevel().isClientSide) {

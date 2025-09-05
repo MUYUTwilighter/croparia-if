@@ -52,6 +52,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     protected final ItemOutput result;
 
     public InfusorRecipe(@NotNull Element element, @NotNull ItemInput ingredient, @NotNull ItemOutput result) {
+        if (element == Element.EMPTY) throw new IllegalArgumentException("Element cannot be EMPTY");
         this.element = element;
         this.ingredient = ingredient;
         this.result = result;

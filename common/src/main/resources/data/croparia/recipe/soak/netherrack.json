@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:fire",
+  "input": "minecraft:stone",
+  "output": "minecraft:netherrack",
+  "probability": 1.0
+}

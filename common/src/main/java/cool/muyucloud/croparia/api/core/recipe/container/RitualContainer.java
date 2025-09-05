@@ -10,12 +10,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.Collection;
 
-public record RitualContainer(BlockState ritual, @NotNull List<ItemStack> stacks,
+public record RitualContainer(BlockState ritual, @NotNull Collection<ItemStack> stacks,
                               @NotNull RitualStructure.Result matched) implements RecipeInput {
-    public static RitualContainer of(BlockState ritual, @NotNull List<ItemEntity> stacks, @NotNull RitualStructure.Result matched) {
-        return new RitualContainer(ritual, stacks.stream().map(ItemEntity::getItem).toList(), matched);
+    public static RitualContainer of(BlockState ritual, @NotNull Collection<ItemEntity> items, @NotNull RitualStructure.Result matched) {
+        return new RitualContainer(ritual, items.stream().map(ItemEntity::getItem).toList(), matched);
     }
 
     public static RitualContainer of(Level level, BlockPos pos, @NotNull RitualStructure.Result matched) {
@@ -32,7 +32,7 @@ public record RitualContainer(BlockState ritual, @NotNull List<ItemStack> stacks
 
     @Override
     public @NotNull ItemStack getItem(int i) {
-        return i < stacks.size() ? stacks.get(i) : ItemStack.EMPTY;
+        return i < stacks.size() ? stacks.stream().iterator().next() : ItemStack.EMPTY;
     }
 
     @Override
