@@ -66,6 +66,10 @@ public class BlockOutput implements SlotDisplay {
         return new BlockOutput(id, properties);
     }
 
+    public static BlockOutput of(BlockState state) {
+        return create(Objects.requireNonNull(state.getBlock().arch$registryName()), BlockProperties.create(state));
+    }
+
     protected BlockOutput(@NotNull ResourceLocation id, @NotNull BlockProperties properties) {
         this.id = id;
         this.properties = properties;
