@@ -36,6 +36,6 @@ public class JeiSoakRecipe extends JeiCategory<SoakRecipe> {
         builder.addDrawable(BLOCK_PLACE, 56, 40);
         builder.addDrawable(ELEM_INFUSE, 56, 8);
         builder.addRecipeArrow().setPosition(88, 40);
-        builder.addText(FormattedText.of("%3.2f %%".formatted(recipe.getProbability() * 100)), 32, 16).setPosition(112, 24);
+        builder.addText(FormattedText.of("%3.2f %%".formatted(recipe.getProbability() * 100)), 64, 16).setPosition(112, 24);
     }
 }
