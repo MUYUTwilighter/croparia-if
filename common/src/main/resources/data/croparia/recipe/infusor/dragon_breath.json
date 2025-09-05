@@ -1,0 +1,13 @@
+{
+  "type": "croparia:infusor",
+  "element": "croparia:air",
+  "ingredient": {
+    "id": "minecraft:potion",
+    "components": {
+      "minecraft:potion_contents": {
+        "potion": "minecraft:awkward"
+      }
+    }
+  },
+  "result": "minecraft:dragon_breath"
+}

@@ -138,6 +138,8 @@
   "tooltip.croparia.bounded_position": "Bounded at %s: %s, %s, %s",
   "tooltip.croparia.soak.infusor": "Place infusor onto the elemental stone",
   "tooltip.croparia.soak.input": "Place input block near the elemental stone",
+  "tooltip.croparia.spawn_egg": "Mod would be spawned after crafting",
+  "tooltip.croparia.ritual.enchant": "The enchantment on the input item will be upgraded",
   "gui.croparia.ritual_structure.title": "Ritual Structure",
   "gui.croparia.ritual_structure.label": "Layer %s",
   "gui.croparia.ritual_structure.lower": "Lower Layer",

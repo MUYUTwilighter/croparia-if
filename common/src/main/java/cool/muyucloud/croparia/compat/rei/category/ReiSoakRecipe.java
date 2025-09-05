@@ -42,7 +42,7 @@ public class ReiSoakRecipe extends ReiCategory<SoakRecipe> {
         Widget infusor = Widgets.createSlot(
             new Point(bounds.getCenterX() - 8, bounds.getCenterY() - 24)
         ).entry(EntryStacks.of(CropariaItems.INFUSOR.get()).tooltip(
-            Texts.translatable("tooltip.croparia.soak.infusor"))
+            Constants.SOAK_INFUSOR)
         ).disableBackground().markInput().disableHighlight();
         Widget infusorArr = Widgets.createTexturedWidget(
             Constants.BLOCK_PLACE_UPON, bounds.getCenterX() - 8, bounds.getCenterY() - 8,

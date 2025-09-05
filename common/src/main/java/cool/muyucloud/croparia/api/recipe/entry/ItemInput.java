@@ -73,7 +73,9 @@ public class ItemInput implements SlotDisplay {
 
     public static ItemInput of(final ItemStack stack) {
         DataComponentPredicate.Builder builder = DataComponentPredicate.builder();
-        stack.getComponentsPatch().entrySet().forEach(entry -> builder.expect(TypedDataComponent.createUnchecked(entry.getKey(), entry.getValue())));
+        stack.getComponentsPatch().entrySet().forEach(entry -> entry.getValue().ifPresent(
+            value -> builder.expect(TypedDataComponent.createUnchecked(entry.getKey(), value))
+        ));
         return new ItemInput(stack.getItem().arch$registryName(), null, builder.build(), stack.getCount());
     }
 

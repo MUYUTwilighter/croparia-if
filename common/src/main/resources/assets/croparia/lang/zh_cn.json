@@ -138,6 +138,8 @@
   "tooltip.croparia.bounded_position": "绑定到 %s: %s, %s, %s",
   "tooltip.croparia.soak.infusor": "将注魔台放置在元素石上",
   "tooltip.croparia.soak.input": "将输入方块放置在元素石旁边",
+  "tooltip.croparia.spawn_egg": "合成后直接召唤生物",
+  "tooltip.croparia.ritual.enchant": "将会升级输入物品的附魔",
   "gui.croparia.ritual_structure.title": "仪式结构",
   "gui.croparia.ritual_structure.label": "第 %s 层",
   "gui.croparia.ritual_structure.lower": "往低一层",

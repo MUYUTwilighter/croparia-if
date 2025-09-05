@@ -24,6 +24,7 @@ public class Constants {
     public static final MutableComponent INPUT_BLOCK = Texts.translatable("tooltip.croparia.input");
     public static final MutableComponent AIR_BLOCK = Texts.translatable("tooltip.croparia.air");
     public static final MutableComponent ANY_BLOCK = Texts.translatable("tooltip.croparia.any");
+    public static final MutableComponent TOOLTIP_RITUAL = Texts.translatable("tooltip.croparia.ritual").setStyle(USAGE);
     public static final MutableComponent ITEM_DROP_TOOLTIP = Texts.translatable("tooltip.croparia.item_drop").setStyle(USAGE);
     public static final MutableComponent ELEM_INFUSE_TOOLTIP = Texts.translatable("tooltip.croparia.elem_infuse").setStyle(USAGE);
     public static final MutableComponent BLOCK_PLACE_TOOLTIP = Texts.translatable("tooltip.croparia.block_place").setStyle(USAGE);
@@ -32,5 +33,4 @@ public class Constants {
     public static final MutableComponent RITUAL_STRUCTURE_LOWER = Texts.translatable("gui.croparia.ritual_structure.lower");
     public static final MutableComponent RITUAL_STRUCTURE_UPPER = Texts.translatable("gui.croparia.ritual_structure.upper");
     public static final MutableComponent INSUFFICIENT_XP = Texts.translatable("overlay.croparia.xp");
-    public static final MutableComponent TOOLTIP_RITUAL = Texts.translatable("tooltip.croparia.ritual");
 }

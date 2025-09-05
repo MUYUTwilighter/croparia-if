@@ -1,0 +1,17 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:earth",
+  "input": {
+    "id": "minecraft:pumpkin_stem",
+    "properties": {
+      "age": "7"
+    }
+  },
+  "output": {
+    "id": "minecraft:melon_stem",
+    "properties": {
+      "age": "7"
+    }
+  },
+  "probability": 1.0
+}

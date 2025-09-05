@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.core.block;
 
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.component.TargetPos;
+import cool.muyucloud.croparia.api.core.entity.FakePlayer;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualContainer;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualStructureContainer;
 import cool.muyucloud.croparia.registry.CropariaItems;
@@ -20,6 +21,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.BlockGetter;
@@ -77,6 +79,9 @@ public class RitualStand extends Block implements ItemPlaceable {
                     RitualContainer matcher = RitualContainer.of(level.getBlockState(pos), cachedItems, matched);
                     recipeManager.getRecipeFor(Recipes.RITUAL, matcher, level).map(RecipeHolder::value).ifPresentOrElse(ritual -> {
                         ItemStack result = ritual.assemble(matcher);
+                        if (result.getItem() instanceof SpawnEggItem) {
+                            FakePlayer.useAllItemsOn(level, pos.above(), result);
+                        }
                         cachedItems.remove(itemEntity);
                         CifUtil.exportItem(level, pos, result, itemEntity.getOwner() instanceof Player player ? player : null);
                         this.playSound(level, pos);

@@ -14,6 +14,8 @@ import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -89,10 +91,35 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
 
     @Override
     public @NotNull List<List<ItemStack>> getOutputs() {
+        ItemStack stack = this.getResult().getDisplayStack();
+        if (stack.getItem() instanceof SpawnEggItem) {
+            Texts.tooltip(stack, Texts.translatable("tooltip.croparia.spawn_egg"));
+        } else if (stack.getItem() == Items.ENCHANTED_BOOK && this.getIngredient().getAmount() == 1L && this.getResult().getAmount() == 1L) {
+            Texts.tooltip(stack, Texts.translatable("tooltip.croparia.ritual.enchant"));
+        }
         return List.of(List.of(this.getResult().getDisplayStack()));
     }
 
     public ItemStack assemble(RitualContainer matcher) {
+        ItemStack result = this.getResult().createStack();
+        // Handle enchanted book special case
+        if (this.getIngredient().getAmount() == 1L && this.getResult().getAmount() == 1L
+            && result.getItem() == Items.ENCHANTED_BOOK) {
+            for (ItemStack stack : matcher.stacks()) {
+                if (this.getIngredient().matchType(stack)) {
+                    matcher.matched().destroy();
+                    stack.shrink(1);
+                    ItemStack toEnchant = stack.copyWithCount(1);
+                    for (var entry : result.getEnchantments().entrySet()) {
+                        int level = toEnchant.getEnchantments().getLevel(entry.getKey());
+                        toEnchant.enchant(entry.getKey(), level + entry.getIntValue());
+                    }
+                    return toEnchant;
+                }
+            }
+            return ItemStack.EMPTY;
+        }
+        // Handle common case
         long consumed = 0;
         for (ItemStack stack : matcher.stacks()) {
             if (this.getIngredient().matchType(stack)) {
