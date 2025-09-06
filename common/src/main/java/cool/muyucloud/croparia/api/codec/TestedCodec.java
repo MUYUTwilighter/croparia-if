@@ -50,55 +50,6 @@ public class TestedCodec<T> implements Codec<T> {
         return FAIL;
     }
 
-    /**
-     * Create a TestedCodec with always-success tests for both encode & decode
-     *
-     * @param codec codec to convert
-     * @param <T>   Type of the target object
-     * @return Tested codec with always-success tests
-     *
-     */
-    public static <T> TestedCodec<T> of(Codec<T> codec) {
-        return new TestedCodec<>(codec, o -> success(), (ops, input) -> success());
-    }
-
-    /**
-     * Create a TestedCodec with specified encode test.
-     *
-     * @param codec      Codec to wrap
-     * @param encodeTest Test for encode
-     * @param <T>        Type of the target object
-     * @return TestedCodec with specified test for encode
-     */
-    public static <T> TestedCodec<T> of(Codec<T> codec, EncodeTest<T> encodeTest) {
-        return new TestedCodec<>(codec, encodeTest, (ops, input) -> success());
-    }
-
-    /**
-     * Creates a TestedCodec with a specified decode test.
-     *
-     * @param codec      The Codec to wrap
-     * @param decodeTest The decode test to apply
-     * @param <T>        The type of the target object
-     * @return A TestedCodec with the specified decode test
-     */
-    public static <T> TestedCodec<T> of(Codec<T> codec, DecodeTest<?> decodeTest) {
-        return new TestedCodec<>(codec, o -> success(), decodeTest);
-    }
-
-    /**
-     * Creates a TestedCodec with specified encode and decode tests.
-     *
-     * @param codec      The Codec to wrap
-     * @param encodeTest The test to apply before encoding
-     * @param decodeTest The test to apply before decoding
-     * @param <T>        The type of the target object
-     * @return A TestedCodec with the specified encode and decode tests
-     */
-    public static <T> TestedCodec<T> of(Codec<T> codec, EncodeTest<T> encodeTest, DecodeTest<?> decodeTest) {
-        return new TestedCodec<>(codec, encodeTest, decodeTest);
-    }
-
     private final Codec<T> codec;
     private final EncodeTest<T> encodeTest;
     private final DecodeTest<?> decodeTest;

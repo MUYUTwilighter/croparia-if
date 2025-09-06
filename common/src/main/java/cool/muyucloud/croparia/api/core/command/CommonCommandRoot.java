@@ -16,12 +16,15 @@ public class CommonCommandRoot {
         .requires(s -> s.hasPermission(2))
         .then(DumpCommand.build())
         .then(CropCommand.build())
+        .then(ConfigCommand.buildFilePath())
+        .then(ConfigCommand.buildRecipeWizard())
         .then(ConfigCommand.buildInfusor())
         .then(ConfigCommand.buildRitual())
         .then(ConfigCommand.buildFruitUse())
         .then(ConfigCommand.buildAutoReload())
         .then(ConfigCommand.buildOverride())
         .then(ConfigCommand.buildSoakAttempts())
+        .then(ConfigCommand.buildReset())
         .then(CreateCommand.build());
 
     public static void register() {

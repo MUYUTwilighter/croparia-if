@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.api.crop.util;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import dev.architectury.platform.Platform;
@@ -16,7 +17,7 @@ import java.util.Map;
 public class CropDependencies implements Iterable<Map.Entry<String, String>> {
     public static final Codec<CropDependencies> CODEC_VANILLA = Codec.STRING.xmap(s -> new CropDependencies(CropariaIf.MOD_ID, s), keys -> keys.getKey(CropariaIf.MOD_ID));
     public static final Codec<CropDependencies> CODEC = Codec.unboundedMap(Codec.STRING, Codec.STRING).xmap(CropDependencies::new, CropDependencies::getCandidates);
-    public static final MultiCodec<CropDependencies> CODEC_ANY = MultiCodec.of(CODEC, CODEC_VANILLA);
+    public static final MultiCodec<CropDependencies> CODEC_ANY = CodecUtil.of(CODEC, CODEC_VANILLA);
     public static final CropDependencies EMPTY = new CropDependencies(Map.of());
 
     private final Map<String, String> candidates;

@@ -1,0 +1,22 @@
+{
+  "type": "croparia:ritual",
+  "ritual": "croparia:ritual_stand_2",
+  "ingredient": "#minecraft:enchantable/fire_aspect",
+  "block": {
+    "id": "croparia:fluid_fire",
+    "properties": {
+      "level": "0"
+    }
+  },
+  "result": {
+    "id": "minecraft:enchanted_book",
+    "components": {
+      "minecraft:stored_enchantments": {
+        "levels": {
+          "minecraft:fire_aspect": 2
+        }
+      }
+    },
+    "amount": 1
+  }
+}

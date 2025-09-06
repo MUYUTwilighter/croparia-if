@@ -32,7 +32,7 @@ public class ItemOutput implements SlotDisplay {
         DataComponentPatch.CODEC.optionalFieldOf("components").forGetter(itemOutput -> Optional.of(itemOutput.getComponentsPatch())),
         Codec.LONG.optionalFieldOf("amount").forGetter(result -> Optional.of(result.getAmount()))
     ).apply(instance, (id, components, amount) -> new ItemOutput(id, components.orElse(DataComponentPatch.EMPTY), amount.orElse(1L))));
-    public static final MultiCodec<ItemOutput> CODEC = MultiCodec.of(TestedCodec.of(CODEC_COMP.codec(), toEncode -> {
+    public static final MultiCodec<ItemOutput> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
         if (toEncode.getComponentsPatch().isEmpty() && toEncode.getAmount() == 1L) return TestedCodec.fail(() -> "Can be encoded as string");
         return TestedCodec.success();
     }), CODEC_STR);

@@ -16,34 +16,6 @@ import java.util.function.Supplier;
  * @see TestedCodec
  */
 public class MultiCodec<T> extends ArrayList<TestedCodec<? extends T>> implements Codec<T> {
-    @SafeVarargs
-    public static <T> MultiCodec<T> of(Codec<? extends T>... codecs) {
-        return of(toEncode -> TestedCodec.success(), (ops, toDecode) -> TestedCodec.success(), codecs);
-    }
-
-    @SafeVarargs
-    public static <T> MultiCodec<T> of(TestedCodec.EncodeTest<T> encodeTest, Codec<? extends T>... codecs) {
-        return of(encodeTest, (ops, toDecode) -> TestedCodec.success(), codecs);
-    }
-
-    @SafeVarargs
-    public static <T> MultiCodec<T> of(TestedCodec.DecodeTest<T> decodeTest, Codec<? extends T>... codecs) {
-        return of(toEncode -> TestedCodec.success(), decodeTest, codecs);
-    }
-
-    @SafeVarargs
-    public static <T> MultiCodec<T> of(TestedCodec.EncodeTest<T> encodeTest, TestedCodec.DecodeTest<?> decodeTest, Codec<? extends T>... codecs) {
-        MultiCodec<T> result = new MultiCodec<>();
-        for (Codec<? extends T> codec : codecs) {
-            if (codec instanceof TestedCodec<? extends T> testedCodec) {
-                result.add(testedCodec);
-            } else {
-                result.add(TestedCodec.of(codec, encodeTest.adapt(), decodeTest));
-            }
-        }
-        return result;
-    }
-
     @Override
     public <I> DataResult<Pair<T, I>> decode(DynamicOps<I> ops, I toDecode) {
         ArrayList<Supplier<String>> logs = new ArrayList<>(this.size());

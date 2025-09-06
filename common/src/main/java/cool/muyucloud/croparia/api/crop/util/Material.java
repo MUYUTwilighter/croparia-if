@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.util.TagUtil;
@@ -29,8 +30,8 @@ public class Material {
             DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY).forGetter(Material::getComponents)
         ).apply(instance, Material::new)
     );
-    public static final MultiCodec<Material> CODEC = MultiCodec.of(
-        TestedCodec.of(CODEC_COMP.codec(), toDecode -> toDecode.components.equals(DataComponentPatch.EMPTY)
+    public static final MultiCodec<Material> CODEC = CodecUtil.of(
+        CodecUtil.of(CODEC_COMP.codec(), toDecode -> toDecode.components.equals(DataComponentPatch.EMPTY)
             ? TestedCodec.fail(() -> "No components, proceed to string codec") : TestedCodec.success()), CODEC_STR
     );
 

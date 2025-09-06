@@ -29,8 +29,6 @@ public abstract class StateHolderMixin<O, S> implements StateHolderAccess< S> {
     @Shadow
     public abstract <T extends Comparable<T>, V extends T> S setValue(Property<T> property, V comparable);
 
-    @Shadow
-    private Map<Property<?>, S[]> neighbours;
     @Unique
     private Map<String, Property<?>> croparia_if$properties;
 
@@ -65,11 +63,12 @@ public abstract class StateHolderMixin<O, S> implements StateHolderAccess< S> {
         }
     }
 
+    @Unique
     @Override
     @SuppressWarnings("unchecked")
-    public S cif$setValue(String key, String value) {
-        Property<?> property = this.cif$getProperty(key);
-        Class<?> cls = property.getValueClass();
+    public <P extends Comparable<P>> S cif$setValue(String key, String value) {
+        Property<P> property = (Property<P>) this.cif$getProperty(key);
+        Class<P> cls = property.getValueClass();
         try {
             if (Integer.class.isAssignableFrom(cls)) {
                 Property<Integer> intProp = (Property<Integer>) property;
@@ -81,10 +80,10 @@ public abstract class StateHolderMixin<O, S> implements StateHolderAccess< S> {
                 Property<String> stringProp = (Property<String>) property;
                 return setValue(stringProp, value);
             } else if (StringRepresentable.class.isAssignableFrom(cls)) {
-                for (Comparable<?> o : property.getPossibleValues()) {
-                    StringRepresentable enumVal = (StringRepresentable) o;
+                for (P p : property.getPossibleValues()) {
+                    StringRepresentable enumVal = (StringRepresentable) p;
                     if (enumVal.getSerializedName().equals(value)) {
-                        return cif$ofProperty(property, enumVal);
+                        return setValue(property, p);
                     }
                 }
                 return (S) this;
@@ -95,12 +94,6 @@ public abstract class StateHolderMixin<O, S> implements StateHolderAccess< S> {
             CropariaIf.LOGGER.error("Failed to set property %s to %s".formatted(key, value), t);
             return (S) this;
         }
-    }
-
-    @Unique
-    @SuppressWarnings("unchecked")
-    private <T extends Comparable<T>> S cif$ofProperty(Property<T> property, Object value) {
-        return (S)((Object[])this.neighbours.get(property))[property.getInternalIndex((T) value)];
     }
 
     @Override

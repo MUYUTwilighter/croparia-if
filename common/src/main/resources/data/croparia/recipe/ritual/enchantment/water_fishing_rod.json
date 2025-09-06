@@ -1,0 +1,22 @@
+{
+  "type": "croparia:ritual",
+  "ritual": "croparia:ritual_stand_2",
+  "ingredient": "minecraft:fishing_rod",
+  "block": {
+    "id": "croparia:fluid_water",
+    "properties": {
+      "level": "0"
+    }
+  },
+  "result": {
+    "id": "minecraft:enchanted_book",
+    "components": {
+      "minecraft:stored_enchantments": {
+        "levels": {
+          "minecraft:luck_of_the_sea": 3
+        }
+      }
+    },
+    "amount": 1
+  }
+}

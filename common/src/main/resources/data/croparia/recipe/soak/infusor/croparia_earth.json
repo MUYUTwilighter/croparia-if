@@ -1,0 +1,17 @@
+{
+  "type": "croparia:soak",
+  "element": "croparia:earth",
+  "input": {
+    "id": "croparia:infusor",
+    "properties": {
+      "element": "croparia_empty"
+    }
+  },
+  "output": {
+    "id": "croparia:infusor",
+    "properties": {
+      "element": "croparia_earth"
+    }
+  },
+  "probability": 0.1
+}

@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
@@ -43,32 +44,106 @@ public class CodecUtil {
         }
     };
 
+    /**
+     * Convert a codec into map codec if possible.<br/>
+     * If the input codec is already a map codec, it will be returned as is.<br/>
+     * Otherwise, it will be unsafely converted into a map codec. For example, {@code "example"} will be converted
+     * into {@code { "value": "example" }}.
+     *
+     * @param codec the codec to convert
+     * @param <T>   the type of the codec
+     * @return the map codec
+     * @see MapCodec#assumeMapUnsafe(Codec)
+     */
     @ApiStatus.Experimental
     public static <T> MapCodec<T> toMap(Codec<T> codec) {
         return codec instanceof MapCodec.MapCodecCodec<T>(MapCodec<T> map) ? map : MapCodec.assumeMapUnsafe(codec);
     }
 
+    /**
+     * Create a flexible list codec that can decode from either a single element or a list of elements into a list of elements,
+     * and encode into a single element if the list has exactly one element, or a list otherwise.
+     *
+     * @param codec the codec for the element type
+     * @param <E>   the element type
+     * @return the flexible list codec
+     * @see MultiCodec
+     */
     public static <E> MultiCodec<List<E>> listOf(Codec<E> codec) {
-        TestedCodec<List<E>> listCodec = TestedCodec.of(Codec.list(codec), list -> list.size() == 1 ? TestedCodec.fail(() -> "Can be applied by singular codec") : TestedCodec.success());
+        TestedCodec<List<E>> listCodec = of(Codec.list(codec), list -> list.size() == 1 ? TestedCodec.fail(() -> "Can be applied by singular codec") : TestedCodec.success());
         Codec<List<E>> singularCodec = codec.xmap(Collections::singletonList, List::getFirst);
         return of(listCodec, singularCodec);
     }
 
+    /**
+     * Create a MultiCodec that tries multiple codecs in order for encoding and decoding.<br/>
+     * Returns the first successful result, or an error if all fail.<br/>
+     * You may try {@link #of(Codec, TestedCodec.EncodeTest, TestedCodec.DecodeTest)} to test before encoding or decoding.
+     *
+     * @param codecs candidate codecs
+     * @param <T>    target type
+     * @return the combined codec
+     *
+     */
     @SafeVarargs
     public static <T> MultiCodec<T> of(Codec<? extends T>... codecs) {
         return of(toEncode -> TestedCodec.success(), (ops, toDecode) -> TestedCodec.success(), codecs);
     }
 
+    /**
+     * Create a MultiCodec that tries multiple codecs in order for encoding and decoding.<br/>
+     * Before encoding, it will apply the specified encode test to the input object.<br/>
+     * It directly tries decoding with each codec without any test.<br/>
+     *
+     * @param encodeTest Test for encode
+     * @param codecs     candidate codecs
+     * @param <T>        target type
+     * @return the combined codec
+     * @see TestedCodec.EncodeTest
+     * @see TestedCodec#success()
+     * @see TestedCodec#fail()
+     * @see TestedCodec#fail(Supplier)
+     **/
     @SafeVarargs
     public static <T> MultiCodec<T> of(TestedCodec.EncodeTest<T> encodeTest, Codec<? extends T>... codecs) {
         return of(encodeTest, (ops, toDecode) -> TestedCodec.success(), codecs);
     }
 
+    /**
+     * Create a MultiCodec that tries multiple codecs in order for encoding and decoding.<br/>
+     * Before decoding, it will apply the specified decode test to the input data.<br/>
+     * It directly tries encoding with each codec without any test.<br/>
+     *
+     * @param decodeTest Test for decode
+     * @param codecs     candidate codecs
+     * @param <T>        target type
+     * @return the combined codec
+     * @see TestedCodec.DecodeTest
+     * @see TestedCodec#success()
+     * @see TestedCodec#fail()
+     * @see TestedCodec#fail(Supplier)
+     */
     @SafeVarargs
     public static <T> MultiCodec<T> of(TestedCodec.DecodeTest<T> decodeTest, Codec<? extends T>... codecs) {
         return of(toEncode -> TestedCodec.success(), decodeTest, codecs);
     }
 
+    /**
+     * Create a MultiCodec that tries multiple codecs in order for encoding and decoding.<br/>
+     * Before encoding, it will apply the specified encode test to the input object.<br/>
+     * Before decoding, it will apply the specified decode test to the input data.<br/>
+     *
+     * @param encodeTest Test for encode
+     * @param decodeTest Test for decode
+     * @param codecs     candidate codecs
+     * @param <T>        target type
+     * @return the combined codec
+     * @see TestedCodec.EncodeTest
+     * @see TestedCodec.DecodeTest
+     * @see TestedCodec#success()
+     * @see TestedCodec#fail()
+     * @see TestedCodec#fail(Supplier)
+     */
     @SafeVarargs
     public static <T> MultiCodec<T> of(TestedCodec.EncodeTest<T> encodeTest, TestedCodec.DecodeTest<?> decodeTest, Codec<? extends T>... codecs) {
         MultiCodec<T> result = new MultiCodec<>();
@@ -76,10 +151,74 @@ public class CodecUtil {
             if (codec instanceof TestedCodec<? extends T> testedCodec) {
                 result.add(testedCodec);
             } else {
-                result.add(TestedCodec.of(codec, encodeTest.adapt(), decodeTest));
+                result.add(of(codec, encodeTest.adapt(), decodeTest));
             }
         }
         return result;
+    }
+
+    /**
+     * Create a TestedCodec that only wraps the input codec without any tests.
+     *
+     * @param codec codec to convert
+     * @param <T>   Type of the target object
+     * @return Tested codec with always-success tests
+     *
+     */
+    public static <T> TestedCodec<T> of(Codec<T> codec) {
+        return new TestedCodec<>(codec, o -> TestedCodec.success(), (ops, input) -> TestedCodec.success());
+    }
+
+    /**
+     * Create a TestedCodec with specified encode test.<br/>
+     * It will directly try decoding with input codec without any test, and apply the encode test before encoding.
+     *
+     * @param codec      Codec to wrap
+     * @param encodeTest Test for encode
+     * @param <T>        Type of the target object
+     * @return TestedCodec with specified test for encode
+     * @see TestedCodec.EncodeTest
+     * @see TestedCodec#success()
+     * @see TestedCodec#fail()
+     * @see TestedCodec#fail(Supplier)
+     */
+    public static <T> TestedCodec<T> of(Codec<T> codec, TestedCodec.EncodeTest<T> encodeTest) {
+        return new TestedCodec<>(codec, encodeTest, (ops, input) -> TestedCodec.success());
+    }
+
+    /**
+     * Creates a TestedCodec with a specified decode test.<br/>
+     * It will directly try encoding with input codec without any test, and apply the decode test before decoding.
+     *
+     * @param codec      The Codec to wrap
+     * @param decodeTest The decode test to apply
+     * @param <T>        The type of the target object
+     * @return A TestedCodec with the specified decode test
+     * @see TestedCodec.DecodeTest
+     * @see TestedCodec#success()
+     * @see TestedCodec#fail()
+     * @see TestedCodec#fail(Supplier)
+     */
+    public static <T> TestedCodec<T> of(Codec<T> codec, TestedCodec.DecodeTest<?> decodeTest) {
+        return new TestedCodec<>(codec, o -> TestedCodec.success(), decodeTest);
+    }
+
+    /**
+     * Creates a TestedCodec with specified encode and decode tests.
+     *
+     * @param codec      The Codec to wrap
+     * @param encodeTest The test to apply before encoding
+     * @param decodeTest The test to apply before decoding
+     * @param <T>        The type of the target object
+     * @return A TestedCodec with the specified encode and decode tests
+     * @see TestedCodec.EncodeTest
+     * @see TestedCodec.DecodeTest
+     * @see TestedCodec#success()
+     * @see TestedCodec#fail()
+     * @see TestedCodec#fail(Supplier)
+     */
+    public static <T> TestedCodec<T> of(Codec<T> codec, TestedCodec.EncodeTest<T> encodeTest, TestedCodec.DecodeTest<?> decodeTest) {
+        return new TestedCodec<>(codec, encodeTest, decodeTest);
     }
 
     /**
@@ -100,7 +239,7 @@ public class CodecUtil {
      **/
     public static <T> MultiFieldCodec<T> fieldsOf(Codec<T> codec, String... names) {
         List<TestedFieldCodec<? extends T>> list = new ArrayList<>(names.length);
-        TestedCodec<T> tested = TestedCodec.of(codec);
+        TestedCodec<T> tested = of(codec);
         for (String name : names) {
             list.add(tested.fieldOf(name));
         }
@@ -178,10 +317,7 @@ public class CodecUtil {
 
     public static <T> JsonElement encodeJson(T object, Codec<T> codec) {
         Ref<JsonElement> elementRef = new Ref<>();
-        CropariaIf.getRegistryAccess().ifPresentOrElse(
-            access -> elementRef.set(codec.encodeStart(RegistryOps.create(JsonOps.INSTANCE, access), object).getOrThrow()),
-            () -> elementRef.set(codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow())
-        );
+        CropariaIf.getRegistryAccess().ifPresentOrElse(access -> elementRef.set(codec.encodeStart(RegistryOps.create(JsonOps.INSTANCE, access), object).getOrThrow()), () -> elementRef.set(codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow()));
         return elementRef.get();
     }
 
@@ -232,6 +368,15 @@ public class CodecUtil {
      * }</pre>
      * </p>
      *
+     * @param superCodec The base {@link MapCodec} to extend.
+     *                   Must produce a type that is a supertype of the target type {@code T}.
+     * @param field1     The first additional field codec.
+     * @param mapper     A function that takes the base type and the additional field(s) to produce an instance of the target type {@code T}.
+     * @param <S>        The base type produced by the {@code superCodec}.
+     * @param <T>        The extended type.
+     * @param <F1>       The type of the first additional field.
+     * @return A new {@link MapCodec} that combines the base codec and the additional field(s).
+     * @apiNote The overloaded methods support up to 8 additional fields, see below.
      */
     @SuppressWarnings("unchecked")
     public static <S, F1, T extends S> MapCodec<T> extend(MapCodec<S> superCodec, RecordCodecBuilder<T, F1> field1, BiFunction<S, F1, T> mapper) {
@@ -273,13 +418,32 @@ public class CodecUtil {
         return extend(superCodec, List.of(field1, field2, field3, field4, field5, field6, field7, field8), (base, fields) -> mapper.apply(base, (F1) fields.getFirst(), (F2) fields.get(1), (F3) fields.get(2), (F4) fields.get(3), (F5) fields.get(4), (F6) fields.get(5), (F7) fields.get(6), (F8) fields.get(7)));
     }
 
+    /**
+     * A raw version of {@link #extend(MapCodec, Collection, ResultMapper)} that accepts a collection of field codecs.<br/>
+     * This method is useful when you have a dynamic number of field codecs to combine.<br/>
+     * However, you need to manually handle the type-casting of the additional fields in the {@link ResultMapper}.
+     *
+     * @param superCodec   The base {@link MapCodec} to extend.
+     * @param resultMapper A function that takes the base type and a list of additional fields to produce an instance of the target type {@code T}.
+     * @param fieldCodecs  A collection of additional field codecs.
+     * @param <S>          The base type produced by the {@code superCodec}.
+     * @param <T>          The extended type.
+     * @return A new {@link MapCodec} that combines the base codec and the additional field(s).
+     * @apiNote This method is less type-safe than the overloaded methods, as it relies on manual casting in the {@link ResultMapper}.
+     * Use with caution and ensure that the order and types of the field codecs match the expectations in the {@link ResultMapper}.
+     *
+     */
     @SafeVarargs
     public static <S, T extends S> MapCodec<T> extend(MapCodec<S> superCodec, ResultMapper<S, T> resultMapper, RecordCodecBuilder<T, ?>... fieldCodecs) {
         return extend(superCodec, Arrays.asList(fieldCodecs), resultMapper);
     }
 
+    /**
+     * @see #extend(MapCodec, ResultMapper, RecordCodecBuilder[])
+     *
+     */
     @SuppressWarnings("unchecked")
-    private static <S, T extends S> MapCodec<T> extend(MapCodec<S> superCodec, Collection<RecordCodecBuilder<T, ?>> fieldCodecs, ResultMapper<S, T> resultMapper) {
+    public static <S, T extends S> MapCodec<T> extend(MapCodec<S> superCodec, Collection<RecordCodecBuilder<T, ?>> fieldCodecs, ResultMapper<S, T> resultMapper) {
         return MapCodec.of(new MapEncoder.Implementation<>() {
             @Override
             public <O> RecordBuilder<O> encode(T input, DynamicOps<O> ops, RecordBuilder<O> prefix) {
@@ -318,7 +482,7 @@ public class CodecUtil {
                         return result.flatMap(f -> DataResult.error(() -> "Failed to decode field: " + f));
                     fields.add(result.getOrThrow());
                 }
-                return DataResult.success(resultMapper.map(superResult.getOrThrow(), fields));
+                return DataResult.success(resultMapper.apply(superResult.getOrThrow(), fields));
             }
 
             @Override
@@ -335,7 +499,15 @@ public class CodecUtil {
         });
     }
 
-    public interface ResultMapper<S, T extends S> {
-        T map(S superResult, ArrayList<?> partialResults);
+    /**
+     * A function that takes a base type and a list of additional fields to produce an instance of the target type {@code T}.
+     * Used in {@link #extend(MapCodec, Collection, ResultMapper)} to combine a base codec with additional field codecs.
+     *
+     * @param <S> The base type produced by the super codec.
+     * @param <T> The extended type.
+     */
+    public interface ResultMapper<S, T extends S> extends BiFunction<S, ArrayList<?>, T> {
+        @Override
+        T apply(S superResult, ArrayList<?> partialResults);
     }
 }

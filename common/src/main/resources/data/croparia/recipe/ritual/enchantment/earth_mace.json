@@ -1,0 +1,22 @@
+{
+  "type": "croparia:ritual",
+  "ritual": "croparia:ritual_stand_2",
+  "ingredient": "#minecraft:enchantable/mace",
+  "block": {
+    "id": "croparia:fluid_earth",
+    "properties": {
+      "level": "0"
+    }
+  },
+  "result": {
+    "id": "minecraft:enchanted_book",
+    "components": {
+      "minecraft:stored_enchantments": {
+        "levels": {
+          "minecraft:density": 5
+        }
+      }
+    },
+    "amount": 1
+  }
+}

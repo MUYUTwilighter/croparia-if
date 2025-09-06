@@ -1,0 +1,17 @@
+{
+  "type": "croparia:ritual",
+  "ritual": "croparia:ritual_stand_2",
+  "ingredient": "#minecraft:enchantable/mining",
+  "block": "minecraft:honeycomb_block",
+  "result": {
+    "id": "minecraft:enchanted_book",
+    "components": {
+      "minecraft:stored_enchantments": {
+        "levels": {
+          "minecraft:silk_touch": 1
+        }
+      }
+    },
+    "amount": 1
+  }
+}

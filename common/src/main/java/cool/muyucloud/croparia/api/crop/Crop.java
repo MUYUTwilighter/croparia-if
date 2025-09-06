@@ -54,8 +54,8 @@ public class Crop extends AbstractCrop implements TierAccess {
         Codec.STRING.optionalFieldOf("type", "crop").forGetter(Crop::getType),
         Codec.unboundedMap(Codec.STRING, Codec.STRING).optionalFieldOf("translations").forGetter(Crop::getTranslationsOptional),
         CropDependencies.CODEC_ANY.optionalFieldOf("dependencies").forGetter(Crop::getDependenciesOptional)
-    ).apply(instance, (name, material, color, tier, type, translations, dependencies) -> new Crop(name, material, color, tier,
-        type, translations.orElse(null), dependencies.orElse(null))
+    ).apply(instance, (name, material, color, tier, type, translations, dependencies) ->
+        new Crop(name, material, color, tier, type, translations.orElse(null), dependencies.orElse(null))
     ));
 
     public static final Placeholder<Crop> COLOR = Placeholder.of("\\{color}", Crop::getColorDec);

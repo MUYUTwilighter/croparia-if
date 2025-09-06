@@ -106,8 +106,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         ItemStack result = this.getResult().createStack();
         // Handle enchanted book special case
         ItemEnchantments enchantments = result.get(DataComponents.STORED_ENCHANTMENTS);
-        if (this.getIngredient().getAmount() == 1L && this.getResult().getAmount() == 1L
-            && result.getItem() == Items.ENCHANTED_BOOK && enchantments != null) {
+        if (this.getIngredient().getAmount() == 1L && result.getItem() == Items.ENCHANTED_BOOK && enchantments != null) {
             for (ItemStack stack : matcher.stacks()) {
                 if (this.getIngredient().matchType(stack)) {
                     matcher.matched().destroy();
@@ -115,7 +114,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
                     stack.shrink(1);
                     for (var entry : enchantments.entrySet()) {
                         int level = toEnchant.getEnchantments().getLevel(entry.getKey());
-                        toEnchant.enchant(entry.getKey(), level + entry.getIntValue());
+                        toEnchant.enchant(entry.getKey(), Math.min(level + result.getCount(), entry.getIntValue()));
                     }
                     return toEnchant;
                 }
@@ -139,6 +138,17 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     }
 
     public boolean matches(RitualContainer matcher) {
+        ItemStack result = this.getResult().createStack();
+        // Handle enchanted book special case
+        ItemEnchantments enchantments = result.get(DataComponents.STORED_ENCHANTMENTS);
+        if (this.getIngredient().getAmount() == 1L && result.getItem() == Items.ENCHANTED_BOOK && enchantments != null) {
+            return matcher.stacks().stream().anyMatch(stack -> {
+                ItemEnchantments toCheck = stack.getEnchantments();
+                return enchantments.entrySet().stream().anyMatch(entry -> toCheck.getLevel(entry.getKey()) < entry.getIntValue())
+                    && this.getIngredient().matches(stack);
+            }) && matcher.matched().getStates().stream().allMatch(state -> this.getBlock().matches(state));
+        }
+        // Handle common case
         long accumulated = 0;
         for (ItemStack stack : matcher.stacks()) {
             if (this.getIngredient().matchType(stack)) {

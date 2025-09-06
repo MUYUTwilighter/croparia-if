@@ -1,0 +1,17 @@
+{
+  "type": "croparia:ritual",
+  "ritual": "croparia:ritual_stand_2",
+  "ingredient": "#minecraft:enchantable/durability",
+  "block": "minecraft:sculk_catalyst",
+  "result": {
+    "id": "minecraft:enchanted_book",
+    "components": {
+      "minecraft:stored_enchantments": {
+        "levels": {
+          "minecraft:mending": 1
+        }
+      }
+    },
+    "amount": 1
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "croparia:ritual",
+  "ritual": "croparia:ritual_stand_2",
+  "ingredient": "#minecraft:enchantable/armor",
+  "block": {
+    "id": "croparia:fluid_fire",
+    "properties": {
+      "level": "0"
+    }
+  },
+  "result": {
+    "id": "minecraft:enchanted_book",
+    "components": {
+      "minecraft:stored_enchantments": {
+        "levels": {
+          "minecraft:fire_protection": 4
+        }
+      }
+    },
+    "amount": 1
+  }
+}

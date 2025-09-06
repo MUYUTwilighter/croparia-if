@@ -67,7 +67,8 @@ public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<Stri
         this.getProperties().forEach((key, value) -> consumer.accept(Texts.literal("%s=%s".formatted(key, value))));
     }
 
-    public boolean isSubsetOf(StateHolderAccess<BlockState> access) {
+    public boolean isSubsetOf(BlockState state) {
+        var access = (StateHolderAccess<?>) state;
         for (Map.Entry<String, String> entry : this.getProperties().entrySet()) {
             @NotNull String key = entry.getKey();
             @Nullable String value = entry.getValue();

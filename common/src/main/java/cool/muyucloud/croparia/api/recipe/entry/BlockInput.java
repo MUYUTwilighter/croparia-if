@@ -54,7 +54,7 @@ public class BlockInput implements SlotDisplay {
     public static final BlockInput ANY = new BlockInput(null, null, BlockProperties.EMPTY);
     public static final MapCodec<BlockInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(ResourceLocation.CODEC.optionalFieldOf("id").forGetter(BlockInput::getId), TagKey.codec(Registries.BLOCK).optionalFieldOf("tag").forGetter(BlockInput::getTag), BlockProperties.CODEC.optionalFieldOf("properties", BlockProperties.EMPTY).forGetter(BlockInput::getProperties)).apply(instance, (id, tag, properties) -> create(id.orElse(null), tag.orElse(null), properties)));
     public static final Codec<BlockInput> CODEC_STR = Codec.STRING.xmap(BlockInput::create, BlockInput::getTaggable);
-    public static final MultiCodec<BlockInput> CODEC = MultiCodec.of(TestedCodec.of(CODEC_COMP.codec(), toEncode -> {
+    public static final MultiCodec<BlockInput> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
         if (toEncode.isAny()) return TestedCodec.fail(() -> "Can be encoded as empty string");
         if (toEncode.getProperties().equals(BlockProperties.EMPTY))
             return TestedCodec.fail(() -> "Can be encoded as simple id or tag");
@@ -186,7 +186,6 @@ public class BlockInput implements SlotDisplay {
         return properties;
     }
 
-    @SuppressWarnings("unchecked")
     public BlockState getExampleState() {
         BlockState state;
         if (this.getId().isPresent()) {
@@ -201,10 +200,7 @@ public class BlockInput implements SlotDisplay {
         } else {
             state = CropariaBlocks.PLACEHOLDER.get().defaultBlockState();
         }
-        for (var entry : this.getProperties()) {
-            state = ((StateHolderAccess<BlockState>) state).cif$setValue(entry.getKey(), entry.getValue());
-        }
-        return state;
+        return StateHolderAccess.apply(state, this.getProperties());
     }
 
     @NotNull
@@ -241,9 +237,8 @@ public class BlockInput implements SlotDisplay {
         else return true;
     }
 
-    @SuppressWarnings("unchecked")
     public boolean matches(@NotNull BlockState state) {
-        return this.matches(state.getBlock()) && this.getProperties().isSubsetOf((StateHolderAccess<BlockState>) state);
+        return this.matches(state.getBlock()) && this.getProperties().isSubsetOf(state);
     }
 
     @Override

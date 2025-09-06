@@ -53,7 +53,7 @@ public class ItemInput implements SlotDisplay {
     ).apply(instance, (id, tag, components, amount) ->
         id.isEmpty() && tag.isEmpty() && components.equals(DataComponentPredicate.EMPTY) || amount <= 0 ? EMPTY :
             new ItemInput(id.orElse(null), tag.orElse(null), components, amount)));
-    public static final MultiCodec<ItemInput> CODEC = MultiCodec.of(TestedCodec.of(CODEC_COMP.codec(), toEncode -> {
+    public static final MultiCodec<ItemInput> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
         if (toEncode.getComponentsPredicate().equals(DataComponentPredicate.EMPTY) && toEncode.getAmount() == 1 || toEncode.equals(EMPTY)) {
             return TestedCodec.fail(() -> "Can be encoded as string");
         } else {

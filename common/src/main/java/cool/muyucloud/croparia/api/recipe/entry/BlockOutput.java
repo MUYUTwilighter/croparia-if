@@ -38,7 +38,7 @@ public class BlockOutput implements SlotDisplay {
         ResourceLocation.CODEC.fieldOf("id").forGetter(BlockOutput::getId),
         BlockProperties.CODEC.optionalFieldOf("properties").forGetter(blockOutput -> Optional.of(blockOutput.getProperties()))
     ).apply(instance, (id, properties) -> create(id, properties.orElse(BlockProperties.EMPTY))));
-    public static final MultiCodec<BlockOutput> CODEC = MultiCodec.of(TestedCodec.of(CODEC_COMP.codec(), toEncode -> {
+    public static final MultiCodec<BlockOutput> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
         if (toEncode.getProperties().isEmpty()) return TestedCodec.fail(() -> "Can be encoded as string");
         return TestedCodec.success();
     }), CODEC_SINGLE);
@@ -101,16 +101,13 @@ public class BlockOutput implements SlotDisplay {
         return Objects.equals(block.arch$registryName(), this.getId());
     }
 
-    @SuppressWarnings("unchecked")
     public boolean matches(@NotNull BlockState state) {
-        return this.matches(state.getBlock()) && this.getProperties().isSubsetOf((StateHolderAccess<BlockState>) state);
+        return this.matches(state.getBlock()) && this.getProperties().isSubsetOf(state);
     }
 
-    @SuppressWarnings("unchecked")
     public void setBlock(ServerLevel level, BlockPos pos) {
         BlockState state = this.getBlock().defaultBlockState();
-        StateHolderAccess<BlockState> access = (StateHolderAccess<BlockState>) state;
-        this.getProperties().forEach(entry -> access.cif$setValue(entry.getKey(), entry.getValue()));
+        state = StateHolderAccess.apply(state, this.getProperties());
         level.setBlock(pos, state, 3);
     }
 

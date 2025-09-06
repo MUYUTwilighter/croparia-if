@@ -151,7 +151,7 @@ public class Element implements StringRepresentable, Comparable<Element>, DgElem
             .setId(ResourceKey.create(Registries.BLOCK, parseId("fluid_%s")))
         ), parseId("fluid_%s"), Registries.BLOCK);
         this.bucket = HolderSupplier.of(() -> new ElementalBucket(this, this.getFluidSource(), new Item.Properties()
-            .setId(ResourceKey.create(Registries.ITEM, parseId("bucket_%s")))
+            .setId(ResourceKey.create(Registries.ITEM, parseId("bucket_%s"))).stacksTo(1)
             .arch$tab(Tabs.MAIN).craftRemainder(Items.GLASS_BOTTLE)), parseId("bucket_%s"), Registries.ITEM);
         this.potion = HolderSupplier.of(() -> new ElementalPotion(this, new Item.Properties()
             .setId(ResourceKey.create(Registries.ITEM, parseId("potion_%s")))

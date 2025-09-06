@@ -44,6 +44,7 @@ public class ConfigFileHandler {
         CropariaIf.LOGGER.info("Loading config");
         Config newConfig = load();
         config.setFilePath(newConfig.getFilePath());
+        config.setRecipeWizard(newConfig.getRecipeWizard());
         config.setOverride(newConfig.getOverride());
         config.setFruitUse(newConfig.getFruitUse());
         config.setInfusor(newConfig.getInfusor());

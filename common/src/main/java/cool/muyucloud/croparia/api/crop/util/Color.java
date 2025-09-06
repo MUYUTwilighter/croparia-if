@@ -1,6 +1,7 @@
 package cool.muyucloud.croparia.api.crop.util;
 
 import com.mojang.serialization.Codec;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
 import net.minecraft.network.chat.Style;
 
@@ -9,7 +10,7 @@ import java.util.Locale;
 public class Color {
     public static final Codec<Color> CODEC_INT = Codec.INT.xmap(Color::new, Color::getValue);
     public static final Codec<Color> CODEC_STR = Codec.STRING.xmap(Color::new, Color::toString);
-    public static final MultiCodec<Color> CODEC = MultiCodec.of(CODEC_STR, CODEC_INT);
+    public static final MultiCodec<Color> CODEC = CodecUtil.of(CODEC_STR, CODEC_INT);
 
     public static Color of(int value) {
         return new Color(value);
