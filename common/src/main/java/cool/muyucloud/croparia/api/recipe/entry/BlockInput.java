@@ -116,7 +116,7 @@ public class BlockInput implements SlotDisplay {
     }
 
     public static BlockInput of(@NotNull BlockState state) {
-        return new BlockInput(Objects.requireNonNull(state.getBlock().arch$registryName()), null, BlockProperties.create(state));
+        return new BlockInput(Objects.requireNonNull(state.getBlock().arch$registryName()), null, BlockProperties.extract(state));
     }
 
     @Nullable

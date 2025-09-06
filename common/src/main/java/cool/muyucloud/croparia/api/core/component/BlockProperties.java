@@ -1,5 +1,6 @@
 package cool.muyucloud.croparia.api.core.component;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.access.StateHolderAccess;
 import cool.muyucloud.croparia.util.text.Texts;
@@ -34,13 +35,24 @@ public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<Stri
         TYPE = builder.build();
     }
 
-    @SuppressWarnings("unchecked")
-    public static BlockProperties create(@NotNull BlockState state) {
-        return create(((StateHolderAccess<BlockState>) state).cif$getProperties());
+    public static BlockProperties extract(@NotNull BlockState state) {
+        ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+        var defaults = ((StateHolderAccess<?>) state.getBlock().defaultBlockState()).cif$getProperties();
+        var access = (StateHolderAccess<?>) state;
+        for (var entry : access.cif$getProperties().entrySet()) {
+            if (!entry.getValue().equals(defaults.get(entry.getKey()))) {
+                builder.put(entry);
+            }
+        }
+        return of(builder.build());
+    }
+
+    public static BlockProperties of(@NotNull BlockState state) {
+        return of(((StateHolderAccess<?>) state).cif$getProperties());
     }
 
     @NotNull
-    public static BlockProperties create(@NotNull Map<String, String> properties) {
+    public static BlockProperties of(@NotNull Map<String, String> properties) {
         return properties.isEmpty() ? EMPTY : new BlockProperties(properties);
     }
 
