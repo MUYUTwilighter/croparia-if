@@ -97,7 +97,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         if (stack.getItem() instanceof SpawnEggItem) {
             Texts.tooltip(stack, Texts.translatable("tooltip.croparia.spawn_egg"));
         } else if (stack.getItem() == Items.ENCHANTED_BOOK && this.getIngredient().getAmount() == 1L) {
-            Texts.tooltip(stack, Texts.translatable("tooltip.croparia.ritual.enchant"));
+            Texts.tooltip(stack, Texts.translatable("tooltip.croparia.ritual.enchant", stack.getCount()));
         }
         return List.of(List.of(this.getResult().getDisplayStack()));
     }
