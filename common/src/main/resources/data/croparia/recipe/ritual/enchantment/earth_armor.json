@@ -1,7 +1,7 @@
 {
   "type": "croparia:ritual",
   "ritual": "croparia:ritual_stand_2",
-  "ingredient": "#minecraft:head_armor",
+  "ingredient": "#minecraft:enchantable/armor",
   "block": {
     "id": "croparia:fluid_earth",
     "properties": {
