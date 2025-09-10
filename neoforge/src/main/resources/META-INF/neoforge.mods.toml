@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "*"
-issueTrackerURL = "https://github.com/MUYUTwilighter/Croparia/issues"
-license = "MIT"
+issueTrackerURL = "https://github.com/MUYUTwilighter/croparia-if/issues"
+license = "MIT with Additional Terms"
 
 [[mods]]
 modId = "croparia"
@@ -9,8 +9,7 @@ version = "${version}"
 displayName = "Croparia-If"
 authors = "MUYU_Twilighter, xwjcool"
 description = '''
-A completely rewritten project from Dalarion's Croparia 4.5.
-You should only install either Croparia or Croparia-If at the same time.
+Farm minerals, loots and even more!
 '''
 logoFile = "assets/croparia/icon.png"
 

@@ -3,7 +3,7 @@
   "id": "croparia",
   "version": "${version}",
   "name": "Croparia-If",
-  "description": "A completely rewritten project from Dalarion's Croparia 4.5.\nYou should only install either Croparia or Croparia-If at the same time.",
+  "description": "Farm minerals, loots and even more!",
   "authors": [
     "MUYU_Twilighter",
     "xwjcool"
@@ -11,9 +11,9 @@
   "contact": {
     "original": "https://www.curseforge.com/minecraft/mc-mods/croparia",
     "homepage": "https://modrinth.com/mod/croparia-if",
-    "sources": "https://github.com/MUYUTwilighter/Croparia"
+    "sources": "https://github.com/MUYUTwilighter/croparia-if"
   },
-  "license": "MIT",
+  "license": "MIT with Additional Terms",
   "icon": "assets/croparia/icon.png",
   "environment": "*",
   "entrypoints": {
