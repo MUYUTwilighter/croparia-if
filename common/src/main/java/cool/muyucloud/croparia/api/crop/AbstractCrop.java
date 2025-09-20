@@ -41,7 +41,7 @@ public abstract class AbstractCrop implements TranslatableElement {
     protected transient OnLoadSupplier<List<ItemStack>> results = OnLoadSupplier.of(() -> {
         List<ItemStack> items = new ArrayList<>();
         for (Item item : this.getMaterial().getItems()) {
-            items.add(item.getDefaultInstance().copyWithCount(this.getMaterial().getCount()));
+            items.add(item.getDefaultInstance().copyWithCount(Math.min(item.getDefaultMaxStackSize(), this.getMaterial().getCount())));
         }
         if (items.isEmpty()) items.add(ItemStack.EMPTY);
         return ImmutableList.copyOf(items);

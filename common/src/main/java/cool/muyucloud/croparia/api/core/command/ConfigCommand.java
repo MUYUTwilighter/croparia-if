@@ -50,7 +50,7 @@ public class ConfigCommand {
     private static final LiteralArgumentBuilder<CommandSourceStack> FRUIT_USE = Commands.literal("fruitUse").executes(context -> {
         Texts.success(context.getSource(), Texts.translatable("commands.croparia.config.fruitUse", CropariaIf.CONFIG.getFruitUse().toString()), true);
         return 1;
-    }).then(Commands.argument("value", IntegerArgumentType.integer()).executes(context -> {
+    }).then(Commands.argument("value", BoolArgumentType.bool()).executes(context -> {
         CropariaIf.CONFIG.setFruitUse(BoolArgumentType.getBool(context, "value"));
         Texts.success(context.getSource(), Texts.translatable("commands.croparia.config.fruitUse", CropariaIf.CONFIG.getFruitUse().toString()), true);
         return 1;
