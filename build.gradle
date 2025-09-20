@@ -65,6 +65,9 @@ subprojects {
             name = "ModMaven"
             url = "https://modmaven.dev"
         }
+        flatDir {
+            dir(getRootDir().toPath().resolve("flat"))
+        }
     }
 
     loom {

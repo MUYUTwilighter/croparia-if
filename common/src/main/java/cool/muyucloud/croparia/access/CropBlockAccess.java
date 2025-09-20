@@ -5,5 +5,5 @@ import org.spongepowered.asm.mixin.Unique;
 
 public interface CropBlockAccess {
     @Unique
-    IntegerProperty cif$invokeGetAgeProperty();
+    IntegerProperty cif$getAgeProperty();
 }

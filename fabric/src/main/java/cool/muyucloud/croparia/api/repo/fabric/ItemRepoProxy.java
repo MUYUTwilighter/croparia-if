@@ -10,9 +10,12 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class ItemRepoProxy extends RepoProxy<ItemSpec> implements Storage<ItemVariant> {
+    private final ArrayList<ItemView> views = new ArrayList<>();
+
     public ItemRepoProxy(Repo<ItemSpec> repo) {
         super(repo);
     }
@@ -51,6 +54,7 @@ public class ItemRepoProxy extends RepoProxy<ItemSpec> implements Storage<ItemVa
 
     @Override
     public @NotNull Iterator<StorageView<ItemVariant>> iterator() {
+        views.removeIf(view -> view.i >= ItemRepoProxy.this.size());
         return new ItemIterator();
     }
 
@@ -64,7 +68,11 @@ public class ItemRepoProxy extends RepoProxy<ItemSpec> implements Storage<ItemVa
 
         @Override
         public StorageView<ItemVariant> next() {
-            return new ItemView(this.i++);
+            if (!hasNext()) throw new IndexOutOfBoundsException("No more elements");
+            if (views.size() <= i) {
+                views.add(new ItemView(i));
+            }
+            return views.get(i++);
         }
     }
 

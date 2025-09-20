@@ -58,6 +58,9 @@ dependencies {
 //    compileOnly "dev.emi:emi-fabric:${emi_version}:api"
 //    localRuntime "dev.emi:emi-fabric:${emi_version}"
     // No kubeJs as it no longer supports fabric after 1.20.1
+
+    // TSS
+    modCompileOnly("flat:toms_storage_fabric-1.21.4:2.3.2")
 }
 
 processResources {

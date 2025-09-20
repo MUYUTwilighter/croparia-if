@@ -23,3 +23,4 @@ classes/
 /.architectury-transformer/
 /data_process/
 /gradle/wrapper/gradle-wrapper.jar
+/flat/
