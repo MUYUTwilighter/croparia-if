@@ -26,13 +26,16 @@ import org.jetbrains.annotations.NotNull;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 public class RecipeWizard extends Item {
     public static final ResourceLocation PACK_ID = CropariaIf.of("recipe_wizard");
     public static final OnLoadSupplier<Collection<RecipeWizardGenerator>> GENERATORS = OnLoadSupplier.of(() -> {
-        for (JarJarEntry entry : PackHandler.getBuiltinGenerators().getOrDefault(PACK_ID, List.of())) {
+        for (JarJarEntry entry : PackHandler.getBuiltinGenerators(PACK_ID)) {
             String name = entry.getEntry().getName();
             String prefix = "data-generators/%s/%s/".formatted(PACK_ID.getNamespace(), PACK_ID.getPath());
             Path target = CropariaIf.CONFIG.getFilePath().resolve("recipe_wizard/generators").resolve(name.substring(prefix.length()));

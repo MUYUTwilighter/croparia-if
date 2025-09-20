@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.generator.pack;
 
 import com.google.gson.JsonObject;
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.mixin.ReloadableResourceManagerImplMixin;
 import cool.muyucloud.croparia.util.FileUtil;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.resources.ResourceLocation;
@@ -18,6 +19,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+/**
+ * Path-based resource pack handler, representing a resource pack stored in a directory.
+ * <p>
+ * Use {@link #register(ResourcePackHandler)} to insert your pack into Minecraft's resource pack list.
+ *
+ * @see ReloadableResourceManagerImplMixin
+ *
+ */
 @SuppressWarnings("unused")
 public class ResourcePackHandler extends PackHandler {
     public static final Map<ResourceLocation, ResourcePackHandler> REGISTRY = new HashMap<>();
@@ -27,6 +36,12 @@ public class ResourcePackHandler extends PackHandler {
         return pack;
     }
 
+    /**
+     * Register a new resource pack handler so that it will be loaded by Minecraft.
+     *
+     * @see ReloadableResourceManagerImplMixin
+     *
+     */
     public static ResourcePackHandler register(ResourceLocation id, Path path, JsonObject meta, Supplier<Boolean> override) {
         return register(new ResourcePackHandler(id, path, meta, override));
     }

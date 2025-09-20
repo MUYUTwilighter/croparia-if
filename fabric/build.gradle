@@ -38,6 +38,7 @@ dependencies {
 
     // Tomlj
     include("org.tomlj:tomlj:$tomlj_version")
+    include("org.antlr:antlr4-runtime:$antlr_version")
     localRuntime("org.tomlj:tomlj:$tomlj_version")
 
     modImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"

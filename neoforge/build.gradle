@@ -59,7 +59,9 @@ dependencies {
 
     // Tomlj
     include("org.tomlj:tomlj:$tomlj_version")
+    include("org.antlr:antlr4-runtime:$antlr_version")
     implementation("org.tomlj:tomlj:$tomlj_version")
+    forgeRuntimeLibrary("org.tomlj:tomlj:$tomlj_version")
 
     // EMI: waiting for update to 1.21.4
 //    modCompileOnly "dev.emi:emi-neoforge:${emi_version}:api"

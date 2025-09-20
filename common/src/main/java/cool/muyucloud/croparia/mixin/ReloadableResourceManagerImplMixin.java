@@ -14,6 +14,8 @@ import java.util.List;
 /**
  * Mixin class used to insert our resourcepack provided by {@link ResourcePackHandler},
  * so that the datapack can be loaded.
+ *
+ * @see ResourcePackHandler
  */
 @Mixin(ReloadableResourceManager.class)
 public abstract class ReloadableResourceManagerImplMixin implements ResourceManager, AutoCloseable {

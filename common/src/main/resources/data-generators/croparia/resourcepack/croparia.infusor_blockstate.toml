@@ -2,6 +2,7 @@ registry = "croparia:elements"
 path = "croparia/blockstates/infusor.json"
 type = "croparia:aggregated"
 startup = true
+content = '        "element={name}": { "model": "croparia:block/infusor_{name}" }'
 template = """
 {
   "variants": {

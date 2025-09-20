@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import cool.muyucloud.croparia.api.generator.DataGenerator;
 import cool.muyucloud.croparia.api.generator.util.JarJarEntry;
 import cool.muyucloud.croparia.util.FileUtil;
+import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import dev.architectury.platform.Platform;
 import net.minecraft.resources.ResourceLocation;
@@ -17,17 +18,54 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A manager class for a data/resource pack represented by a directory.
  */
 public abstract class PackHandler {
     public static final Gson GSON = new Gson();
-
+    private static final Pattern PATTERN = Pattern.compile("^data-generators/([^/]+)/([^/]+)/[^/]+$");
+    private static final LazySupplier<Map<ResourceLocation, Collection<JarJarEntry>>> BUILTIN_GENERATORS = LazySupplier.of(() -> {
+        Map<ResourceLocation, Collection<JarJarEntry>> map = new HashMap<>();
+        forEachJar((file, modId) -> {
+            if (file.isFile() && file.getName().endsWith(".jar")) {
+                try (JarFile jar = new JarFile(file)) {
+                    Enumeration<JarEntry> entries = jar.entries();
+                    while (entries.hasMoreElements()) {
+                        JarEntry entry = entries.nextElement();
+                        String name = entry.getName();
+                        Matcher matcher = PATTERN.matcher(name);
+                        if (matcher.find()) {
+                            ResourceLocation id = ResourceLocation.tryBuild(matcher.group(1), matcher.group(2));
+                            if (id == null) {
+                                DataGenerator.LOGGER.error("Invalid generator entry \"%s\" in mod \"%s\"".formatted(name, modId));
+                                continue;
+                            }
+                            Collection<JarJarEntry> collected = map.computeIfAbsent(id, k -> new ArrayList<>());
+                            collected.add(new JarJarEntry(file, entry));
+                        }
+                    }
+                } catch (IOException e) {
+                    DataGenerator.LOGGER.error("Failed to read generators from mod \"%s\"".formatted(modId), e);
+                }
+            }
+        });
+        return map;
+    });
+    
     @ExpectPlatform
-    public static Map<ResourceLocation, Collection<JarJarEntry>> getBuiltinGenerators() {
+    public static void forEachJar(BiConsumer<File, String> consumer) {
         throw new NotImplementedException("Not implemented");
+    }
+
+    public static Collection<JarJarEntry> getBuiltinGenerators(ResourceLocation id) {
+        return BUILTIN_GENERATORS.get().getOrDefault(id, List.of());
     }
 
     protected final ResourceLocation id;
@@ -83,7 +121,7 @@ public abstract class PackHandler {
             DataGenerator.LOGGER.error("Failed to establish directory \"%s\"".formatted(targetRoot));
         }
         String prefix = "data-generators/%s/%s/".formatted(this.getId().getNamespace(), this.getId().getPath());
-        getBuiltinGenerators().getOrDefault(this.getId(), List.of()).forEach(entry -> {
+        getBuiltinGenerators(this.getId()).forEach(entry -> {
             String name = entry.getEntry().getName();
             Path targetPath = targetRoot.resolve(name.substring(prefix.length()));
             File target = targetPath.toFile();
