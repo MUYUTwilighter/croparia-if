@@ -1,27 +1,27 @@
 package cool.muyucloud.croparia.api.generator.util;
 
 import com.google.gson.*;
+import cool.muyucloud.croparia.api.json.JsonTransformer;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Objects;
 
-public class DgCompiler {
+public class DgReader {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    public static JsonObject compile(File file) throws IOException {
-        try (FileInputStream fis = new FileInputStream(file)) {
-            byte[] data = fis.readAllBytes();
-            String content = new String(data);
-            return compile(content);
+    public static JsonObject read(File file) throws IOException {
+        JsonElement json = JsonTransformer.transform(file);
+        if (json.isJsonObject()) {
+            return json.getAsJsonObject();
         }
+        throw new RuntimeException("Invalid or unsupported format: " + file);
     }
 
     /**
      * Compile a CDG-formatted string into a JsonObject.
      */
-    public static JsonObject compile(String source) {
+    public static JsonObject read(String source) {
         if (source == null) source = "";
         int len = source.length();
         int i = 0;
@@ -57,16 +57,16 @@ public class DgCompiler {
             }
             String key = source.substring(keyStart, i).trim();
             if (key.isEmpty()) {
-                throw syntax("期待元数据键名，如 @meta=...", source, i);
+                throw syntax("Expecting @meta=...", source, i);
             }
             i = skipWhitespace(source, i);
             if (i >= len || source.charAt(i) != '=') {
-                throw syntax("缺少 '='", source, i);
+                throw syntax("Expecting '='", source, i);
             }
             i++; // skip '='
             i = skipWhitespace(source, i);
             if (i >= len) {
-                throw syntax("缺少值", source, i);
+                throw syntax("Expecting value", source, i);
             }
 
             // parse meta value
@@ -74,7 +74,7 @@ public class DgCompiler {
             i = val.nextIndex;
             i = skipWhitespace(source, i);
             if (i >= len || source.charAt(i) != ';') {
-                throw syntax("元数据项缺少结束分号 ';'", source, i);
+                throw syntax("Expecting ';'", source, i);
             }
             i++; // consume ';'
 

@@ -8,10 +8,14 @@
     "MUYU_Twilighter",
     "xwjcool"
   ],
+  "contributors": [
+    "Dalarion"
+  ],
   "contact": {
     "original": "https://www.curseforge.com/minecraft/mc-mods/croparia",
-    "homepage": "https://modrinth.com/mod/croparia-if",
-    "sources": "https://github.com/MUYUTwilighter/croparia-if"
+    "homepage": "https://croparia.muyucloud.cool",
+    "sources": "https://github.com/MUYUTwilighter/croparia-if",
+    "issues": "https://github.com/MUYUTwilighter/croparia-if/issues"
   },
   "license": "MIT with Additional Terms",
   "icon": "assets/croparia/icon.png",
@@ -37,5 +41,10 @@
     "fabric": "*",
     "minecraft": "~1.21",
     "architectury": "*"
+  },
+  "suggests": {
+    "rei": "*",
+    "jei": "*",
+    "emi": "*"
   }
 }

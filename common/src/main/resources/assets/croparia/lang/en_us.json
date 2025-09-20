@@ -62,6 +62,7 @@
   "block.croparia.fluid_earth": "Fluid Earth",
   "block.croparia.fluid_elematilius": "Fluid Elematilius",
   "container.greenhouse": "Greenhouse",
+  "chat.croparia.alpha_warning": "You are running an unstable version of Croparia-If, expect bugs and crashes. Report issues at %s",
   "item.croparia.gem_air": "Elemental Air",
   "item.croparia.gem_earth": "Elemental Earth",
   "item.croparia.gem_elemental": "Elematilius",

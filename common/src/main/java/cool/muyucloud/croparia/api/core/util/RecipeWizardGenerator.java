@@ -15,7 +15,7 @@ import cool.muyucloud.croparia.api.core.block.RitualStand;
 import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualStructureContainer;
 import cool.muyucloud.croparia.api.element.Element;
-import cool.muyucloud.croparia.api.generator.util.DgCompiler;
+import cool.muyucloud.croparia.api.generator.util.DgReader;
 import cool.muyucloud.croparia.api.generator.util.Placeholder;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
@@ -61,7 +61,7 @@ public class RecipeWizardGenerator {
 
     public static Optional<RecipeWizardGenerator> read(File file) {
         try {
-            JsonElement json = DgCompiler.compile(file);
+            JsonElement json = DgReader.read(file);
             return Optional.of(CodecUtil.decodeJson(json, CODEC));
         } catch (Throwable t) {
             CropariaIf.LOGGER.error("Failed to compile recipe wizard file %s".formatted(file), t);

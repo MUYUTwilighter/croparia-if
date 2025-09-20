@@ -10,8 +10,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
-import cool.muyucloud.croparia.api.generator.util.DgCompiler;
 import cool.muyucloud.croparia.api.generator.util.DgElement;
+import cool.muyucloud.croparia.api.generator.util.DgReader;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.api.generator.util.Placeholder;
 import cool.muyucloud.croparia.util.Dependencies;
@@ -38,10 +38,10 @@ public class DataGenerator {
     /**
      * Registers a data generator codec, used to get Generator API known of custom data generator types.
      *
-     * @param id the id of the data generator
+     * @param id    the id of the data generator
      * @param codec the codec of the data generator
-     * @param <G> the type of the data generator
-     * @param <C> the type of the codec
+     * @param <G>   the type of the data generator
+     * @param <C>   the type of the codec
      * @return the codec
      */
     public static <G extends DataGenerator, C extends MapCodec<G>> C register(ResourceLocation id, C codec) {
@@ -57,12 +57,10 @@ public class DataGenerator {
      * @throws IOException if an I/O error occurs
      */
     public static DataGenerator read(File file) throws IOException {
-        if (file.getName().endsWith(".cdg")) {
-            JsonObject json = DgCompiler.compile(file);
-            JsonElement type = json.get("type");
-            ResourceLocation id = ResourceLocation.parse(type == null ? "croparia:generator" : type.getAsString());
-            return CodecUtil.decodeJson(json, REGISTRY.get(id));
-        } else throw new IllegalArgumentException("Invalid file suffix: " + file.getName());
+        JsonObject json = DgReader.read(file);
+        JsonElement type = json.get("type");
+        ResourceLocation id = ResourceLocation.parse(type == null ? "croparia:generator" : type.getAsString());
+        return CodecUtil.decodeJson(json, REGISTRY.get(id));
     }
 
     public static final MapCodec<DataGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(

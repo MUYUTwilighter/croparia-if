@@ -144,6 +144,15 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
     long accept(int i, T resource, long amount);
 
     /**
+     * Calculates the capacity for the specified resource in the specified resource storage unit.
+     *
+     * @param i        The index of the resource storage unit to check
+     * @param resource The resource to check
+     * @return The capacity for the specified resource
+     */
+    long capacityFor(int i, T resource);
+
+    /**
      * Calculates the total capacity for the specified resource across all resource storage units.
      *
      * @param resource The resource to check
@@ -157,14 +166,18 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
         return amount;
     }
 
+    default long capacityFor(int i) {
+        return this.capacityFor(i, this.resourceFor(i));
+    }
+
     /**
-     * Calculates the capacity for the specified resource in the specified resource storage unit.
+     * Calculates the amount of resource in the specified resource storage unit.
      *
      * @param i        The index of the resource storage unit to check
      * @param resource The resource to check
-     * @return The capacity for the specified resource
+     * @return The amount of resource
      */
-    long capacityFor(int i, T resource);
+    long amountFor(int i, T resource);
 
     /**
      * Calculates the total amount of resource across all resource storage units.
@@ -179,15 +192,6 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
         }
         return amount;
     }
-
-    /**
-     * Calculates the amount of resource in the specified resource storage unit.
-     *
-     * @param i        The index of the resource storage unit to check
-     * @param resource The resource to check
-     * @return The amount of resource
-     */
-    long amountFor(int i, T resource);
 
     /**
      * Calculates the amount of whatever resource is in the specified resource storage unit.

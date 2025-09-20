@@ -1,5 +1,5 @@
 architectury {
-    common rootProject.enabled_platforms.split(',')
+    common enabled_platforms.split(',')
 }
 
 loom {
@@ -7,6 +7,9 @@ loom {
 }
 
 dependencies {
+    // Tomlj
+    modApi("org.tomlj:tomlj:$tomlj_version")
+
     // We depend on Fabric Loader here to use the Fabric @Environment annotations,
     // which get remapped to the correct annotations on each platform.
     // Do NOT use other classes from Fabric Loader.

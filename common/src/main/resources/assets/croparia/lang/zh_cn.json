@@ -62,6 +62,7 @@
   "block.croparia.fluid_earth": "液态土元素",
   "block.croparia.fluid_elematilius": "液态元素",
   "container.greenhouse": "温室",
+  "chat.croparia.alpha_warning": "警告：你正在使用非稳定版 Croparia IF，可能会遇到崩溃或错误。有问题请及时反馈到 %s",
   "item.croparia.bucket_air": "风元素桶",
   "item.croparia.bucket_elemental": "元素桶",
   "item.croparia.bucket_earth": "土元素桶",

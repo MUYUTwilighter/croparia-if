@@ -91,4 +91,9 @@ public record ContainerRepo(@NotNull Container container) implements Repo<ItemSp
             return 0;
         }
     }
+
+    @Override
+    public long amountFor(int i) {
+        return this.container().getItem(i).getCount();
+    }
 }
