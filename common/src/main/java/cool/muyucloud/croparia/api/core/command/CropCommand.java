@@ -18,7 +18,6 @@ import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -77,7 +76,7 @@ public class CropCommand {
         );
         MutableComponent material = Texts.translatable("commands.croparia.crop.material", Texts.literal(
             crop.getMaterialName(),
-            Texts.suggestCommand("give @s", Objects.requireNonNull(crop.getResult().arch$registryName()).toString()),
+            Texts.suggestCommand("give @s", Objects.requireNonNull(crop.getResult().getItem().arch$registryName()).toString()),
             Texts.hoverItem(crop.getMaterialStack()),
             Texts.inlineMouseBehavior()
         ));
@@ -129,7 +128,7 @@ public class CropCommand {
     }
 
     public static MutableComponent diagnose(@NotNull Crop crop) {
-        if (crop.getResult() == Items.AIR) {
+        if (crop.getResult().isEmpty()) {
             return Texts.translatable("commands.croparia.crop.status.material").withStyle(ChatFormatting.RED);
         }
         if (!crop.shouldLoad()) {

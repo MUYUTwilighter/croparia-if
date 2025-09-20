@@ -52,7 +52,7 @@ public class RecipeWizard extends Item {
             FileUtil.forFilesIn(
                 CropariaIf.CONFIG.getFilePath().resolve("recipe_wizard/generators").toFile(),
                 file -> RecipeWizardGenerator.read(file).ifPresent(generator -> {
-                    if (generator.isEnabled() && generator.isDependenciesAvailable()) {
+                    if (generator.isEnabled()) {
                         generators.add(generator);
                     }
                 })

@@ -51,7 +51,7 @@ public class ConfigCommand {
         Texts.success(context.getSource(), Texts.translatable("commands.croparia.config.fruitUse", CropariaIf.CONFIG.getFruitUse().toString()), true);
         return 1;
     }).then(Commands.argument("value", IntegerArgumentType.integer()).executes(context -> {
-        CropariaIf.CONFIG.setFruitUse(IntegerArgumentType.getInteger(context, "value"));
+        CropariaIf.CONFIG.setFruitUse(BoolArgumentType.getBool(context, "value"));
         Texts.success(context.getSource(), Texts.translatable("commands.croparia.config.fruitUse", CropariaIf.CONFIG.getFruitUse().toString()), true);
         return 1;
     }));

@@ -28,17 +28,17 @@ public class CropFruit extends Item implements CropAccess<Crop> {
     }
 
     public @NotNull InteractionResult useOn(@NotNull UseOnContext context) {
-        if (CropariaIf.CONFIG.getFruitUse() <= 0) {
+        if (!CropariaIf.CONFIG.getFruitUse()) {
             return InteractionResult.PASS;
         }
         if (!context.getLevel().isClientSide) {
-            Item material = getCrop().getResult();
+            ItemStack material = getCrop().getResult();
             context.getLevel().addFreshEntity(new ItemEntity(
                 context.getLevel(),
                 context.getClickedPos().getX() + 0.5,
                 context.getClickedPos().getY() + 1,
                 context.getClickedPos().getZ() + 0.5,
-                new ItemStack(material, Math.min(material.getDefaultMaxStackSize(), CropariaIf.CONFIG.getFruitUse()))
+                material.copy()
             ));
             context.getItemInHand().shrink(1);
             return InteractionResult.SUCCESS;

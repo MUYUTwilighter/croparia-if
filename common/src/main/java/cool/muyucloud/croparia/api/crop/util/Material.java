@@ -27,7 +27,8 @@ public class Material {
     public static final MapCodec<Material> CODEC_COMP = RecordCodecBuilder.mapCodec(
         instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(Material::getName),
-            DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY).forGetter(Material::getComponents)
+            DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY).forGetter(Material::getComponents),
+            Codec.INT.optionalFieldOf("count", 2).forGetter(Material::getCount)
         ).apply(instance, Material::new)
     );
     public static final MultiCodec<Material> CODEC = CodecUtil.of(
@@ -38,6 +39,7 @@ public class Material {
     private final boolean tag;
     @NotNull
     private final ResourceLocation id;
+    private final int count;
     @NotNull
     private final DataComponentPatch components;
     private transient final OnLoadSupplier<List<Item>> items = OnLoadSupplier.of(() -> {
@@ -54,27 +56,22 @@ public class Material {
     });
 
     public Material(ItemStack stack) {
-        this(String.valueOf(stack.getItem().arch$registryName()), stack.getComponentsPatch());
+        this(String.valueOf(stack.getItem().arch$registryName()), stack.getComponentsPatch(), stack.getCount());
     }
 
     public Material(@NotNull String name) {
-        if (name.startsWith("#")) {
-            this.tag = true;
-            this.id = ResourceLocation.parse(name.substring(1));
-        } else {
-            this.tag = false;
-            this.id = ResourceLocation.parse(name);
-        }
-        this.components = DataComponentPatch.EMPTY;
+        this(name, DataComponentPatch.EMPTY, 2);
     }
 
-    public Material(@NotNull String name, @NotNull DataComponentPatch components) {
+    public Material(@NotNull String name, @NotNull DataComponentPatch components, int count) {
         if (name.startsWith("#")) {
             this.tag = true;
             this.id = ResourceLocation.parse(name.substring(1));
+            this.count = count;
         } else {
             this.tag = false;
             this.id = ResourceLocation.parse(name);
+            this.count = count;
         }
         this.components = components;
     }
@@ -106,6 +103,11 @@ public class Material {
     public ItemStack getStack() {
         ItemStack stack = new ItemStack(this.getItem());
         stack.applyComponents(this.getComponents());
+        stack.setCount(this.getCount());
         return stack;
+    }
+
+    public int getCount() {
+        return count;
     }
 }

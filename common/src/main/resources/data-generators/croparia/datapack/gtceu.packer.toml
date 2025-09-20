@@ -26,9 +26,9 @@ template = """
             {
                 "content": {
                     "type": "gtceu:sized",
-                    "count": {result_count.2},
+                    "count": {result_count},
                     "ingredient": {
-                        "item": "{result}",
+                        "item": "{result_id}",
                         "components": {material_components}
                     }
                 },

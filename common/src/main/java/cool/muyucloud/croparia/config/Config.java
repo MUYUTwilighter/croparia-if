@@ -45,7 +45,7 @@ public class Config {
     @NotNull
     private Boolean ritual;
     @NotNull
-    private Integer fruitUse;
+    private Boolean fruitUse;
     @NotNull
     private Integer autoReload;
     @NotNull
@@ -62,7 +62,7 @@ public class Config {
         this.recipeWizard = Platform.getGameFolder().resolve("croparia/recipe_wizard/dump");
         this.autoReload = 20;
         this.override = true;
-        this.fruitUse = 2;
+        this.fruitUse = true;
         this.infusor = true;
         this.ritual = true;
         this.soakAttempts = 1;
@@ -78,7 +78,7 @@ public class Config {
         this.recipeWizard = parsePath(raw.recipeWizard()).orElse(Platform.getGameFolder().resolve("croparia/recipe_wizard/dump"));
         this.autoReload = raw.autoReload() != null ? raw.autoReload() : 20;
         this.override = raw.override() != null ? raw.override() : true;
-        this.fruitUse = raw.fruitUse() != null ? raw.fruitUse() : 2;
+        this.fruitUse = raw.fruitUse() != null ? raw.fruitUse() : true;
         this.infusor = raw.infusor() != null ? raw.infusor() : true;
         this.ritual = raw.ritual() != null ? raw.ritual() : true;
         this.soakAttempts = raw.soakAttempts() != null ? raw.soakAttempts() : 1;
@@ -88,7 +88,7 @@ public class Config {
     }
 
     public RawConfig toRaw() {
-        return new RawConfig(resolvePath(filePath), resolvePath(recipeWizard), override, infusor, ritual, autoReload, soakAttempts, fruitUse, this.getBlacklist());
+        return new RawConfig(resolvePath(filePath), resolvePath(recipeWizard), override, infusor, ritual, fruitUse, autoReload, soakAttempts, this.getBlacklist());
     }
 
     public @NotNull Path getFilePath() {
@@ -123,11 +123,11 @@ public class Config {
         this.override = override;
     }
 
-    public @NotNull Integer getFruitUse() {
+    public @NotNull Boolean getFruitUse() {
         return fruitUse;
     }
 
-    public void setFruitUse(@NotNull Integer fruitUse) {
+    public void setFruitUse(@NotNull Boolean fruitUse) {
         this.fruitUse = fruitUse;
     }
 

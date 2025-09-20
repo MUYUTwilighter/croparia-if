@@ -1,6 +1,5 @@
 package cool.muyucloud.croparia.api.crop;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -20,12 +19,9 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.supplier.HolderSupplier;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
-import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,12 +64,6 @@ public class Crop extends AbstractCrop implements TierAccess {
     public static final Placeholder<Crop> FRUIT_PATH = Placeholder.of("\\{fruit_path}", crop -> crop.getFruitId().getPath());
     public static final Placeholder<Crop> CROP_BLOCK = Placeholder.of("\\{crop_block}", crop -> crop.getBlockId().toString());
     public static final Placeholder<Crop> CROP_BLOCK_PATH = Placeholder.of("\\{crop_block_path}", crop -> crop.getBlockId().getPath());
-    public static final Placeholder<Crop> RESULT = Placeholder.of("\\{result}", crop -> Objects.requireNonNull(crop.getResult().arch$registryName()).toString());
-    public static final Placeholder<Crop> RESULT_PATH = Placeholder.of("\\{result_path}", crop -> Objects.requireNonNull(crop.getResult().arch$registryName()).getPath());
-    public static final Placeholder<Crop> RESULT_COUNT = Placeholder.of("\\{result_count\\.(\\d+)}", ((matcher, crop) -> {
-        int count = Integer.parseInt(matcher.group(1));
-        return String.valueOf(Math.min(crop.getResult().getDefaultMaxStackSize(), count));
-    }));
     public static final Placeholder<Crop> CROPARIA = Placeholder.of("\\{croparia}", crop -> CropariaItems.getCroparia(crop.getTier()).getId().toString());
     public static final Placeholder<Crop> CROPARIA_PATH = Placeholder.of("\\{croparia_path}", crop -> CropariaItems.getCroparia(crop.getTier()).getId().getPath());
 
@@ -115,16 +105,6 @@ public class Crop extends AbstractCrop implements TierAccess {
     private transient final LazySupplier<Boolean> load = LazySupplier.of(
         () -> this.getDependencies().shouldLoad() && CropariaIf.CONFIG.isCropValid(this.getKey())
     );
-    private transient final OnLoadSupplier<List<Item>> items = OnLoadSupplier.of(() -> {
-        List<Item> items = new ArrayList<>();
-        for (Item item : this.getMaterial().getItems()) {
-            if (CropariaIf.CONFIG.isModValid(Objects.requireNonNull(item.arch$registryName()).getNamespace())) {
-                items.add(item);
-            }
-        }
-        if (items.isEmpty()) items.add(Items.AIR);
-        return ImmutableList.copyOf(items);
-    });
 
     public Crop(
         @NotNull ResourceLocation id, @NotNull Material material, @NotNull Color color, int tier, @Nullable String type,
@@ -143,6 +123,9 @@ public class Crop extends AbstractCrop implements TierAccess {
         this.block = HolderSupplier.of(() -> new CropariaCropBlock(this), CifUtil.formatId("block_crop_%s", this.getKey()), Registries.BLOCK);
         this.seed = HolderSupplier.of(() -> new CropSeed(this), CifUtil.formatId("crop_seed_%s", this.getKey()), Registries.ITEM);
         this.fruit = HolderSupplier.of(() -> new CropFruit(this), CifUtil.formatId("fruit_%s", this.getKey()), Registries.ITEM);
+        this.results = this.results.map(stacks -> stacks.stream().filter(stack -> CropariaIf.CONFIG.isModValid(
+            Objects.requireNonNull(stack.getItem().arch$registryName()).getNamespace()
+        )).toList());
     }
 
     @Override
@@ -280,9 +263,6 @@ public class Crop extends AbstractCrop implements TierAccess {
         list.add(CROP_BLOCK_PATH);
         list.add(FRUIT);
         list.add(FRUIT_PATH);
-        list.add(RESULT);
-        list.add(RESULT_COUNT);
-        list.add(RESULT_PATH);
         list.add(SEED);
         list.add(SEED_PATH);
         list.add(TYPE);
@@ -292,14 +272,6 @@ public class Crop extends AbstractCrop implements TierAccess {
     @Override
     public boolean shouldLoad() {
         return load.get();
-    }
-
-    public Item getResult() {
-        return this.getResults().getFirst();
-    }
-
-    public List<Item> getResults() {
-        return items.get();
     }
 
     @Override

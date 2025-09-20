@@ -7,8 +7,8 @@ template = """
     "{fruit}"
   ],
   "result": {
-    "id": "{result}",
-    "count": {result_count.2},
+    "id": "{result_id}",
+    "count": {result_count},
     "components": {material_components}
   }
 }
