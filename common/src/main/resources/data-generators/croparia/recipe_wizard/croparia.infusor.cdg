@@ -1,9 +1,0 @@
-@block=croparia:infusor;
-@path=croparia/infusor_{datetime}.json;
-@extensions=croparia:infusor;
-{
-  "type": "croparia:infusor",
-  "element": "{infusor_element}",
-  "ingredient": {item},
-  "result": {off_hand}
-}
