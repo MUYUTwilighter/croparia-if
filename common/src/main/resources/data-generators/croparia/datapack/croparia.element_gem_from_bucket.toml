@@ -1,5 +1,6 @@
-@registry=croparia:elements;
-@path=croparia/recipe/crafting/gem/{name}_from_bucket.json;
+registry = "croparia:elements"
+path = "croparia/recipe/crafting/gem/{name}_from_bucket.json"
+template = """
 {
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
@@ -10,3 +11,4 @@
     "id": "{gem}"
   }
 }
+"""

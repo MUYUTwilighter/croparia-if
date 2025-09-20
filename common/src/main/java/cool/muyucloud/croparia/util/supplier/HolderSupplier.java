@@ -80,14 +80,13 @@ public class HolderSupplier<T> implements DeferredSupplier<T> {
         register.register();
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean tryRegister() {
         try {
             this.register();
             return true;
         } catch (IllegalStateException e) {
             return false;
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
         }
     }
 }

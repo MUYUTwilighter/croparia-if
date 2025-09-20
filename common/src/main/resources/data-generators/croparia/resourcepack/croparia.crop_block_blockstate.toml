@@ -1,6 +1,7 @@
-@startup=true;
-@registry=croparia:crops;
-@path={id_namespace}/blockstates/{crop_block_path}.json;
+registry = "croparia:crops"
+path = "{id_namespace}/blockstates/{crop_block_path}.json"
+startup = true
+template = """
 {
   "variants": {
     "age=0": {
@@ -29,3 +30,4 @@
     }
   }
 }
+"""

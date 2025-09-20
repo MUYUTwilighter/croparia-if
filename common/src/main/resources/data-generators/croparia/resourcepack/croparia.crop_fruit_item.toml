@@ -1,10 +1,11 @@
-@startup=true;
-@registry=croparia:elements;
-@path={id_namespace}/items/{bucket_path}.json;
+registry = "croparia:crops"
+path = "{id_namespace}/items/{fruit_path}.json"
+startup = true
+template = """
 {
   "model": {
     "type": "minecraft:model",
-    "model": "croparia:item/bucket_template",
+    "model": "croparia:item/template_fruit_{type}",
     "tints": [
       {
         "type": "minecraft:constant",
@@ -17,3 +18,4 @@
     ]
   }
 }
+"""

@@ -1,6 +1,7 @@
-@registry=croparia:elements;
-@path=indrev/recipe/croparia/smelter/fluid/{name}.json;
-@dependencies=indrev;
+registry = "croparia:elements"
+path = "indrev/recipe/croparia/smelter/fluid/{name}.json"
+dependencies = "indrev"
+template = """
 {
   "neoforge:conditions": [
     {
@@ -26,3 +27,4 @@
   },
   "processTime": 600
 }
+"""

@@ -88,10 +88,10 @@ public abstract class StateHolderMixin<O, S> implements StateHolderAccess< S> {
                 }
                 return (S) this;
             } else {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("Property %s of type %s is not supported".formatted(key, cls));
             }
-        } catch (Throwable t) {
-            CropariaIf.LOGGER.error("Failed to set property %s to %s".formatted(key, value), t);
+        } catch (ClassCastException e) {
+            CropariaIf.LOGGER.error("Failed to set property %s to %s".formatted(key, value), e);
             return (S) this;
         }
     }

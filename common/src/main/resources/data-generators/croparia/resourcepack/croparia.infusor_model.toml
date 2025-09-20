@@ -1,6 +1,7 @@
-@startup=true;
-@registry=croparia:elements;
-@path=croparia/models/block/infusor_{name}.json;
+registry = "croparia:elements"
+path = "croparia/models/block/infusor_{name}.json"
+startup = true
+template = """
 {
   "__comment": "Model generated using MrCrayfish's Model Creator (http://mrcrayfish.com/modelcreator/)",
   "textures": {
@@ -26,3 +27,4 @@
     }
   ]
 }
+"""

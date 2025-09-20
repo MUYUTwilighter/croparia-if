@@ -24,6 +24,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 
@@ -33,25 +35,31 @@ public class RecipeWizard extends Item {
         for (JarJarEntry entry : PackHandler.getBuiltinGenerators().getOrDefault(PACK_ID, List.of())) {
             String name = entry.getEntry().getName();
             String prefix = "data-generators/%s/%s/".formatted(PACK_ID.getNamespace(), PACK_ID.getPath());
-            String finalName = name.substring(prefix.length());
-            entry.forInputStream(inputStream -> {
-                try (FileOutputStream outputStream = new FileOutputStream(CropariaIf.CONFIG.getFilePath().resolve("recipe_wizard/generators").resolve(finalName).toFile())) {
-                    inputStream.transferTo(outputStream);
-                    outputStream.flush();
-                } catch (Throwable t) {
-                    CropariaIf.LOGGER.error("Failed to move built-in recipe wizard template %s".formatted(name), t);
-                }
-            });
+            Path target = CropariaIf.CONFIG.getFilePath().resolve("recipe_wizard/generators").resolve(name.substring(prefix.length()));
+            try {
+                entry.forInputStream(inputStream -> {
+                    try (FileOutputStream outputStream = new FileOutputStream(target.toFile())) {
+                        inputStream.transferTo(outputStream);
+                        outputStream.flush();
+                    }
+                });
+            } catch (IOException e) {
+                CropariaIf.LOGGER.error("Failed to move built-in recipe wizard template from %s to %s".formatted(name, target), e);
+            }
         }
         Collection<RecipeWizardGenerator> generators = new ArrayList<>();
-        FileUtil.forFilesIn(
-            CropariaIf.CONFIG.getFilePath().resolve("recipe_wizard/generators").toFile(),
-            file -> RecipeWizardGenerator.read(file).ifPresent(generator -> {
-                if (generator.isEnabled() && generator.isDependenciesAvailable()) {
-                    generators.add(generator);
-                }
-            })
-        );
+        try {
+            FileUtil.forFilesIn(
+                CropariaIf.CONFIG.getFilePath().resolve("recipe_wizard/generators").toFile(),
+                file -> RecipeWizardGenerator.read(file).ifPresent(generator -> {
+                    if (generator.isEnabled() && generator.isDependenciesAvailable()) {
+                        generators.add(generator);
+                    }
+                })
+            );
+        } catch (IOException e) {
+            CropariaIf.LOGGER.error("Failed to read recipe wizard generators", e);
+        }
         return ImmutableList.copyOf(generators);
     });
     public static final Map<BlockInput, Function<UseOnContext, InteractionResult>> OPERATIONS = new HashMap<>();

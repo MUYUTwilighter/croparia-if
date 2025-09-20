@@ -1,6 +1,7 @@
-@block=croparia:elemental_stone;
-@path=croparia/soak_{datetime}.json;
-@extensions=croparia:soak;
+path = "croparia/soak_{datetime}.json"
+extensions = "croparia:soak"
+block = "croparia:elemental_stone"
+template = """
 {
   "type": "croparia:soak",
   "element": "{soak_element}",
@@ -8,3 +9,4 @@
   "output": {below},
   "probability": 1.0
 }
+"""

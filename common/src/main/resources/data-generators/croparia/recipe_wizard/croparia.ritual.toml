@@ -1,6 +1,7 @@
-@block=#croparia:ritual_stands;
-@path=croparia/ritual_{datetime}.json;
-@extensions=croparia:ritual;
+path = "croparia/ritual_{datetime}.json"
+extensions = "croparia:ritual"
+block = "#croparia:ritual_stands"
+template = """
 {
   "type": "croparia:ritual",
   "ritual": {block},
@@ -8,3 +9,4 @@
   "block": {ritual_input},
   "result": {off_hand}
 }
+"""

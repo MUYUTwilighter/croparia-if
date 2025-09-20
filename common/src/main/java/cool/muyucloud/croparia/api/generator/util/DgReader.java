@@ -10,12 +10,12 @@ import java.util.Objects;
 public class DgReader {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    public static JsonObject read(File file) throws IOException {
+    public static JsonObject read(File file) throws IOException, NotJsonObjectException {
         JsonElement json = JsonTransformer.transform(file);
         if (json.isJsonObject()) {
             return json.getAsJsonObject();
         }
-        throw new RuntimeException("Invalid or unsupported format: " + file);
+        throw new NotJsonObjectException("Expecting JsonObject in " + file.getAbsolutePath());
     }
 
     /**

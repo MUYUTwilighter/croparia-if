@@ -1,6 +1,7 @@
-@registry=croparia:elements;
-@path=indrev/recipe/croparia/condenser/gem/{name}.json;
-@dependencies=indrev;
+registry = "croparia:elements"
+path = "indrev/recipe/croparia/condenser/gem/{name}.json"
+dependencies = "indrev"
+template = """
 {
   "neoforge:conditions": [
     {
@@ -27,3 +28,4 @@
   },
   "processTime": 500
 }
+"""

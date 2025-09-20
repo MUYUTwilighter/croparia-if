@@ -1,6 +1,7 @@
-@registry=croparia:elements;
-@path=thermal/recipe/croparia/crystallizer/{id_namespace}/{id_path}.json;
-@dependencies=thermal_cultivation;
+registry = "croparia:elements"
+path = "thermal/recipe/croparia/crystallizer/{id_namespace}/{id_path}.json"
+dependencies = "thermal_expansion"
+template = """
 {
   "neoforge:conditions": [
     {
@@ -33,3 +34,4 @@
     }
   ]
 }
+"""

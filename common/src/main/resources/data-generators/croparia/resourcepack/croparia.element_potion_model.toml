@@ -1,0 +1,11 @@
+registry = "croparia:elements"
+path = "{id_namespace}/models/item/{potion_path}.json"
+startup = true
+template = """
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "{id_namespace}:item/{potion_path}"
+  }
+}
+"""

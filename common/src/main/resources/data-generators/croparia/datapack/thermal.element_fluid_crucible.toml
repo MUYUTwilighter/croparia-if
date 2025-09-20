@@ -1,6 +1,7 @@
-@registry=croparia:elements;
-@path=thermal/recipe/croparia/crucible/fluid/{name}.json;
-@dependencies=thermal_cultivation;
+registry = "croparia:elements"
+path = "thermal/recipe/croparia/crucible/fluid/{name}.json"
+dependencies = "thermal_expansion"
+template = """
 {
   "neoforge:conditions": [
     {
@@ -28,3 +29,4 @@
   ],
   "energy": 20000
 }
+"""

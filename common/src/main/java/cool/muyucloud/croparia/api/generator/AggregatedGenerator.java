@@ -6,7 +6,6 @@ import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.api.generator.util.DgElement;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
-import cool.muyucloud.croparia.util.Dependencies;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
@@ -22,7 +21,7 @@ public class AggregatedGenerator extends DataGenerator {
         DataGenerator.CODEC,
         Codec.STRING.fieldOf("content").forGetter(AggregatedGenerator::getContent),
         (base, content) -> new AggregatedGenerator(
-            base.isEnabled(), base.isStartup(), base.getDependencies(), base.getWhitelist(),
+            base.isEnabled(), base.isStartup(), base.getWhitelist(),
             base.getPath(), base.getRegistry(), content, base.getTemplate()
         )
     );
@@ -30,8 +29,8 @@ public class AggregatedGenerator extends DataGenerator {
     private final String content;
     protected final transient Map<String, List<String>> cache = new HashMap<>();
 
-    public AggregatedGenerator(boolean enabled, boolean startup, Dependencies dependencies, List<ResourceLocation> whitelist, String path, DgRegistry<? extends DgElement> iterable, String content, String template) {
-        super(enabled, startup, dependencies, whitelist, path, iterable, template);
+    public AggregatedGenerator(boolean enabled, boolean startup, List<ResourceLocation> whitelist, String path, DgRegistry<? extends DgElement> iterable, String content, String template) {
+        super(enabled, startup, whitelist, path, iterable, template);
         this.content = content;
     }
 

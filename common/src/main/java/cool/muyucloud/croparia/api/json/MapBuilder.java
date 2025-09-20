@@ -2,7 +2,9 @@ package cool.muyucloud.croparia.api.json;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 
 import java.util.Map;
@@ -61,8 +63,10 @@ public class MapBuilder implements JsonBuilder {
         return this;
     }
 
-    public <T> MapBuilder with(String key, T value, Codec<T> codec) {
-        json.add(key, CodecUtil.encodeJson(value, codec));
-        return this;
+    public <T> DataResult<Pair<JsonElement, MapBuilder>> with(String key, T value, Codec<T> codec) {
+        return CodecUtil.encodeJson(value, codec).mapOrElse(
+            json -> DataResult.success(Pair.of(json, this)),
+            err -> DataResult.error(err.messageSupplier())
+        );
     }
 }

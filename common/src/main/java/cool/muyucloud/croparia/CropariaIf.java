@@ -61,10 +61,9 @@ public class CropariaIf {
                 server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "schedule function croparia:auto_reload %s".formatted(CONFIG.getAutoReload()));
             }
             if (INSTANCE.getVersion().contains("a") || INSTANCE.getVersion().contains("alpha")) {
-                server.sendSystemMessage(Texts.translatable(
-                    "chat.croparia.alpha_warning",
-                    Texts.literal(INSTANCE.getIssueTracker().orElse(""))
-                ).withStyle(style -> style.withColor(0xFF5555).withBold(true)));
+                server.getPlayerList().getPlayers().forEach(player -> player.sendSystemMessage(Texts.translatable(
+                    "chat.croparia.alpha_warning", Texts.literal(INSTANCE.getIssueTracker().orElse(""))
+                ).withStyle(style -> style.withColor(0xFF5555).withBold(true))));
             }
         });
         LifecycleEvent.SERVER_STOPPING.register(server -> {

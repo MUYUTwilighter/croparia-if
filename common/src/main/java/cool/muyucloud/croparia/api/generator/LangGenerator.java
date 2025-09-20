@@ -5,7 +5,6 @@ import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.api.generator.util.DgElement;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.api.generator.util.TranslatableElement;
-import cool.muyucloud.croparia.util.Dependencies;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
@@ -24,21 +23,21 @@ public class LangGenerator extends DataGenerator {
                 break;
             }
             return new LangGenerator(
-                dg.isEnabled(), dg.isStartup(), dg.getDependencies(), dg.getWhitelist(),
+                dg.isEnabled(), dg.isStartup(), dg.getWhitelist(),
                 dg.getPath(), translatable, dg.getTemplate()
             );
-        } catch (Throwable t) {
-            throw new IllegalArgumentException("Iterable %s is not translatable".formatted(dg.getRegistry()), t);
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Iterable %s is not translatable".formatted(dg.getRegistry()), e);
         }
     }, lg -> lg);
 
     private static final Map<String, List<String>> TRANSLATIONS = new HashMap<>();
 
     public LangGenerator(
-        boolean enabled, boolean startup, Dependencies dependencies, List<ResourceLocation> whitelist, String path,
+        boolean enabled, boolean startup, List<ResourceLocation> whitelist, String path,
         DgRegistry<? extends TranslatableElement> registry, String template
     ) {
-        super(enabled, startup, dependencies, whitelist, path, registry, template);
+        super(enabled, startup, whitelist, path, registry, template);
     }
 
     @Override

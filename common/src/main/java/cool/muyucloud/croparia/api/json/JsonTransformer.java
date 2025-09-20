@@ -31,7 +31,7 @@ public interface JsonTransformer {
             throw new IllegalArgumentException("File must have an extension: " + name);
         }
         String ext = name.substring(dotIndex + 1).toLowerCase();
-        JsonTransformer transformer = TRANSFORMERS.get(ext);
+        JsonTransformer transformer = TRANSFORMERS.getOrDefault(ext, JsonParser::parseString);
         if (transformer == null) {
             throw new IllegalArgumentException("No transformer found for extension: " + ext);
         }

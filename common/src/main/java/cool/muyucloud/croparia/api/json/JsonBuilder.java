@@ -4,8 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.serialization.Codec;
-import cool.muyucloud.croparia.api.codec.CodecUtil;
 
 import java.util.Map;
 
@@ -30,11 +28,6 @@ public interface JsonBuilder {
         else if (o instanceof String string) return new JsonPrimitive(string);
         else if (o instanceof Boolean bool) return new JsonPrimitive(bool);
         throw new IllegalArgumentException("Codec is required for type: " + o.getClass());
-    }
-
-    @SuppressWarnings("unused")
-    static <T> JsonElement parse(T value, Codec<T> codec) {
-        return CodecUtil.encodeJson(value, codec);
     }
 
     JsonElement build();

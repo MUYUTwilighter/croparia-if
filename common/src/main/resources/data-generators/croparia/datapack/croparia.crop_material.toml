@@ -1,5 +1,6 @@
-@registry=croparia:crops;
-@path=croparia/recipe/crafting/material/{id_namespace}/{id_path}.json;
+registry = "croparia:crops"
+path = "croparia/recipe/crafting/material/{id_namespace}/{id_path}.json"
+template = """
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
@@ -11,3 +12,4 @@
     "components": {material_components}
   }
 }
+"""

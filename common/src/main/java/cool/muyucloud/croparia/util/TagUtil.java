@@ -24,7 +24,7 @@ public class TagUtil {
             } else {
                 return Optional.empty();
             }
-        } catch (Throwable e) {
+        } catch (ClassCastException e) {
             return Optional.empty();
         }
     }

@@ -115,14 +115,13 @@ public abstract class PackHandler {
         try {
             FileUtil.forFilesIn(parent, file -> {
                 try {
-                    DataGenerator generator = DataGenerator.read(file);
-                    if (generator.isEnabled() && generator.isAvailable()) this.generators.add(generator);
-                } catch (Throwable t) {
-                    DataGenerator.LOGGER.error("Failed in reading generator \"%s\"".formatted(file), t);
+                    DataGenerator.read(file).ifPresent(this.generators::add);
+                } catch (IOException e) {
+                    DataGenerator.LOGGER.error("Failed in reading generator \"%s\"".formatted(file), e);
                 }
             });
-        } catch (Throwable t) {
-            DataGenerator.LOGGER.error("Failed in reading generators from \"%s\"".formatted(parent), t);
+        } catch (IOException e) {
+            DataGenerator.LOGGER.error("Failed to read generators from directory \"%s\"".formatted(parent), e);
         }
     }
 

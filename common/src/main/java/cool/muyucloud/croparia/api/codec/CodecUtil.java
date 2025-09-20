@@ -10,7 +10,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.reflection.RecordCodecBuilderReflection;
 import cool.muyucloud.croparia.util.FileUtil;
-import cool.muyucloud.croparia.util.Ref;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryOps;
@@ -315,40 +314,49 @@ public class CodecUtil {
         return toStream(codec.codec());
     }
 
-    public static <T> JsonElement encodeJson(T object, Codec<T> codec) {
-        Ref<JsonElement> elementRef = new Ref<>();
-        CropariaIf.getRegistryAccess().ifPresentOrElse(access -> elementRef.set(codec.encodeStart(RegistryOps.create(JsonOps.INSTANCE, access), object).getOrThrow()), () -> elementRef.set(codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow()));
-        return elementRef.get();
+    public static <T> Optional<RegistryOps<T>> getRegistryOps(DynamicOps<T> ops) {
+        return CropariaIf.getRegistryAccess().map(access -> RegistryOps.create(ops, access));
     }
 
-    public static <T> JsonElement encodeJson(T object, MapCodec<T> codec) {
+    public static <T> DynamicOps<T> getOps(DynamicOps<T> ops) {
+        return getRegistryOps(ops).map(o -> (DynamicOps<T>) o).orElse(ops);
+    }
+
+    public static <T> DataResult<JsonElement> encodeJson(T object, Codec<T> codec) {
+        return codec.encodeStart(getOps(JsonOps.INSTANCE), object);
+    }
+
+    public static <T> DataResult<JsonElement> encodeJson(T object, MapCodec<T> codec) {
         return encodeJson(object, codec.codec());
     }
 
-    public static <T> void dumpJson(T object, Codec<T> codec, Path path, boolean override) throws IOException, IllegalStateException {
-        JsonElement json = encodeJson(object, codec);
-        FileUtil.write(path.toFile(), json.toString(), override);
+    public static <T> DataResult<JsonElement> dumpJson(T object, Codec<T> codec, Path path, boolean override) throws IOException {
+        DataResult<JsonElement> result = encodeJson(object, codec);
+        if (result.isSuccess()) {
+            FileUtil.write(path.toFile(), result.getOrThrow().toString(), override);
+        }
+        return result;
     }
 
-    public static <T> void dumpJson(T object, MapCodec<T> codec, Path path, boolean override) throws IOException, IllegalStateException {
-        dumpJson(object, codec.codec(), path, override);
+    public static <T> DataResult<JsonElement> dumpJson(T object, MapCodec<T> codec, Path path, boolean override) throws IOException, IllegalStateException {
+        return dumpJson(object, codec.codec(), path, override);
     }
 
-    public static <T> T decodeJson(JsonElement element, Codec<T> codec) {
-        return codec.decode(JsonOps.INSTANCE, element).getOrThrow().getFirst();
+    public static <T> DataResult<T> decodeJson(JsonElement element, Codec<T> codec) {
+        return codec.decode(getOps(JsonOps.INSTANCE), element).map(Pair::getFirst);
     }
 
-    public static <T> T decodeJson(JsonElement element, MapCodec<T> codec) {
+    public static <T> DataResult<T> decodeJson(JsonElement element, MapCodec<T> codec) {
         return decodeJson(element, codec.codec());
     }
 
-    public static <T> T readJson(File file, Codec<T> codec) throws IOException {
+    public static <T> DataResult<T> readJson(File file, Codec<T> codec) throws IOException {
         try (FileReader reader = new FileReader(file)) {
             return decodeJson(GSON.fromJson(reader, JsonElement.class), codec);
         }
     }
 
-    public static <T> T readJson(File file, MapCodec<T> codec) throws IOException {
+    public static <T> DataResult<T> readJson(File file, MapCodec<T> codec) throws IOException {
         return readJson(file, codec.codec());
     }
 

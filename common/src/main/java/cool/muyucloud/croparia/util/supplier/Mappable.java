@@ -1,6 +1,5 @@
 package cool.muyucloud.croparia.util.supplier;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -21,21 +20,9 @@ public interface Mappable<T> extends Supplier<T> {
         return () -> mapper.apply(this.get());
     }
 
-    default T get(Consumer<Throwable> onError) {
-        try {
-            return this.get();
-        } catch (Throwable t) {
-            onError.accept(t);
-            return null;
-        }
-    }
-
+    @SuppressWarnings("unused")
     default T getOr(T def) {
-        try {
             T v = this.get();
             return v == null ? def : v;
-        } catch (Throwable t) {
-            return def;
-        }
     }
 }

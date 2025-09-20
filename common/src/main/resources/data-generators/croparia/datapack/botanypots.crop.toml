@@ -1,6 +1,7 @@
-@registry=croparia:crops;
-@path=botanypots/recipe/{id_namespace}/seed/{id_path}.json;
-@dependencies=botanypots;
+registry = "croparia:crops"
+path = "botanypots/recipe/{id_namespace}/seed/{id_path}.json"
+dependencies = "botanypots"
+template = """
 {
   "type": "botanypots:crop",
   "seed": {
@@ -29,3 +30,4 @@
     }
   ]
 }
+"""

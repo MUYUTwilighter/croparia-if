@@ -1,10 +1,8 @@
 package cool.muyucloud.croparia.api.generator.util;
 
-import cool.muyucloud.croparia.api.generator.DataGenerator;
-
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.function.Consumer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -25,13 +23,15 @@ public class JarJarEntry {
         return entry;
     }
 
-    public void forInputStream(Consumer<InputStream> consumer) {
+    public void forInputStream(InputStreamConsumer consumer) throws IOException {
         try (JarFile jar = new JarFile(this.getFile())) {
             try (InputStream stream = jar.getInputStream(this.getEntry())) {
                 consumer.accept(stream);
             }
-        } catch (Throwable t) {
-            DataGenerator.LOGGER.error("Error handling jar entry %s in %s".formatted(this.getEntry(), this.getFile()), t);
         }
+    }
+
+    public interface InputStreamConsumer {
+        void accept(InputStream stream) throws IOException;
     }
 }

@@ -89,11 +89,10 @@ public class ConfigCommand {
     }));
     private static final LiteralArgumentBuilder<CommandSourceStack> RESET = Commands.literal("reset").executes(context -> {
         Texts.chat(context.getSource(), Texts.translatable(
-            "commands.croparia.config.reset.warn",
-            Texts.translatable("commands.croparia.config.reset.confirm")
-                .withStyle(Texts.runCommand("cropariaServer reset confirm"))
-                .withStyle(Texts.inlineMouseBehavior())
-        ));
+            "commands.croparia.config.reset.warn"
+        ).append(Texts.translatable("commands.croparia.config.reset.confirm")
+            .withStyle(Texts.runCommand("cropariaServer reset confirm"))
+            .withStyle(Texts.inlineMouseBehavior())));
         return 1;
     }).then(Commands.literal("confirm").executes(context -> {
         ConfigFileHandler.save(new Config());

@@ -19,7 +19,7 @@ public abstract class AbstractCrop implements TranslatableElement {
     public static final Placeholder<AbstractCrop> MATERIAL_PATH = Placeholder.of("\\{material_path}", crop -> crop.getMaterial().getId().getPath());
     public static final Placeholder<AbstractCrop> MATERIAL_TYPE = Placeholder.of("\\{material_type}", crop -> crop.getMaterial().isTag() ? "tag" : "item");
     public static final Placeholder<AbstractCrop> MATERIAL_TAGGABLE = Placeholder.of("\\{material_taggable}", crop -> crop.getMaterial().getName());
-    public static final Placeholder<AbstractCrop> MATERIAL_COMPONENTS = Placeholder.of("\\{material_components}", crop -> CodecUtil.encodeJson(crop.getMaterial().getComponents(), DataComponentPatch.CODEC).toString());
+    public static final Placeholder<AbstractCrop> MATERIAL_COMPONENTS = Placeholder.of("\\{material_components}", crop -> CodecUtil.encodeJson(crop.getMaterial().getComponents(), DataComponentPatch.CODEC).getOrThrow().toString());
 
     private final LazySupplier<Collection<Placeholder<? extends DgElement>>> placeholders = LazySupplier.of(() -> {
         ArrayList<Placeholder<? extends DgElement>> list = new ArrayList<>();

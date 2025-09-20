@@ -1,6 +1,7 @@
-@startup=true;
-@registry=croparia:crops;
-@path={id_namespace}/items/{seed_path}.json;
+registry = "croparia:crops"
+path = "{id_namespace}/items/{seed_path}.json"
+startup = true
+template = """
 {
   "model": {
     "type": "minecraft:model",
@@ -13,3 +14,4 @@
     ]
   }
 }
+"""

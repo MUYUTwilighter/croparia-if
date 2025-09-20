@@ -1,0 +1,5 @@
+registry = "croparia:crops"
+path = "{id_namespace}/lang/{lang}.json"
+type = "croparia:lang"
+startup = true
+template = '"{translation_key}": "{translation.{lang}}"'

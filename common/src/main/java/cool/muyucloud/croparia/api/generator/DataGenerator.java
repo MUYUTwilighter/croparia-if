@@ -15,7 +15,6 @@ import cool.muyucloud.croparia.api.generator.util.DgReader;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.api.generator.util.Placeholder;
 import cool.muyucloud.croparia.util.Dependencies;
-import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 
@@ -56,39 +55,48 @@ public class DataGenerator {
      * @return the read data generator
      * @throws IOException if an I/O error occurs
      */
-    public static DataGenerator read(File file) throws IOException {
+    public static Optional<DataGenerator> read(File file) throws IOException {
         JsonObject json = DgReader.read(file);
         JsonElement type = json.get("type");
         ResourceLocation id = ResourceLocation.parse(type == null ? "croparia:generator" : type.getAsString());
-        return CodecUtil.decodeJson(json, REGISTRY.get(id));
+        JsonElement rawDependencies = json.get("dependencies");
+        if (rawDependencies != null) {
+            if (!CodecUtil.decodeJson(rawDependencies, Dependencies.CODEC).mapOrElse(Dependencies::available, err -> {
+                LOGGER.error("Failed to parse dependencies of data generator {}: {}", file, err.message());
+                return false;
+            })) {
+                LOGGER.debug("Skipped loading data generator {} due to missing dependencies", file);
+                return Optional.empty();
+            }
+        }
+        return CodecUtil.decodeJson(json, REGISTRY.get(id)).mapOrElse(Optional::of, err -> {
+            LOGGER.error("Failed to parse data generator {}: {}", file, err.message());
+            return Optional.empty();
+        });
     }
 
     public static final MapCodec<DataGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
         Codec.BOOL.optionalFieldOf("enabled").forGetter(DataGenerator::optionalEnabled),
         Codec.BOOL.optionalFieldOf("startup").forGetter(DataGenerator::optionalStartup),
-        Dependencies.CODEC.optionalFieldOf("dependencies").forGetter(DataGenerator::optionalDependencies),
         ResourceLocation.CODEC.listOf().optionalFieldOf("whitelist").forGetter(DataGenerator::optionalWhitelist),
         Codec.STRING.fieldOf("path").forGetter(DataGenerator::getPath),
         DgRegistry.CODEC.fieldOf("registry").forGetter(DataGenerator::getRegistry),
         Codec.STRING.fieldOf("template").forGetter(DataGenerator::getTemplate)
-    ).apply(instance, (enabled, startup, dependencies, whitelist, path, registry, template) -> new DataGenerator(
-        enabled.orElse(true), startup.orElse(false), dependencies.orElse(Dependencies.EMPTY), whitelist.orElse(List.of()), path, registry, template
+    ).apply(instance, (enabled, startup, whitelist, path, registry, template) -> new DataGenerator(
+        enabled.orElse(true), startup.orElse(false), whitelist.orElse(List.of()), path, registry, template
     )));
 
     private final boolean enabled;
     private final boolean startup;
-    private final Dependencies dependencies;
     private final List<ResourceLocation> whitelist;
     private final String path;
     private final DgRegistry<? extends DgElement> registry;
     private final String template;
-    private final transient LazySupplier<Boolean> load = LazySupplier.of(() -> this.getDependencies().available());
 
-    public DataGenerator(boolean enabled, boolean startup, Dependencies dependencies, List<ResourceLocation> whitelist,
+    public DataGenerator(boolean enabled, boolean startup, List<ResourceLocation> whitelist,
                          String path, DgRegistry<? extends DgElement> registry, String template) {
         this.enabled = enabled;
         this.startup = startup;
-        this.dependencies = dependencies;
         this.whitelist = whitelist instanceof ImmutableList<ResourceLocation> immutable ? immutable : ImmutableList.copyOf(whitelist);
         this.path = path;
         this.registry = registry;
@@ -117,14 +125,6 @@ public class DataGenerator {
         return this.isStartup() ? Optional.of(true) : Optional.empty();
     }
 
-    public Dependencies getDependencies() {
-        return dependencies;
-    }
-
-    public Optional<Dependencies> optionalDependencies() {
-        return this.getDependencies().isEmpty() ? Optional.empty() : Optional.of(this.getDependencies());
-    }
-
     public List<ResourceLocation> getWhitelist() {
         return whitelist;
     }
@@ -151,13 +151,6 @@ public class DataGenerator {
 
     public String getTemplate(DgElement element) {
         return replace(this.getTemplate(), element);
-    }
-
-    /**
-     * Whether the dependencies are present
-     */
-    public boolean isAvailable() {
-        return load.get();
     }
 
     public void generate(PackHandler pack) {

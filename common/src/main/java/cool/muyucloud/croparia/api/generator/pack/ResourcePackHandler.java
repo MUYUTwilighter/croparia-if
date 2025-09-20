@@ -11,6 +11,7 @@ import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.repository.PackSource;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class ResourcePackHandler extends PackHandler {
             CropariaIf.LOGGER.info("Clearing resource pack directory");
             try {
                 FileUtil.deleteUnder(file);
-            } catch (Throwable e) {
+            } catch (IOException e) {
                 CropariaIf.LOGGER.error("Failed to clear resourcepack directory", e);
             }
         }

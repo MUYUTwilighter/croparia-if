@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.api.core.command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.crop.Crop;
 import cool.muyucloud.croparia.api.crop.item.Croparia;
 import cool.muyucloud.croparia.api.crop.util.Color;
@@ -98,7 +99,7 @@ public class CreateCommand {
             return -1;
         }
         Item rawCroparia = player.getOffhandItem().getItem();
-        id = id == null ? Objects.requireNonNull(material.getItem().arch$registryName()) : id;
+        id = id == null ? CropariaIf.of(Objects.requireNonNull(material.getItem().arch$registryName()).getNamespace()) : id;
         Color color;
         try {
             color = new Color(rawColor);

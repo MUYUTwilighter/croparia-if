@@ -1,0 +1,12 @@
+registry = "croparia:elements"
+path = "croparia/blockstates/infusor.json"
+type = "croparia:aggregated"
+startup = true
+template = """
+{
+  "variants": {
+    "element=croparia_empty": { "model": "croparia:block/infusor" },
+{content}
+  }
+}
+"""

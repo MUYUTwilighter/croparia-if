@@ -1,5 +1,6 @@
-@registry=croparia:crops;
-@path=croparia/recipe/crafting/seeds/{id_namespace}/{id_path}.json;
+registry = "croparia:crops"
+path = "croparia/recipe/crafting/seeds/{id_namespace}/{id_path}.json"
+template = """
 {
   "type": "minecraft:crafting_shaped",
   "key": {
@@ -17,3 +18,4 @@
     "count": 1
   }
 }
+"""

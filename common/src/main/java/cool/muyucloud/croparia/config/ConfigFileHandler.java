@@ -8,6 +8,7 @@ import dev.architectury.platform.Platform;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 
 public class ConfigFileHandler {
@@ -23,7 +24,7 @@ public class ConfigFileHandler {
         try (JsonWriter writer = new JsonWriter(new FileWriter(CONFIG_PATH.toFile()))) {
             writer.setIndent("  ");
             GSON.toJson(config.toRaw(), RawConfig.class, writer);
-        } catch (Throwable e) {
+        } catch (IOException e) {
             CropariaIf.LOGGER.error("Failed to save config", e);
         }
     }

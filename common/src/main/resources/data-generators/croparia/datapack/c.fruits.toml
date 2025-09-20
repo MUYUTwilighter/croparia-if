@@ -1,0 +1,12 @@
+registry = "croparia:crops"
+path = "c/tag/item/fruits.json"
+type = "croparia:aggregated"
+content = '    "{fruit}"'
+template = """
+{
+  "replace": false,
+  "values": [
+{content}
+  ]
+}
+"""

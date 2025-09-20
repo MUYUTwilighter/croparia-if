@@ -1,5 +1,6 @@
-@registry=croparia:elements;
-@path=croparia/recipe/crafting/potion/{name}.json;
+registry = "croparia:elements"
+path = "croparia/recipe/crafting/potion/{name}.json"
+template = """
 {
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
@@ -11,3 +12,4 @@
     "id": "{potion}"
   }
 }
+"""

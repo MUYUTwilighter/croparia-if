@@ -1,7 +1,6 @@
 package cool.muyucloud.croparia.api.crop;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.CropariaIf;
@@ -11,8 +10,8 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -77,23 +76,23 @@ public class CropRegistry<C extends AbstractCrop> implements DgRegistry<C> {
                     readCrops(path);
                 }
             });
-        } catch (Throwable t) {
-            CropariaIf.LOGGER.error("Failed to read crops", t);
+        }  catch (IOException e) {
+            CropariaIf.LOGGER.error("Failed to read crops", e);
         }
     }
 
     protected void readCrop(File file) {
         if (!file.getName().endsWith(".json")) return;
-        try (FileReader reader = new FileReader(file)) {
-            JsonElement json = GSON.fromJson(reader, JsonElement.class);
-            C crop = CodecUtil.decodeJson(json, this.getCodec());
-            all.put(crop.getKey(), crop);
-            if (crop.shouldLoad()) {
-                crop.onRegister();
-                loaded.put(crop.getKey(), crop);
-            }
-        } catch (Exception e) {
-            CropariaIf.LOGGER.error("Invalid crop file \"%s\"".formatted(file), e);
+        try {
+            CodecUtil.readJson(file, this.getCodec()).ifSuccess(crop -> {
+                all.put(crop.getKey(), crop);
+                if (crop.shouldLoad()) {
+                    crop.onRegister();
+                    loaded.put(crop.getKey(), crop);
+                }
+            });
+        } catch (IOException e) {
+            CropariaIf.LOGGER.error("Failed to read crop from file \"%s\"".formatted(file), e);
         }
     }
 
@@ -103,31 +102,40 @@ public class CropRegistry<C extends AbstractCrop> implements DgRegistry<C> {
         if (!dirFile.isDirectory() && !dirFile.mkdirs()) {
             throw new IllegalStateException("Failed to create directory " + dir);
         }
-        all.values().forEach(crop -> {
+        all.values().forEach(crop -> CodecUtil.encodeJson(crop, this.getCodec()).mapOrElse(json -> {
             try (JsonWriter writer = new JsonWriter(new FileWriter(dir.resolve(crop.getKey().toString().replace(":", "/") + ".json").toFile()))) {
                 writer.setIndent("  ");
-                GSON.toJson(CodecUtil.encodeJson(crop, this.getCodec()), writer);
-            } catch (Throwable e) {
+                GSON.toJson(json, writer);
+            } catch (IOException e) {
                 CropariaIf.LOGGER.error("Failed to dump crop \"%s\"".formatted(crop.getKey()), e);
             }
-        });
+            return null;
+        }, e -> {
+            CropariaIf.LOGGER.error("Failed to dump crop \"%s\": %s".formatted(crop.getKey(), e.message()));
+            return null;
+        }));
     }
 
-    public Path dumpCrop(@NotNull Crop crop) {
+    public Path dumpCrop(@NotNull C crop) {
         Path dir = this.getPath();
         File dirFile = dir.toFile();
         if (!dirFile.isDirectory() && !dirFile.mkdirs()) {
             throw new IllegalStateException("Failed to create directory " + dir);
         }
         Path cropPath = dir.resolve(crop.getKey().toString().replace(":", "/") + ".json");
-        try (JsonWriter writer = new JsonWriter(new FileWriter(cropPath.toFile()))) {
-            writer.setIndent("  ");
-            GSON.toJson(CodecUtil.encodeJson(crop, Crop.CODEC), writer);
-            return cropPath;
-        } catch (Throwable e) {
-            CropariaIf.LOGGER.error("Failed to dump crop \"%s\"".formatted(crop.getKey()), e);
-        }
-        return null;
+        CodecUtil.encodeJson(crop, this.getCodec()).mapOrElse(json -> {
+            try (JsonWriter writer = new JsonWriter(new FileWriter(cropPath.toFile()))) {
+                writer.setIndent("  ");
+                GSON.toJson(json, writer);
+            } catch (IOException e) {
+                CropariaIf.LOGGER.error("Failed to dump crop \"%s\"".formatted(crop.getKey()), e);
+            }
+            return null;
+        }, e -> {
+            CropariaIf.LOGGER.error("Failed to dump crop \"%s\": %s".formatted(crop.getKey(), e.message()));
+            return null;
+        });
+        return cropPath;
     }
 
     public boolean exists(ResourceLocation name) {

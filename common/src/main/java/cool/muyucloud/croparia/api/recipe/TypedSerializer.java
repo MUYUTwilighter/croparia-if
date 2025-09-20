@@ -170,6 +170,7 @@ public class TypedSerializer<R extends DisplayableRecipe<?>>
 
     @Override
     @NotNull
+    @SuppressWarnings("deprecation")
     public StreamCodec<RegistryFriendlyByteBuf, R> streamCodec() {
         return streamCodec;
     }

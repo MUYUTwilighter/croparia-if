@@ -1,6 +1,7 @@
-@registry=croparia:elements;
-@path=gtceu/recipe/croparia/extractor/fluid/{name}.json;
-@dependencies=gtceu;
+registry = "croparia:elements"
+path = "gtceu/recipe/croparia/extractor/fluid/{name}.json"
+dependencies = "gtceu"
+template = """
 {
   "type": "gtceu:extractor",
   "duration": 40,
@@ -63,3 +64,4 @@
     }
   ]
 }
+"""
