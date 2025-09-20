@@ -16,6 +16,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 Additional Terms
 
+This project may include third-party libraries, refer to common/src/resources/third-party for details.
+
 For General Users:
 
 - You may freely install and use this mod in the game, including recording and live-streaming gameplay.
