@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.api.generator.pack;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import cool.muyucloud.croparia.api.generator.DataGenerator;
 import cool.muyucloud.croparia.api.generator.util.JarJarEntry;
 import cool.muyucloud.croparia.util.FileUtil;
@@ -58,7 +59,7 @@ public abstract class PackHandler {
         });
         return map;
     });
-    
+
     @ExpectPlatform
     public static void forEachJar(BiConsumer<File, String> consumer) {
         throw new NotImplementedException("Not implemented");
@@ -151,14 +152,8 @@ public abstract class PackHandler {
         this.generators.clear();
         File parent = this.getRoot().resolve("generators").toFile();
         try {
-            FileUtil.forFilesIn(parent, file -> {
-                try {
-                    DataGenerator.read(file).ifPresent(this.generators::add);
-                } catch (IOException e) {
-                    DataGenerator.LOGGER.error("Failed in reading generator \"%s\"".formatted(file), e);
-                }
-            });
-        } catch (IOException e) {
+            FileUtil.forFilesIn(parent, file -> DataGenerator.read(file).ifPresent(this.generators::add));
+        } catch (IOException | JsonParseException e) {
             DataGenerator.LOGGER.error("Failed to read generators from directory \"%s\"".formatted(parent), e);
         }
     }

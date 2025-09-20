@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.api.generator;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -53,26 +54,30 @@ public class DataGenerator {
      *
      * @param file the file to read
      * @return the read data generator
-     * @throws IOException if an I/O error occurs
      */
-    public static Optional<DataGenerator> read(File file) throws IOException {
-        JsonObject json = DgReader.read(file);
-        JsonElement type = json.get("type");
-        ResourceLocation id = ResourceLocation.parse(type == null ? "croparia:generator" : type.getAsString());
-        JsonElement rawDependencies = json.get("dependencies");
-        if (rawDependencies != null) {
-            if (!CodecUtil.decodeJson(rawDependencies, Dependencies.CODEC).mapOrElse(Dependencies::available, err -> {
-                LOGGER.error("Failed to parse dependencies of data generator {}: {}", file, err.message());
-                return false;
-            })) {
-                LOGGER.debug("Skipped loading data generator {} due to missing dependencies", file);
-                return Optional.empty();
+    public static Optional<DataGenerator> read(File file) {
+        try {
+            JsonObject json = DgReader.read(file);
+            JsonElement type = json.get("type");
+            ResourceLocation id = ResourceLocation.parse(type == null ? "croparia:generator" : type.getAsString());
+            JsonElement rawDependencies = json.get("dependencies");
+            if (rawDependencies != null) {
+                if (!CodecUtil.decodeJson(rawDependencies, Dependencies.CODEC).mapOrElse(Dependencies::available, err -> {
+                    LOGGER.error("Failed to parse dependencies of data generator {}: {}", file, err.message());
+                    return false;
+                })) {
+                    LOGGER.debug("Skipped loading data generator {} due to missing dependencies", file);
+                    return Optional.empty();
+                }
             }
-        }
-        return CodecUtil.decodeJson(json, REGISTRY.get(id)).mapOrElse(Optional::of, err -> {
-            LOGGER.error("Failed to parse data generator {}: {}", file, err.message());
+            return CodecUtil.decodeJson(json, REGISTRY.get(id)).mapOrElse(Optional::of, err -> {
+                LOGGER.error("Failed to parse data generator {}: {}", file, err.message());
+                return Optional.empty();
+            });
+        } catch (IOException | JsonParseException e) {
+            LOGGER.error("Failed to read data generator from file " + file, e);
             return Optional.empty();
-        });
+        }
     }
 
     public static final MapCodec<DataGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
