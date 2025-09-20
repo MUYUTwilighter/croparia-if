@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.api.core.util;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -16,7 +17,6 @@ import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualStructureContainer;
 import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.generator.util.DgReader;
-import cool.muyucloud.croparia.api.generator.util.NotJsonObjectException;
 import cool.muyucloud.croparia.api.generator.util.Placeholder;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
@@ -80,7 +80,7 @@ public class RecipeWizardGenerator {
                 CropariaIf.LOGGER.error("Failed to compile recipe wizard file %s".formatted(file), error);
                 return Optional.empty();
             });
-        } catch (IOException | NotJsonObjectException e) {
+        } catch (IOException | JsonParseException e) {
             CropariaIf.LOGGER.error("Failed to read recipe wizard file %s".formatted(file), e);
             return Optional.empty();
         }

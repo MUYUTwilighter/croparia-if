@@ -1,6 +1,7 @@
 package cool.muyucloud.croparia.api.generator.util;
 
 import com.google.gson.*;
+import cool.muyucloud.croparia.api.generator.DataGenerator;
 import cool.muyucloud.croparia.api.json.JsonTransformer;
 
 import java.io.File;
@@ -10,18 +11,27 @@ import java.util.Objects;
 public class DgReader {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    public static JsonObject read(File file) throws IOException, NotJsonObjectException {
+    public static JsonObject read(File file) throws IOException, JsonParseException {
         JsonElement json = JsonTransformer.transform(file);
         if (json.isJsonObject()) {
             return json.getAsJsonObject();
         }
-        throw new NotJsonObjectException("Expecting JsonObject in " + file.getAbsolutePath());
+        throw new JsonParseException("Expecting JsonObject in " + file.getAbsolutePath());
+    }
+
+    public static JsonObject tryRead(String source) {
+        try {
+            return read(source);
+        } catch (CdgFormatException e) {
+            DataGenerator.LOGGER.error("Failed to read CDG source: " + e.getMessage(), e);
+            return new JsonObject();
+        }
     }
 
     /**
      * Compile a CDG-formatted string into a JsonObject.
      */
-    public static JsonObject read(String source) {
+    public static JsonObject read(String source) throws CdgFormatException {
         if (source == null) source = "";
         int len = source.length();
         int i = 0;
@@ -111,7 +121,7 @@ public class DgReader {
     /**
      * read meta value until a real semicolon ';' (not in string or structure)
      */
-    private static ParseResult readValueUntilSemicolon(String s, int i) {
+    private static ParseResult readValueUntilSemicolon(String s, int i) throws CdgFormatException {
         final int len = s.length();
         if (i >= len) return new ParseResult("", ValueKind.STRING, i);
 
@@ -284,12 +294,12 @@ public class DgReader {
         return i;
     }
 
-    private static IllegalArgumentException syntax(String msg, String src, int pos) {
+    private static CdgFormatException syntax(String msg, String src, int pos) {
         // show context
         int start = Math.max(0, pos - 20);
         int end = Math.min(src.length(), pos + 20);
         String ctx = src.substring(start, end).replace("\n", "\\n");
-        return new IllegalArgumentException(msg + ", at=" + pos + ", context: ..." + ctx + "...");
+        return new CdgFormatException(msg + ", at=" + pos + ", context: ..." + ctx + "...");
     }
 
     private enum ValueKind {
