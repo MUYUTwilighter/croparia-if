@@ -1,6 +1,7 @@
 package cool.muyucloud.croparia.api.core.util;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -23,7 +24,6 @@ import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import cool.muyucloud.croparia.registry.Recipes;
 import cool.muyucloud.croparia.util.Dependencies;
 import cool.muyucloud.croparia.util.FileUtil;
-import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -62,7 +62,21 @@ public class RecipeWizardGenerator {
 
     public static Optional<RecipeWizardGenerator> read(File file) {
         try {
-            return CodecUtil.decodeJson(DgReader.read(file), CODEC).mapOrElse(Optional::of, error -> {
+            JsonElement json = DgReader.read(file);
+            if (!json.isJsonObject() || json.getAsJsonObject().has("dependencies")) {
+                if (!CodecUtil.decodeJson(json.getAsJsonObject().get("dependencies"), Dependencies.CODEC).mapOrElse(
+                    Dependencies::available,
+                    e -> {
+                        CropariaIf.LOGGER.error("Failed to analyze dependencies of recipe wizard file %s".formatted(file));
+                        CropariaIf.LOGGER.error(e.message());
+                        return false;
+                    }
+                )) {
+                    CropariaIf.LOGGER.warn("Skipped loading recipe wizard file %s due to missing or bad dependencies".formatted(file));
+                    return Optional.empty();
+                }
+            }
+            return CodecUtil.decodeJson(json, CODEC).mapOrElse(Optional::of, error -> {
                 CropariaIf.LOGGER.error("Failed to compile recipe wizard file %s".formatted(file), error);
                 return Optional.empty();
             });
@@ -729,7 +743,6 @@ public class RecipeWizardGenerator {
     private final String path;
     private final List<ResourceLocation> extensions;
     private final String template;
-    private final transient LazySupplier<Boolean> dependenciesAvailable = LazySupplier.of(() -> this.getDependencies().available());
 
     public RecipeWizardGenerator(boolean enabled, Dependencies dependencies, BlockInput block, String path, List<ResourceLocation> extensions, String template) {
         this.enabled = enabled;
@@ -756,10 +769,6 @@ public class RecipeWizardGenerator {
         return dependencies;
     }
 
-    public boolean isDependenciesAvailable() {
-        return this.dependenciesAvailable.get();
-    }
-
     public List<ResourceLocation> getExtensions() {
         return extensions;
     }
@@ -774,7 +783,7 @@ public class RecipeWizardGenerator {
 
     public void handle(UseOnContext context) {
         Player player = Objects.requireNonNull(context.getPlayer());
-        if (this.isEnabled() && this.isDependenciesAvailable()) {
+        if (this.isEnabled()) {
             String template = this.getTemplate();
             String path = this.getPath();
             try {
