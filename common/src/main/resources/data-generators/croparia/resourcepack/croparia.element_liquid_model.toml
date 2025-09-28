@@ -1,10 +1,10 @@
 registry = "croparia:elements"
-path = "{id_namespace}/models/block/{liquid_block_path}.json"
+path = "${id.namespace}/models/block/${liquid_block.path}.json"
 startup = true
 template = """
 {
   "textures": {
-    "particle": "croparia:block/air_still"
+    "particle": "${id.namespace}:block/${id.path}_still"
   }
 }
 """

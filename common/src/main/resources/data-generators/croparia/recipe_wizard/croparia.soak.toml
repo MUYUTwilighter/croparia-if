@@ -1,12 +1,12 @@
-path = "croparia/soak_{datetime}.json"
+path = "croparia/soak_${datetime}.json"
 extensions = "croparia:soak"
 block = "croparia:elemental_stone"
 template = """
 {
   "type": "croparia:soak",
-  "element": "{soak_element}",
-  "input": {neighbor},
-  "output": {below},
+  "element": "${soak_element}",
+  "input": ${neighbor},
+  "output": ${below},
   "probability": 1.0
 }
 """

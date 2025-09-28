@@ -360,6 +360,10 @@ public class CodecUtil {
         return readJson(file, codec.codec());
     }
 
+    public static <T> DataResult<T> readJson(String json, Codec<T> codec) {
+        return decodeJson(GSON.fromJson(json, JsonElement.class), codec);
+    }
+
     /**
      * <p>
      * Extend a base {@link MapCodec} with additional fields to create a new {@link MapCodec}.

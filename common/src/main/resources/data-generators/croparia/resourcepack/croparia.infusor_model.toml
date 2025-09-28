@@ -1,15 +1,14 @@
 registry = "croparia:elements"
-path = "croparia/models/block/infusor_{name}.json"
+path = "croparia/models/block/infusor_${name}.json"
 startup = true
 template = """
 {
-  "__comment": "Model generated using MrCrayfish's Model Creator (http://mrcrayfish.com/modelcreator/)",
   "textures": {
-    "particle": "croparia:block/infusor_{name}_top",
-    "0": "croparia:block/infusor_{name}_ns",
-    "1": "croparia:block/infusor_{name}_ew",
-    "2": "croparia:block/infusor_{name}_top",
-    "3": "croparia:block/infusor_{name}_bottom"
+    "particle": "croparia:block/infusor_${name}_top",
+    "0": "croparia:block/infusor_${name}_ns",
+    "1": "croparia:block/infusor_${name}_ew",
+    "2": "croparia:block/infusor_${name}_top",
+    "3": "croparia:block/infusor_${name}_bottom"
   },
   "elements": [
     {

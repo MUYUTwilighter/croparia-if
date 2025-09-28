@@ -1,16 +1,16 @@
 {
   "type": "croparia:soak",
-  "element": "croparia:elemental",
+  "element": "elemental",
   "input": {
     "id": "croparia:infusor",
     "properties": {
-      "element": "croparia_empty"
+      "element": "empty"
     }
   },
   "output": {
     "id": "croparia:infusor",
     "properties": {
-      "element": "croparia_elemental"
+      "element": "elemental"
     }
   },
   "probability": 0.1

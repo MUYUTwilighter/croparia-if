@@ -1,6 +1,6 @@
 {
   "type": "croparia:soak",
-  "element": "croparia:earth",
+  "element": "earth",
   "input": "minecraft:crimson_fungus",
   "output": "minecraft:red_mushroom",
   "probability": 1.0

@@ -1,6 +1,7 @@
 package cool.muyucloud.croparia.registry;
 
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.util.text.Texts;
 import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.registries.DeferredRegister;
@@ -26,7 +27,7 @@ public class Tabs {
         "main",
         () -> CreativeTabRegistry.create(
             Texts.translatable("tab." + CropariaIf.MOD_ID + ".main"),
-            () -> Elements.ELEMENTAL.getGem().get().getDefaultInstance()
+            () -> Element.ELEMENTAL.getGem().get().getDefaultInstance()
         )
     );
 

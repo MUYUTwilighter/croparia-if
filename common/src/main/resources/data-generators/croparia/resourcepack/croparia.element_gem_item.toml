@@ -1,11 +1,11 @@
 registry = "croparia:elements"
-path = "{id_namespace}/items/{gem_path}.json"
+path = "${id.namespace}/items/${gem.path}.json"
 startup = true
 template = """
 {
   "model": {
     "type": "minecraft:model",
-    "model": "{id_namespace}:item/{gem_path}"
+    "model": "${id.namespace}:item/${gem.path}"
   }
 }
 """

@@ -12,7 +12,7 @@ public class DgRegistries {
     );
     @SuppressWarnings("unused")
     public static final DgRegistry<Element> ELEMENTS = DgRegistry.register(
-        CropariaIf.of("elements"), DgRegistry.map(Element.REGISTRY)
+        CropariaIf.of("elements"), DgRegistry.ofEnum(Element.class)
     );
 
     public static void register() {

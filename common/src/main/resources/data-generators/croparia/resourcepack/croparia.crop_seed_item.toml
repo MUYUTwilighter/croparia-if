@@ -1,5 +1,5 @@
 registry = "croparia:crops"
-path = "{id_namespace}/items/{seed_path}.json"
+path = "${id.namespace}/items/${seed.path}.json"
 startup = true
 template = """
 {
@@ -9,7 +9,7 @@ template = """
     "tints": [
       {
         "type": "minecraft:constant",
-        "value": {color}
+        "value": ${color.dec}
       }
     ]
   }

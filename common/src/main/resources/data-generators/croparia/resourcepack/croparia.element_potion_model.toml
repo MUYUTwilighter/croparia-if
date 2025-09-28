@@ -1,11 +1,11 @@
 registry = "croparia:elements"
-path = "{id_namespace}/models/item/{potion_path}.json"
+path = "${id.namespace}/models/item/${potion.path}.json"
 startup = true
 template = """
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "{id_namespace}:item/{potion_path}"
+    "layer0": "${id.namespace}:item/${potion.path}"
   }
 }
 """

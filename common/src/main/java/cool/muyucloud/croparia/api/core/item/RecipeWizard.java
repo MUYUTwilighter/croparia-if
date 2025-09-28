@@ -2,12 +2,15 @@ package cool.muyucloud.croparia.api.core.item;
 
 import com.google.common.collect.ImmutableList;
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.core.block.Infusor;
 import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualStructureContainer;
 import cool.muyucloud.croparia.api.core.util.RecipeWizardGenerator;
+import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.api.generator.util.JarJarEntry;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
+import cool.muyucloud.croparia.registry.CropariaBlocks;
 import cool.muyucloud.croparia.util.FileUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
@@ -76,6 +79,16 @@ public class RecipeWizard extends Item {
                     structure.tryBuild(context.getLevel(), context.getClickedPos());
                     return (InteractionResult) InteractionResult.SUCCESS;
                 }).orElse(InteractionResult.PASS);
+            }
+        );
+        OPERATIONS.put(
+            BlockInput.of(CropariaBlocks.INFUSOR.getId()),
+            context -> {
+                BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+                int i = (Infusor.ELEMENT.getInternalIndex(state.getValue(Infusor.ELEMENT)) + 1) % Infusor.ELEMENT.getPossibleValues().size();
+                Element element = Infusor.ELEMENT.getPossibleValues().get(i);
+                context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(Infusor.ELEMENT, element));
+                return InteractionResult.SUCCESS;
             }
         );
     }

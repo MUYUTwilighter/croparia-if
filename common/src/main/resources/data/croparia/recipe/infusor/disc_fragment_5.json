@@ -1,6 +1,6 @@
 {
   "type": "croparia:infusor",
-  "element": "croparia:earth",
+  "element": "earth",
   "ingredient": "minecraft:echo_shard",
   "result": "minecraft:disc_fragment_5"
 }

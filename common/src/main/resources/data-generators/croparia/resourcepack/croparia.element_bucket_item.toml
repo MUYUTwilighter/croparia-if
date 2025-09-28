@@ -1,5 +1,5 @@
 registry = "croparia:elements"
-path = "{id_namespace}/items/{bucket_path}.json"
+path = "${id.namespace}/items/${bucket.path}.json"
 startup = true
 template = """
 {
@@ -13,7 +13,7 @@ template = """
       },
       {
         "type": "minecraft:constant",
-        "value": {color}
+        "value": ${color.dec}
       }
     ]
   }

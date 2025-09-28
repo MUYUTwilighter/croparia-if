@@ -1,29 +1,15 @@
 registry = "croparia:elements"
-path = "thermal/recipe/croparia/crucible/fluid/{name}.json"
+path = "thermal/recipe/croparia/crucible/fluid/${name}.json"
 dependencies = "thermal_expansion"
 template = """
 {
-  "neoforge:conditions": [
-    {
-      "type": "neoforge:mod_loaded",
-      "modid": "thermal_expansion"
-    }
-  ],
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:all_mods_loaded",
-      "values": [
-        "thermal_expansion"
-      ]
-    }
-  ],
   "type": "thermal:crucible",
   "ingredient": {
-    "item": "{gem}"
+    "item": "${gem}"
   },
   "result": [
     {
-      "fluid": "{fluid_source}",
+      "fluid": "${fluid_source}",
       "amount": 250
     }
   ],

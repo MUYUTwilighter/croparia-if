@@ -1,5 +1,5 @@
 registry = "croparia:elements"
-path = "gtceu/recipe/croparia/extractor/fluid/{name}.json"
+path = "gtceu/recipe/croparia/extractor/fluid/${name}.json"
 dependencies = "gtceu"
 template = """
 {
@@ -12,7 +12,7 @@ template = """
           "type": "gtceu:sized",
           "count": 1,
           "ingredient": {
-            "item": "{gem}"
+            "item": "${gem}"
           }
         },
         "chance": 10000,
@@ -28,7 +28,7 @@ template = """
           "amount": 250,
           "value": [
             {
-              "fluid": "{fluid_source}"
+              "fluid": "${fluid_source}"
             }
           ]
         },
@@ -48,20 +48,6 @@ template = """
       }
     ]
   },
-  "category": "gtceu:extractor_recycling",
-  "neoforge:conditions": [
-    {
-      "type": "neoforge:mod_loaded",
-      "modid": "gtceu"
-    }
-  ],
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:all_mods_loaded",
-      "values": [
-        "gtceu"
-      ]
-    }
-  ]
+  "category": "gtceu:extractor_recycling"
 }
 """

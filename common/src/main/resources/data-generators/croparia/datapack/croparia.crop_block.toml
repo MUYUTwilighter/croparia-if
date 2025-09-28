@@ -1,5 +1,5 @@
 registry = "croparia:crops"
-path = "{id_namespace}/loot_table/blocks/{crop_block_path}.json"
+path = "${id.namespace}/loot_table/blocks/${crop_block.path}.json"
 template = """
 {
   "type": "minecraft:block",
@@ -9,7 +9,7 @@ template = """
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "{seed}"
+          "name": "${seed}"
         }
       ]
     },
@@ -18,11 +18,11 @@ template = """
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "{fruit}",
+          "name": "${fruit}",
           "conditions": [
             {
               "condition": "minecraft:block_state_property",
-              "block": "{crop_block}",
+              "block": "${crop_block}",
               "properties": {
                 "age": "7"
               }
@@ -36,11 +36,11 @@ template = """
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "{seed}",
+          "name": "${seed}",
           "conditions": [
             {
               "condition": "minecraft:block_state_property",
-              "block": "{crop_block}",
+              "block": "${crop_block}",
               "properties": {
                 "age": "7"
               }

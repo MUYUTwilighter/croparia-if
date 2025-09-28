@@ -1,6 +1,6 @@
 {
   "type": "croparia:soak",
-  "element": "croparia:air",
+  "element": "air",
   "input": "minecraft:dead_bush",
   "output": "minecraft:bubble_coral",
   "probability": 1.0

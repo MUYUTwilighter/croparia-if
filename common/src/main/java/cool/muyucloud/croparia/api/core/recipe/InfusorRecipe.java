@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.recipe.container.InfusorContainer;
 import cool.muyucloud.croparia.api.element.Element;
+import cool.muyucloud.croparia.api.element.ElementAccess;
 import cool.muyucloud.croparia.api.element.item.ElementalPotion;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
@@ -29,7 +30,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     public static final TypedSerializer<InfusorRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
         CropariaIf.of("infusor"), InfusorRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Element.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
+            ElementAccess.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
             ItemInput.CODEC.fieldOf("ingredient").forGetter(InfusorRecipe::getIngredient),
             ItemOutput.CODEC.fieldOf("result").forGetter(InfusorRecipe::getResult)
         ).apply(instance, InfusorRecipe::new)), TypedSerializer.JEI,
@@ -38,7 +39,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     public static final TypedSerializer<InfusorRecipe> OLD_TYPED_SERIALIZER = new TypedSerializer<>(
         CropariaIf.of("infusor_type"), InfusorRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Element.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
+            ElementAccess.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
             ItemInput.CODEC.fieldOf("input").forGetter(InfusorRecipe::getIngredient),
             ItemOutput.CODEC.fieldOf("output").forGetter(InfusorRecipe::getResult),
             Codec.INT.fieldOf("count").forGetter(recipe -> Math.toIntExact(recipe.getResult().getAmount()))

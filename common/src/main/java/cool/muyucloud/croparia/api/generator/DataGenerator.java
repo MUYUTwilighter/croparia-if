@@ -11,10 +11,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
-import cool.muyucloud.croparia.api.generator.util.DgElement;
+import cool.muyucloud.croparia.api.generator.util.DgEntry;
+import cool.muyucloud.croparia.api.generator.util.DgListener;
 import cool.muyucloud.croparia.api.generator.util.DgReader;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
-import cool.muyucloud.croparia.api.generator.util.Placeholder;
+import cool.muyucloud.croparia.api.placeholder.Template;
 import cool.muyucloud.croparia.util.Dependencies;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ import java.util.Optional;
  * <p>To generate aggregated files like lang, tags, etc. use {@link LangGenerator} or {@link AggregatedGenerator}.</p>
  */
 @SuppressWarnings("unused")
-public class DataGenerator {
+public class DataGenerator implements DgListener {
     public static final Logger LOGGER = LogUtils.getLogger();
     private static final Map<ResourceLocation, MapCodec<? extends DataGenerator>> REGISTRY = new HashMap<>();
 
@@ -84,9 +85,9 @@ public class DataGenerator {
         Codec.BOOL.optionalFieldOf("enabled").forGetter(DataGenerator::optionalEnabled),
         Codec.BOOL.optionalFieldOf("startup").forGetter(DataGenerator::optionalStartup),
         ResourceLocation.CODEC.listOf().optionalFieldOf("whitelist").forGetter(DataGenerator::optionalWhitelist),
-        Codec.STRING.fieldOf("path").forGetter(DataGenerator::getPath),
+        Template.CODEC.fieldOf("path").forGetter(DataGenerator::getPath),
         DgRegistry.CODEC.fieldOf("registry").forGetter(DataGenerator::getRegistry),
-        Codec.STRING.fieldOf("template").forGetter(DataGenerator::getTemplate)
+        Template.CODEC.fieldOf("template").forGetter(DataGenerator::getTemplate)
     ).apply(instance, (enabled, startup, whitelist, path, registry, template) -> new DataGenerator(
         enabled.orElse(true), startup.orElse(false), whitelist.orElse(List.of()), path, registry, template
     )));
@@ -94,12 +95,12 @@ public class DataGenerator {
     private final boolean enabled;
     private final boolean startup;
     private final List<ResourceLocation> whitelist;
-    private final String path;
-    private final DgRegistry<? extends DgElement> registry;
-    private final String template;
+    private final Template path;
+    private final DgRegistry<? extends DgEntry> registry;
+    private final Template template;
 
     public DataGenerator(boolean enabled, boolean startup, List<ResourceLocation> whitelist,
-                         String path, DgRegistry<? extends DgElement> registry, String template) {
+                         Template path, DgRegistry<? extends DgEntry> registry, Template template) {
         this.enabled = enabled;
         this.startup = startup;
         this.whitelist = whitelist instanceof ImmutableList<ResourceLocation> immutable ? immutable : ImmutableList.copyOf(whitelist);
@@ -138,32 +139,32 @@ public class DataGenerator {
         return this.getWhitelist().isEmpty() ? Optional.empty() : Optional.of(this.getWhitelist());
     }
 
-    public String getPath() {
+    public Template getPath() {
         return path;
     }
 
-    public String getPath(DgElement element) {
-        return replace(this.getPath(), element);
+    public String getPath(DgEntry entry) {
+        return this.getPath().replace(entry);
     }
 
-    public DgRegistry<? extends DgElement> getRegistry() {
+    public DgRegistry<? extends DgEntry> getRegistry() {
         return registry;
     }
 
-    public String getTemplate() {
+    public Template getTemplate() {
         return template;
     }
 
-    public String getTemplate(DgElement element) {
-        return replace(this.getTemplate(), element);
+    public String getTemplate(DgEntry entry) {
+        return this.getTemplate().replace(entry);
     }
 
     public void generate(PackHandler pack) {
         if (this.isStartup() || CropariaIf.isServerStarted()) {
             if (this.getWhitelist().isEmpty()) {
-                for (DgElement element : this.getRegistry()) {
-                    if (element.shouldLoad()) {
-                        this.generate(element, pack);
+                for (DgEntry entry : this.getRegistry()) {
+                    if (entry.shouldLoad()) {
+                        this.generate(entry, pack);
                     }
                 }
             } else {
@@ -174,22 +175,9 @@ public class DataGenerator {
         }
     }
 
-    protected void generate(DgElement element, PackHandler pack) {
-        String relative = this.getPath(element);
-        String replaced = this.getTemplate(element);
-        pack.addFile(relative, replaced);
-    }
-
-    protected String replace(String template, DgElement element) {
-        for (Placeholder<? extends DgElement> placeholder : element.placeholders()) {
-            template = placeholder.mapAll(template, element);
-        }
-        return template;
-    }
-
-    public void onGenerated(PackHandler handler) {
-    }
-
-    public void onDumped(PackHandler handler) {
+    protected void generate(DgEntry entry, PackHandler pack) {
+        String relative = this.getPath(entry);
+        String replaced = this.getTemplate(entry);
+        pack.cache(relative, replaced);
     }
 }

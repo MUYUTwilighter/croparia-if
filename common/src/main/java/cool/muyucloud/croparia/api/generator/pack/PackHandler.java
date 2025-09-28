@@ -1,9 +1,9 @@
 package cool.muyucloud.croparia.api.generator.pack;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.generator.DataGenerator;
 import cool.muyucloud.croparia.api.generator.util.JarJarEntry;
 import cool.muyucloud.croparia.util.FileUtil;
@@ -73,7 +73,7 @@ public abstract class PackHandler {
     protected final Path root;
     protected final JsonObject meta;
     protected final transient Supplier<Boolean> override;
-    protected final transient Map<Path, String> cache = new HashMap<>();
+    protected final transient Map<String, Object> cache = new HashMap<>();
     protected final transient Set<DataGenerator> generators = new HashSet<>();
 
     public PackHandler(ResourceLocation id, Path path, JsonObject meta, Supplier<Boolean> override) {
@@ -84,7 +84,17 @@ public abstract class PackHandler {
         this.writeMeta();
     }
 
-    public abstract void clear();
+    public void clear() {
+        Path path = this.getRoot().resolve(this.proxyPath("/"));
+        File file = path.toFile();
+        if (file.isDirectory()) {
+            try {
+                FileUtil.deleteUnder(file);
+            } catch (IOException e) {
+                CropariaIf.LOGGER.error("Failed to clear pack directory", e);
+            }
+        }
+    }
 
     public boolean canOverride() {
         return this.override.get();
@@ -166,13 +176,17 @@ public abstract class PackHandler {
 
     protected void dump() {
         try {
-            for (Map.Entry<Path, String> entry : this.cache.entrySet()) {
-                FileUtil.write(entry.getKey().toFile(), entry.getValue(), this.canOverride());
+            for (Map.Entry<String, Object> entry : this.cache.entrySet()) {
+                FileUtil.write(this.getRoot().resolve(this.proxyPath(entry.getKey())).toFile(), entry.getValue().toString(), this.canOverride());
             }
         } catch (Exception e) {
             DataGenerator.LOGGER.error("Failed to write pack data to file system", e);
         }
         this.cache.clear();
+    }
+
+    public String proxyPath(String path) {
+        return path;
     }
 
     protected void writeMeta() {
@@ -183,15 +197,40 @@ public abstract class PackHandler {
         }
     }
 
-    public void addFile(String relative, String content) {
-        Path path = this.root.resolve(relative);
-        this.cache.put(path, content);
+    public void cache(String relative, Object content) {
+        this.cache.put(relative, content);
+    }
+
+    @SuppressWarnings({"unchecked","unused"})
+    public <T> Optional<T> queryCache(String relative) {
+        try {
+            return Optional.of((T) this.cache.get(relative));
+        } catch (ClassCastException e) {
+            return Optional.empty();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T computeIfAbsent(String relative, Supplier<T> supplier) throws ClassCastException {
+        try {
+            return (T) this.cache.computeIfAbsent(relative, k -> supplier.get());
+        } catch (ClassCastException e) {
+            throw new ClassCastException("Cached value for key \"%s\" is not of the expected type".formatted(relative));
+        }
     }
 
     @SuppressWarnings("unused")
-    public void addFile(String relative, JsonElement element) {
-        this.addFile(relative, GSON.toJson(element));
+    public <T> T overrideIfMismatch(String relative, Supplier<T> supplier) {
+        try {
+            return this.computeIfAbsent(relative, supplier);
+        } catch (ClassCastException e) {
+            DataGenerator.LOGGER.warn("Cached value for key \"%s\" is not of the expected type, overriding".formatted(relative));
+            T value = supplier.get();
+            this.cache(relative, value);
+            return value;
+        }
     }
+
 
     public Path getRoot() {
         return this.root;

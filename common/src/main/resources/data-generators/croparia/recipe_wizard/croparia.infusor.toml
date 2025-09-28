@@ -1,11 +1,11 @@
-path = "croparia/infusor_{datetime}.json"
+path = "croparia/infusor_${datetime}.json"
 extensions = "croparia:infusor"
 block = "croparia:infusor"
 template = """
 {
   "type": "croparia:infusor",
-  "element": "{infusor_element}",
-  "ingredient": {item},
-  "result": {off_hand}
+  "element": "${infusor_element}",
+  "ingredient": ${item},
+  "result": ${off_hand}
 }
 """

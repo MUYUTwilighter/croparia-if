@@ -2,14 +2,12 @@ package cool.muyucloud.croparia.api.core.util;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.access.AbstractFurnaceBlockEntityAccess;
-import cool.muyucloud.croparia.access.StateHolderAccess;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.core.block.Infusor;
 import cool.muyucloud.croparia.api.core.block.RitualStand;
@@ -17,7 +15,10 @@ import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualStructureContainer;
 import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.generator.util.DgReader;
-import cool.muyucloud.croparia.api.generator.util.Placeholder;
+import cool.muyucloud.croparia.api.placeholder.Placeholder;
+import cool.muyucloud.croparia.api.placeholder.RegexParser;
+import cool.muyucloud.croparia.api.placeholder.RegexParserException;
+import cool.muyucloud.croparia.api.placeholder.Template;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
@@ -28,7 +29,6 @@ import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -37,9 +37,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.AirBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -52,9 +49,8 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public class RecipeWizardGenerator {
@@ -64,14 +60,11 @@ public class RecipeWizardGenerator {
         try {
             JsonElement json = DgReader.read(file);
             if (!json.isJsonObject() || json.getAsJsonObject().has("dependencies")) {
-                if (!CodecUtil.decodeJson(json.getAsJsonObject().get("dependencies"), Dependencies.CODEC).mapOrElse(
-                    Dependencies::available,
-                    e -> {
-                        CropariaIf.LOGGER.error("Failed to analyze dependencies of recipe wizard file %s".formatted(file));
-                        CropariaIf.LOGGER.error(e.message());
-                        return false;
-                    }
-                )) {
+                if (!CodecUtil.decodeJson(json.getAsJsonObject().get("dependencies"), Dependencies.CODEC).mapOrElse(Dependencies::available, e -> {
+                    CropariaIf.LOGGER.error("Failed to analyze dependencies of recipe wizard file %s".formatted(file));
+                    CropariaIf.LOGGER.error(e.message());
+                    return false;
+                })) {
                     CropariaIf.LOGGER.warn("Skipped loading recipe wizard file %s due to missing or bad dependencies".formatted(file));
                     return Optional.empty();
                 }
@@ -88,14 +81,6 @@ public class RecipeWizardGenerator {
 
     protected static final Map<ResourceLocation, ArrayList<Placeholder<UseOnContext>>> EXTENSIONS = new HashMap<>();
 
-    public static Placeholder<UseOnContext> register(ResourceLocation id, String regex, Function<UseOnContext, String> mapper) {
-        return register(id, regex, (matcher, context) -> mapper.apply(context));
-    }
-
-    public static Placeholder<UseOnContext> register(ResourceLocation id, String regex, BiFunction<Matcher, UseOnContext, String> mapper) {
-        return register(id, Placeholder.of(regex, mapper));
-    }
-
     public static Placeholder<UseOnContext> register(ResourceLocation id, Placeholder<UseOnContext> placeholder) {
         ArrayList<Placeholder<UseOnContext>> list = EXTENSIONS.computeIfAbsent(id, k -> new ArrayList<>());
         list.add(placeholder);
@@ -103,123 +88,43 @@ public class RecipeWizardGenerator {
         return placeholder;
     }
 
+    public static Placeholder<UseOnContext> register(ResourceLocation id, Pattern key, Function<UseOnContext, String> function) {
+        return register(id, key, function, Placeholder.STRING);
+    }
+
+    public static <T> Placeholder<UseOnContext> register(ResourceLocation id, Pattern key, Function<UseOnContext, T> function, RegexParser<T> parser) {
+        return register(id, Placeholder.build(builder -> builder.then(key, function, parser)));
+    }
+
     public static final Placeholder<UseOnContext> TIMESTAMP = register(
-        ResourceLocation.parse("default"), "\\{datetime}", context -> LocalDateTime.now().format(FORMATTER)
+        ResourceLocation.parse("default"),
+        Pattern.compile("^datetime$"),
+        context -> LocalDateTime.now().format(FORMATTER)
     );
     public static final Placeholder<UseOnContext> MAIN_HAND = register(
-        ResourceLocation.tryParse("default"), "\\{main_hand}", context -> {
+        ResourceLocation.parse("default"), Pattern.compile("^main_hand$"), context -> {
             ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.MAIN_HAND);
             if (stack.isEmpty()) {
                 Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.main_hand"));
                 throw new ReplaceException();
             } else {
-                return CodecUtil.encodeJson(new ItemOutput(stack), ItemOutput.CODEC).getOrThrow().toString();
+                return ItemOutput.of(stack);
             }
-        }
-    );
-    public static final Placeholder<UseOnContext> MAIN_HAND_ID = register(
-        ResourceLocation.tryParse("default"), "\\{main_hand_id}", context -> {
-            ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.MAIN_HAND);
-            if (stack.isEmpty()) {
-                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.main_hand"));
-                throw new ReplaceException();
-            } else return Objects.requireNonNull(stack.getItem().arch$registryName()).toString();
-        }
-    );
-    public static final Placeholder<UseOnContext> MAIN_HAND_COUNT = register(
-        ResourceLocation.tryParse("default"), "\\{main_hand_count}", context -> {
-            ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.MAIN_HAND);
-            if (stack.isEmpty()) {
-                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.main_hand"));
-                throw new ReplaceException();
-            } else return String.valueOf(stack.getCount());
-        }
-    );
-    public static final Placeholder<UseOnContext> MAIN_HAND_NAMESPACE = register(
-        ResourceLocation.tryParse("default"), "\\{main_hand_namespace}", context -> {
-            ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.MAIN_HAND);
-            if (stack.isEmpty()) {
-                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.main_hand"));
-                throw new ReplaceException();
-            } else return Objects.requireNonNull(stack.getItem().arch$registryName()).getNamespace();
-        }
-    );
-    public static final Placeholder<UseOnContext> MAIN_HAND_PATH = register(
-        ResourceLocation.tryParse("default"), "\\{main_hand_path}", context -> {
-            ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.MAIN_HAND);
-            if (stack.isEmpty()) {
-                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.main_hand"));
-                throw new ReplaceException();
-            } else return Objects.requireNonNull(stack.getItem().arch$registryName()).getPath();
-        }
-    );
-    public static final Placeholder<UseOnContext> MAIN_HAND_COMPONENTS = register(
-        ResourceLocation.tryParse("default"), "\\{main_hand_components}", context -> {
-            ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.MAIN_HAND);
-            if (stack.isEmpty()) {
-                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.main_hand"));
-                throw new ReplaceException();
-            } else return CodecUtil.encodeJson(stack.getComponentsPatch(), DataComponentPatch.CODEC).getOrThrow().toString();
-        }
+        }, Placeholder.ITEM_OUTPUT
     );
     public static final Placeholder<UseOnContext> OFF_HAND = register(
-        ResourceLocation.tryParse("default"), "\\{off_hand}", context -> {
+        ResourceLocation.parse("default"), Pattern.compile("^off_hand$"), context -> {
             ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.OFF_HAND);
             if (stack.isEmpty()) {
                 Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.off_hand"));
                 throw new ReplaceException();
             } else {
-                return CodecUtil.encodeJson(new ItemOutput(stack), ItemOutput.CODEC).getOrThrow().toString();
+                return ItemOutput.of(stack);
             }
-        }
-    );
-    public static final Placeholder<UseOnContext> OFF_HAND_ID = register(
-        ResourceLocation.tryParse("default"), "\\{off_hand_id}", context -> {
-            ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.OFF_HAND);
-            if (stack.isEmpty()) {
-                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.off_hand"));
-                throw new ReplaceException();
-            } else return Objects.requireNonNull(stack.getItem().arch$registryName()).toString();
-        }
-    );
-    public static final Placeholder<UseOnContext> OFF_HAND_COUNT = register(
-        ResourceLocation.tryParse("default"), "\\{off_hand_count}", context -> {
-            ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.OFF_HAND);
-            if (stack.isEmpty()) {
-                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.off_hand"));
-                throw new ReplaceException();
-            } else return String.valueOf(stack.getCount());
-        }
-    );
-    public static final Placeholder<UseOnContext> OFF_HAND_NAMESPACE = register(
-        ResourceLocation.tryParse("default"), "\\{off_hand_namespace}", context -> {
-            ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.OFF_HAND);
-            if (stack.isEmpty()) {
-                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.off_hand"));
-                throw new ReplaceException();
-            } else return Objects.requireNonNull(stack.getItem().arch$registryName()).getNamespace();
-        }
-    );
-    public static final Placeholder<UseOnContext> OFF_HAND_PATH = register(
-        ResourceLocation.tryParse("default"), "\\{off_hand_namespace}", context -> {
-            ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.OFF_HAND);
-            if (stack.isEmpty()) {
-                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.off_hand"));
-                throw new ReplaceException();
-            } else return Objects.requireNonNull(stack.getItem().arch$registryName()).getPath();
-        }
-    );
-    public static final Placeholder<UseOnContext> OFF_HAND_COMPONENTS = register(
-        ResourceLocation.tryParse("default"), "\\{off_hand_components}", context -> {
-            ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.OFF_HAND);
-            if (stack.isEmpty()) {
-                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.off_hand"));
-                throw new ReplaceException();
-            } else return CodecUtil.encodeJson(stack.getComponentsPatch(), DataComponentPatch.CODEC).getOrThrow().toString();
-        }
+        }, Placeholder.ITEM_OUTPUT
     );
     public static final Placeholder<UseOnContext> ITEM = register(
-        ResourceLocation.tryParse("default"), "\\{item}", context -> {
+        ResourceLocation.parse("default"), Pattern.compile("^item$"), context -> {
             List<ItemEntity> entities = context.getLevel().getEntities(
                 EntityTypeTest.forClass(ItemEntity.class),
                 AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
@@ -227,502 +132,119 @@ public class RecipeWizardGenerator {
             );
             if (entities.isEmpty()) {
                 assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.target_item")
-                );
+                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.target_item"));
                 throw new ReplaceException();
             } else {
-                return CodecUtil.encodeJson(new ItemOutput(entities.getFirst().getItem()), ItemOutput.CODEC).getOrThrow().toString();
+                return ItemOutput.of(entities.getFirst().getItem());
             }
-        }
-    );
-    public static final Placeholder<UseOnContext> ITEM_ID = register(
-        ResourceLocation.tryParse("default"), "\\{item}", context -> {
-            List<ItemEntity> entities = context.getLevel().getEntities(
-                EntityTypeTest.forClass(ItemEntity.class),
-                AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
-                item -> !item.getItem().isEmpty()
-            );
-            if (entities.isEmpty()) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.target_item")
-                );
-                throw new ReplaceException();
-            } else
-                return Objects.requireNonNull(entities.getFirst().getItem().getItem().arch$registryName()).toString();
-        }
-    );
-    public static final Placeholder<UseOnContext> ITEM_COUNT = register(
-        ResourceLocation.tryParse("default"), "\\{item_count}", context -> {
-            List<ItemEntity> entities = context.getLevel().getEntities(
-                EntityTypeTest.forClass(ItemEntity.class),
-                AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
-                item -> !item.getItem().isEmpty()
-            );
-            if (entities.isEmpty()) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.target_item")
-                );
-                throw new ReplaceException();
-            } else
-                return String.valueOf(entities.getFirst().getItem().getCount());
-        }
-    );
-    public static final Placeholder<UseOnContext> ITEM_NAMESPACE = register(
-        ResourceLocation.tryParse("default"), "\\{item_namespace}", context -> {
-            List<ItemEntity> entities = context.getLevel().getEntities(
-                EntityTypeTest.forClass(ItemEntity.class),
-                AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
-                item -> !item.getItem().isEmpty()
-            );
-            if (entities.isEmpty()) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.target_item")
-                );
-                throw new ReplaceException();
-            } else return Objects.requireNonNull(
-                entities.getFirst().getItem().getItem().arch$registryName()
-            ).getNamespace();
-        }
-    );
-    public static final Placeholder<UseOnContext> ITEM_PATH = register(
-        ResourceLocation.tryParse("default"), "\\{item_path}", context -> {
-            List<ItemEntity> entities = context.getLevel().getEntities(
-                EntityTypeTest.forClass(ItemEntity.class),
-                AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
-                item -> !item.getItem().isEmpty()
-            );
-            if (entities.isEmpty()) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.target_item")
-                );
-                throw new ReplaceException();
-            } else return Objects.requireNonNull(entities.getFirst().getItem().getItem().arch$registryName()).getPath();
-        }
-    );
-    public static final Placeholder<UseOnContext> ITEM_COMPONENTS = register(
-        ResourceLocation.tryParse("default"), "\\{item_components}", context -> {
-            List<ItemEntity> entities = context.getLevel().getEntities(
-                EntityTypeTest.forClass(ItemEntity.class),
-                AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
-                item -> !item.getItem().isEmpty()
-            );
-            if (entities.isEmpty()) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.target_item")
-                );
-                throw new ReplaceException();
-            } else return CodecUtil.encodeJson(entities.getFirst().getItem().getComponentsPatch(),
-                DataComponentPatch.CODEC).getOrThrow().toString();
-        }
+        }, Placeholder.ITEM_OUTPUT
     );
     public static final Placeholder<UseOnContext> BLOCK = register(
-        ResourceLocation.tryParse("default"), "\\{block}", context -> {
+        ResourceLocation.parse("default"), Pattern.compile("^block$"), context -> {
             Level level = context.getLevel();
             BlockState block = level.getBlockState(context.getClickedPos());
             if (block.isAir()) {
                 assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block")
-                );
+                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block"));
                 throw new ReplaceException();
             }
-            return CodecUtil.encodeJson(BlockOutput.of(block), BlockOutput.CODEC).getOrThrow().toString();
-        }
+            return BlockOutput.of(block);
+        }, Placeholder.BLOCK_OUTPUT
     );
-    public static final Placeholder<UseOnContext> BLOCK_ID = register(
-        ResourceLocation.tryParse("default"), "\\{block_id}", context -> {
-            Level level = context.getLevel();
-            Block block = level.getBlockState(context.getClickedPos()).getBlock();
-            if (block == Blocks.AIR) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block")
-                );
-                throw new ReplaceException();
+    public static final Placeholder<UseOnContext> NEIGHBOR = register(ResourceLocation.parse("default"), Pattern.compile("^neighbor$"), context -> {
+        Level level = context.getLevel();
+        for (Direction direction : Direction.values()) {
+            if (direction == Direction.UP || direction == Direction.DOWN) continue;
+            BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getUnitVec3i()));
+            if (!state.isAir()) {
+                return BlockOutput.of(state);
             }
-            return Objects.requireNonNull(block.arch$registryName()).toString();
         }
-    );
-    public static final Placeholder<UseOnContext> BLOCK_NAMESPACE = register(
-        ResourceLocation.tryParse("default"), "\\{block_namespace}", context -> {
-            Level level = context.getLevel();
-            Block block = level.getBlockState(context.getClickedPos()).getBlock();
-            if (block == Blocks.AIR) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block")
-                );
-                throw new ReplaceException();
-            }
-            return Objects.requireNonNull(block.arch$registryName()).getNamespace();
-        }
-    );
-    public static final Placeholder<UseOnContext> BLOCK_PATH = register(
-        ResourceLocation.tryParse("default"), "\\{block_path}", context -> {
-            Level level = context.getLevel();
-            Block block = level.getBlockState(context.getClickedPos()).getBlock();
-            if (block == Blocks.AIR) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block")
-                );
-                throw new ReplaceException();
-            }
-            return Objects.requireNonNull(block.arch$registryName()).getPath();
-        }
-    );
-    public static final Placeholder<UseOnContext> BLOCK_PROPERTIES = register(
-        ResourceLocation.tryParse("default"), "\\{block_properties}", context -> {
-            Level level = context.getLevel();
-            BlockState state = level.getBlockState(context.getClickedPos());
-            if (state.getBlock() instanceof AirBlock) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block")
-                );
-                throw new ReplaceException();
-            }
-            @SuppressWarnings("unchecked")
-            StateHolderAccess<BlockState> access = (StateHolderAccess<BlockState>) level.getBlockState(context.getClickedPos());
-            JsonObject json = new JsonObject();
-            access.cif$getProperties().forEach(json::addProperty);
-            return json.toString();
-        }
-    );
-    public static final Placeholder<UseOnContext> NEIGHBOR = register(
-        ResourceLocation.tryParse("default"), "\\{neighbor}", context -> {
-            Level level = context.getLevel();
-            for (Direction direction : Direction.values()) {
-                if (direction == Direction.UP || direction == Direction.DOWN) continue;
-                BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getUnitVec3i()));
-                if (!state.isAir()) {
-                    return CodecUtil.encodeJson(BlockOutput.of(state), BlockOutput.CODEC).getOrThrow().toString();
-                }
-            }
+        assert context.getPlayer() != null;
+        Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.neighbor"));
+        throw new ReplaceException();
+    }, Placeholder.BLOCK_OUTPUT);
+    public static final Placeholder<UseOnContext> BELOW = register(ResourceLocation.parse("default"), Pattern.compile("^below$"), context -> {
+        Level level = context.getLevel();
+        BlockState state = level.getBlockState(context.getClickedPos().below());
+        if (state.isAir()) {
             assert context.getPlayer() != null;
-            Texts.overlay(context.getPlayer(),
-                Texts.translatable("overlay.croparia.recipe_wizard.default.missing.neighbor"));
+            Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block"));
             throw new ReplaceException();
         }
-    );
-    public static final Placeholder<UseOnContext> NEIGHBOR_ID = register(
-        ResourceLocation.tryParse("default"), "\\{neighbor_id}", context -> {
-            Level level = context.getLevel();
-            for (Direction direction : Direction.values()) {
-                if (direction == Direction.UP || direction == Direction.DOWN) continue;
-                BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getUnitVec3i()));
-                if (!state.isAir()) {
-                    return Objects.requireNonNull(state.getBlock().arch$registryName()).toString();
-                }
+        return BlockOutput.of(state);
+    }, Placeholder.BLOCK_OUTPUT);
+    public static final Placeholder<UseOnContext> INFUSOR_ELEMENT = register(CropariaIf.of("infusor"), Pattern.compile("^infusor_element$"), context -> {
+        BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+        if (state.getBlock() instanceof Infusor) {
+            Element element = state.getValue(Infusor.ELEMENT);
+            if (element != Element.EMPTY) {
+                return element.getSerializedName();
             }
+        }
+        assert context.getPlayer() != null;
+        Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.infusor.missing.element"));
+        throw new ReplaceException();
+    });
+    public static final Placeholder<UseOnContext> RITUAL_INPUT = register(CropariaIf.of("ritual"), Pattern.compile("^ritual_input$"), context -> {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof RitualStand) {
+            RitualStructureContainer container = new RitualStructureContainer(state);
+            Optional<RitualStructure> structure = Recipes.RITUAL_STRUCTURE.find(container, level);
+            Optional<BlockState> input = structure.flatMap(s -> s.validate(pos, level).getStates().stream().filter(candidate -> !candidate.isAir()).findFirst());
+            if (input.isPresent()) {
+                return BlockOutput.of(input.get());
+            }
+        }
+        assert context.getPlayer() != null;
+        Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.ritual.missing.block"));
+        throw new ReplaceException();
+    }, Placeholder.BLOCK_OUTPUT);
+    public static final Placeholder<UseOnContext> SOAK_ELEMENT = register(CropariaIf.of("soak"), Pattern.compile("^soak_element$"), context -> {
+        BlockState state = context.getLevel().getBlockState(context.getClickedPos().above());
+        if (state.getBlock() instanceof Infusor infusor) {
+            Element element = state.getValue(Infusor.ELEMENT);
+            return element.getSerializedName();
+        } else {
             assert context.getPlayer() != null;
-            Texts.overlay(context.getPlayer(),
-                Texts.translatable("overlay.croparia.recipe_wizard.default.missing.neighbor"));
+            Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.soak.missing.element"));
             throw new ReplaceException();
         }
-    );
-    public static final Placeholder<UseOnContext> NEIGHBOR_NAMESPACE = register(
-        ResourceLocation.tryParse("default"), "\\{neighbor_namespace}", context -> {
-            Level level = context.getLevel();
-            for (Direction direction : Direction.values()) {
-                if (direction == Direction.UP || direction == Direction.DOWN) continue;
-                BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getUnitVec3i()));
-                if (!state.isAir()) {
-                    return Objects.requireNonNull(state.getBlock().arch$registryName()).getNamespace();
-                }
-            }
-            assert context.getPlayer() != null;
-            Texts.overlay(context.getPlayer(),
-                Texts.translatable("overlay.croparia.recipe_wizard.default.missing.neighbor"));
-            throw new ReplaceException();
-        }
-    );
-    public static final Placeholder<UseOnContext> NEIGHBOR_PATH = register(
-        ResourceLocation.tryParse("default"), "\\{neighbor_path}", context -> {
-            Level level = context.getLevel();
-            for (Direction direction : Direction.values()) {
-                if (direction == Direction.UP || direction == Direction.DOWN) continue;
-                BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getUnitVec3i()));
-                if (!state.isAir()) {
-                    return Objects.requireNonNull(state.getBlock().arch$registryName()).getPath();
-                }
-            }
-            assert context.getPlayer() != null;
-            Texts.overlay(context.getPlayer(),
-                Texts.translatable("overlay.croparia.recipe_wizard.default.missing.neighbor"));
-            throw new ReplaceException();
-        }
-    );
-    @SuppressWarnings("unchecked")
-    public static final Placeholder<UseOnContext> NEIGHBOR_PROPERTIES = register(
-        ResourceLocation.tryParse("default"), "\\{neighbor_properties}", context -> {
-            Level level = context.getLevel();
-            for (Direction direction : Direction.values()) {
-                if (direction == Direction.UP || direction == Direction.DOWN) continue;
-                BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getUnitVec3i()));
-                if (!state.isAir()) {
-                    JsonObject properties = new JsonObject();
-                    ((StateHolderAccess<BlockState>) state).cif$getProperties().forEach(properties::addProperty);
-                    return properties.toString();
-                }
-            }
-            assert context.getPlayer() != null;
-            Texts.overlay(context.getPlayer(),
-                Texts.translatable("overlay.croparia.recipe_wizard.default.missing.neighbor"));
-            throw new ReplaceException();
-        }
-    );
-    public static final Placeholder<UseOnContext> BELOW = register(
-        ResourceLocation.tryParse("default"), "\\{below}", context -> {
-            Level level = context.getLevel();
-            BlockState state = level.getBlockState(context.getClickedPos().below());
-            if (state.isAir()) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block")
-                );
-                throw new ReplaceException();
-            }
-            return CodecUtil.encodeJson(BlockOutput.of(state), BlockOutput.CODEC).getOrThrow().toString();
-        }
-    );
-    public static final Placeholder<UseOnContext> BELOW_ID = register(
-        ResourceLocation.tryParse("default"), "\\{below_id}", context -> {
-            Level level = context.getLevel();
-            BlockState state = level.getBlockState(context.getClickedPos().below());
-            Block block = state.getBlock();
-            if (state.isAir()) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.neighbor")
-                );
-                throw new ReplaceException();
-            }
-            return Objects.requireNonNull(block.arch$registryName()).toString();
-        }
-    );
-    public static final Placeholder<UseOnContext> BELOW_NAMESPACE = register(
-        ResourceLocation.tryParse("default"), "\\{below_namespace}", context -> {
-            Level level = context.getLevel();
-            BlockState state = level.getBlockState(context.getClickedPos().below());
-            Block block = state.getBlock();
-            if (state.isAir()) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.neighbor")
-                );
-                throw new ReplaceException();
-            }
-            return Objects.requireNonNull(block.arch$registryName()).getNamespace();
-        }
-    );
-    public static final Placeholder<UseOnContext> BELOW_PATH = register(
-        ResourceLocation.tryParse("default"), "\\{below_path}", context -> {
-            Level level = context.getLevel();
-            BlockState state = level.getBlockState(context.getClickedPos().below());
-            Block block = state.getBlock();
-            if (state.isAir()) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.opposite")
-                );
-                throw new ReplaceException();
-            }
-            return Objects.requireNonNull(block.arch$registryName()).getPath();
-        }
-    );
-    public static final Placeholder<UseOnContext> BELOW_PROPERTIES = register(
-        ResourceLocation.tryParse("default"), "\\{below_properties}", context -> {
-            Level level = context.getLevel();
-            BlockState state = level.getBlockState(context.getClickedPos().below());
-            Block block = state.getBlock();
-            if (state.isAir()) {
-                assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(),
-                    Texts.translatable("overlay.croparia.recipe_wizard.default.missing.opposite")
-                );
-                throw new ReplaceException();
-            }
-            @SuppressWarnings("unchecked")
-            StateHolderAccess<BlockState> access = (StateHolderAccess<BlockState>) level.getBlockState(context.getClickedPos());
-            JsonObject json = new JsonObject();
-            access.cif$getProperties().forEach(json::addProperty);
-            return json.toString();
-        }
-    );
-    public static final Placeholder<UseOnContext> INFUSOR_ELEMENT = register(
-        CropariaIf.of("infusor"), "\\{infusor_element}", context -> {
-            BlockState state = context.getLevel().getBlockState(context.getClickedPos());
-            if (state.getBlock() instanceof Infusor) {
-                Element element = state.getValue(Infusor.ELEMENT);
-                if (element != Element.EMPTY) {
-                    return element.getKey().toString();
-                }
-            }
-            assert context.getPlayer() != null;
-            Texts.overlay(context.getPlayer(),
-                Texts.translatable("overlay.croparia.recipe_wizard.infusor.missing.element")
-            );
-            throw new ReplaceException();
-        }
-    );
-    public static final Placeholder<UseOnContext> RITUAL_INPUT = register(
-        CropariaIf.of("ritual"), "\\{ritual_input}", context -> {
-            Level level = context.getLevel();
-            BlockPos pos = context.getClickedPos();
-            BlockState state = level.getBlockState(pos);
-            if (state.getBlock() instanceof RitualStand) {
-                RitualStructureContainer container = new RitualStructureContainer(state);
-                Optional<RitualStructure> structure = Recipes.RITUAL_STRUCTURE.find(container, level);
-                Optional<BlockState> input = structure.flatMap(s ->
-                    s.validate(pos, level).getStates().stream().filter(candidate -> !candidate.isAir()).findFirst());
-                if (input.isPresent()) {
-                    return CodecUtil.encodeJson(BlockOutput.of(input.get()), BlockOutput.CODEC).getOrThrow().toString();
-                }
-            }
-            assert context.getPlayer() != null;
-            Texts.overlay(context.getPlayer(),
-                Texts.translatable("overlay.croparia.recipe_wizard.ritual.missing.block"));
-            throw new ReplaceException();
-        }
-    );
-    public static final Placeholder<UseOnContext> SOAK_ELEMENT = register(
-        CropariaIf.of("soak"), "\\{soak_element}", context -> {
-            BlockState state = context.getLevel().getBlockState(context.getClickedPos().above());
-            if (state.getBlock() instanceof Infusor infusor) {
-                Element element = state.getValue(Infusor.ELEMENT);
-                return element.getKey().toString();
+    });
+    public static final Placeholder<UseOnContext> FURNACE_INPUT = register(ResourceLocation.parse("furnace"), Pattern.compile("^furnace_input$"), context -> {
+        BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
+        if (be instanceof AbstractFurnaceBlockEntity furnace) {
+            ItemStack stack = furnace.getItem(0);
+            if (!stack.isEmpty()) {
+                return ItemOutput.of(stack);
             } else {
-                assert context.getPlayer() != null;
-                Texts.overlay(
-                    context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.soak.missing.element")
-                );
-                throw new ReplaceException();
-            }
-        }
-    );
-    public static final Placeholder<UseOnContext> FURNACE_INPUT = register(
-        ResourceLocation.parse("furnace"), "\\{furnace_input}", context -> {
-            BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
-            if (be instanceof AbstractFurnaceBlockEntity furnace) {
-                ItemStack stack = furnace.getItem(0);
-                if (!stack.isEmpty()) {
-                    return CodecUtil.encodeJson(new ItemOutput(stack), ItemOutput.CODEC).getOrThrow().toString();
-                } else {
-                    Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_input"));
-                }
-            } else {
-                Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_furnace"));
-            }
-            throw new ReplaceException();
-        }
-    );
-    public static final Placeholder<UseOnContext> FURNACE_INPUT_ID = register(
-        ResourceLocation.parse("furnace"), "\\{furnace_input_id}", context -> {
-            BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
-            if (be instanceof AbstractFurnaceBlockEntity furnace) {
-                ItemStack stack = furnace.getItem(0);
-                if (!stack.isEmpty()) {
-                    return Objects.requireNonNull(stack.getItem().arch$registryName()).toString();
-                } else {
-                    Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_input"));
-                }
-            } else {
-                Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_furnace"));
-            }
-            throw new ReplaceException();
-        }
-    );
-    public static final Placeholder<UseOnContext> FURNACE_INPUT_COUNT = register(
-        ResourceLocation.parse("furnace"), "\\{furnace_input_count}", context -> {
-            BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
-            if (be instanceof AbstractFurnaceBlockEntity furnace) {
-                ItemStack stack = furnace.getItem(0);
-                if (!stack.isEmpty()) {
-                    return String.valueOf(stack.getCount());
-                } else {
-                    Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_input"));
-                }
-            } else {
-                Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_furnace"));
-            }
-            throw new ReplaceException();
-        }
-    );
-    public static final Placeholder<UseOnContext> FURNACE_INPUT_NAMESPACE = register(
-        ResourceLocation.parse("furnace"), "\\{furnace_input_namespace}", context -> {
-            BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
-            if (be instanceof AbstractFurnaceBlockEntity furnace) {
-                ItemStack stack = furnace.getItem(0);
-                if (!stack.isEmpty()) {
-                    return Objects.requireNonNull(stack.getItem().arch$registryName()).getNamespace();
-                } else {
-                    Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_input"));
-                }
-            } else {
-                Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_furnace"));
-            }
-            throw new ReplaceException();
-        }
-    );
-    public static final Placeholder<UseOnContext> FURNACE_INPUT_PATH = register(
-        ResourceLocation.parse("furnace"), "\\{furnace_input_path}", context -> {
-            BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
-            if (be instanceof AbstractFurnaceBlockEntity furnace) {
-                ItemStack stack = furnace.getItem(0);
-                if (!stack.isEmpty()) {
-                    return Objects.requireNonNull(stack.getItem().arch$registryName()).getPath();
-                } else {
-                    Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_input"));
-                }
-            } else {
-                Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_furnace"));
-            }
-            throw new ReplaceException();
-        }
-    );
-    public static final Placeholder<UseOnContext> FURNACE_INPUT_COMPONENTS = register(
-        ResourceLocation.parse("furnace"), "\\{furnace_input_components}", context -> {
-            BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
-            if (be instanceof AbstractFurnaceBlockEntity furnace) {
-                ItemStack stack = furnace.getItem(0);
-                if (!stack.isEmpty()) {
-                    return CodecUtil.encodeJson(stack.getComponentsPatch(), DataComponentPatch.CODEC).getOrThrow().toString();
-                } else {
-                    Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_input"));
-                }
-            } else {
-                Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_furnace"));
-            }
-            throw new ReplaceException();
-        }
-    );
-    public static final Placeholder<UseOnContext> FURNACE_TIME = register(
-        ResourceLocation.parse("furnace"), "\\{furnace_time}", context -> {
-            BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
-            if (!(be instanceof AbstractFurnaceBlockEntity furnace)) {
-                Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_furnace"));
-                throw new ReplaceException();
-            }
-            ItemStack input = furnace.getItem(0);
-            if (input.isEmpty()) {
                 Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_input"));
-                throw new ReplaceException();
             }
-            ItemStack fuel = furnace.getItem(1);
-            if (fuel.isEmpty()) {
-                Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_fuel"));
-                throw new ReplaceException();
-            }
-            return String.valueOf(((AbstractFurnaceBlockEntityAccess) furnace).cif$getBurnDuration(context.getLevel(), fuel) * fuel.getCount());
+        } else {
+            Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_furnace"));
         }
-    );
+        throw new ReplaceException();
+    }, Placeholder.ITEM_OUTPUT);
+    public static final Placeholder<UseOnContext> FURNACE_TIME = register(ResourceLocation.parse("furnace"), Pattern.compile("^furnace_time$"), context -> {
+        BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
+        if (!(be instanceof AbstractFurnaceBlockEntity furnace)) {
+            Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_furnace"));
+            throw new ReplaceException();
+        }
+        ItemStack input = furnace.getItem(0);
+        if (input.isEmpty()) {
+            Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_input"));
+            throw new ReplaceException();
+        }
+        ItemStack fuel = furnace.getItem(1);
+        if (fuel.isEmpty()) {
+            Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_fuel"));
+            throw new ReplaceException();
+        }
+        return String.valueOf(((AbstractFurnaceBlockEntityAccess) furnace).cif$getBurnDuration(context.getLevel(), fuel) * fuel.getCount());
+    });
 
     protected static Collection<Placeholder<UseOnContext>> getExtensions(ResourceLocation id) {
         return EXTENSIONS.getOrDefault(id, new ArrayList<>());
@@ -732,25 +254,39 @@ public class RecipeWizardGenerator {
         Codec.BOOL.optionalFieldOf("enabled", true).forGetter(RecipeWizardGenerator::isEnabled),
         Dependencies.CODEC.optionalFieldOf("dependencies", Dependencies.EMPTY).forGetter(RecipeWizardGenerator::getDependencies),
         BlockInput.CODEC.fieldOf("block").forGetter(RecipeWizardGenerator::getBlock),
-        Codec.STRING.fieldOf("path").forGetter(RecipeWizardGenerator::getPath),
+        Template.CODEC.fieldOf("path").forGetter(RecipeWizardGenerator::getPath),
         CodecUtil.listOf(ResourceLocation.CODEC).optionalFieldOf("extensions", List.of()).forGetter(RecipeWizardGenerator::getExtensions),
-        Codec.STRING.fieldOf("template").forGetter(RecipeWizardGenerator::getTemplate)
+        Template.CODEC.fieldOf("template").forGetter(RecipeWizardGenerator::getTemplate)
     ).apply(instance, RecipeWizardGenerator::new));
 
     private final boolean enabled;
     private final Dependencies dependencies;
     private final BlockInput block;
-    private final String path;
+    private final Template path;
     private final List<ResourceLocation> extensions;
-    private final String template;
+    private final Template template;
+    private final transient Placeholder<UseOnContext> placeholder;
 
-    public RecipeWizardGenerator(boolean enabled, Dependencies dependencies, BlockInput block, String path, List<ResourceLocation> extensions, String template) {
+    public RecipeWizardGenerator(boolean enabled, Dependencies dependencies, BlockInput block, Template path, List<ResourceLocation> extensions, Template template) {
         this.enabled = enabled;
         this.dependencies = dependencies;
         this.block = block;
         this.path = path;
         this.extensions = extensions instanceof ImmutableList<ResourceLocation> immutable ? immutable : ImmutableList.copyOf(extensions);
         this.template = template;
+        this.placeholder = Placeholder.build(builder -> {
+            Collection<Placeholder<UseOnContext>> defaults = getExtensions(ResourceLocation.parse("default"));
+            for (Placeholder<UseOnContext> p : defaults) {
+                builder.overwrite(p);
+            }
+            for (ResourceLocation id : this.getExtensions()) {
+                Collection<Placeholder<UseOnContext>> extension = getExtensions(id);
+                for (Placeholder<UseOnContext> p : extension) {
+                    builder.overwrite(p);
+                }
+            }
+            return builder;
+        });
     }
 
     public boolean isEnabled() {
@@ -761,7 +297,7 @@ public class RecipeWizardGenerator {
         return block;
     }
 
-    public String getPath() {
+    public Template getPath() {
         return path;
     }
 
@@ -773,8 +309,12 @@ public class RecipeWizardGenerator {
         return extensions;
     }
 
-    public String getTemplate() {
+    public Template getTemplate() {
         return template;
+    }
+
+    public Placeholder<UseOnContext> getPlaceholder() {
+        return placeholder;
     }
 
     public boolean matches(BlockState state) {
@@ -784,20 +324,9 @@ public class RecipeWizardGenerator {
     public void handle(UseOnContext context) {
         Player player = Objects.requireNonNull(context.getPlayer());
         if (this.isEnabled()) {
-            String template = this.getTemplate();
-            String path = this.getPath();
             try {
-                for (ResourceLocation id : this.getExtensions()) {
-                    Collection<Placeholder<UseOnContext>> extension = getExtensions(id);
-                    for (Placeholder<UseOnContext> placeholder : extension) {
-                        template = placeholder.mapAll(template, context);
-                        path = placeholder.mapAll(path, context);
-                    }
-                }
-                for (Placeholder<UseOnContext> placeholder : getExtensions(ResourceLocation.tryParse("default"))) {
-                    template = placeholder.mapAll(template, context);
-                    path = placeholder.mapAll(path, context);
-                }
+                String path = this.getPath().replace(context, this.getPlaceholder());
+                String template = this.getTemplate().replace(context, this.getPlaceholder());
                 Path result = CropariaIf.CONFIG.getRecipeWizard().resolve(path);
                 FileUtil.write(result.toFile(), template, true);
                 String s = result.toString();
@@ -805,7 +334,7 @@ public class RecipeWizardGenerator {
                 Texts.chat(player, Texts.translatable("chat.croparia.recipe_wizard.success", c));
             } catch (ReplaceException ignored) {
                 // Termination caused by missing data, message already sent in placeholder
-            } catch (IOException e) {
+            } catch (RegexParserException | IOException e) {
                 Texts.chat(player, Texts.translatable("overlay.croparia.recipe_wizard.failed").withStyle(ChatFormatting.RED));
                 CropariaIf.LOGGER.error("Failed to generate recipe", e);
             }

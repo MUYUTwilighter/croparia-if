@@ -1,9 +1,7 @@
 package cool.muyucloud.croparia.api.generator.pack;
 
 import com.google.gson.JsonObject;
-import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.mixin.ReloadableResourceManagerImplMixin;
-import cool.muyucloud.croparia.util.FileUtil;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackLocationInfo;
@@ -11,8 +9,6 @@ import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.repository.PackSource;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,20 +60,7 @@ public class ResourcePackHandler extends PackHandler {
     }
 
     @Override
-    public void clear() {
-        File file = this.getRoot().resolve("assets").toFile();
-        if (file.isDirectory()) {
-            CropariaIf.LOGGER.info("Clearing resource pack directory");
-            try {
-                FileUtil.deleteUnder(file);
-            } catch (IOException e) {
-                CropariaIf.LOGGER.error("Failed to clear resourcepack directory", e);
-            }
-        }
-    }
-
-    @Override
-    public void addFile(String relative, String content) {
-        super.addFile("assets/" + relative, content);
+    public String proxyPath(String path) {
+        return path.startsWith("assets/") ? path : "assets/" + path;
     }
 }

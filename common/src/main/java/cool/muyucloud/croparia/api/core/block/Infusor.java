@@ -10,7 +10,6 @@ import cool.muyucloud.croparia.registry.CropariaBlocks;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.registry.Recipes;
 import cool.muyucloud.croparia.util.CifUtil;
-import cool.muyucloud.croparia.util.DynamicProperty;
 import cool.muyucloud.croparia.util.ItemPlaceable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -29,6 +28,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
@@ -40,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Infusor extends Block implements ItemPlaceable {
     protected final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
-    public static final DynamicProperty<Element> ELEMENT = new DynamicProperty<>("element", Element.class, Element.STRING_REGISTRY);
+    public static final EnumProperty<Element> ELEMENT = EnumProperty.create("element", Element.class);
 
     public Infusor(Properties properties) {
         super(properties);

@@ -1,16 +1,16 @@
 {
   "type": "croparia:soak",
-  "element": "croparia:fire",
+  "element": "fire",
   "input": {
     "id": "croparia:infusor",
     "properties": {
-      "element": "croparia_empty"
+      "element": "empty"
     }
   },
   "output": {
     "id": "croparia:infusor",
     "properties": {
-      "element": "croparia_fire"
+      "element": "fire"
     }
   },
   "probability": 0.1

@@ -1,19 +1,19 @@
 registry = "croparia:crops"
-path = "thermal/recipe/croparia/insolator/{id_namespace}/{id_path}.json"
+path = "thermal/recipe/croparia/insolator/${id.namespace}/${id.path}.json"
 dependencies = "thermal_expansion"
 template = """
 {
   "type": "thermal:insolator",
   "ingredient": {
-    "item": "{seed}"
+    "item": "${seed}"
   },
   "result": [
     {
-      "item": "{seed}",
+      "item": "${seed}",
       "chance": 0.0
     },
     {
-      "item": "{fruit}",
+      "item": "${fruit}",
       "chance": 1.0
     }
   ],

@@ -1,11 +1,11 @@
 registry = "croparia:elements"
-path = "{id_namespace}/blockstates/{liquid_block_path}.json"
+path = "${id.namespace}/blockstates/${liquid_block.path}.json"
 startup = true
 template = """
 {
   "variants": {
     "": {
-      "model": "{id_namespace}:block/{liquid_block_path}"
+      "model": "${id.namespace}:block/${liquid_block.path}"
     }
   }
 }

@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.recipe.container.SoakContainer;
 import cool.muyucloud.croparia.api.element.Element;
+import cool.muyucloud.croparia.api.element.ElementAccess;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
@@ -27,7 +28,7 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
     public static final TypedSerializer<SoakRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
         CropariaIf.of("soak"), SoakRecipe.class,
         RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Element.CODEC.fieldOf("element").forGetter(SoakRecipe::getElement),
+            ElementAccess.CODEC.fieldOf("element").forGetter(SoakRecipe::getElement),
             Codec.FLOAT.fieldOf("probability").forGetter(SoakRecipe::getProbability),
             BlockInput.CODEC.fieldOf("input").forGetter(SoakRecipe::getInput),
             BlockOutput.CODEC.fieldOf("output").forGetter(SoakRecipe::getOutput)

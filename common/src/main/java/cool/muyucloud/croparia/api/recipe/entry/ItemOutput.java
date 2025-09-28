@@ -33,11 +33,16 @@ public class ItemOutput implements SlotDisplay {
         Codec.LONG.optionalFieldOf("amount").forGetter(result -> Optional.of(result.getAmount()))
     ).apply(instance, (id, components, amount) -> new ItemOutput(id, components.orElse(DataComponentPatch.EMPTY), amount.orElse(1L))));
     public static final MultiCodec<ItemOutput> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
-        if (toEncode.getComponentsPatch().isEmpty() && toEncode.getAmount() == 1L) return TestedCodec.fail(() -> "Can be encoded as string");
+        if (toEncode.getComponentsPatch().isEmpty() && toEncode.getAmount() == 1L)
+            return TestedCodec.fail(() -> "Can be encoded as string");
         return TestedCodec.success();
     }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemOutput> STREAM_CODEC = CodecUtil.toStream(CODEC);
     public static final Type<ItemOutput> TYPE = new Type<>(CODEC_COMP, STREAM_CODEC);
+
+    public static ItemOutput of(@NotNull ItemStack stack) {
+        return new ItemOutput(stack);
+    }
 
     @NotNull
     private final ResourceLocation id;

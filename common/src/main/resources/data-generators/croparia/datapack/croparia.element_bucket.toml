@@ -1,18 +1,18 @@
 registry = "croparia:elements"
-path = "croparia/recipe/crafting/bucket/{name}.json"
+path = "croparia/recipe/crafting/bucket/${name}.json"
 template = """
 {
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
     "minecraft:bucket",
-    "{gem}",
-    "{gem}",
-    "{gem}",
-    "{gem}"
+    "${gem}",
+    "${gem}",
+    "${gem}",
+    "${gem}"
   ],
   "result": {
-    "id": "{bucket}"
+    "id": "${bucket}"
   }
 }
 """

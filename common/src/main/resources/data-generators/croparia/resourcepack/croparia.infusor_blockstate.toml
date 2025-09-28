@@ -2,12 +2,12 @@ registry = "croparia:elements"
 path = "croparia/blockstates/infusor.json"
 type = "croparia:aggregated"
 startup = true
-content = '        "element={name}": { "model": "croparia:block/infusor_{name}" }'
+content = '        "element=${name}": { "model": "croparia:block/infusor_${name}" }'
 template = """
 {
   "variants": {
-    "element=croparia_empty": { "model": "croparia:block/infusor" },
-{content}
+    "element=empty": { "model": "croparia:block/infusor" },
+${content}
   }
 }
 """

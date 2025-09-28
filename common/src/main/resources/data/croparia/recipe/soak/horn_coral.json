@@ -1,6 +1,6 @@
 {
   "type": "croparia:soak",
-  "element": "croparia:earth",
+  "element": "earth",
   "input": "minecraft:dead_bush",
   "output": "minecraft:horn_coral",
   "probability": 1.0

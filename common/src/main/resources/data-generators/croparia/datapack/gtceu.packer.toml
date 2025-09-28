@@ -1,5 +1,5 @@
 registry = "croparia:crops"
-path = "croparia/recipes/gtceu/packer/{id_namespace}/{id_path}.json"
+path = "croparia/recipes/gtceu/packer/${id.namespace}/${id.path}.json"
 dependencies = "gtceu"
 template = """
 {
@@ -12,7 +12,7 @@ template = """
                     "type": "gtceu:sized",
                     "count": 1,
                     "ingredient": {
-                        "item": "{fruit}"
+                        "item": "${fruit}"
                     }
                 },
                 "chance": 10000,
@@ -28,8 +28,8 @@ template = """
                     "type": "gtceu:sized",
                     "count": {result_count},
                     "ingredient": {
-                        "item": "{result_id}",
-                        "components": {material_components}
+                        "item": "${result.id}",
+                        "components": ${result.components}
                     }
                 },
                 "chance": 10000,

@@ -1,17 +1,13 @@
 package cool.muyucloud.croparia.api.generator.pack;
 
 import com.google.gson.JsonObject;
-import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.generator.util.AlwaysEnabledFileResourcePackProvider;
 import cool.muyucloud.croparia.mixin.PackRepositoryMixin;
 import cool.muyucloud.croparia.mixin.ReloadableResourceManagerImplMixin;
-import cool.muyucloud.croparia.util.FileUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.PackSource;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,20 +52,7 @@ public class DataPackHandler extends PackHandler {
     }
 
     @Override
-    public void clear() {
-        Path path = this.getRoot().resolve("data");
-        File file = path.toFile();
-        if (file.isDirectory()) {
-            try {
-                FileUtil.deleteUnder(file);
-            } catch (IOException e) {
-                CropariaIf.LOGGER.error("Failed to clear datapack directory", e);
-            }
-        }
-    }
-
-    @Override
-    public void addFile(String relative, String content) {
-        super.addFile("data/" + relative, content);
+    public String proxyPath(String path) {
+        return path.startsWith("data/") ? path : "data/" + path;
     }
 }

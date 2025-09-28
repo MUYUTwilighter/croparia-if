@@ -1,6 +1,6 @@
 {
   "type": "croparia:soak",
-  "element": "croparia:earth",
+  "element": "earth",
   "input": {
     "id": "minecraft:pumpkin_stem",
     "properties": {

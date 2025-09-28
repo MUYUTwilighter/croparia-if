@@ -1,18 +1,27 @@
 package cool.muyucloud.croparia.api.core.block;
 
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.core.item.RecipeWizard;
 import cool.muyucloud.croparia.api.core.recipe.SoakRecipe;
 import cool.muyucloud.croparia.api.core.recipe.container.SoakContainer;
 import cool.muyucloud.croparia.api.element.Element;
+import cool.muyucloud.croparia.registry.CropariaBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 public class ElementalStone extends Block {
     public ElementalStone(Properties properties) {
@@ -43,5 +52,14 @@ public class ElementalStone extends Block {
             level.playSound(null, pos, SoundEvent.createVariableRangeEvent(CropariaIf.of("block.soak.craft")), SoundSource.BLOCKS, 0.5F, 1.0F);
             recipe.getOutput().setBlock(level, pos);
         });
+    }
+
+    @Override
+    protected @NotNull InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (stack.getItem() instanceof RecipeWizard && player.isCrouching()) {
+            level.setBlock(pos.above(), CropariaBlocks.INFUSOR.get().defaultBlockState(), Block.UPDATE_ALL);
+            return InteractionResult.SUCCESS;
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 }

@@ -1,5 +1,5 @@
 registry = "croparia:crops"
-path = "{id_namespace}/blockstates/{crop_block_path}.json"
+path = "${id.namespace}/blockstates/${crop_block.path}.json"
 startup = true
 template = """
 {
@@ -20,13 +20,13 @@ template = """
       "model": "croparia:block/crop_stage4"
     },
     "age=5": {
-      "model": "croparia:block/{type}_stage5"
+      "model": "croparia:block/${type}_stage5"
     },
     "age=6": {
-      "model": "croparia:block/{type}_stage6"
+      "model": "croparia:block/${type}_stage6"
     },
     "age=7": {
-      "model": "croparia:block/{type}_stage7"
+      "model": "croparia:block/${type}_stage7"
     }
   }
 }

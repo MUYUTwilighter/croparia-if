@@ -13,8 +13,7 @@ import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
 import cool.muyucloud.croparia.api.crop.util.Material;
 import cool.muyucloud.croparia.api.crop.util.TierAccess;
-import cool.muyucloud.croparia.api.generator.util.DgElement;
-import cool.muyucloud.croparia.api.generator.util.Placeholder;
+import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.supplier.HolderSupplier;
@@ -26,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public class Crop extends AbstractCrop implements TierAccess {
@@ -54,18 +54,16 @@ public class Crop extends AbstractCrop implements TierAccess {
         new Crop(name, material, color, tier, type, translations.orElse(null), dependencies.orElse(null))
     ));
 
-    public static final Placeholder<Crop> COLOR = Placeholder.of("\\{color}", Crop::getColorDec);
-    public static final Placeholder<Crop> COLOR_HEX = Placeholder.of("\\{color_hex}", Crop::getColorHex);
-    public static final Placeholder<Crop> TYPE = Placeholder.of("\\{type}", Crop::getType);
-    public static final Placeholder<Crop> TIER = Placeholder.of("\\{tier}", crop -> String.valueOf(crop.getTier()));
-    public static final Placeholder<Crop> SEED = Placeholder.of("\\{seed}", crop -> crop.getSeedId().toString());
-    public static final Placeholder<Crop> SEED_PATH = Placeholder.of("\\{seed_path}", crop -> crop.getSeedId().getPath());
-    public static final Placeholder<Crop> FRUIT = Placeholder.of("\\{fruit}", crop -> crop.getFruitId().toString());
-    public static final Placeholder<Crop> FRUIT_PATH = Placeholder.of("\\{fruit_path}", crop -> crop.getFruitId().getPath());
-    public static final Placeholder<Crop> CROP_BLOCK = Placeholder.of("\\{crop_block}", crop -> crop.getBlockId().toString());
-    public static final Placeholder<Crop> CROP_BLOCK_PATH = Placeholder.of("\\{crop_block_path}", crop -> crop.getBlockId().getPath());
-    public static final Placeholder<Crop> CROPARIA = Placeholder.of("\\{croparia}", crop -> CropariaItems.getCroparia(crop.getTier()).getId().toString());
-    public static final Placeholder<Crop> CROPARIA_PATH = Placeholder.of("\\{croparia_path}", crop -> CropariaItems.getCroparia(crop.getTier()).getId().getPath());
+    public static final Placeholder<Crop> PLACEHOLDER = Placeholder.build(node -> node
+        .then(Pattern.compile("^color$"), Crop::getColor, Color.PLACEHOLDER)
+        .then(Pattern.compile("^type$"), Crop::getType, Placeholder.STRING)
+        .then(Pattern.compile("^tier$"), Crop::getTier, Placeholder.NUMBER)
+        .then(Pattern.compile("^seed$"), Crop::getSeedId, Placeholder.ID)
+        .then(Pattern.compile("^fruit$"), Crop::getFruitId, Placeholder.ID)
+        .then(Pattern.compile("^crop_block$"), Crop::getBlockId, Placeholder.ID)
+        .then(Pattern.compile("^croparia$"), crop -> CropariaItems.getCroparia(crop.getTier()).getId(), Placeholder.ID)
+        .concat(AbstractCrop.PLACEHOLDER, crop -> crop)
+    );
 
     public static String defaultTranslation(ResourceLocation id) {
         String name = id.getPath();
@@ -184,6 +182,7 @@ public class Crop extends AbstractCrop implements TierAccess {
         }
     }
 
+    @Override
     public @NotNull ImmutableMap<String, String> getTranslations() {
         return translations;
     }
@@ -253,20 +252,8 @@ public class Crop extends AbstractCrop implements TierAccess {
     }
 
     @Override
-    public void buildPlaceholders(Collection<Placeholder<? extends DgElement>> list) {
-        super.buildPlaceholders(list);
-        list.add(COLOR);
-        list.add(COLOR_HEX);
-        list.add(CROPARIA);
-        list.add(CROPARIA_PATH);
-        list.add(CROP_BLOCK);
-        list.add(CROP_BLOCK_PATH);
-        list.add(FRUIT);
-        list.add(FRUIT_PATH);
-        list.add(SEED);
-        list.add(SEED_PATH);
-        list.add(TYPE);
-        list.add(TIER);
+    public Placeholder<? extends Crop> placeholder() {
+        return PLACEHOLDER;
     }
 
     @Override

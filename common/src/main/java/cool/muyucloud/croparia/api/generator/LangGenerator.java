@@ -1,24 +1,30 @@
 package cool.muyucloud.croparia.api.generator;
 
+import com.google.gson.JsonParseException;
 import com.mojang.serialization.MapCodec;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
-import cool.muyucloud.croparia.api.generator.util.DgElement;
+import cool.muyucloud.croparia.api.generator.util.DgEntry;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
-import cool.muyucloud.croparia.api.generator.util.TranslatableElement;
+import cool.muyucloud.croparia.api.generator.util.TranslatableEntry;
+import cool.muyucloud.croparia.api.placeholder.Placeholder;
+import cool.muyucloud.croparia.api.placeholder.PlaceholderAccess;
+import cool.muyucloud.croparia.api.placeholder.RegexParser;
+import cool.muyucloud.croparia.api.placeholder.Template;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 
 public class LangGenerator extends DataGenerator {
     public static final MapCodec<LangGenerator> CODEC = DataGenerator.CODEC.xmap(dg -> {
         try {
             @SuppressWarnings("unchecked")
-            DgRegistry<? extends TranslatableElement> translatable = (DgRegistry<? extends TranslatableElement>) dg.getRegistry();
-            for (TranslatableElement element : translatable) {
+            DgRegistry<? extends TranslatableEntry> translatable = (DgRegistry<? extends TranslatableEntry>) dg.getRegistry();
+            for (TranslatableEntry element : translatable) {
                 element.translate("en_us");
                 break;
             }
@@ -34,15 +40,10 @@ public class LangGenerator extends DataGenerator {
     private static final Map<String, List<String>> TRANSLATIONS = new HashMap<>();
 
     public LangGenerator(
-        boolean enabled, boolean startup, List<ResourceLocation> whitelist, String path,
-        DgRegistry<? extends TranslatableElement> registry, String template
+        boolean enabled, boolean startup, List<ResourceLocation> whitelist, Template path,
+        DgRegistry<? extends TranslatableEntry> registry, Template template
     ) {
         super(enabled, startup, whitelist, path, registry, template);
-    }
-
-    @Override
-    public String getPath() {
-        return super.getPath();
     }
 
     @Override
@@ -52,21 +53,26 @@ public class LangGenerator extends DataGenerator {
             translations.forEach(translation -> builder.append("  ").append(translation).append(",\n"));
             String generated = builder.isEmpty() ? "" : builder.substring(0, builder.length() - 2);
             generated += "\n}";
-            handler.addFile(path, generated);
+            handler.cache(path, generated);
         });
         TRANSLATIONS.clear();
     }
 
     @Override
-    protected void generate(DgElement element, PackHandler pack) {
-        if (element instanceof TranslatableElement translatable) {
+    protected void generate(DgEntry entry, PackHandler pack) {
+        if (entry instanceof TranslatableEntry translatable) {
             for (String lang : translatable.getLangs()) {
-                String relative = replace(this.getPath().replaceAll("\\{lang}", lang), element);
+                @SuppressWarnings("unchecked")
+                PlaceholderAccess access = PlaceholderAccess.of(entry, Placeholder.build(builder -> builder
+                    .then(Pattern.compile("^lang$"), RegexParser.of(e -> lang))
+                    .overwrite((Placeholder<DgEntry>) entry.placeholder())
+                ));
+                String relative = this.getPath().replace(access, placeholder -> placeholder.replaceAll("_lang", lang));
                 List<String> list = TRANSLATIONS.computeIfAbsent(relative, k -> new LinkedList<>());
-                list.add(replace(this.getTemplate().replaceAll("\\{lang}", lang), element));
+                list.add(this.getTemplate().replace(access, placeholder -> placeholder.replaceAll("_lang", lang)));
             }
         } else {
-            throw new IllegalArgumentException("Element %s is not translatable".formatted(element.getKey()));
+            throw new JsonParseException("Entry %s in %s is not translatable".formatted(entry.getKey(), this.getRegistry().getId()));
         }
     }
 }

@@ -7,6 +7,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.api.codec.TestedCodec;
+import cool.muyucloud.croparia.api.placeholder.Placeholder;
+import cool.muyucloud.croparia.api.placeholder.RegexParser;
+import cool.muyucloud.croparia.api.placeholder.RegexParserException;
 import cool.muyucloud.croparia.util.TagUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import net.minecraft.core.Holder;
@@ -21,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class Material {
     public static final Codec<Material> CODEC_STR = Codec.STRING.xmap(Material::new, Material::getName);
@@ -35,6 +39,14 @@ public class Material {
         CodecUtil.of(CODEC_COMP.codec(), toDecode -> toDecode.components.equals(DataComponentPatch.EMPTY)
             ? TestedCodec.fail(() -> "No components, proceed to string codec") : TestedCodec.success()), CODEC_STR
     );
+    public static final Placeholder<Material> PLACEHOLDER = Placeholder.build(node -> node
+        .self(RegexParser.of(material -> CodecUtil.encodeJson(material, CODEC).getOrThrow(RegexParserException::new)))
+        .then(Pattern.compile("stack"), Material::getStack, ItemStack.CODEC)
+        .then(Pattern.compile("type"), material -> material.isTag() ? "tag" : "item", Placeholder.STRING)
+        .then(Pattern.compile("name"), Material::getName, Placeholder.STRING)
+        .then(Pattern.compile("count"), Material::getCount, Placeholder.NUMBER)
+        .then(Pattern.compile("components"), Material::getComponents, Placeholder.DATA_COMPONENTS)
+        .overwrite(Placeholder.ID, Material::getId));
 
     private final boolean tag;
     @NotNull

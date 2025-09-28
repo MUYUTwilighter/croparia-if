@@ -1,11 +1,11 @@
 registry = "croparia:crops"
-path = "{id_namespace}/items/{fruit_path}.json"
+path = "${id.namespace}/items/${fruit.path}.json"
 startup = true
 template = """
 {
   "model": {
     "type": "minecraft:model",
-    "model": "croparia:item/template_fruit_{type}",
+    "model": "croparia:item/template_fruit_${type}",
     "tints": [
       {
         "type": "minecraft:constant",
@@ -13,7 +13,7 @@ template = """
       },
       {
         "type": "minecraft:constant",
-        "value": {color}
+        "value": ${color.dec}
       }
     ]
   }

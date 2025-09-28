@@ -14,25 +14,25 @@
     "J": {
       "id": "croparia:infusor",
       "properties": {
-        "element": "croparia_air"
+        "element": "air"
       }
     },
     "K": {
       "id": "croparia:infusor",
       "properties": {
-        "element": "croparia_earth"
+        "element": "earth"
       }
     },
     "L": {
       "id": "croparia:infusor",
       "properties": {
-        "element": "croparia_fire"
+        "element": "fire"
       }
     },
     "M": {
       "id": "croparia:infusor",
       "properties": {
-        "element": "croparia_water"
+        "element": "water"
       }
     },
     "N": "minecraft:white_stained_glass",
