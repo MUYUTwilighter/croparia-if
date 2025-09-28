@@ -27,7 +27,7 @@ public abstract class PackRepositoryMixin {
 
     /**
      * Insert {@link DataPackHandler} into Minecraft
-     * */
+     */
     @ModifyVariable(method = "<init>", at = @At("HEAD"), argsOnly = true)
     private static RepositorySource[] insertProviders(RepositorySource... providers) {
         DataGenerator.LOGGER.debug("=== Inserting Data Pack Providers ===");

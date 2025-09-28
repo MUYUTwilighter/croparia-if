@@ -208,7 +208,7 @@ public class CompatCrops {
         "modern_industrialization", "item.modern_industrialization.tungsten_ingot",
         "gtceu", "material.gtceu.tungsten"
     ));
-    public static final Crop URANIUM = Crops.compat("uranium_conventional", "#c:ingots/uranium", 0x32CE00, 3, Crop.CROP, Map.of(
+    public static final Crop URANIUM = Crops.compat("uranium", "#c:ingots/uranium", 0x32CE00, 3, Crop.CROP, Map.of(
         "modern_industrialization", "item.modern_industrialization.uranium_ingot",
         "mekanism", "item.mekanism.ingot_uranium"
     ));

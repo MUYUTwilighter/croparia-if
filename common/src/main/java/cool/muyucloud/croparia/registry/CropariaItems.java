@@ -114,10 +114,10 @@ public class CropariaItems {
         "infinite_apple", properties -> new InfiniteApple(properties.food(
             new FoodProperties.Builder().alwaysEdible().nutrition(5).saturationModifier(4.0F).build(),
             Consumable.builder().onConsume(new ApplyStatusEffectsConsumeEffect(List.of(
-                new MobEffectInstance(MobEffects.REGENERATION, 400, 1),
-                new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 6000, 0),
-                new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 6000, 0),
-                new MobEffectInstance(MobEffects.ABSORPTION, 2400, 3)
+                new MobEffectInstance(MobEffects.REGENERATION, 100, 1),
+                new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 0),
+                new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 100, 0),
+                new MobEffectInstance(MobEffects.ABSORPTION, 100, 3)
             ))).build()
         ).stacksTo(1).arch$tab(Tabs.MAIN).rarity(Rarity.EPIC)));
     public static final RegistrySupplier<MagicRope> MAGIC_ROPE = registerItem(

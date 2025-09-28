@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.api.placeholder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.util.ListReader;
@@ -136,9 +137,46 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
         }));
     }
 
+    public static final Pattern EMPTY = Placeholder.literal("");
+    public static final Pattern QUOTE_IF_STRING = Placeholder.literal("_qis");
+    public static final Pattern QUOTE = Placeholder.literal("_q");
+
     private final Map<PatternKey, RegexParser<T>> subNodes = new LinkedHashMap<>();
 
     public PlaceholderBuilder() {
+        this.then(QUOTE_IF_STRING, (entry, placeholder, matcher) -> {
+            RegexParser<T> parser = this.subNodes.get(PatternKey.of(EMPTY));
+            if (parser != null) {
+                return parser.parse(entry, placeholder, matcher).map(json -> {
+                    if (json.isJsonPrimitive()) {
+                        JsonPrimitive primitive = json.getAsJsonPrimitive();
+                        if (primitive.isString()) {
+                            return new JsonPrimitive(primitive.toString());
+                        }
+                    }
+                    return json;
+                });
+            } else {
+                return Optional.empty();
+            }
+        });
+        this.then(QUOTE, (entry, placeholder, matcher) -> {
+            RegexParser<T> parser = this.subNodes.get(PatternKey.of(EMPTY));
+            if (parser != null) {
+                return parser.parse(entry, placeholder, matcher).map(json -> {
+                    if (json.isJsonPrimitive()) {
+                        JsonPrimitive primitive = json.getAsJsonPrimitive();
+                        if (primitive.isString()) {
+                            return new JsonPrimitive(primitive.toString());
+                        }
+                    }
+                    return new JsonPrimitive("\"" + json + "\"");
+                });
+            } else {
+                return Optional.empty();
+            }
+        });
+
     }
 
     @SuppressWarnings("unused")
@@ -153,7 +191,7 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      * @return The current builder instance for chaining.
      */
     public @NotNull PlaceholderBuilder<T> self(@NotNull RegexParser<T> parser) {
-        return then(Pattern.compile("^$"), parser);
+        return then(EMPTY, parser);
     }
 
     /**
@@ -168,7 +206,7 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      */
     @SuppressWarnings("unused")
     public @NotNull PlaceholderBuilder<T> encodeSelf(@NotNull Codec<T> codec) {
-        return then(Pattern.compile("^$"), (entry, placeholder, matcher) ->
+        return then(EMPTY, (entry, placeholder, matcher) ->
             Optional.ofNullable(CodecUtil.encodeJson(entry, codec).getOrThrow(RegexParserException::new)));
     }
 

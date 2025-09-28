@@ -54,21 +54,22 @@ public class Placeholder<T> implements RegexParser<T> {
     });
     public static final Placeholder<JsonObject> JSON_OBJECT = Placeholder.build(node -> node
         .self(RegexParser.of())
-        .overwrite(PlaceholderBuilder.ofMap(MapReader::jsonObject, Placeholder.JSON), Function.identity()));
+        .concat(PlaceholderBuilder.ofMap(MapReader::jsonObject, Placeholder.JSON), Function.identity()));
     public static final Placeholder<JsonArray> JSON_ARRAY = Placeholder.build(node -> node
         .self(RegexParser.of())
-        .overwrite(PlaceholderBuilder.ofList(ListReader::jsonArray, Placeholder.JSON), Function.identity()));
+        .concat(PlaceholderBuilder.ofList(ListReader::jsonArray, Placeholder.JSON), Function.identity()));
     public static final Placeholder<ResourceLocation> ID = Placeholder.build(node -> node
         .self(RegexParser.of(ResourceLocation::toString))
-        .then(Pattern.compile("^namespace$"), RegexParser.of(ResourceLocation::getNamespace))
-        .then(Pattern.compile("^path$"), RegexParser.of(ResourceLocation::getPath))
+        .then(literal("namespace"), RegexParser.of(ResourceLocation::getNamespace))
+        .then(literal("path"), RegexParser.of(ResourceLocation::getPath))
     );
     public static final Placeholder<BlockOutput> BLOCK_OUTPUT = build(BlockOutput.CODEC_COMP.codec(), builder -> builder
-        .then(Pattern.compile("id"), BlockOutput::getId, ID));
+        .then(literal("id"), BlockOutput::getId, ID)
+    );
     public static final Placeholder<ItemOutput> ITEM_OUTPUT = build(
-        ItemOutput.CODEC_COMP.codec(), builder -> builder.then(
-            Pattern.compile("^id$"), ItemOutput::getId, ID
-        )
+        ItemOutput.CODEC_COMP.codec(), builder -> builder
+            .then(literal("id"), ItemOutput::getId, ID)
+            .then(literal("stack"), ItemOutput::createStack, ItemStack.CODEC)
     );
     public static final Placeholder<Item> ITEM = ID.map(Item::arch$registryName);
     public static final Placeholder<ItemStack> ITEM_STACK = ITEM_OUTPUT.map(ItemOutput::of);
@@ -76,6 +77,10 @@ public class Placeholder<T> implements RegexParser<T> {
     @SuppressWarnings("unused")
     public static final Placeholder<BlockState> BLOCK_STATE = BLOCK_OUTPUT.map(BlockOutput::of);
     public static final Placeholder<DataComponentPatch> DATA_COMPONENTS = Placeholder.build(DataComponentPatch.CODEC, Function.identity());
+
+    public static Pattern literal(String literal) {
+        return Pattern.compile(Pattern.quote(literal));
+    }
 
     /**
      * Build a placeholder parser using the given factory function to configure the root node.
