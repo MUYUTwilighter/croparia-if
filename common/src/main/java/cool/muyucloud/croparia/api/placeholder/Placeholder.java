@@ -78,8 +78,13 @@ public class Placeholder<T> implements RegexParser<T> {
     public static final Placeholder<BlockState> BLOCK_STATE = BLOCK_OUTPUT.map(BlockOutput::of);
     public static final Placeholder<DataComponentPatch> DATA_COMPONENTS = Placeholder.build(DataComponentPatch.CODEC, Function.identity());
 
+    public static final Pattern EMPTY = Pattern.compile("^$");
+    public static final Pattern QUOTE_IF_STR = literal("_qis");
+    public static final Pattern QUOTE = literal("_q");
+
     public static Pattern literal(String literal) {
-        return Pattern.compile(Pattern.quote(literal));
+        if (literal.isEmpty()) return EMPTY;
+        else return Pattern.compile(Pattern.quote(literal));
     }
 
     /**

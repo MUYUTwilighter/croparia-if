@@ -137,15 +137,11 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
         }));
     }
 
-    public static final Pattern EMPTY = Placeholder.literal("");
-    public static final Pattern QUOTE_IF_STRING = Placeholder.literal("_qis");
-    public static final Pattern QUOTE = Placeholder.literal("_q");
-
     private final Map<PatternKey, RegexParser<T>> subNodes = new LinkedHashMap<>();
 
     public PlaceholderBuilder() {
-        this.then(QUOTE_IF_STRING, (entry, placeholder, matcher) -> {
-            RegexParser<T> parser = this.subNodes.get(PatternKey.of(EMPTY));
+        this.then(Placeholder.QUOTE_IF_STR, (entry, placeholder, matcher) -> {
+            RegexParser<T> parser = this.subNodes.get(PatternKey.of(Placeholder.EMPTY));
             if (parser != null) {
                 return parser.parse(entry, placeholder, matcher).map(json -> {
                     if (json.isJsonPrimitive()) {
@@ -160,8 +156,8 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
                 return Optional.empty();
             }
         });
-        this.then(QUOTE, (entry, placeholder, matcher) -> {
-            RegexParser<T> parser = this.subNodes.get(PatternKey.of(EMPTY));
+        this.then(Placeholder.QUOTE, (entry, placeholder, matcher) -> {
+            RegexParser<T> parser = this.subNodes.get(PatternKey.of(Placeholder.EMPTY));
             if (parser != null) {
                 return parser.parse(entry, placeholder, matcher).map(json -> {
                     if (json.isJsonPrimitive()) {
@@ -191,7 +187,7 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      * @return The current builder instance for chaining.
      */
     public @NotNull PlaceholderBuilder<T> self(@NotNull RegexParser<T> parser) {
-        return then(EMPTY, parser);
+        return then(Placeholder.EMPTY, parser);
     }
 
     /**
@@ -206,7 +202,7 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      */
     @SuppressWarnings("unused")
     public @NotNull PlaceholderBuilder<T> encodeSelf(@NotNull Codec<T> codec) {
-        return then(EMPTY, (entry, placeholder, matcher) ->
+        return then(Placeholder.EMPTY, (entry, placeholder, matcher) ->
             Optional.ofNullable(CodecUtil.encodeJson(entry, codec).getOrThrow(RegexParserException::new)));
     }
 

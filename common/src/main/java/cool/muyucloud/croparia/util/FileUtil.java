@@ -28,7 +28,6 @@ public class FileUtil {
         }
     }
 
-
     /**
      * Deletes all files and directories under the given directory.
      *

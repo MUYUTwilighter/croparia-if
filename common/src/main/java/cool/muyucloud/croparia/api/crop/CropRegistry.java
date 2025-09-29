@@ -6,12 +6,13 @@ import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
+import cool.muyucloud.croparia.util.FileUtil;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -97,36 +98,17 @@ public class CropRegistry<C extends AbstractCrop> implements DgRegistry<C> {
     }
 
     public void dumpCrops() {
-        Path dir = this.getPath();
-        File dirFile = dir.toFile();
-        if (!dirFile.isDirectory() && !dirFile.mkdirs()) {
-            throw new IllegalStateException("Failed to create directory " + dir);
-        }
-        all.values().forEach(crop -> CodecUtil.encodeJson(crop, this.getCodec()).mapOrElse(json -> {
-            try (JsonWriter writer = new JsonWriter(new FileWriter(dir.resolve(crop.getKey().toString().replace(":", "/") + ".json").toFile()))) {
-                writer.setIndent("  ");
-                GSON.toJson(json, writer);
-            } catch (IOException e) {
-                CropariaIf.LOGGER.error("Failed to dump crop \"%s\"".formatted(crop.getKey()), e);
-            }
-            return null;
-        }, e -> {
-            CropariaIf.LOGGER.error("Failed to dump crop \"%s\": %s".formatted(crop.getKey(), e.message()));
-            return null;
-        }));
+        all.values().forEach(this::dumpCrop);
     }
 
     public Path dumpCrop(@NotNull C crop) {
-        Path dir = this.getPath();
-        File dirFile = dir.toFile();
-        if (!dirFile.isDirectory() && !dirFile.mkdirs()) {
-            throw new IllegalStateException("Failed to create directory " + dir);
-        }
-        Path cropPath = dir.resolve(crop.getKey().toString().replace(":", "/") + ".json");
+        Path cropPath = this.getPath().resolve(crop.getKey().toString().replace(":", "/") + ".json");
+        StringWriter result = new StringWriter();
         CodecUtil.encodeJson(crop, this.getCodec()).mapOrElse(json -> {
-            try (JsonWriter writer = new JsonWriter(new FileWriter(cropPath.toFile()))) {
+            try (JsonWriter writer = new JsonWriter(result)) {
                 writer.setIndent("  ");
                 GSON.toJson(json, writer);
+                FileUtil.write(cropPath.toFile(), result.toString(), true);
             } catch (IOException e) {
                 CropariaIf.LOGGER.error("Failed to dump crop \"%s\"".formatted(crop.getKey()), e);
             }

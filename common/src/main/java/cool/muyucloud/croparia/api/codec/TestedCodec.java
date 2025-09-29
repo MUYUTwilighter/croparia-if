@@ -100,11 +100,6 @@ public class TestedCodec<T> implements Codec<T> {
         }
     }
 
-    @Override
-    public TestedFieldCodec<T> fieldOf(String name) {
-        return new TestedFieldCodec<>(name, this);
-    }
-
     @SuppressWarnings("unchecked")
     public <T2> TestedCodec<T2> adapt() {
         return (TestedCodec<T2>) this;

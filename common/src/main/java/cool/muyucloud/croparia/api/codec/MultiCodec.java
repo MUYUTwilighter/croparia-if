@@ -45,7 +45,7 @@ public class MultiCodec<T> extends ArrayList<TestedCodec<? extends T>> implement
         return DataResult.error(() -> buildMsg(logs));
     }
 
-    private static String buildMsg(Iterable<Supplier<String>> logs) {
+    public static String buildMsg(Iterable<Supplier<String>> logs) {
         StringBuilder builder = new StringBuilder("Failed to apply any of the provided codecs:");
         for (Supplier<String> log : logs) {
             builder.append("\n").append(log.get());

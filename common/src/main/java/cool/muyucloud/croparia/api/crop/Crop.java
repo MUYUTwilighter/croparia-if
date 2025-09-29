@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public class Crop extends AbstractCrop implements TierAccess {
@@ -55,13 +54,13 @@ public class Crop extends AbstractCrop implements TierAccess {
     ));
 
     public static final Placeholder<Crop> PLACEHOLDER = Placeholder.build(node -> node
-        .then(Pattern.compile("^color$"), Crop::getColor, Color.PLACEHOLDER)
-        .then(Pattern.compile("^type$"), Crop::getType, Placeholder.STRING)
-        .then(Pattern.compile("^tier$"), Crop::getTier, Placeholder.NUMBER)
-        .then(Pattern.compile("^seed$"), Crop::getSeedId, Placeholder.ID)
-        .then(Pattern.compile("^fruit$"), Crop::getFruitId, Placeholder.ID)
-        .then(Pattern.compile("^crop_block$"), Crop::getBlockId, Placeholder.ID)
-        .then(Pattern.compile("^croparia$"), crop -> CropariaItems.getCroparia(crop.getTier()).getId(), Placeholder.ID)
+        .then(Placeholder.literal("color"), Crop::getColor, Color.PLACEHOLDER)
+        .then(Placeholder.literal("type"), Crop::getType, Placeholder.STRING)
+        .then(Placeholder.literal("tier"), Crop::getTier, Placeholder.NUMBER)
+        .then(Placeholder.literal("seed"), Crop::getSeedId, Placeholder.ID)
+        .then(Placeholder.literal("fruit"), Crop::getFruitId, Placeholder.ID)
+        .then(Placeholder.literal("crop_block"), Crop::getBlockId, Placeholder.ID)
+        .then(Placeholder.literal("croparia"), crop -> CropariaItems.getCroparia(crop.getTier()).getId(), Placeholder.ID)
         .concat(AbstractCrop.PLACEHOLDER, crop -> crop)
     );
 

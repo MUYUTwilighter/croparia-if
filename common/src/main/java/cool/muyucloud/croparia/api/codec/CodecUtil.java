@@ -237,12 +237,12 @@ public class CodecUtil {
      * </p>
      **/
     public static <T> MultiFieldCodec<T> fieldsOf(Codec<T> codec, String... names) {
-        List<TestedFieldCodec<? extends T>> list = new ArrayList<>(names.length);
+        Map<String, TestedCodec<? extends T>> map = new LinkedHashMap<>();
         TestedCodec<T> tested = of(codec);
         for (String name : names) {
-            list.add(tested.fieldOf(name));
+            map.put(name, tested);
         }
-        return new MultiFieldCodec<>(list);
+        return new MultiFieldCodec<>(map);
     }
 
     /**
@@ -264,13 +264,12 @@ public class CodecUtil {
      * The {@code codec} can decode from either {@code { "id": 123 }} or {@code { "name": "example" }}, and encode into {@code { "name": "example }}.
      * </p>
      *
-     * @param codecs the field codecs to combine
-     * @param <T>    target type
+     * @param map the field-codec entries to combine
+     * @param <T> target type
      * @return the combined field codec
      */
-    @SafeVarargs
-    public static <T> MultiFieldCodec<T> fieldsOf(TestedFieldCodec<? extends T>... codecs) {
-        return new MultiFieldCodec<>(Arrays.asList(codecs));
+    public static <T> MultiFieldCodec<T> fieldsOf(Map<String, TestedCodec<? extends T>> map) {
+        return new MultiFieldCodec<>(map);
     }
 
     /**
