@@ -3,21 +3,21 @@ package cool.muyucloud.croparia.api.crop.util;
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
+import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
-import cool.muyucloud.croparia.api.placeholder.RegexParser;
+import cool.muyucloud.croparia.api.placeholder.TypeMapper;
 import net.minecraft.network.chat.Style;
 
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 public class Color {
     public static final Codec<Color> CODEC_INT = Codec.INT.xmap(Color::new, Color::getValue);
     public static final Codec<Color> CODEC_STR = Codec.STRING.xmap(Color::new, Color::toString);
     public static final MultiCodec<Color> CODEC = CodecUtil.of(CODEC_STR, CODEC_INT);
     public static final Placeholder<Color> PLACEHOLDER = Placeholder.build(node -> node
-        .self(RegexParser.of(Color::toString))
-        .then(Pattern.compile("^hex$"), RegexParser.of(Color::toHexString))
-        .then(Pattern.compile("^dec$"), RegexParser.of(Color::toDecString))
+        .self(TypeMapper.of(Color::toString), Placeholder.STRING)
+        .then(PatternKey.literal("hex"), TypeMapper.of(Color::toHexString), Placeholder.STRING)
+        .then(PatternKey.literal("dec"), TypeMapper.of(Color::toDecString), Placeholder.STRING)
     );
 
     public static Color of(int value) {

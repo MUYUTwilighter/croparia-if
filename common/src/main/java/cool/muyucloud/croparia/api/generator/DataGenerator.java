@@ -144,7 +144,7 @@ public class DataGenerator implements DgListener {
     }
 
     public String getPath(DgEntry entry) {
-        return this.getPath().replace(entry);
+        return this.getPath().parser(entry);
     }
 
     public DgRegistry<? extends DgEntry> getRegistry() {
@@ -156,7 +156,7 @@ public class DataGenerator implements DgListener {
     }
 
     public String getTemplate(DgEntry entry) {
-        return this.getTemplate().replace(entry);
+        return this.getTemplate().parser(entry);
     }
 
     public void generate(PackHandler pack) {

@@ -3,7 +3,9 @@ package cool.muyucloud.croparia.api.crop;
 import com.google.common.collect.ImmutableList;
 import cool.muyucloud.croparia.api.crop.util.Material;
 import cool.muyucloud.croparia.api.generator.util.TranslatableEntry;
+import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
+import cool.muyucloud.croparia.api.placeholder.TypeMapper;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -11,13 +13,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public abstract class AbstractCrop implements TranslatableEntry {
     public static final Placeholder<AbstractCrop> PLACEHOLDER = Placeholder.build(node -> node
-        .then(Pattern.compile("material"), AbstractCrop::getMaterial, Material.PLACEHOLDER)
-        .then(Pattern.compile("result"), AbstractCrop::getResult, Placeholder.ITEM_STACK)
-        .concat(TranslatableEntry.PLACEHOLDER, crop -> crop));
+        .then(PatternKey.literal("material"), TypeMapper.of(AbstractCrop::getMaterial), Material.PLACEHOLDER)
+        .then(PatternKey.literal("result"), TypeMapper.of(AbstractCrop::getResult), Placeholder.ITEM_STACK)
+        .concat(TranslatableEntry.PLACEHOLDER, TypeMapper.of(crop -> crop)));
 
     protected transient OnLoadSupplier<List<ItemStack>> results = OnLoadSupplier.of(() -> {
         List<ItemStack> items = new ArrayList<>();

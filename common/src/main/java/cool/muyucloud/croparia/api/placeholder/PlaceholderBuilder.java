@@ -6,16 +6,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
-import cool.muyucloud.croparia.util.ListReader;
-import cool.muyucloud.croparia.util.MapReader;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,34 +58,51 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      * @return A new PlaceholderBuilder instance for the map type.
      * @apiNote The builder supports Json Object Querier.
      */
-    public static <T, V> PlaceholderBuilder<T> ofMap(Function<T, MapReader<String, V>> mapper, RegexParser<V> valueParser) {
+    public static <T, V> PlaceholderBuilder<T> ofMap(TypeMapper<T, @NotNull MapReader<String, V>> mapper, Placeholder<V> valueParser) {
         return PlaceholderBuilder.of(parser -> parser.self((entry, placeholder, matcher) -> {
-            JsonObject obj = new JsonObject();
-            for (Map.Entry<String, V> e : mapper.apply(entry)) {
-                valueParser.parse(e.getValue(), placeholder, matcher).ifPresent(v -> obj.add(e.getKey(), v));
+            if (entry instanceof JsonObject obj) {
+                return Optional.of(obj);
             }
+            JsonObject obj = new JsonObject();
+            mapper.map(entry, placeholder, matcher).ifPresent(map -> map.forEach(
+                e -> valueParser.parse(e.getValue(), placeholder, matcher).ifPresent(v -> obj.add(e.getKey(), v))
+            ));
             return Optional.of(obj);
         }).then(
-            Pattern.compile("^size$|^length$"), RegexParser.of(entry -> mapper.apply(entry).size())
-        ).then(Pattern.compile("^\\{}$"), (entry, placeholder, matcher) -> {
+            Pattern.compile("^size$|^length$"), (entry, placeholder, matcher) -> mapper.map(entry, placeholder, matcher).map(MapReader::size), Placeholder.NUMBER
+        ).then(Pattern.compile("mapKey\\((.*)\\)"), (entry, placeholder, matcher) -> {
             JsonObject obj = new JsonObject();
-            for (Map.Entry<String, V> e : mapper.apply(entry)) {
-                valueParser.parse(e.getValue(), placeholder, matcher).ifPresent(v -> obj.add(e.getKey(), v));
-            }
+            mapper.map(entry, placeholder, matcher).ifPresent(map -> map.forEach(
+                e -> valueParser.parse(e.getValue(), placeholder, matcher).ifPresent(
+                    k -> valueParser.parse(e.getValue(), "", PatternKey.EMPTY.matcher("")).ifPresent(
+                        v -> obj.add(k.getAsString(), v)
+                    )
+                )
+            ));
             return Optional.of(obj);
-        }).then(Pattern.compile("^\\[]$"), (entry, placeholder, matcher) -> {
+        }, Placeholder.JSON_OBJECT).then(Pattern.compile("mapValue\\((.*)\\)"), (entry, placeholder, matcher) -> {
+            JsonObject obj = new JsonObject();
+            mapper.map(entry, placeholder, matcher).ifPresent(map -> map.forEach(
+                e -> valueParser.parse(e.getValue(), placeholder, matcher).ifPresent(v -> obj.add(e.getKey(), v))
+            ));
+            return Optional.of(obj);
+        }, Placeholder.JSON_OBJECT).then(PatternKey.literal("values()"), (entry, placeholder, matcher) -> {
             JsonArray array = new JsonArray();
-            for (Map.Entry<String, V> e : mapper.apply(entry)) {
-                valueParser.parse(e.getValue(), placeholder, matcher).ifPresent(array::add);
-            }
+            mapper.map(entry, placeholder, matcher).ifPresent(map -> map.values().forEach(value -> valueParser.parse(value, placeholder, matcher).ifPresent(array::add)));
             return Optional.of(array);
-        }).then(Pattern.compile("(^.*$)"), (entry, placeholder, matcher) -> {
+        }, Placeholder.JSON_ARRAY).then(PatternKey.literal("keys()"), (entry, placeholder, matcher) -> {
+            JsonArray array = new JsonArray();
+            mapper.map(entry, placeholder, matcher).ifPresent(map -> map.values().forEach(value -> valueParser.parse(value, placeholder, matcher).ifPresent(array::add)));
+            return Optional.of(array);
+        }, Placeholder.JSON_ARRAY).then(Pattern.compile("get\\((^.*$)\\)"), (entry, placeholder, matcher) -> {
             String key = matcher.group(1);
-            V value = mapper.apply(entry).get(key);
-            if (value == null) {
-                throw new RegexParserException("Key not found: " + key);
-            }
-            return valueParser.parse(value, placeholder, matcher);
+            return mapper.map(entry, placeholder, matcher).map(map -> map.get(key))
+                .flatMap(value -> valueParser.parse(value, placeholder, matcher));
+        }).then(Pattern.compile("^getOr\\((.*),(.*)\\)$"), (entry, placeholder, matcher) -> {
+            String key = matcher.group(1);
+            String def = matcher.group(2);
+            return mapper.map(entry, placeholder, matcher).map(map -> map.get(key))
+                .flatMap(value -> valueParser.parse(value, placeholder, matcher));
         }));
     }
 
@@ -102,37 +116,45 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      * @return A new PlaceholderBuilder instance for the list type.
      * @apiNote The builder supports Json Array Querier.
      */
-    public static <T, E> PlaceholderBuilder<T> ofList(Function<T, ListReader<E>> mapper, RegexParser<E> elementParser) {
+    public static <T, E> PlaceholderBuilder<T> ofList(TypeMapper<T, ListReader<E>> mapper, Placeholder<E> elementParser) {
         return PlaceholderBuilder.of(parser -> parser.self((entry, placeholder, matcher) -> {
-            JsonArray array = new JsonArray();
-            for (E e : mapper.apply(entry)) {
-                elementParser.parse(e, placeholder, matcher).ifPresent(array::add);
+            if (entry instanceof JsonArray array) {
+                return Optional.of(array);
             }
+            JsonArray array = new JsonArray();
+            mapper.map(entry, placeholder, matcher).ifPresent(
+                list -> list.forEach(element -> elementParser.parse(element, placeholder, matcher).ifPresent(array::add))
+            );
             return Optional.of(array);
         }).then(
-            Pattern.compile("^size$|^length$"), RegexParser.of(entry -> mapper.apply(entry).size())
-        ).then(Pattern.compile("\\[]"), (entry, placeholder, matcher) -> {
+            PatternKey.literal("_size"),
+            (entry, placeholder, matcher) -> mapper.map(entry, placeholder, matcher).map(ListReader::size),
+            Placeholder.NUMBER
+        ).then(Pattern.compile("map\\(.*\\)"), (entry, placeholder, matcher) -> {
             JsonArray array = new JsonArray();
-            for (E e : mapper.apply(entry)) {
-                elementParser.parse(e, placeholder, matcher).ifPresent(array::add);
-            }
+            mapper.map(entry, placeholder, matcher).ifPresent(
+                list -> list.forEach(element -> elementParser.parse(element, placeholder, matcher).ifPresent(array::add))
+            );
             return Optional.of(array);
-        }).then(Pattern.compile("^\\{}$"), (entry, placeholder, matcher) -> {
+        }, Placeholder.JSON_ARRAY).then(PatternKey.literal("mapi()"), (entry, placeholder, matcher) -> {
             JsonObject obj = new JsonObject();
-            int i = 0;
-            for (E e : mapper.apply(entry)) {
-                String k = String.valueOf(i);
-                elementParser.parse(e, placeholder, matcher).ifPresent(v -> obj.add(k, v));
-                i++;
-            }
+            mapper.map(entry, placeholder, matcher).ifPresent(list -> {
+                int i = 0;
+                for (E e : list) {
+                    String k = String.valueOf(i);
+                    elementParser.parse(e, placeholder, matcher).ifPresent(v -> obj.add(k, v));
+                    i++;
+                }
+            });
             return Optional.of(obj);
-        }).then(Pattern.compile("(^\\d+$)"), (entry, placeholder, matcher) -> {
+        }, Placeholder.JSON_OBJECT).then(Pattern.compile("^get\\(\\d+\\)$"), (entry, placeholder, matcher) -> {
             try {
                 int index = Integer.parseInt(matcher.group(1));
-                E element = mapper.apply(entry).get(index);
-                return elementParser.parse(element, placeholder, matcher);
+                return mapper.map(entry, placeholder, matcher).map(
+                    list -> list.get(index)
+                ).flatMap(element -> elementParser.parse(element, placeholder, matcher));
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                throw new RegexParserException("Invalid index: " + RegexParser.next(placeholder), e);
+                return Optional.empty();
             }
         }));
     }
@@ -140,8 +162,8 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
     private final Map<PatternKey, RegexParser<T>> subNodes = new LinkedHashMap<>();
 
     public PlaceholderBuilder() {
-        this.then(Placeholder.QUOTE_IF_STR, (entry, placeholder, matcher) -> {
-            RegexParser<T> parser = this.subNodes.get(PatternKey.of(Placeholder.EMPTY));
+        this.then(PatternKey.QUOTE_IF_STR, (entry, placeholder, matcher) -> {
+            RegexParser<T> parser = this.subNodes.get(PatternKey.of(PatternKey.EMPTY));
             if (parser != null) {
                 return parser.parse(entry, placeholder, matcher).map(json -> {
                     if (json.isJsonPrimitive()) {
@@ -156,8 +178,8 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
                 return Optional.empty();
             }
         });
-        this.then(Placeholder.QUOTE, (entry, placeholder, matcher) -> {
-            RegexParser<T> parser = this.subNodes.get(PatternKey.of(Placeholder.EMPTY));
+        this.then(PatternKey.QUOTE, (entry, placeholder, matcher) -> {
+            RegexParser<T> parser = this.subNodes.get(PatternKey.of(PatternKey.EMPTY));
             if (parser != null) {
                 return parser.parse(entry, placeholder, matcher).map(json -> {
                     if (json.isJsonPrimitive()) {
@@ -172,12 +194,15 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
                 return Optional.empty();
             }
         });
-
     }
 
     @SuppressWarnings("unused")
     public PlaceholderBuilder(RegexParser<T> selfParser) {
         this.self(selfParser);
+    }
+
+    protected Map<PatternKey, RegexParser<T>> getSubNodes() {
+        return subNodes;
     }
 
     /**
@@ -186,53 +211,26 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      * @param parser The parser to use for the entry itself.
      * @return The current builder instance for chaining.
      */
-    public @NotNull PlaceholderBuilder<T> self(@NotNull RegexParser<T> parser) {
-        return then(Placeholder.EMPTY, parser);
+    protected @NotNull PlaceholderBuilder<T> self(@NotNull RegexParser<T> parser) {
+        return then(PatternKey.EMPTY, parser);
     }
 
-    /**
-     * Encode the entry itself using the given codec when the placeholder is empty.
-     *
-     * @param codec The codec to use for encoding the entry into Json.
-     * @return The current builder instance for chaining.
-     * @apiNote <b>DO NOT</b> copy the {@link RegexParser} lambda here to {@link #then(Pattern, RegexParser)} or
-     * {@link #then(Pattern, Function, RegexParser)} when you need to parse into Json for sub-parsing.<br/>
-     * You should use {@link #then(Pattern, Function)} or {@code then(key, mapper, Placeholder.JSON)} so that the parser
-     * would support auto-casting and Json Querier.
-     */
-    @SuppressWarnings("unused")
-    public @NotNull PlaceholderBuilder<T> encodeSelf(@NotNull Codec<T> codec) {
-        return then(Placeholder.EMPTY, (entry, placeholder, matcher) ->
-            Optional.ofNullable(CodecUtil.encodeJson(entry, codec).getOrThrow(RegexParserException::new)));
+    public @NotNull <F> PlaceholderBuilder<T> self(TypeMapper<T, F> mapper, @NotNull Placeholder<F> parser) {
+        return then(PatternKey.EMPTY, mapper, parser);
     }
 
-    /**
-     * Add a sub-node that matches the given key pattern and uses the provided parser to parse the entry.
-     *
-     * @param key    The pattern to match the placeholder key.
-     * @param parser The parser to use for parsing the entry when the key matches.
-     * @return The current builder instance for chaining.
-     * @apiNote If you want to parse the entry into Json, you should use {@link #then(Pattern, Function)} or
-     * {@code then(key, mapper, Placeholder.JSON)} so that the parser would support auto-casting and Json Querier.
-     */
-    public <N> @NotNull PlaceholderBuilder<T> then(@NotNull Pattern key, @NotNull Function<T, N> mapper, @NotNull RegexParser<N> parser) {
-        return then(key, (entry, placeholder, matcher) -> {
-            N next = mapper.apply(entry);
-            if (next == null) return Optional.empty();
-            return parser.parse(next, placeholder, matcher);
-        });
+    public @NotNull <F> PlaceholderBuilder<T> self(TypeMapper<T, F> mapper, @NotNull Codec<F> codec) {
+        return then(PatternKey.EMPTY, mapper, codec);
     }
 
-    /**
-     * Add a sub-node that matches the given key pattern and uses the provided mapper to convert the entry into Json.
-     *
-     * @param key    The pattern to match the placeholder key.
-     * @param mapper The function to convert the entry into a JsonElement.
-     * @return The current builder instance for chaining.
-     * @apiNote This is a shorthand for {@code then(key, mapper, Placeholder.JSON)}.
-     */
-    public @NotNull PlaceholderBuilder<T> then(@NotNull Pattern key, @NotNull Function<T, JsonElement> mapper) {
-        return then(key, mapper, Placeholder.JSON);
+    protected @NotNull PlaceholderBuilder<T> then(@NotNull Pattern key, @NotNull RegexParser<T> parser) {
+        this.subNodes.put(PatternKey.of(key), parser);
+        return this;
+    }
+
+    public @NotNull <O> PlaceholderBuilder<T> then(@NotNull Pattern key, TypeMapper<T, O> mapper, @NotNull Placeholder<O> parser) {
+        return then(key, ((entry, placeholder, matcher) -> mapper.map(entry, placeholder, matcher)
+            .flatMap(other -> parser.parse(other, placeholder, matcher))));
     }
 
     /**
@@ -242,13 +240,16 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      * @param key    The pattern to match the placeholder key.
      * @param mapper The function to convert the entry into a type.
      * @param codec  The codec to use for encoding the type into Json.
-     * @param <N>    The type to convert the entry into.
+     * @param <O>    The type to convert the entry into.
      * @return The current builder instance for chaining.
-     * @apiNote This is a shorthand for then(key, t -> CodecUtil.encodeJson(mapper.apply(t), codec).getOrThrow(RegexParserException::new))
-     * @see #then(Pattern, Function)
+     * @apiNote This is a shorthand for then(key, t -> CodecUtil.encodeJson(mapper.apply(t), codec).getOrThrow(PlaceholderException::new))
      */
-    public @NotNull <N> PlaceholderBuilder<T> then(@NotNull Pattern key, @NotNull Function<T, N> mapper, @NotNull Codec<N> codec) {
-        return then(key, t -> CodecUtil.encodeJson(mapper.apply(t), codec).getOrThrow(RegexParserException::new));
+    public @NotNull <O> PlaceholderBuilder<T> then(@NotNull Pattern key, @NotNull TypeMapper<T, O> mapper, @NotNull Codec<O> codec) {
+        return then(key, (entry, placeholder, matcher) -> mapper.map(entry, placeholder, matcher).map(mapped -> {
+            AtomicReference<JsonElement> ref = new AtomicReference<>();
+            CodecUtil.encodeJson(mapped, codec).ifSuccess(ref::set);
+            return ref.get();
+        }), Placeholder.JSON);
     }
 
     /**
@@ -257,10 +258,10 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      * @param key    The pattern to match the placeholder key.
      * @param parser The parser to use for parsing the entry when the key matches.
      * @return The current builder instance for chaining.
-     * @apiNote If you want to parse the entry into Json, you should use {@link #then(Pattern, Function)} or
-     * {@code then(key, mapper, Placeholder.JSON)} so that the parser would support auto-casting and Json Querier.
+     * @apiNote If you want to parse the entry into Json, you should use {@code then(key, mapper, Placeholder.JSON)} so
+     * that the parser would support auto-casting and Json Querier.
      */
-    public @NotNull PlaceholderBuilder<T> then(@NotNull Pattern key, @NotNull RegexParser<T> parser) {
+    public @NotNull PlaceholderBuilder<T> then(@NotNull Pattern key, @NotNull Placeholder<T> parser) {
         subNodes.put(new PatternKey(key), parser);
         return this;
     }
@@ -275,94 +276,41 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      * @param <V>         The type of the map values.
      * @return The current builder instance for chaining.
      * @apiNote This is a shorthand for {@code then(key, mapper, ofMap(mapper, valueParser))}.
-     * @see #ofMap(Function, RegexParser)
+     * @see #ofMap(TypeMapper, Placeholder)
      */
-    public @NotNull <V> PlaceholderBuilder<T> thenMap(@NotNull Pattern key, @NotNull Function<T, MapReader<String, V>> mapper, @NotNull RegexParser<V> valueParser) {
+    public @NotNull <V> PlaceholderBuilder<T> thenMap(@NotNull Pattern key, @NotNull TypeMapper<T, MapReader<String, V>> mapper, @NotNull Placeholder<V> valueParser) {
         return this.then(key, ofMap(mapper, valueParser));
     }
 
     /**
      * Add a sub-node that matches the given key pattern and uses the provided mapper to convert the entry into a list,
      * then parses the elements using the provided element parser.
-     *
-     * @param key        The pattern to match the placeholder key.
-     * @param mapper     The function to convert the entry into a list.
-     * @param elemParser The parser to use for parsing the list elements.
-     * @param <E>        The type of the list elements.
-     * @return The current builder instance for chaining.
-     * @apiNote This is a shorthand for {@code then(key, mapper, ofList(mapper, elemParser))}.
-     * @see #ofList(Function, RegexParser)
      */
     @SuppressWarnings("unused")
-    public @NotNull <E> PlaceholderBuilder<T> thenList(@NotNull Pattern key, @NotNull Function<T, ListReader<E>> mapper, @NotNull RegexParser<E> elemParser) {
+    public @NotNull <E> PlaceholderBuilder<T> thenList(@NotNull Pattern key, @NotNull TypeMapper<T, ListReader<E>> mapper, @NotNull Placeholder<E> elemParser) {
         return this.then(key, ofList(mapper, elemParser));
     }
 
     /**
-     * Concatenate another placeholder builder to this one, using the provided mapper to convert the entry type.
-     *
-     * @param other  The other placeholder builder to concatenate.
-     * @param mapper The function to convert the entry type from T to O.
-     * @param <O>    The other entry type.
-     * @return The current builder instance for chaining.
-     * @apiNote This method merges the sub-nodes of the other builder into this one.
-     * If there are conflicting patterns, the other builder's patterns will overwrite this one's.
+     * Overwrite the sub-nodes of this builder with the sub-nodes of another placeholder.
      */
-    public @NotNull <O> PlaceholderBuilder<T> overwrite(@NotNull PlaceholderBuilder<O> other, @NotNull Function<T, O> mapper) {
-        for (Map.Entry<PatternKey, RegexParser<O>> otherEntry : other.subNodes.entrySet()) {
-            RegexParser<O> parser = otherEntry.getValue();
-            subNodes.put(otherEntry.getKey(), (entry, placeholder, matcher) -> {
-                O next = mapper.apply(entry);
-                return parser.parse(next, placeholder, matcher);
-            });
+    public @NotNull <O> PlaceholderBuilder<T> overwrite(@NotNull Placeholder<O> other, @NotNull TypeMapper<T, O> mapper) {
+        for (var entry : other.getSubNodes().entrySet()) {
+            subNodes.put(entry.getKey(), (t, p, m) -> mapper.map(t, p, m).flatMap(o -> entry.getValue().parse(o, p, m)));
         }
         return this;
     }
 
-    public @NotNull PlaceholderBuilder<T> overwrite(@NotNull PlaceholderBuilder<T> other) {
-        return this.overwrite(other, Function.identity());
-    }
-
-    public @NotNull <O> PlaceholderBuilder<T> overwrite(@NotNull Placeholder<O> other, @NotNull Function<T, O> mapper) {
-        return this.overwrite(other.copy(), mapper);
-    }
-
-    public @NotNull PlaceholderBuilder<T> overwrite(@NotNull Placeholder<T> other) {
-        return this.overwrite(other, Function.identity());
-    }
-
-    /**
-     * Similar to {@link #overwrite(PlaceholderBuilder, Function)}, but does not overwrite existing patterns.
-     *
-     * @param other  The other placeholder builder to concatenate.
-     * @param mapper The function to convert the entry type from T to O.
-     * @param <O>    The other entry type.
-     * @return The current builder instance for chaining.
-     * @apiNote This method merges the sub-nodes of the other builder into this one.
-     * If there are conflicting patterns, the existing patterns in this builder will be preserved.
-     */
-    public @NotNull <O> PlaceholderBuilder<T> concat(@NotNull PlaceholderBuilder<O> other, @NotNull Function<T, O> mapper) {
-        for (Map.Entry<PatternKey, RegexParser<O>> otherEntry : other.subNodes.entrySet()) {
-            this.subNodes.putIfAbsent(otherEntry.getKey(), (entry, placeholder, matcher) -> {
-                O next = mapper.apply(entry);
-                return otherEntry.getValue().parse(next, placeholder, matcher);
-            });
+    public @NotNull <O> PlaceholderBuilder<T> concat(@NotNull Placeholder<O> other, @NotNull TypeMapper<T, O> mapper) {
+        for (var entry : other.getSubNodes().entrySet()) {
+            this.subNodes.putIfAbsent(entry.getKey(), (t, s, m) -> mapper.map(t, s, m).flatMap(o -> entry.getValue().parse(o, s, m)));
         }
         return this;
     }
 
-    @SuppressWarnings("unused")
-    public @NotNull PlaceholderBuilder<T> concat(@NotNull PlaceholderBuilder<T> other) {
-        return this.concat(other, Function.identity());
-    }
-
-    public @NotNull <O> PlaceholderBuilder<T> concat(@NotNull Placeholder<O> other, @NotNull Function<T, O> mapper) {
-        return this.concat(other.copy(), mapper);
-    }
-
-    @SuppressWarnings("unused")
-    public @NotNull PlaceholderBuilder<T> concat(@NotNull Placeholder<T> other) {
-        return this.concat(other, Function.identity());
+    public @NotNull PlaceholderBuilder<T> remove(@NotNull Pattern key) {
+        this.subNodes.remove(new PatternKey(key));
+        return this;
     }
 
     /**
@@ -375,30 +323,14 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      * the entry type from O to T before passing it to the original parsers.<br/>
      * The original builder remains unchanged.
      */
-    public <O> PlaceholderBuilder<O> map(@NotNull Function<O, T> mapper) {
+    public <O> PlaceholderBuilder<O> map(@NotNull TypeMapper<O, T> mapper) {
         PlaceholderBuilder<O> mapped = new PlaceholderBuilder<>();
         for (Map.Entry<PatternKey, RegexParser<T>> entry : this.subNodes.entrySet()) {
             PatternKey key = entry.getKey();
             RegexParser<T> parser = entry.getValue();
-            mapped.subNodes.put(key, (oEntry, placeholder, matcher) -> {
-                T next = mapper.apply(oEntry);
-                return parser.parse(next, placeholder, matcher);
-            });
+            mapped.subNodes.put(key, (oEntry, placeholder, matcher) -> mapper.map(oEntry, placeholder, matcher).flatMap(t -> parser.parse(t, placeholder, matcher)));
         }
         return mapped;
-    }
-
-    /**
-     * Create a copy of this placeholder builder.
-     *
-     * @return A new placeholder builder that is a copy of this one.
-     * @apiNote The copy contains the same sub-nodes as the original, but is a separate instance.
-     * Modifications to the copy will not affect the original, and vice versa.
-     */
-    public PlaceholderBuilder<T> copy() {
-        PlaceholderBuilder<T> copy = new PlaceholderBuilder<>();
-        copy.subNodes.putAll(this.subNodes);
-        return copy;
     }
 
     /**
@@ -419,18 +351,18 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      * @param placeholder The placeholder to be processed.
      * @param matcher     The matcher of the pattern that matched the placeholder.
      * @return The processed JsonElement, or Optional.empty() if the placeholder is not recognized.
-     * @throws RegexParserException If any error occurs during processing.
+     * @throws PlaceholderException If any error occurs during processing.
      * @apiNote This method checks if the placeholder is empty, in which case it calls the self parser.<br/>
      * If not empty, it extracts the next key segment and looks for a matching sub-node parser.<br/>
      * If a matching sub-node is found, it forwards the remaining placeholder to that parser.<br/>
-     * If no matching sub-node is found, it throws a RegexParserException.
+     * If no matching sub-node is found, it throws a PlaceholderException.
      */
     @Override
-    public Optional<JsonElement> parse(@NotNull T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws RegexParserException {
+    public Optional<JsonElement> parse(@NotNull T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws PlaceholderException {
         String forwarded = RegexParser.forward(placeholder);
         String next = RegexParser.next(placeholder);
         for (Map.Entry<PatternKey, RegexParser<T>> subEntry : subNodes.entrySet()) {
-            Matcher subMatcher = subEntry.getKey().pattern.matcher(next);
+            Matcher subMatcher = subEntry.getKey().pattern().matcher(next);
             if (subMatcher.find()) {
                 Optional<JsonElement> result = subEntry.getValue().parse(entry, forwarded, subMatcher);
                 if (result.isPresent()) {
@@ -438,41 +370,7 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
                 }
             }
         }
-        throw new RegexParserException("No matching key for: " + next);
+        return Optional.empty();
     }
 
-    public static class PatternKey {
-        public static PatternKey of(Pattern pattern) {
-            return new PatternKey(pattern);
-        }
-
-        private final Pattern pattern;
-
-        public PatternKey(Pattern pattern) {
-            this.pattern = pattern;
-        }
-
-        @Override
-        public String toString() {
-            return pattern.toString();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null) return false;
-            if (this == o) return true;
-            if (o instanceof Pattern oPattern) {
-                return Objects.equals(this.pattern.pattern(), oPattern.pattern());
-            } else if (o instanceof PatternKey key) {
-                return Objects.equals(this.pattern.pattern(), key.pattern.pattern());
-            } else {
-                return false;
-            }
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(pattern.pattern());
-        }
-    }
 }

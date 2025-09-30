@@ -27,9 +27,9 @@ public interface RegexParser<T> {
      * @param placeholder The placeholder to be processed.
      * @param matcher     The matcher of the pattern that matched the placeholder.
      * @return The processed JsonElement, or Optional.empty() if the placeholder is not recognized.
-     * @throws RegexParserException If any error occurs during processing.
+     * @throws PlaceholderException If any error occurs during processing.
      */
-    Optional<JsonElement> parse(T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws RegexParserException;
+    Optional<JsonElement> parse(T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws PlaceholderException;
 
     static String forward(@NotNull String placeholder) {
         int i = placeholder.indexOf('.');
@@ -50,7 +50,7 @@ public interface RegexParser<T> {
     }
 
     interface Direct<T> {
-        Object process(@NotNull T entry) throws RegexParserException;
+        Object process(@NotNull T entry) throws PlaceholderException;
 
         default RegexParser<T> asNode() {
             return (entry, placeholder, matcher) -> Optional.ofNullable(JsonBuilder.parse(this.process(entry)));
@@ -58,7 +58,7 @@ public interface RegexParser<T> {
     }
 
     interface Pass<T> {
-        Object process(@NotNull T entry, @NotNull String placeholder) throws RegexParserException;
+        Object process(@NotNull T entry, @NotNull String placeholder) throws PlaceholderException;
 
         default RegexParser<T> asNode() {
             return (entry, placeholder, matcher) -> Optional.ofNullable(JsonBuilder.parse(this.process(entry, placeholder)));

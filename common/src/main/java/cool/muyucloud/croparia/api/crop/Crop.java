@@ -13,7 +13,9 @@ import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
 import cool.muyucloud.croparia.api.crop.util.Material;
 import cool.muyucloud.croparia.api.crop.util.TierAccess;
+import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
+import cool.muyucloud.croparia.api.placeholder.TypeMapper;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.supplier.HolderSupplier;
@@ -54,14 +56,14 @@ public class Crop extends AbstractCrop implements TierAccess {
     ));
 
     public static final Placeholder<Crop> PLACEHOLDER = Placeholder.build(node -> node
-        .then(Placeholder.literal("color"), Crop::getColor, Color.PLACEHOLDER)
-        .then(Placeholder.literal("type"), Crop::getType, Placeholder.STRING)
-        .then(Placeholder.literal("tier"), Crop::getTier, Placeholder.NUMBER)
-        .then(Placeholder.literal("seed"), Crop::getSeedId, Placeholder.ID)
-        .then(Placeholder.literal("fruit"), Crop::getFruitId, Placeholder.ID)
-        .then(Placeholder.literal("crop_block"), Crop::getBlockId, Placeholder.ID)
-        .then(Placeholder.literal("croparia"), crop -> CropariaItems.getCroparia(crop.getTier()).getId(), Placeholder.ID)
-        .concat(AbstractCrop.PLACEHOLDER, crop -> crop)
+        .then(PatternKey.literal("color"), TypeMapper.of(Crop::getColor), Color.PLACEHOLDER)
+        .then(PatternKey.literal("type"), TypeMapper.of(Crop::getType), Placeholder.STRING)
+        .then(PatternKey.literal("tier"), TypeMapper.of(Crop::getTier), Placeholder.NUMBER)
+        .then(PatternKey.literal("seed"), TypeMapper.of(Crop::getSeedId), Placeholder.ID)
+        .then(PatternKey.literal("fruit"), TypeMapper.of(Crop::getFruitId), Placeholder.ID)
+        .then(PatternKey.literal("crop_block"), TypeMapper.of(Crop::getBlockId), Placeholder.ID)
+        .then(PatternKey.literal("croparia"), TypeMapper.of(crop -> CropariaItems.getCroparia(crop.getTier()).getId()), Placeholder.ID)
+        .concat(AbstractCrop.PLACEHOLDER, TypeMapper.of(crop -> crop))
     );
 
     public static String defaultTranslation(ResourceLocation id) {
@@ -114,8 +116,10 @@ public class Crop extends AbstractCrop implements TierAccess {
         this.defaultTranslationKey = defaultTranslationKey(id);
         this.dependencies = dependencies == null || dependencies.isEmpty() ? new CropDependencies(CropariaIf.MOD_ID, this.getDefaultTranslationKey()) : dependencies;
         this.defaultTranslation = defaultTranslation(id);
-        ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-        this.translations = builder.put("en_us", this.getDefaultTranslation()).putAll(translations == null ? Collections.emptyMap() : translations).build();
+        Map<String, String> builder = new HashMap<>();
+        builder.put("en_us", this.getDefaultTranslation());
+        builder.putAll(translations == null ? Collections.emptyMap() : translations);
+        this.translations = ImmutableMap.copyOf(builder);
         this.type = type == null ? DEFAULT_TYPE : type;
         this.block = HolderSupplier.of(() -> new CropariaCropBlock(this), CifUtil.formatId("block_crop_%s", this.getKey()), Registries.BLOCK);
         this.seed = HolderSupplier.of(() -> new CropSeed(this), CifUtil.formatId("crop_seed_%s", this.getKey()), Registries.ITEM);

@@ -44,17 +44,12 @@ public class AggregatedGenerator extends DataGenerator {
     }
 
     public String getContent(DgEntry entry) {
-        return this.getContent().replace(entry);
+        return this.getContent().parser(entry);
     }
 
     @Override
     public String getTemplate(DgEntry entry) {
         throw new UnsupportedOperationException("AggregatedGenerator does not support single file generation.");
-    }
-
-    @Override
-    public void generate(PackHandler pack) {
-        super.generate(pack);
     }
 
     @Override
@@ -72,7 +67,7 @@ public class AggregatedGenerator extends DataGenerator {
                 builder.append(s).append(",\n");
             }
             String content = builder.isEmpty() ? "" : builder.substring(0, builder.length() - 2);
-            handler.cache(relative, this.getTemplate().replace(PlaceholderAccess.of(content, CONTENT_PLACEHOLDER)));
+            handler.cache(relative, this.getTemplate().parser(PlaceholderAccess.of(content, CONTENT_PLACEHOLDER)));
         }
         CACHE.clear();
     }

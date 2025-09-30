@@ -6,17 +6,17 @@ import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.api.generator.util.DgEntry;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.api.generator.util.TranslatableEntry;
+import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
-import cool.muyucloud.croparia.api.placeholder.PlaceholderAccess;
-import cool.muyucloud.croparia.api.placeholder.RegexParser;
 import cool.muyucloud.croparia.api.placeholder.Template;
+import cool.muyucloud.croparia.api.placeholder.TypeMapper;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class LangGenerator extends DataGenerator {
@@ -61,15 +61,15 @@ public class LangGenerator extends DataGenerator {
     @Override
     protected void generate(DgEntry entry, PackHandler pack) {
         if (entry instanceof TranslatableEntry translatable) {
+            AtomicReference<String> langRef = new AtomicReference<>();
+            @SuppressWarnings("unchecked")
+            Placeholder<TranslatableEntry> parser = Placeholder.build(builder -> builder
+                .then(PatternKey.literal("lang"), TypeMapper.of(e -> langRef.get()), Placeholder.STRING)
+                .overwrite((Placeholder<TranslatableEntry>) translatable.placeholder(), TypeMapper.identity()));
             for (String lang : translatable.getLangs()) {
-                @SuppressWarnings("unchecked")
-                PlaceholderAccess access = PlaceholderAccess.of(entry, Placeholder.build(builder -> builder
-                    .then(Pattern.compile("^lang$"), RegexParser.of(e -> lang))
-                    .overwrite((Placeholder<DgEntry>) entry.placeholder())
-                ));
-                String relative = this.getPath().replace(access, placeholder -> placeholder.replaceAll("_lang", lang));
+                String relative = this.getPath().parser(translatable, parser, placeholder -> placeholder.replaceAll("_lang", lang));
                 List<String> list = TRANSLATIONS.computeIfAbsent(relative, k -> new LinkedList<>());
-                list.add(this.getTemplate().replace(access, placeholder -> placeholder.replaceAll("_lang", lang)));
+                list.add(this.getTemplate().parser(translatable, parser, placeholder -> placeholder.replaceAll("_lang", lang)));
             }
         } else {
             throw new JsonParseException("Entry %s in %s is not translatable".formatted(entry.getKey(), this.getRegistry().getId()));

@@ -1,15 +1,15 @@
 package cool.muyucloud.croparia.api.generator.util;
 
+import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.PlaceholderAccess;
+import cool.muyucloud.croparia.api.placeholder.TypeMapper;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.regex.Pattern;
-
 public interface DgEntry extends PlaceholderAccess {
     Placeholder<DgEntry> PLACEHOLDER = Placeholder.build(node -> node.then(
-        Pattern.compile("^id$|^key$"), DgEntry::getKey, Placeholder.ID
+        PatternKey.literal("id"), TypeMapper.of(DgEntry::getKey), Placeholder.ID
     ));
 
     @NotNull

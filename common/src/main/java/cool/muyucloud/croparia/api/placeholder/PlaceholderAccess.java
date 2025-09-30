@@ -10,11 +10,11 @@ public interface PlaceholderAccess {
     Placeholder<?> placeholder();
 
     @SuppressWarnings("unchecked")
-    default String parsePlaceholder(String placeholder, Matcher matcher) throws RegexParserException {
+    default String parsePlaceholder(String placeholder, Matcher matcher) throws PlaceholderException {
         try {
             return ((Placeholder<PlaceholderAccess>) this.placeholder()).parseStart(this, placeholder, matcher);
         } catch (ClassCastException e) {
-            throw new RegexParserException(e);
+            throw new PlaceholderException(e);
         }
     }
 
@@ -33,11 +33,11 @@ public interface PlaceholderAccess {
         }
 
         @Override
-        public String parsePlaceholder(String placeholder, Matcher matcher) throws RegexParserException {
+        public String parsePlaceholder(String placeholder, Matcher matcher) throws PlaceholderException {
             try {
                 return this.placeholder().parseStart(this.value, placeholder, matcher);
             } catch (ClassCastException e) {
-                throw new RegexParserException(e);
+                throw new PlaceholderException(e);
             }
         }
     }

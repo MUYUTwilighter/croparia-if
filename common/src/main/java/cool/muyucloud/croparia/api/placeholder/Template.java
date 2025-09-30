@@ -77,15 +77,16 @@ public class Template {
         }
     }
 
-    public <T> String replace(T entry, Placeholder<T> placeholder) {
-        return replace(PlaceholderAccess.of(entry, placeholder));
+    public <T> String parser(T entry, Placeholder<T> placeholder) {
+        return parser(entry, placeholder, Function.identity());
     }
 
-    public String replace(PlaceholderAccess entry) {
-        return replace(entry, Function.identity());
+    @SuppressWarnings("unchecked")
+    public String parser(PlaceholderAccess entry) {
+        return parser(entry, (Placeholder<PlaceholderAccess>) entry.placeholder(), Function.identity());
     }
 
-    public String replace(PlaceholderAccess entry, Function<String, String> preProcess) {
+    public <T> String parser(T entry, Placeholder<T> placeholder, Function<String, String> preProcess) {
         Map<String, String> cache = new HashMap<>();
         StringBuilder sb = new StringBuilder();
         int cursor = 0;
@@ -97,7 +98,7 @@ public class Template {
             }
             String parsed = cache.computeIfAbsent(
                 content,
-                key -> entry.parsePlaceholder(m.group(1), m)
+                key -> placeholder.parseStart(entry, m.group(1), m)
             );
             // Append the text before the placeholder
             sb.append(template, cursor, span.getStart());

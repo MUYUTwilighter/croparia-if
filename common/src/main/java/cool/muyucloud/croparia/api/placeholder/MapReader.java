@@ -1,4 +1,4 @@
-package cool.muyucloud.croparia.util;
+package cool.muyucloud.croparia.api.placeholder;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

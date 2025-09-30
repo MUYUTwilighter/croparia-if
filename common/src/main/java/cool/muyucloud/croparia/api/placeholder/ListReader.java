@@ -1,4 +1,4 @@
-package cool.muyucloud.croparia.util;
+package cool.muyucloud.croparia.api.placeholder;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -11,6 +11,10 @@ import java.util.stream.Stream;
 public interface ListReader<E> extends Iterable<E> {
     static JsonArrayReader jsonArray(JsonArray array) {
         return new JsonArrayReader(array);
+    }
+
+    static <E> ListReaderImpl<E> list(List<E> list) {
+        return new ListReaderImpl<>(list);
     }
 
     int size();

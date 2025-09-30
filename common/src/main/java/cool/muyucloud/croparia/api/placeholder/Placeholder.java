@@ -9,8 +9,6 @@ import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
-import cool.muyucloud.croparia.util.ListReader;
-import cool.muyucloud.croparia.util.MapReader;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -18,8 +16,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import org.slf4j.Logger;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -30,7 +31,7 @@ import java.util.regex.Pattern;
  * The parser is built using a {@link PlaceholderBuilder}, which provides a fluent API to define how to parse each part of the placeholder.
  *
  * @apiNote This can be seen as an immutable version of {@link PlaceholderBuilder}, which can be reused and shared.<br/>
- * To create a new parser, use {@link #build(Function)} or {@link #build(Codec, Function)}.
+ * To create a new parser, use {@code #build(...)}.
  * @see PlaceholderBuilder
  */
 public class Placeholder<T> implements RegexParser<T> {
@@ -52,105 +53,60 @@ public class Placeholder<T> implements RegexParser<T> {
         });
         return builder;
     });
-    public static final Placeholder<JsonObject> JSON_OBJECT = Placeholder.build(node -> node
-        .self(RegexParser.of())
-        .concat(PlaceholderBuilder.ofMap(MapReader::jsonObject, Placeholder.JSON), Function.identity()));
-    public static final Placeholder<JsonArray> JSON_ARRAY = Placeholder.build(node -> node
-        .self(RegexParser.of())
-        .concat(PlaceholderBuilder.ofList(ListReader::jsonArray, Placeholder.JSON), Function.identity()));
+    public static final Placeholder<JsonObject> JSON_OBJECT = Placeholder.buildMap(TypeMapper.of(MapReader::jsonObject), Placeholder.JSON, builder -> builder);
+    public static final Placeholder<JsonArray> JSON_ARRAY = Placeholder.buildList(TypeMapper.of(ListReader::jsonArray), Placeholder.JSON, builder -> builder);
     public static final Placeholder<ResourceLocation> ID = Placeholder.build(node -> node
         .self(RegexParser.of(ResourceLocation::toString))
-        .then(literal("namespace"), RegexParser.of(ResourceLocation::getNamespace))
-        .then(literal("path"), RegexParser.of(ResourceLocation::getPath))
+        .then(PatternKey.literal("namespace"), RegexParser.of(ResourceLocation::getNamespace))
+        .then(PatternKey.literal("path"), RegexParser.of(ResourceLocation::getPath))
     );
     public static final Placeholder<BlockOutput> BLOCK_OUTPUT = build(BlockOutput.CODEC_COMP.codec(), builder -> builder
-        .then(literal("id"), BlockOutput::getId, ID)
+        .then(PatternKey.literal("id"), TypeMapper.of(BlockOutput::getId), ID)
     );
     public static final Placeholder<ItemOutput> ITEM_OUTPUT = build(
         ItemOutput.CODEC_COMP.codec(), builder -> builder
-            .then(literal("id"), ItemOutput::getId, ID)
-            .then(literal("stack"), ItemOutput::createStack, ItemStack.CODEC)
+            .then(PatternKey.literal("id"), TypeMapper.of(ItemOutput::getId), ID)
+            .then(PatternKey.literal("stack"), TypeMapper.of(ItemOutput::createStack), ItemStack.CODEC)
     );
-    public static final Placeholder<Item> ITEM = ID.map(Item::arch$registryName);
-    public static final Placeholder<ItemStack> ITEM_STACK = ITEM_OUTPUT.map(ItemOutput::of);
-    public static final Placeholder<Block> BLOCK = ID.map(Block::arch$registryName);
+    public static final Placeholder<Item> ITEM = ID.map(TypeMapper.of(Item::arch$registryName));
+    public static final Placeholder<ItemStack> ITEM_STACK = ITEM_OUTPUT.map(TypeMapper.of(ItemOutput::of));
+    public static final Placeholder<Block> BLOCK = ID.map(TypeMapper.of(Block::arch$registryName));
     @SuppressWarnings("unused")
-    public static final Placeholder<BlockState> BLOCK_STATE = BLOCK_OUTPUT.map(BlockOutput::of);
-    public static final Placeholder<DataComponentPatch> DATA_COMPONENTS = Placeholder.build(DataComponentPatch.CODEC, Function.identity());
+    public static final Placeholder<BlockState> BLOCK_STATE = BLOCK_OUTPUT.map(TypeMapper.of(BlockOutput::of));
+    public static final Placeholder<DataComponentPatch> DATA_COMPONENTS = Placeholder.build(DataComponentPatch.CODEC, PlaceholderFactory.identity());
 
-    public static final Pattern EMPTY = Pattern.compile("^$");
-    public static final Pattern QUOTE_IF_STR = literal("_qis");
-    public static final Pattern QUOTE = literal("_q");
-
-    public static Pattern literal(String literal) {
-        if (literal.isEmpty()) return EMPTY;
-        else return Pattern.compile(Pattern.quote(literal));
-    }
-
-    /**
-     * Build a placeholder parser using the given factory function to configure the root node.
-     *
-     * @param factory The factory function to configure the root node.
-     * @param <T>     The type of the entry that provides the values.
-     * @return A new placeholder parser.
-     * @see #Placeholder(Function)
-     */
     public static <T> Placeholder<T> build(Function<PlaceholderBuilder<T>, PlaceholderBuilder<T>> factory) {
-        return new Placeholder<>(factory);
+        return factory.apply(PlaceholderBuilder.of()).build();
     }
 
-    /**
-     * Build a placeholder parser using the given codec to encode the entry to JSON, and the given factory function to configure the root node.
-     *
-     * @param codec   The codec to encode the entry to JSON.
-     * @param factory The factory function to configure the root node.
-     * @param <T>     The type of the entry that provides the values.
-     * @return A new placeholder parser.
-     * @apiNote This is a shortcut for {@code build(builder -> builder.self(codec).then(...))}.
-     * @see #Placeholder(Codec, Function)
-     */
-    public static <T> Placeholder<T> build(Codec<T> codec, Function<PlaceholderBuilder<T>, PlaceholderBuilder<T>> factory) {
-        return new Placeholder<>(codec, factory);
+    public static <T> Placeholder<T> build(Codec<T> codec, PlaceholderFactory<T> factory) {
+        Placeholder<T> json = JSON.map((entry, placeholder, matcher) -> Optional.ofNullable(CodecUtil.encodeJson(entry, codec).getOrThrow(PlaceholderException::new)));
+        return factory.apply(PlaceholderBuilder.of()).concat(json, TypeMapper.identity()).build();
     }
 
-    private final PlaceholderBuilder<T> root;
+    public static <T, V> Placeholder<T> buildMap(TypeMapper<T, MapReader<String, V>> mapper, Placeholder<V> valueParser, Function<PlaceholderBuilder<T>, PlaceholderBuilder<T>> factory) {
+        return factory.apply(PlaceholderBuilder.ofMap(mapper, valueParser)).build();
+    }
+
+    public static <T, E> Placeholder<T> buildList(TypeMapper<T, ListReader<E>> mapper, Placeholder<E> valueParser, Function<PlaceholderBuilder<T>, PlaceholderBuilder<T>> factory) {
+        return factory.apply(PlaceholderBuilder.ofList(mapper, valueParser)).build();
+    }
+
+    @Unmodifiable
+    private final Map<PatternKey, RegexParser<T>> subNodes;
 
     public Placeholder(Codec<T> codec, Function<PlaceholderBuilder<T>, PlaceholderBuilder<T>> factory) {
-        PlaceholderBuilder<T> builder = PlaceholderBuilder.of();
-        factory.apply(builder);
-        Placeholder<T> placeholder = JSON.map(t -> CodecUtil.encodeJson(t, codec).getOrThrow(RegexParserException::new));
-        this.root = placeholder.root.overwrite(builder);
+        Placeholder<T> json = JSON.map((entry, placeholder, matcher) -> Optional.ofNullable(CodecUtil.encodeJson(entry, codec).getOrThrow(PlaceholderException::new)));
+        this.subNodes = Collections.unmodifiableMap(factory.apply(PlaceholderBuilder.of()).concat(json, TypeMapper.identity()).getSubNodes());
     }
 
-    public Placeholder(Function<PlaceholderBuilder<T>, PlaceholderBuilder<T>> factory) {
-        this(factory.apply(PlaceholderBuilder.of()));
+    public Placeholder(PlaceholderBuilder<T> builder) {
+        this.subNodes = Collections.unmodifiableMap(builder.getSubNodes());
     }
 
-    public Placeholder(PlaceholderBuilder<T> root) {
-        this.root = root;
-    }
-
-    /**
-     * Create a mutable copy of this parser.
-     *
-     * @return A new {@link PlaceholderBuilder} that is a copy of this parser.
-     */
-    public PlaceholderBuilder<T> copy() {
-        return this.root.copy();
-    }
-
-    /**
-     * Parse the placeholder.
-     *
-     * @param entry       The entry that provide the values.
-     * @param placeholder The placeholder to be processed.
-     * @param matcher     The matcher of the pattern that matched the placeholder.
-     * @return The processed JsonElement, or Optional.empty() if the placeholder is not recognized.
-     * @throws RegexParserException If any error occurs during processing.
-     * @see PlaceholderBuilder#parse(Object, String, Matcher)
-     */
-    public Optional<JsonElement> parse(T entry, @NotNull String placeholder, @NotNull Matcher matcher) {
-        return this.root.parse(entry, placeholder, matcher);
+    @Unmodifiable
+    protected Map<PatternKey, RegexParser<T>> getSubNodes() {
+        return this.subNodes;
     }
 
     /**
@@ -160,21 +116,52 @@ public class Placeholder<T> implements RegexParser<T> {
      * @param <O>    The new entry type.
      * @return A new parser that maps the entry type.
      */
-    public <O> Placeholder<O> map(Function<O, T> mapper) {
-        return new Placeholder<>(this.root.map(mapper));
+    public <O> Placeholder<O> map(TypeMapper<O, T> mapper) {
+        PlaceholderBuilder<T> builder = PlaceholderBuilder.of();
+        builder.overwrite(this, TypeMapper.identity());
+        return new Placeholder<>(builder.map(mapper));
+    }
+
+    /**
+     * Analyze the placeholder and delegate to the appropriate sub-node parser.
+     *
+     * @param entry       The entry that provides the values.
+     * @param placeholder The placeholder to be processed.
+     * @param matcher     The matcher of the pattern that matched the placeholder.
+     * @return The processed JsonElement, or Optional.empty() if the placeholder is not recognized.
+     * @throws PlaceholderException If any error occurs during processing.
+     * @apiNote This method checks if the placeholder is empty, in which case it calls the self parser.<br/>
+     * If not empty, it extracts the next key segment and looks for a matching sub-node parser.<br/>
+     * If a matching sub-node is found, it forwards the remaining placeholder to that parser.<br/>
+     * If no matching sub-node is found, it throws a PlaceholderException.
+     */
+    @Override
+    public Optional<JsonElement> parse(@NotNull T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws PlaceholderException {
+        String forwarded = RegexParser.forward(placeholder);
+        String next = RegexParser.next(placeholder);
+        for (Map.Entry<PatternKey, RegexParser<T>> subEntry : subNodes.entrySet()) {
+            Matcher subMatcher = subEntry.getKey().pattern().matcher(next);
+            if (subMatcher.find()) {
+                Optional<JsonElement> result = subEntry.getValue().parse(entry, forwarded, subMatcher);
+                if (result.isPresent()) {
+                    return result;
+                }
+            }
+        }
+        throw new PlaceholderException("No matching key for: " + next);
     }
 
     public String parseStart(T entry, String placeholder, Matcher matcher) {
         try {
-            JsonElement json = root.parse(entry, placeholder, matcher).orElseThrow(
-                () -> new RegexParserException("Unrecognized placeholder: " + placeholder)
+            JsonElement json = this.parse(entry, placeholder, matcher).orElseThrow(
+                () -> new PlaceholderException("Unrecognized placeholder: " + placeholder)
             );
             if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isString()) {
                 return json.getAsString();
             } else {
                 return json.toString();
             }
-        } catch (RegexParserException e) {
+        } catch (PlaceholderException e) {
             LOGGER.error("Error processing placeholder: " + placeholder, e);
         }
         return "${" + placeholder + "}";

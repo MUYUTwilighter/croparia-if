@@ -9,7 +9,9 @@ import cool.muyucloud.croparia.api.element.item.ElementalBucket;
 import cool.muyucloud.croparia.api.element.item.ElementalGem;
 import cool.muyucloud.croparia.api.element.item.ElementalPotion;
 import cool.muyucloud.croparia.api.generator.util.DgEntry;
+import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
+import cool.muyucloud.croparia.api.placeholder.TypeMapper;
 import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.supplier.HolderSupplier;
@@ -26,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 
 public enum Element implements DgEntry, StringRepresentable, Comparable<Element> {
     EMPTY,
@@ -46,15 +47,15 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
     }
 
     public static final Placeholder<Element> PLACEHOLDER = Placeholder.build(builder -> builder
-        .then(Pattern.compile("^name$"), Element::getSerializedName, Placeholder.STRING)
-        .then(Pattern.compile("^color$"), Element::getColor, Color.PLACEHOLDER)
-        .then(Pattern.compile("^fluid_source$"), element -> element.getFluidSource().getId(), Placeholder.ID)
-        .then(Pattern.compile("^fluid_flowing$"), element -> element.getFluidFlowing().getId(), Placeholder.ID)
-        .then(Pattern.compile("^liquid_block$"), element -> element.getFluidBlock().getId(), Placeholder.ID)
-        .then(Pattern.compile("^bucket$"), element -> element.getBucket().getId(), Placeholder.ID)
-        .then(Pattern.compile("^potion$"), element -> element.getPotion().getId(), Placeholder.ID)
-        .then(Pattern.compile("^gem$"), element -> element.getGem().getId(), Placeholder.ID)
-        .overwrite(DgEntry.PLACEHOLDER, element -> element)
+        .then(PatternKey.literal("name"), TypeMapper.of(Element::getSerializedName), Placeholder.STRING)
+        .then(PatternKey.literal("color"), TypeMapper.of(Element::getColor), Color.PLACEHOLDER)
+        .then(PatternKey.literal("fluid_source"), TypeMapper.of(element -> element.getFluidSource().getId()), Placeholder.ID)
+        .then(PatternKey.literal("fluid_flowing"),TypeMapper.of(element -> element.getFluidFlowing().getId()), Placeholder.ID)
+        .then(PatternKey.literal("liquid_block"),TypeMapper.of(element -> element.getFluidBlock().getId()), Placeholder.ID)
+        .then(PatternKey.literal("bucket"), TypeMapper.of(element -> element.getBucket().getId()), Placeholder.ID)
+        .then(PatternKey.literal("potion"), TypeMapper.of(element -> element.getPotion().getId()), Placeholder.ID)
+        .then(PatternKey.literal("gem"), TypeMapper.of(element -> element.getGem().getId()), Placeholder.ID)
+        .overwrite(DgEntry.PLACEHOLDER, TypeMapper.of(element -> element))
     );
 
     private final ResourceLocation id;
