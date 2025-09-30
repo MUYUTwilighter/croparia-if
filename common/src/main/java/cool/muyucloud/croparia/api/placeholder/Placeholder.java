@@ -60,12 +60,15 @@ public class Placeholder<T> implements RegexParser<T> {
         .then(PatternKey.literal("namespace"), RegexParser.of(ResourceLocation::getNamespace))
         .then(PatternKey.literal("path"), RegexParser.of(ResourceLocation::getPath))
     );
+    public static final Placeholder<DataComponentPatch> DATA_COMPONENTS = Placeholder.build(DataComponentPatch.CODEC, PlaceholderFactory.identity());
     public static final Placeholder<BlockOutput> BLOCK_OUTPUT = build(BlockOutput.CODEC_COMP.codec(), builder -> builder
         .then(PatternKey.literal("id"), TypeMapper.of(BlockOutput::getId), ID)
     );
     public static final Placeholder<ItemOutput> ITEM_OUTPUT = build(
-        ItemOutput.CODEC_COMP.codec(), builder -> builder
+        ItemOutput.CODEC, builder -> builder
             .then(PatternKey.literal("id"), TypeMapper.of(ItemOutput::getId), ID)
+            .then(PatternKey.literal("amount"), TypeMapper.of(ItemOutput::getAmount), NUMBER)
+            .then(PatternKey.literal("components"), TypeMapper.of(ItemOutput::getComponentsPatch), Placeholder.DATA_COMPONENTS)
             .then(PatternKey.literal("stack"), TypeMapper.of(ItemOutput::createStack), ItemStack.CODEC)
     );
     public static final Placeholder<Item> ITEM = ID.map(TypeMapper.of(Item::arch$registryName));
@@ -73,7 +76,6 @@ public class Placeholder<T> implements RegexParser<T> {
     public static final Placeholder<Block> BLOCK = ID.map(TypeMapper.of(Block::arch$registryName));
     @SuppressWarnings("unused")
     public static final Placeholder<BlockState> BLOCK_STATE = BLOCK_OUTPUT.map(TypeMapper.of(BlockOutput::of));
-    public static final Placeholder<DataComponentPatch> DATA_COMPONENTS = Placeholder.build(DataComponentPatch.CODEC, PlaceholderFactory.identity());
 
     public static <T> Placeholder<T> build(Function<PlaceholderBuilder<T>, PlaceholderBuilder<T>> factory) {
         return factory.apply(PlaceholderBuilder.of()).build();

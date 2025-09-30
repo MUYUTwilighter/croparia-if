@@ -12,17 +12,18 @@ import cool.muyucloud.croparia.api.generator.util.DgEntry;
 import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.TypeMapper;
+import cool.muyucloud.croparia.registry.CropariaBlocks;
+import cool.muyucloud.croparia.registry.CropariaFluids;
+import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.CifUtil;
-import cool.muyucloud.croparia.util.supplier.HolderSupplier;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,22 +61,22 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
 
     private final ResourceLocation id;
     private final Color color;
-    private final HolderSupplier<ElementalSource> fluidSource;
-    private final HolderSupplier<ElementalFlowing> fluidFlowing;
-    private final HolderSupplier<ElementalLiquidBlock> fluidBlock;
-    private final HolderSupplier<ElementalBucket> bucket;
-    private final HolderSupplier<ElementalPotion> potion;
-    private final HolderSupplier<ElementalGem> gem;
+    private final RegistrySupplier<ElementalSource> fluidSource;
+    private final RegistrySupplier<ElementalFlowing> fluidFlowing;
+    private final RegistrySupplier<ElementalLiquidBlock> fluidBlock;
+    private final RegistrySupplier<ElementalBucket> bucket;
+    private final RegistrySupplier<ElementalPotion> potion;
+    private final RegistrySupplier<ElementalGem> gem;
 
     Element() {
         this.id = CropariaIf.of("empty");
         this.color = new Color(-1);
-        this.fluidSource = HolderSupplier.of(() -> null, CropariaIf.of("fluid_empty"), Registries.FLUID);
-        this.fluidFlowing = HolderSupplier.of(() -> null, CropariaIf.of("fluid_empty_flow"), Registries.FLUID);
-        this.fluidBlock = HolderSupplier.of(() -> null, CropariaIf.of("fluid_empty"), Registries.BLOCK);
-        this.bucket = HolderSupplier.of(() -> null, CropariaIf.of("bucket_empty"), Registries.ITEM);
-        this.potion = HolderSupplier.of(() -> null, CropariaIf.of("potion_empty"), Registries.ITEM);
-        this.gem = HolderSupplier.of(() -> null, CropariaIf.of("gem_empty"), Registries.ITEM);
+        this.fluidSource = null;
+        this.fluidFlowing = null;
+        this.fluidBlock = null;
+        this.bucket = null;
+        this.potion = null;
+        this.gem = null;
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -92,31 +93,22 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
             () -> Optional.ofNullable(Element.this.getBucket().get())
         ).sourceTexture(parseId("block/%s_still")).flowingTexture(parseId("block/%s_flow"));
         appendix.accept(attr);
-        this.fluidSource = HolderSupplier.of(() -> new ElementalSource(this, attr), parseId("fluid_%s"), Registries.FLUID);
-        this.fluidFlowing = HolderSupplier.of(() -> new ElementalFlowing(this, attr), parseId("fluid_%s_flow"), Registries.FLUID);
-        this.fluidBlock = HolderSupplier.of(() -> new ElementalLiquidBlock(this, BlockBehaviour.Properties
-            .ofFullCopy(Blocks.WATER).lightLevel(state -> 8)
-            .setId(ResourceKey.create(Registries.BLOCK, parseId("fluid_%s")))
-        ), parseId("fluid_%s"), Registries.BLOCK);
-        this.bucket = HolderSupplier.of(() -> new ElementalBucket(
+        this.fluidSource = CropariaFluids.registerFluid(parseId("fluid_%s"), () -> new ElementalSource(this, attr));
+        this.fluidFlowing = CropariaFluids.registerFluid(parseId("fluid_%s_flow"), () -> new ElementalFlowing(this, attr));
+        this.fluidBlock = CropariaBlocks.registerBlock(parseId("fluid_%s"), properties -> new ElementalLiquidBlock(this, BlockBehaviour.Properties
+            .of().setId(ResourceKey.create(Registries.BLOCK, parseId("fluid_%s")))
+            .lightLevel(state -> 8).noCollission().strength(100.0F).noLootTable()
+        ));
+        this.bucket = CropariaItems.registerItem(parseId("bucket_%s"), properties -> new ElementalBucket(
             this, this.getFluidSource(),
-            new Item.Properties().setId(ResourceKey.create(Registries.ITEM, parseId("bucket_%s")))
-                .stacksTo(1).arch$tab(Tabs.MAIN).craftRemainder(Items.GLASS_BOTTLE)
-        ), parseId("bucket_%s"), Registries.ITEM);
-        this.potion = HolderSupplier.of(() -> new ElementalPotion(
-            this, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, parseId("potion_%s")))
-            .arch$tab(Tabs.MAIN).craftRemainder(Items.GLASS_BOTTLE)
-        ), parseId("potion_%s"), Registries.ITEM);
-        this.gem = HolderSupplier.of(() -> new ElementalGem(
-            this, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, parseId("gem_%s")))
-            .arch$tab(Tabs.MAIN).craftRemainder(Items.GLASS_BOTTLE)
-        ), parseId("gem_%s"), Registries.ITEM);
-        this.getFluidSource().tryRegister();
-        this.getFluidFlowing().tryRegister();
-        this.getFluidBlock().tryRegister();
-        this.getBucket().tryRegister();
-        this.getPotion().tryRegister();
-        this.getGem().tryRegister();
+            properties.stacksTo(1).arch$tab(Tabs.MAIN).craftRemainder(Items.GLASS_BOTTLE)
+        ));
+        this.potion = CropariaItems.registerItem(parseId("potion_%s"), properties -> new ElementalPotion(
+            this, properties.arch$tab(Tabs.MAIN).craftRemainder(Items.GLASS_BOTTLE)
+        ));
+        this.gem = CropariaItems.registerItem(parseId("gem_%s"), properties -> new ElementalGem(
+            this, properties.arch$tab(Tabs.MAIN)
+        ));
     }
 
     public ResourceLocation parseId(String pattern) {
@@ -127,27 +119,27 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
         return color;
     }
 
-    public HolderSupplier<ElementalFlowing> getFluidFlowing() {
+    public RegistrySupplier<ElementalFlowing> getFluidFlowing() {
         return fluidFlowing;
     }
 
-    public HolderSupplier<ElementalSource> getFluidSource() {
+    public RegistrySupplier<ElementalSource> getFluidSource() {
         return fluidSource;
     }
 
-    public HolderSupplier<ElementalLiquidBlock> getFluidBlock() {
+    public RegistrySupplier<ElementalLiquidBlock> getFluidBlock() {
         return fluidBlock;
     }
 
-    public HolderSupplier<ElementalBucket> getBucket() {
+    public RegistrySupplier<ElementalBucket> getBucket() {
         return bucket;
     }
 
-    public HolderSupplier<ElementalPotion> getPotion() {
+    public RegistrySupplier<ElementalPotion> getPotion() {
         return potion;
     }
 
-    public HolderSupplier<ElementalGem> getGem() {
+    public RegistrySupplier<ElementalGem> getGem() {
         return gem;
     }
 

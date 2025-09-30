@@ -77,16 +77,16 @@ public class Template {
         }
     }
 
-    public <T> String parser(T entry, Placeholder<T> placeholder) {
-        return parser(entry, placeholder, Function.identity());
+    public <T> String parse(T entry, Placeholder<T> placeholder) {
+        return parse(entry, placeholder, Function.identity());
     }
 
     @SuppressWarnings("unchecked")
-    public String parser(PlaceholderAccess entry) {
-        return parser(entry, (Placeholder<PlaceholderAccess>) entry.placeholder(), Function.identity());
+    public String parse(PlaceholderAccess entry) {
+        return parse(entry, (Placeholder<PlaceholderAccess>) entry.placeholder(), Function.identity());
     }
 
-    public <T> String parser(T entry, Placeholder<T> placeholder, Function<String, String> preProcess) {
+    public <T> String parse(T entry, Placeholder<T> placeholder, Function<String, String> preProcess) {
         Map<String, String> cache = new HashMap<>();
         StringBuilder sb = new StringBuilder();
         int cursor = 0;

@@ -1,10 +1,12 @@
 package cool.muyucloud.croparia.mixin;
 
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.generator.DataGenerator;
 import cool.muyucloud.croparia.api.generator.pack.DataPackHandler;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -21,6 +23,15 @@ public abstract class PackRepositoryMixin {
      */
     @Inject(method = "reload", at = @At("HEAD"))
     private void onReload(CallbackInfo ci) {
+        CropariaIf.getServer().ifPresentOrElse(server -> {
+            if (server.isSameThread()) {
+                cif$trigger();
+            }
+        }, this::cif$trigger);
+    }
+
+    @Unique
+    private void cif$trigger() {
         DataGenerator.LOGGER.debug("=== Data Pack Reload Triggered ===");
         DataPackHandler.REGISTRY.values().forEach(DataPackHandler::onTriggered);
     }

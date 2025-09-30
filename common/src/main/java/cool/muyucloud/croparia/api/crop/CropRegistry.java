@@ -52,7 +52,9 @@ public class CropRegistry<C extends AbstractCrop> implements DgRegistry<C> {
     public void register(C crop) {
         this.all.put(crop.getKey(), crop);
         if (crop.shouldLoad()) {
-            crop.onRegister();
+            if (!loaded.containsKey(crop.getKey())) {
+                crop.onRegister();
+            }
             loaded.put(crop.getKey(), crop);
         } else {
             loaded.remove(crop.getKey());
@@ -85,13 +87,7 @@ public class CropRegistry<C extends AbstractCrop> implements DgRegistry<C> {
     protected void readCrop(File file) {
         if (!file.getName().endsWith(".json")) return;
         try {
-            CodecUtil.readJson(file, this.getCodec()).ifSuccess(crop -> {
-                all.put(crop.getKey(), crop);
-                if (crop.shouldLoad()) {
-                    crop.onRegister();
-                    loaded.put(crop.getKey(), crop);
-                }
-            });
+            CodecUtil.readJson(file, this.getCodec()).ifSuccess(this::register);
         } catch (IOException e) {
             CropariaIf.LOGGER.error("Failed to read crop from file \"%s\"".formatted(file), e);
         }

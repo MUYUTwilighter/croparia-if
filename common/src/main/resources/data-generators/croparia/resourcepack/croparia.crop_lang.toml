@@ -2,4 +2,4 @@ registry = "croparia:crops"
 path = "${id.namespace}/lang/${lang}.json"
 type = "croparia:lang"
 startup = true
-template = '"${translation_key}": "${translations._lang}"'
+template = '"${translation_key}": "${translations.get(_lang)}"'

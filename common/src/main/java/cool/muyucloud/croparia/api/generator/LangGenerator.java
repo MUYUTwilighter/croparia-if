@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 
 public class LangGenerator extends DataGenerator {
@@ -66,10 +67,12 @@ public class LangGenerator extends DataGenerator {
             Placeholder<TranslatableEntry> parser = Placeholder.build(builder -> builder
                 .then(PatternKey.literal("lang"), TypeMapper.of(e -> langRef.get()), Placeholder.STRING)
                 .overwrite((Placeholder<TranslatableEntry>) translatable.placeholder(), TypeMapper.identity()));
+            Function<String, String> preProcess = placeholder -> placeholder.replaceAll("_lang", langRef.get());
             for (String lang : translatable.getLangs()) {
-                String relative = this.getPath().parser(translatable, parser, placeholder -> placeholder.replaceAll("_lang", lang));
+                langRef.set(lang);
+                String relative = this.getPath().parse(translatable, parser, preProcess);
                 List<String> list = TRANSLATIONS.computeIfAbsent(relative, k -> new LinkedList<>());
-                list.add(this.getTemplate().parser(translatable, parser, placeholder -> placeholder.replaceAll("_lang", lang)));
+                list.add(this.getTemplate().parse(translatable, parser, preProcess));
             }
         } else {
             throw new JsonParseException("Entry %s in %s is not translatable".formatted(entry.getKey(), this.getRegistry().getId()));

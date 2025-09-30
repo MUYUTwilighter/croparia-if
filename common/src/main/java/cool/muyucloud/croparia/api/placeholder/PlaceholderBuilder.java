@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -24,7 +23,7 @@ import java.util.regex.Pattern;
  * It supports self-parsing, sub-node parsing, and provides utility methods for common data structures like maps and lists.
  * The built {@link Placeholder} can be used in data generation contexts to dynamically generate JSON based on the entry data.
  */
-public class PlaceholderBuilder<T> implements RegexParser<T> {
+public class PlaceholderBuilder<T> {
     /**
      * Create an empty PlaceholderBuilder.
      *
@@ -80,7 +79,7 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
                 )
             ));
             return Optional.of(obj);
-        }, Placeholder.JSON_OBJECT).then(Pattern.compile("mapValue\\((.*)\\)"), (entry, placeholder, matcher) -> {
+        }, Placeholder.JSON_OBJECT).then(Pattern.compile("^mapValue\\((.*)\\)$"), (entry, placeholder, matcher) -> {
             JsonObject obj = new JsonObject();
             mapper.map(entry, placeholder, matcher).ifPresent(map -> map.forEach(
                 e -> valueParser.parse(e.getValue(), placeholder, matcher).ifPresent(v -> obj.add(e.getKey(), v))
@@ -94,7 +93,7 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
             JsonArray array = new JsonArray();
             mapper.map(entry, placeholder, matcher).ifPresent(map -> map.values().forEach(value -> valueParser.parse(value, placeholder, matcher).ifPresent(array::add)));
             return Optional.of(array);
-        }, Placeholder.JSON_ARRAY).then(Pattern.compile("get\\((^.*$)\\)"), (entry, placeholder, matcher) -> {
+        }, Placeholder.JSON_ARRAY).then(Pattern.compile("^get\\((.*)\\)$"), (entry, placeholder, matcher) -> {
             String key = matcher.group(1);
             return mapper.map(entry, placeholder, matcher).map(map -> map.get(key))
                 .flatMap(value -> valueParser.parse(value, placeholder, matcher));
@@ -102,7 +101,7 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
             String key = matcher.group(1);
             String def = matcher.group(2);
             return mapper.map(entry, placeholder, matcher).map(map -> map.get(key))
-                .flatMap(value -> valueParser.parse(value, placeholder, matcher));
+                .flatMap(value -> valueParser.parse(value, placeholder, matcher)).or(() -> Optional.of(new JsonPrimitive(def)));
         }));
     }
 
@@ -279,7 +278,7 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      * @see #ofMap(TypeMapper, Placeholder)
      */
     public @NotNull <V> PlaceholderBuilder<T> thenMap(@NotNull Pattern key, @NotNull TypeMapper<T, MapReader<String, V>> mapper, @NotNull Placeholder<V> valueParser) {
-        return this.then(key, ofMap(mapper, valueParser));
+        return this.then(key, ofMap(mapper, valueParser).build());
     }
 
     /**
@@ -288,7 +287,7 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
      */
     @SuppressWarnings("unused")
     public @NotNull <E> PlaceholderBuilder<T> thenList(@NotNull Pattern key, @NotNull TypeMapper<T, ListReader<E>> mapper, @NotNull Placeholder<E> elemParser) {
-        return this.then(key, ofList(mapper, elemParser));
+        return this.then(key, ofList(mapper, elemParser).build());
     }
 
     /**
@@ -343,34 +342,4 @@ public class PlaceholderBuilder<T> implements RegexParser<T> {
     public Placeholder<T> build() {
         return new Placeholder<>(this);
     }
-
-    /**
-     * Analyze the placeholder and delegate to the appropriate sub-node parser.
-     *
-     * @param entry       The entry that provides the values.
-     * @param placeholder The placeholder to be processed.
-     * @param matcher     The matcher of the pattern that matched the placeholder.
-     * @return The processed JsonElement, or Optional.empty() if the placeholder is not recognized.
-     * @throws PlaceholderException If any error occurs during processing.
-     * @apiNote This method checks if the placeholder is empty, in which case it calls the self parser.<br/>
-     * If not empty, it extracts the next key segment and looks for a matching sub-node parser.<br/>
-     * If a matching sub-node is found, it forwards the remaining placeholder to that parser.<br/>
-     * If no matching sub-node is found, it throws a PlaceholderException.
-     */
-    @Override
-    public Optional<JsonElement> parse(@NotNull T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws PlaceholderException {
-        String forwarded = RegexParser.forward(placeholder);
-        String next = RegexParser.next(placeholder);
-        for (Map.Entry<PatternKey, RegexParser<T>> subEntry : subNodes.entrySet()) {
-            Matcher subMatcher = subEntry.getKey().pattern().matcher(next);
-            if (subMatcher.find()) {
-                Optional<JsonElement> result = subEntry.getValue().parse(entry, forwarded, subMatcher);
-                if (result.isPresent()) {
-                    return result;
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
 }

@@ -25,7 +25,6 @@ public class CropariaIfClient {
         CropariaIf.LOGGER.debug("Registering cutout rendering");
         RenderTypeRegistry.register(RenderType.cutout(), CropariaBlocks.GREENHOUSE.get());
         RenderTypeRegistry.register(RenderType.cutout(), CropariaBlocks.ACTIVATED_SHRIEKER.get());
-//        getClientRecipeBook().ifPresent(book -> book.getCollections());
     }
 
     public static Optional<LocalPlayer> getLocalPlayer() {

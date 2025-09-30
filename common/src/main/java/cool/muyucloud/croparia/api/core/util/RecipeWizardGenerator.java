@@ -324,8 +324,8 @@ public class RecipeWizardGenerator {
         Player player = Objects.requireNonNull(context.getPlayer());
         if (this.isEnabled()) {
             try {
-                String path = this.getPath().parser(context, this.getPlaceholder());
-                String template = this.getTemplate().parser(context, this.getPlaceholder());
+                String path = this.getPath().parse(context, this.getPlaceholder());
+                String template = this.getTemplate().parse(context, this.getPlaceholder());
                 Path result = CropariaIf.CONFIG.getRecipeWizard().resolve(path);
                 FileUtil.write(result.toFile(), template, true);
                 String s = result.toString();

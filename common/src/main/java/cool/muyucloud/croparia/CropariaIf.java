@@ -41,6 +41,7 @@ public class CropariaIf {
         LOGGER.info("Croparia IF vanilla registration");
         NetworkHandlers.register();
         CropariaComponents.register();
+        CropariaFluids.register();
         CropariaBlocks.register();
         BlockEntities.register();
         CropariaItems.register();

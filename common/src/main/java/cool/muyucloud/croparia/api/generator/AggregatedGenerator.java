@@ -6,7 +6,6 @@ import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.api.generator.util.DgEntry;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
-import cool.muyucloud.croparia.api.placeholder.PlaceholderAccess;
 import cool.muyucloud.croparia.api.placeholder.Template;
 import net.minecraft.resources.ResourceLocation;
 
@@ -44,7 +43,7 @@ public class AggregatedGenerator extends DataGenerator {
     }
 
     public String getContent(DgEntry entry) {
-        return this.getContent().parser(entry);
+        return this.getContent().parse(entry);
     }
 
     @Override
@@ -67,7 +66,7 @@ public class AggregatedGenerator extends DataGenerator {
                 builder.append(s).append(",\n");
             }
             String content = builder.isEmpty() ? "" : builder.substring(0, builder.length() - 2);
-            handler.cache(relative, this.getTemplate().parser(PlaceholderAccess.of(content, CONTENT_PLACEHOLDER)));
+            handler.cache(relative, this.getTemplate().parse(content, CONTENT_PLACEHOLDER));
         }
         CACHE.clear();
     }

@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
     @Inject(method = "reloadResources", at = @At("RETURN"))
-    public void onReload(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir, @Local CompletableFuture<Void> completableFuture) {
+    public void onReloaded(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir, @Local CompletableFuture<Void> completableFuture) {
         completableFuture.whenComplete((v, t) -> {
             OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
             Recipes.forEach(TypedSerializer::syncRecipes);

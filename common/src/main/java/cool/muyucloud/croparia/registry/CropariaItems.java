@@ -14,6 +14,7 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodProperties;
@@ -139,6 +140,15 @@ public class CropariaItems {
     ) {
         return ITEMS.register(name, () -> supplier.apply(
             new Item.Properties().setId(ResourceKey.create(Registries.ITEM, CropariaIf.of(name)))
+        ));
+    }
+
+    @NotNull
+    public static <T extends Item> RegistrySupplier<T> registerItem(
+        @NotNull ResourceLocation id, @NotNull Function<Item.Properties, T> supplier
+    ) {
+        return ITEMS.register(id, () -> supplier.apply(
+            new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))
         ));
     }
 

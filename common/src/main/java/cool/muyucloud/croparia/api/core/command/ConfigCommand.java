@@ -59,8 +59,8 @@ public class ConfigCommand {
         Texts.success(context.getSource(), Texts.translatable("commands.croparia.config.soakAttempts", CropariaIf.CONFIG.getSoakAttempts().toString()), true);
         return 1;
     }).then(Commands.argument("value", IntegerArgumentType.integer()).suggests((context, builder) -> {
-        builder.suggest("2");
-        builder.suggest("0");
+        builder.suggest(2);
+        builder.suggest(0);
         return builder.buildFuture();
     }).executes(context -> {
         CropariaIf.CONFIG.setSoakAttempts(IntegerArgumentType.getInteger(context, "value"));
