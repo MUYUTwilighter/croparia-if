@@ -3,9 +3,13 @@ description: File a bug/issue
 title: "[BUG] "
 labels: ["Bug"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Your feedback is important to us, no worry if it's not correct!
   - type: checkboxes
     attributes:
-      label: I have checked following things before submitting
+      label: I have checked following things before submitting (No worry, it won't affect our help)
       description: Please make sure you have checked all of the following.
       options:
         - label: I have searched and found no existing issues

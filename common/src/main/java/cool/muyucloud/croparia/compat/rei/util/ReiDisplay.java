@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class ReiDisplay<R extends DisplayableRecipe<?>> implements Display {
-    public static <R extends DisplayableRecipe<?>> DisplaySerializer<ReiDisplay<R>> serializer(ProxyCategory<R> category) {
+    public static <R extends DisplayableRecipe<?>> DisplaySerializer<ReiDisplay<R>> serializer(ReiType<R> category) {
         return DisplaySerializer.of(
             RecordCodecBuilder.mapCodec(instance -> instance.group(
                 category.getType().codec().fieldOf("recipe").forGetter(ReiDisplay::getRecipe),
@@ -37,11 +37,11 @@ public class ReiDisplay<R extends DisplayableRecipe<?>> implements Display {
 
     private final R recipe;
     private final ResourceLocation id;
-    private final ProxyCategory<R> category;
+    private final ReiType<R> category;
     private final List<EntryIngredient> inputs;
     private final List<EntryIngredient> outputs;
 
-    public ReiDisplay(RecipeHolder<R> holder, ProxyCategory<R> category) {
+    public ReiDisplay(RecipeHolder<R> holder, ReiType<R> category) {
         this.recipe = holder.value();
         this.id = holder.id().location();
         this.category = category;
@@ -49,7 +49,7 @@ public class ReiDisplay<R extends DisplayableRecipe<?>> implements Display {
         this.outputs = this.recipe.getOutputs().stream().map(EntryIngredients::ofItemStacks).toList();
     }
 
-    public ReiDisplay(R recipe, ResourceLocation id, ProxyCategory<R> category) {
+    public ReiDisplay(R recipe, ResourceLocation id, ReiType<R> category) {
         this(new RecipeHolder<>(ResourceKey.create(Registries.RECIPE, id), recipe), category);
     }
 

@@ -201,5 +201,16 @@
   "subtitles.block.croparia.infusor.craft": "Infusor: craft",
   "subtitles.block.croparia.infusor.infuse": "Infusor: infuse",
   "subtitles.block.croparia.ritual.craft": "Ritual: craft",
-  "subtitles.ambient.croparia.magic_rope.teleport": "Magic Rope: teleport"
+  "subtitles.ambient.croparia.magic_rope.teleport": "Magic Rope: teleport",
+  "tag.item.croparia.crop_seeds": "Croparia Seeds",
+  "tag.entity_type.croparia.midas_hand_immune": "Entities immune to Midas Hand",
+  "tag.block.croparia.midas_hand_immune": "Blocks immune to Midas Hand",
+  "tag.block.croparia.ritual_stands": "Croparia Ritual Stands",
+  "tag.block.croparia.ritual_stands_2": "Croparia Ritual Stands T2",
+  "tag.block.croparia.ritual_stands_3": "Croparia Ritual Stands T3",
+  "tag.item.croparia.horn_plenty_blacklist": "Items cannot be summoned by Horn of Plenty",
+  "tag.item.croparia.ritual_stands": "Croparia Ritual Stands",
+  "tag.item.croparia.ritual_stands_2": "Croparia Ritual Stands T2",
+  "tag.item.croparia.ritual_stands_3": "Croparia Ritual Stands T3",
+  "tag.item.croparia.seed_ingredient": "Seeds that can craft Croparia Seeds"
 }

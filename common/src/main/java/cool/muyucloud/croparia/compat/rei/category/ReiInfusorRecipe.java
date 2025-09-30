@@ -2,8 +2,8 @@ package cool.muyucloud.croparia.compat.rei.category;
 
 import cool.muyucloud.croparia.api.core.recipe.InfusorRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
-import cool.muyucloud.croparia.compat.rei.util.ProxyCategory;
 import cool.muyucloud.croparia.compat.rei.util.ReiDisplay;
+import cool.muyucloud.croparia.compat.rei.util.ReiType;
 import cool.muyucloud.croparia.compat.rei.util.ReiUtil;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
@@ -22,7 +22,7 @@ import java.util.List;
 public class ReiInfusorRecipe extends ReiCategory<InfusorRecipe> {
     public static final LazySupplier<EntryStack<ItemStack>> STATION = LazySupplier.of(() -> EntryStacks.of(CropariaItems.INFUSOR.get()));
 
-    public ReiInfusorRecipe(ProxyCategory<InfusorRecipe> proxy) {
+    public ReiInfusorRecipe(ReiType<InfusorRecipe> proxy) {
         super(proxy);
     }
 

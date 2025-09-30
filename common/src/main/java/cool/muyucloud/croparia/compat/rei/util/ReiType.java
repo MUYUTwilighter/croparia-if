@@ -2,32 +2,32 @@ package cool.muyucloud.croparia.compat.rei.util;
 
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
-import cool.muyucloud.croparia.compat.rei.category.ReiCategory;
-import cool.muyucloud.croparia.util.SidedRef;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
+import net.minecraft.world.item.crafting.RecipeInput;
 
-import java.util.function.Function;
+public class ReiType<R extends DisplayableRecipe<?>> {
+    public static <R extends DisplayableRecipe<?>> ReiType<R> of(TypedSerializer<R> type) {
+        return new ReiType<>(type);
+    }
 
-public class ProxyCategory<R extends DisplayableRecipe<?>> {
     private final TypedSerializer<R> type;
     private final DisplaySerializer<ReiDisplay<R>> serializer;
     private final CategoryIdentifier<ReiDisplay<R>> id;
-    private final SidedRef<ReiCategory<R>> category;
 
-    public ProxyCategory(TypedSerializer<R> type, Function<ProxyCategory<R>, ? extends ReiCategory<R>> category) {
+    public ReiType(TypedSerializer<R> type) {
         this.type = type;
         this.id = CategoryIdentifier.of(type.getId());
         this.serializer = ReiDisplay.serializer(this);
-        this.category = SidedRef.ofClient(() -> category.apply(this));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <I extends RecipeInput, T extends DisplayableRecipe<I>> ReiType<T> adapt() {
+        return (ReiType<T>) this;
     }
 
     public TypedSerializer<R> getType() {
         return type;
-    }
-
-    public SidedRef<ReiCategory<R>> getCategory() {
-        return category;
     }
 
     public DisplaySerializer<ReiDisplay<R>> getSerializer() {

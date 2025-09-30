@@ -3,9 +3,13 @@ description: 告诉我们发生了什么不对劲的事
 title: "[BUG] "
 labels: ["bug"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        我们对你的反馈非常重视，即使它可能不正确也没关系！
   - type: checkboxes
     attributes:
-      label: 我已经检查过以下事项
+      label: 我已经检查过以下事项（别担心，这并不影响我们帮助你）
       description: 请确保你已经检查所有事项
       options:
         - label: 我已经搜索并确认问题未被发布过
