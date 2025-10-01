@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
 public class BlockOutput implements SlotDisplay {
-    public static final Codec<BlockOutput> CODEC_SINGLE = ResourceLocation.CODEC.xmap(
+    public static final Codec<BlockOutput> CODEC_STR = ResourceLocation.CODEC.xmap(
         BlockOutput::create, BlockOutput::getId
     );
     public static final MapCodec<BlockOutput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -41,7 +41,7 @@ public class BlockOutput implements SlotDisplay {
     public static final MultiCodec<BlockOutput> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
         if (toEncode.getProperties().isEmpty()) return TestedCodec.fail(() -> "Can be encoded as string");
         return TestedCodec.success();
-    }), CODEC_SINGLE);
+    }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockOutput> STREAM_CODEC = CodecUtil.toStream(CODEC);
     public static final SlotDisplay.Type<BlockOutput> TYPE = new SlotDisplay.Type<>(CODEC_COMP, STREAM_CODEC);
     public static final ItemStack STACK_UNKNOWN = Items.BEDROCK.getDefaultInstance();
@@ -88,7 +88,7 @@ public class BlockOutput implements SlotDisplay {
     }
 
     @NotNull
-    protected BlockProperties getProperties() {
+    public BlockProperties getProperties() {
         return properties;
     }
 

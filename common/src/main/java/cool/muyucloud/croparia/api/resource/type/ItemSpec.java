@@ -1,8 +1,12 @@
 package cool.muyucloud.croparia.api.resource.type;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
+import cool.muyucloud.croparia.api.codec.MultiCodec;
+import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.TypedResource;
 import cool.muyucloud.croparia.util.TagUtil;
@@ -16,17 +20,22 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-
 @SuppressWarnings("unused")
 public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
-    public static final MapCodec<ItemSpec> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+    public static final MapCodec<ItemSpec> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
         ResourceLocation.CODEC.fieldOf("id").forGetter(itemSpec -> itemSpec.getResource().arch$registryName()),
-        DataComponentPatch.CODEC.optionalFieldOf("nbt").forGetter(itemSpec -> Optional.of(itemSpec.getComponentsPatch())),
-        DataComponentPatch.CODEC.optionalFieldOf("components").forGetter(itemSpec -> Optional.of(itemSpec.getComponentsPatch()))
-    ).apply(instance, (id, nbt, components) -> new ItemSpec(BuiltInRegistries.ITEM.getValue(id), nbt.orElse(components.orElse(DataComponentPatch.EMPTY)))));
+        CodecUtil.optionalFieldsOf(DataComponentPatch.CODEC, DataComponentPatch.EMPTY, "components", "nbt").forGetter(ItemSpec::getComponentsPatch)
+    ).apply(instance, (id, components) -> new ItemSpec(BuiltInRegistries.ITEM.getValue(id), components)));
+    public static final Codec<ItemSpec> CODEC_STR = ResourceLocation.CODEC.xmap(
+        id -> new ItemSpec(BuiltInRegistries.ITEM.getValue(id), DataComponentPatch.EMPTY),
+        itemSpec -> itemSpec.getResource().arch$registryName()
+    );
+    public static final MultiCodec<ItemSpec> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
+        if (toEncode.getComponents().isEmpty()) return TestedCodec.fail(() -> "Can be encoded as string");
+        return TestedCodec.success();
+    }), CODEC_STR);
     public static final ItemSpec EMPTY = ItemSpec.of(Items.AIR);
-    public static final TypeToken<ItemSpec> TYPE = TypeToken.register(CropariaIf.of("item_spec"), EMPTY, CODEC).orElseThrow();
+    public static final TypeToken<ItemSpec> TYPE = TypeToken.register(CropariaIf.of("item_spec"), EMPTY, CODEC_COMP).orElseThrow();
 
     @NotNull
     private final Item resource;
@@ -126,7 +135,7 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
 
     @Override
     public MapCodec<ItemSpec> getCodec() {
-        return CODEC;
+        return CODEC_COMP;
     }
 
     @Override

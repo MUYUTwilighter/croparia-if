@@ -245,31 +245,37 @@ public class CodecUtil {
         return new MultiFieldCodec<>(map);
     }
 
-    /**
-     * <p>
-     * Combine multiple field codecs into one.
-     * </p>
-     * <p>
-     * For example:
-     * <pre>{@code
-     * MapCodec<MyType> codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
-     *     CodecUtil.fieldsOf(
-     *         TestedCodec.of(Codec.INT.xmap(MyId::find, MyId::getIndex), toDecode -> TestedCodec.fail(() -> "Don't like int decoder, use string")).fieldOf("id"),
-     *         TestedCodec.of(Codec.STRING).xmap(MyId::forName, MyId::getName).fieldOf("name")
-     *     ).forGetter(MyType::getId)
-     * ).apply(instance, MyType::new));
-     * }</pre>
-     * </p>
-     * <p>
-     * The {@code codec} can decode from either {@code { "id": 123 }} or {@code { "name": "example" }}, and encode into {@code { "name": "example }}.
-     * </p>
-     *
-     * @param map the field-codec entries to combine
-     * @param <T> target type
-     * @return the combined field codec
-     */
     public static <T> MultiFieldCodec<T> fieldsOf(Map<String, TestedCodec<? extends T>> map) {
         return new MultiFieldCodec<>(map);
+    }
+
+    public static <T> OptionalMultiFieldCodec<T> optionalFieldsOf(Codec<T> codec, String... names) {
+        Map<String, TestedCodec<? extends T>> map = new LinkedHashMap<>();
+        TestedCodec<T> tested = of(codec);
+        for (String name : names) {
+            map.put(name, tested);
+        }
+        return new OptionalMultiFieldCodec<>(map);
+    }
+
+    public static <T> OptionalMultiFieldCodec<T> optionalFieldsOf(Map<String, TestedCodec<? extends T>> map) {
+        return new OptionalMultiFieldCodec<>(map);
+    }
+
+    public static <T> MapCodec<T> optionalFieldsOf(Codec<T> codec, T def, String... names) {
+        Map<String, TestedCodec<? extends T>> map = new LinkedHashMap<>();
+        TestedCodec<T> tested = of(codec);
+        for (String name : names) {
+            map.put(name, tested);
+        }
+        return optionalFieldsOf(map, def);
+    }
+
+    public static <T> MapCodec<T> optionalFieldsOf(Map<String, TestedCodec<? extends T>> map, T def) {
+        return new OptionalMultiFieldCodec<>(map).xmap(
+            may -> may.orElse(def),
+            t -> Objects.equals(t, def) ? Optional.empty() : Optional.of(t)
+        );
     }
 
     /**

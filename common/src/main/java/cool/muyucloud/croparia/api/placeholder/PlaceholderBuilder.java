@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -68,8 +67,8 @@ public class PlaceholderBuilder<T> {
             ));
             return Optional.of(obj);
         }).then(
-            Pattern.compile("^size$|^length$"), (entry, placeholder, matcher) -> mapper.map(entry, placeholder, matcher).map(MapReader::size), Placeholder.NUMBER
-        ).then(Pattern.compile("mapKey\\((.*)\\)"), (entry, placeholder, matcher) -> {
+            PatternKey.literal("_size"), (entry, placeholder, matcher) -> mapper.map(entry, placeholder, matcher).map(MapReader::size), Placeholder.NUMBER
+        ).then(PatternKey.MAP_MAP_KEY, (entry, placeholder, matcher) -> {
             JsonObject obj = new JsonObject();
             mapper.map(entry, placeholder, matcher).ifPresent(map -> map.forEach(
                 e -> valueParser.parse(e.getValue(), placeholder, matcher).ifPresent(
@@ -79,7 +78,7 @@ public class PlaceholderBuilder<T> {
                 )
             ));
             return Optional.of(obj);
-        }, Placeholder.JSON_OBJECT).then(Pattern.compile("^mapValue\\((.*)\\)$"), (entry, placeholder, matcher) -> {
+        }, Placeholder.JSON_OBJECT).then(PatternKey.MAP_MAP_VALUE, (entry, placeholder, matcher) -> {
             JsonObject obj = new JsonObject();
             mapper.map(entry, placeholder, matcher).ifPresent(map -> map.forEach(
                 e -> valueParser.parse(e.getValue(), placeholder, matcher).ifPresent(v -> obj.add(e.getKey(), v))
@@ -93,11 +92,11 @@ public class PlaceholderBuilder<T> {
             JsonArray array = new JsonArray();
             mapper.map(entry, placeholder, matcher).ifPresent(map -> map.values().forEach(value -> valueParser.parse(value, placeholder, matcher).ifPresent(array::add)));
             return Optional.of(array);
-        }, Placeholder.JSON_ARRAY).then(Pattern.compile("^get\\((.*)\\)$"), (entry, placeholder, matcher) -> {
+        }, Placeholder.JSON_ARRAY).then(PatternKey.MAP_GET, (entry, placeholder, matcher) -> {
             String key = matcher.group(1);
             return mapper.map(entry, placeholder, matcher).map(map -> map.get(key))
                 .flatMap(value -> valueParser.parse(value, placeholder, matcher));
-        }).then(Pattern.compile("^getOr\\((.*),(.*)\\)$"), (entry, placeholder, matcher) -> {
+        }).then(PatternKey.MAP_GET_OR, (entry, placeholder, matcher) -> {
             String key = matcher.group(1);
             String def = matcher.group(2);
             return mapper.map(entry, placeholder, matcher).map(map -> map.get(key))
@@ -129,31 +128,53 @@ public class PlaceholderBuilder<T> {
             PatternKey.literal("_size"),
             (entry, placeholder, matcher) -> mapper.map(entry, placeholder, matcher).map(ListReader::size),
             Placeholder.NUMBER
-        ).then(Pattern.compile("map\\(.*\\)"), (entry, placeholder, matcher) -> {
+        ).then(PatternKey.LIST_MAP, (entry, placeholder, matcher) -> {
             JsonArray array = new JsonArray();
-            mapper.map(entry, placeholder, matcher).ifPresent(
-                list -> list.forEach(element -> elementParser.parse(element, placeholder, matcher).ifPresent(array::add))
-            );
+            var mayList = mapper.map(entry, placeholder, matcher);
+            if (mayList.isEmpty()) return Optional.of(array);
+            var list = mayList.get();
+            for (E e : list) {
+                elementParser.parse(e, placeholder, matcher).ifPresent(array::add);
+            }
             return Optional.of(array);
         }, Placeholder.JSON_ARRAY).then(PatternKey.literal("mapi()"), (entry, placeholder, matcher) -> {
             JsonObject obj = new JsonObject();
-            mapper.map(entry, placeholder, matcher).ifPresent(list -> {
-                int i = 0;
-                for (E e : list) {
-                    String k = String.valueOf(i);
-                    elementParser.parse(e, placeholder, matcher).ifPresent(v -> obj.add(k, v));
-                    i++;
+            var mayList = mapper.map(entry, placeholder, matcher);
+            if (mayList.isEmpty()) return Optional.of(obj);
+            var list = mayList.get();
+            int i = 0;
+            for (E e : list) {
+                var mayValue = elementParser.parse(e, placeholder, matcher);
+                if (mayValue.isPresent()) {
+                    obj.add(String.valueOf(i), mayValue.get());
                 }
-            });
+                i++;
+            }
             return Optional.of(obj);
-        }, Placeholder.JSON_OBJECT).then(Pattern.compile("^get\\(\\d+\\)$"), (entry, placeholder, matcher) -> {
+        }, Placeholder.JSON_OBJECT).then(PatternKey.LIST_GET, (entry, placeholder, matcher) -> {
             try {
-                int index = Integer.parseInt(matcher.group(1));
-                return mapper.map(entry, placeholder, matcher).map(
-                    list -> list.get(index)
-                ).flatMap(element -> elementParser.parse(element, placeholder, matcher));
-            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                int index = Integer.parseInt(matcher.group(1).trim());
+                var mayList = mapper.map(entry, placeholder, matcher);
+                if (mayList.isEmpty()) return Optional.empty();
+                var list = mayList.get();
+                return list.size() > index ? elementParser.parse(list.get(index), placeholder, matcher) : Optional.empty();
+            } catch (NumberFormatException e) {
+                throw new PlaceholderException(e);
+            } catch (IndexOutOfBoundsException e) {
                 return Optional.empty();
+            }
+        }).then(PatternKey.LIST_GET_OR, (entry, placeholder, matcher) -> {
+            String def = matcher.group(2).trim();
+            try {
+                int index = Integer.parseInt(matcher.group(1).trim());
+                var mayList = mapper.map(entry, placeholder, matcher);
+                if (mayList.isEmpty()) return Optional.empty();
+                var list = mayList.get();
+                return list.size() > index ? elementParser.parse(list.get(index), placeholder, matcher) : Optional.empty();
+            } catch (NumberFormatException e) {
+                throw new PlaceholderException(e);
+            } catch (IndexOutOfBoundsException e) {
+                return Optional.of(new JsonPrimitive(def));
             }
         }));
     }
@@ -164,15 +185,14 @@ public class PlaceholderBuilder<T> {
         this.then(PatternKey.QUOTE_IF_STR, (entry, placeholder, matcher) -> {
             RegexParser<T> parser = this.subNodes.get(PatternKey.of(PatternKey.EMPTY));
             if (parser != null) {
-                return parser.parse(entry, placeholder, matcher).map(json -> {
-                    if (json.isJsonPrimitive()) {
-                        JsonPrimitive primitive = json.getAsJsonPrimitive();
-                        if (primitive.isString()) {
-                            return new JsonPrimitive(primitive.toString());
-                        }
-                    }
-                    return json;
-                });
+                var maySelf = parser.parse(entry, placeholder, matcher);
+                if (maySelf.isEmpty()) return Optional.empty();
+                JsonElement self = maySelf.get();
+                if (self.isJsonPrimitive() && self.getAsJsonPrimitive().isString()) {
+                    return Optional.of(new JsonPrimitive(self.toString()));
+                } else {
+                    return Optional.of(self);
+                }
             } else {
                 return Optional.empty();
             }
@@ -180,15 +200,14 @@ public class PlaceholderBuilder<T> {
         this.then(PatternKey.QUOTE, (entry, placeholder, matcher) -> {
             RegexParser<T> parser = this.subNodes.get(PatternKey.of(PatternKey.EMPTY));
             if (parser != null) {
-                return parser.parse(entry, placeholder, matcher).map(json -> {
-                    if (json.isJsonPrimitive()) {
-                        JsonPrimitive primitive = json.getAsJsonPrimitive();
-                        if (primitive.isString()) {
-                            return new JsonPrimitive(primitive.toString());
-                        }
-                    }
-                    return new JsonPrimitive("\"" + json + "\"");
-                });
+                var maySelf = parser.parse(entry, placeholder, matcher);
+                if (maySelf.isEmpty()) return Optional.empty();
+                JsonElement self = maySelf.get();
+                if (self.isJsonPrimitive() && self.getAsJsonPrimitive().isString()) {
+                    return Optional.of(new JsonPrimitive(self.toString()));
+                } else {
+                    return Optional.of(new JsonPrimitive("\"" + self + "\""));
+                }
             } else {
                 return Optional.empty();
             }
@@ -228,8 +247,12 @@ public class PlaceholderBuilder<T> {
     }
 
     public @NotNull <O> PlaceholderBuilder<T> then(@NotNull Pattern key, TypeMapper<T, O> mapper, @NotNull Placeholder<O> parser) {
-        return then(key, ((entry, placeholder, matcher) -> mapper.map(entry, placeholder, matcher)
-            .flatMap(other -> parser.parse(other, placeholder, matcher))));
+        return then(key, (entry, placeholder, matcher) -> {
+            var mayO = mapper.map(entry, placeholder, matcher);
+            if (mayO.isEmpty()) return Optional.empty();
+            O o = mayO.get();
+            return parser.parse(o, placeholder, matcher);
+        });
     }
 
     /**
@@ -244,11 +267,12 @@ public class PlaceholderBuilder<T> {
      * @apiNote This is a shorthand for then(key, t -> CodecUtil.encodeJson(mapper.apply(t), codec).getOrThrow(PlaceholderException::new))
      */
     public @NotNull <O> PlaceholderBuilder<T> then(@NotNull Pattern key, @NotNull TypeMapper<T, O> mapper, @NotNull Codec<O> codec) {
-        return then(key, (entry, placeholder, matcher) -> mapper.map(entry, placeholder, matcher).map(mapped -> {
-            AtomicReference<JsonElement> ref = new AtomicReference<>();
-            CodecUtil.encodeJson(mapped, codec).ifSuccess(ref::set);
-            return ref.get();
-        }), Placeholder.JSON);
+        return then(key, (entry, placeholder, matcher) -> {
+            var mayO = mapper.map(entry, placeholder, matcher);
+            if (mayO.isEmpty()) return Optional.empty();
+            O o = mayO.get();
+            return CodecUtil.encodeJson(o, codec).map(Optional::of).getOrThrow(PlaceholderException::new);
+        }, Placeholder.JSON);
     }
 
     /**
@@ -295,14 +319,24 @@ public class PlaceholderBuilder<T> {
      */
     public @NotNull <O> PlaceholderBuilder<T> overwrite(@NotNull Placeholder<O> other, @NotNull TypeMapper<T, O> mapper) {
         for (var entry : other.getSubNodes().entrySet()) {
-            subNodes.put(entry.getKey(), (t, p, m) -> mapper.map(t, p, m).flatMap(o -> entry.getValue().parse(o, p, m)));
+            subNodes.put(entry.getKey(), (t, p, m) -> {
+                var mayO = mapper.map(t, p, m);
+                if (mayO.isEmpty()) return Optional.empty();
+                var o = mayO.get();
+                return entry.getValue().parse(o, p, m);
+            });
         }
         return this;
     }
 
     public @NotNull <O> PlaceholderBuilder<T> concat(@NotNull Placeholder<O> other, @NotNull TypeMapper<T, O> mapper) {
         for (var entry : other.getSubNodes().entrySet()) {
-            this.subNodes.putIfAbsent(entry.getKey(), (t, s, m) -> mapper.map(t, s, m).flatMap(o -> entry.getValue().parse(o, s, m)));
+            this.subNodes.putIfAbsent(entry.getKey(), (t, s, m) -> {
+                var mayO = mapper.map(t, s, m);
+                if (mayO.isEmpty()) return Optional.empty();
+                var o = mayO.get();
+                return entry.getValue().parse(o, s, m);
+            });
         }
         return this;
     }

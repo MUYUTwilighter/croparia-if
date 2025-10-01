@@ -6,6 +6,7 @@ import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.api.generator.util.DgEntry;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.api.generator.util.PackCacheEntry;
+import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.Template;
 import net.minecraft.resources.ResourceLocation;
@@ -14,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 public class AggregatedGenerator extends DataGenerator {
     public static final MapCodec<AggregatedGenerator> CODEC = CodecUtil.extend(
@@ -26,7 +26,7 @@ public class AggregatedGenerator extends DataGenerator {
         )
     );
     public static final Placeholder<String> CONTENT_PLACEHOLDER = Placeholder.build(builder -> builder
-        .then(Pattern.compile("^content$"), Placeholder.STRING));
+        .then(PatternKey.literal("content"), Placeholder.STRING));
 
     private final Template content;
 

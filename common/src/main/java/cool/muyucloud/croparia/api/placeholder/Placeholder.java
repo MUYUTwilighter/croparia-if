@@ -48,7 +48,7 @@ public class Placeholder<T> implements RegexParser<T> {
             } else if (entry.isJsonObject()) {
                 return Placeholder.JSON_OBJECT.parse(entry.getAsJsonObject(), matcher.group(1) + "." + placeholder, matcher);
             } else {
-                return Optional.empty();    // Pass to next parser
+                return Optional.empty();
             }
         });
         return builder;
@@ -61,8 +61,9 @@ public class Placeholder<T> implements RegexParser<T> {
         .then(PatternKey.literal("path"), RegexParser.of(ResourceLocation::getPath))
     );
     public static final Placeholder<DataComponentPatch> DATA_COMPONENTS = Placeholder.build(DataComponentPatch.CODEC, PlaceholderFactory.identity());
-    public static final Placeholder<BlockOutput> BLOCK_OUTPUT = build(BlockOutput.CODEC_COMP.codec(), builder -> builder
+    public static final Placeholder<BlockOutput> BLOCK_OUTPUT = build(BlockOutput.CODEC, builder -> builder
         .then(PatternKey.literal("id"), TypeMapper.of(BlockOutput::getId), ID)
+        .thenMap(PatternKey.literal("properties"), TypeMapper.of(block -> MapReader.map(block.getProperties().getProperties())), Placeholder.STRING)
     );
     public static final Placeholder<ItemOutput> ITEM_OUTPUT = build(
         ItemOutput.CODEC, builder -> builder

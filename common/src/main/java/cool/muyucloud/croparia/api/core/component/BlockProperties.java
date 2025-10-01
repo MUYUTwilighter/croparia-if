@@ -64,7 +64,7 @@ public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<Stri
     }
 
     @NotNull
-    protected Map<String, String> getProperties() {
+    public Map<String, String> getProperties() {
         return properties;
     }
 

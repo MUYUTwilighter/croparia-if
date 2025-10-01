@@ -9,11 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Template {
     public static final Codec<Template> CODEC = Codec.STRING.xmap(Template::new, Template::getTemplate);
-    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{(.*)}");
     private final String template;
     private final List<Span> spans = new ArrayList<>();
 
@@ -88,11 +86,11 @@ public class Template {
 
     public <T> String parse(T entry, Placeholder<T> placeholder, Function<String, String> preProcess) {
         Map<String, String> cache = new HashMap<>();
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder(template.length());
         int cursor = 0;
         for (Span span : spans) {
             String content = preProcess.apply(span.getContent());
-            Matcher m = PLACEHOLDER_PATTERN.matcher(content);
+            Matcher m = PatternKey.PLACEHOLDER.matcher(content);
             if (!m.matches()) {
                 throw new JsonParseException("Invalid placeholder format: %s (%s)".formatted(span.getContent(), content));
             }
