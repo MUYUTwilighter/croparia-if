@@ -207,6 +207,21 @@ public class Crops {
         return crop;
     }
 
+    public static String forIngot(String name) {
+        String platform = ArchitecturyTarget.getCurrentTarget();
+        return "c:ingots/" + name;
+    }
+
+    public static String forGem(String name) {
+        String platform = ArchitecturyTarget.getCurrentTarget();
+        return "c:gems/" + name;
+    }
+
+    public static String forDust(String name) {
+        String platform = ArchitecturyTarget.getCurrentTarget();
+        return "c:dusts/" + name;
+    }
+
     public static final Crop ADAMANTITE = compat("adamantite", forIngot("adamantite"), 0xAD0E19, 3, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.adamantite_ingot"
     ));
@@ -392,7 +407,7 @@ public class Crops {
         "mythicmetals", "item.mythicmetals.palladium_ingot",
         "gtceu", "material.gtceu.palladium"
     ));
-    public static final Crop PERIDOT = compat("peridot", forElse("peridot_gems", "gems/peridot"), 0xAAD26F, 3, Crop.CROP, Map.of(
+    public static final Crop PERIDOT = compat("peridot", forGem("peridot"), 0xAAD26F, 3, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.peridot_gem"
     ));
     public static final Crop PLATINUM = compat("platinum", forIngot("platinum"), 0xAABBC7, 3, Crop.CROP, Map.of(
@@ -410,7 +425,7 @@ public class Crops {
     public static final Crop QUADRILLUM = compat("quadrillum", forIngot("quadrillum"), 0x626E6E, 3, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.quadrillum_ingot"
     ));
-    public static final Crop RED_GARNET = compat("red_garnet", forElse("red_garnet_gems", "gems/red_garnet"), 0xE66C67, 3, Crop.CROP, Map.of(
+    public static final Crop RED_GARNET = compat("red_garnet", forGem("red_garnet"), 0xE66C67, 3, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.red_garnet_gem"
     ));
     public static final Crop RHODIUM = compat("rhodium", forIngot("rhodium"), 0xB5BFC6, 3, Crop.CROP, Map.of(
@@ -419,7 +434,7 @@ public class Crops {
     public static final Crop ROSITE = compat("rosite", forIngot("rosite"), 0xF16B59, 3, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.rosite_ingot"
     ));
-    public static final Crop RUBY = compat("ruby", forElse("rubies", "gems/ruby"), 0xC45E68, 3, Crop.CROP, Map.of(
+    public static final Crop RUBY = compat("ruby", forGem("ruby"), 0xC45E68, 3, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.ruby_gem"
     ));
     public static final Crop RUNITE = compat("runite", forIngot("runite"), 0x00AECE, 3, Crop.CROP, Map.of(
@@ -435,7 +450,7 @@ public class Crops {
     public static final Crop SAMARIUM = compat("samarium", forIngot("samarium"), 0xFF4500, 3, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.samarium"
     ));
-    public static final Crop SAPPHIRE = compat("sapphire", forElse("sapphires", "gems/sapphire"), 0x6D9BEC, 3, Crop.CROP, Map.of(
+    public static final Crop SAPPHIRE = compat("sapphire", forGem("sapphire"), 0x6D9BEC, 3, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.sapphire_gem"
     ));
     public static final Crop SHYRESTONE = compat("shyrestone", forIngot("shyrestone"), 0xA1EAFC, 3, Crop.CROP, Map.of(
@@ -503,7 +518,7 @@ public class Crops {
     public static final Crop VARSIUM = compat("varsium", forIngot("varsium"), 0xDABF59, 3, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.varsium_ingot"
     ));
-    public static final Crop YELLOW_GARNET = compat("yellow_garnet", forElse("yellow_garnet_gems", "gems/yellow_garnet"), 0xEACB5F, 3, Crop.CROP, Map.of(
+    public static final Crop YELLOW_GARNET = compat("yellow_garnet", forGem("yellow_garnet"), 0xEACB5F, 3, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.yellow_garnet_gem"
     ));
     public static final Crop YTTRIUM = compat("yttrium", forIngot("yttrium"), 0xFF6347, 3, Crop.CROP, Map.of(
@@ -517,45 +532,5 @@ public class Crops {
     public static void register() {
         CropariaIf.LOGGER.info("Loading custom crops from file definitions");
         DgRegistries.CROPS.readCrops();
-    }
-
-    public static String forIngot(String name) {
-        String platform = ArchitecturyTarget.getCurrentTarget();
-        return switch (platform) {
-            case "fabric" -> "#c:%s_ingots".formatted(name);
-            case "neoforge" -> "#c:ingots/%s".formatted(name);
-            case "forge" -> "#forge:ingots/%s".formatted(name);
-            default -> throw new UnsupportedOperationException("Unknow platform: " + platform);
-        };
-    }
-
-    public static String forGem(String name) {
-        String platform = ArchitecturyTarget.getCurrentTarget();
-        return switch (platform) {
-            case "fabric" -> "#c:%s".formatted(name);
-            case "neoforge" -> "#c:gems/%s".formatted(name);
-            case "forge" -> "#forge:gems/%s".formatted(name);
-            default -> throw new UnsupportedOperationException("Unknow platform: " + platform);
-        };
-    }
-
-    public static String forDust(String name) {
-        String platform = ArchitecturyTarget.getCurrentTarget();
-        return switch (platform) {
-            case "fabric" -> "#c:%s_dusts".formatted(name);
-            case "neoforge" -> "#c:dusts/%s".formatted(name);
-            case "forge" -> "#forge:dusts/%s".formatted(name);
-            default -> throw new UnsupportedOperationException("Unknow platform: " + platform);
-        };
-    }
-    
-    public static String forElse(String fabric, String forge) {
-        String platform = ArchitecturyTarget.getCurrentTarget();
-        return switch (platform) {
-            case "fabric" -> "c:%s".formatted(fabric);
-            case "neoforge" -> "c:%s".formatted(forge);
-            case "forge" -> "forge:%s".formatted(forge);
-            default -> throw new UnsupportedOperationException("Unknow platform: " + platform);
-        };
     }
 }

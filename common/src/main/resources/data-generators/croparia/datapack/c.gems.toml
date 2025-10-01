@@ -1,0 +1,11 @@
+registry = "croparia:elements"
+path = "c/tags/item/gems/${gem.path}.json"
+content = '    ${gem._qis}'
+template = """
+{
+  "replace": false,
+  "values": [
+    ${gem._qis}
+  ]
+}
+"""

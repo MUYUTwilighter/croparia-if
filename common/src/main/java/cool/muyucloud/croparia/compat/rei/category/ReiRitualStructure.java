@@ -10,6 +10,7 @@ import cool.muyucloud.croparia.compat.rei.widget.Item2DWidget;
 import cool.muyucloud.croparia.compat.rei.widget.PatchedOverflow;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
+import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
@@ -27,11 +28,11 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReiRitualStructure extends ReiCategory<RitualStructure> {
-    private static final ItemStack INPUT = CropariaItems.PLACEHOLDER.get().getDefaultInstance();
-
-    static {
-        INPUT.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.input"));
-    }
+    private static final LazySupplier<ItemStack> INPUT = LazySupplier.of(() -> {
+        ItemStack stack = CropariaItems.PLACEHOLDER.get().getDefaultInstance();
+        stack.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.input"));
+        return stack;
+    });
 
     public static final int SLOT_SIZE = 18;
     public static final int LABEL_MARGIN = 6;
@@ -96,7 +97,7 @@ public class ReiRitualStructure extends ReiCategory<RitualStructure> {
                 if (c == '.') {
                     return Collections.singleton(EntryStacks.of(BlockInput.STACK_AIR));
                 } else if (c == '$') {
-                    return Collections.singleton(EntryStacks.of(INPUT));
+                    return Collections.singleton(EntryStacks.of(INPUT.get()));
                 } else if (c == '*') {
                     return ReiUtil.toIngredient(recipe.getRitual());
                 } else if (c == ' ') {

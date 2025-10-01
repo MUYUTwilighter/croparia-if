@@ -61,6 +61,7 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
 
     private final ResourceLocation id;
     private final Color color;
+    private final String translationKey;
     private final RegistrySupplier<ElementalSource> fluidSource;
     private final RegistrySupplier<ElementalFlowing> fluidFlowing;
     private final RegistrySupplier<ElementalLiquidBlock> fluidBlock;
@@ -71,6 +72,7 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
     Element() {
         this.id = CropariaIf.of("empty");
         this.color = new Color(-1);
+        this.translationKey = "element." + CropariaIf.MOD_ID + ".empty";
         this.fluidSource = null;
         this.fluidFlowing = null;
         this.fluidBlock = null;
@@ -86,6 +88,7 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
         }
         this.id = CropariaIf.of(name);
         this.color = color;
+        this.translationKey = "element." + CropariaIf.MOD_ID + "." + name;
         SimpleArchitecturyFluidAttributes attr = SimpleArchitecturyFluidAttributes.of(
             () -> Element.this.getFluidFlowing().get(),
             () -> Element.this.getFluidSource().get()
@@ -161,5 +164,9 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
     @Override
     public boolean shouldLoad() {
         return this != EMPTY;
+    }
+
+    public String getTranslationKey() {
+        return this.translationKey;
     }
 }

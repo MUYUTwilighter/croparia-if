@@ -12,10 +12,9 @@ import cool.muyucloud.croparia.api.placeholder.Template;
 import cool.muyucloud.croparia.api.placeholder.TypeMapper;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -38,8 +37,6 @@ public class LangGenerator extends DataGenerator {
         }
     }, lg -> lg);
 
-    private static final Map<String, List<String>> TRANSLATIONS = new HashMap<>();
-
     public LangGenerator(
         boolean enabled, boolean startup, List<ResourceLocation> whitelist, Template path,
         DgRegistry<? extends TranslatableEntry> registry, Template template
@@ -49,14 +46,15 @@ public class LangGenerator extends DataGenerator {
 
     @Override
     public void onGenerated(PackHandler handler) {
-        TRANSLATIONS.forEach((path, translations) -> {
+        handler.getAll(this).forEach(entry -> {
             StringBuilder builder = new StringBuilder("{\n");
-            translations.forEach(translation -> builder.append("  ").append(translation).append(",\n"));
-            String generated = builder.isEmpty() ? "" : builder.substring(0, builder.length() - 2);
-            generated += "\n}";
-            handler.cache(path, generated);
+            if (entry.value() instanceof Collection<?> translations) {
+                translations.forEach(translation -> builder.append("  ").append(translation.toString()).append(",\n"));
+                String generated = builder.isEmpty() ? "" : builder.substring(0, builder.length() - 2);
+                generated += "\n}";
+                handler.cache(entry.path(), generated, this);
+            }
         });
-        TRANSLATIONS.clear();
     }
 
     @Override
@@ -64,18 +62,25 @@ public class LangGenerator extends DataGenerator {
         if (entry instanceof TranslatableEntry translatable) {
             AtomicReference<String> langRef = new AtomicReference<>();
             @SuppressWarnings("unchecked")
-            Placeholder<TranslatableEntry> parser = Placeholder.build(builder -> builder
+            Placeholder<DgEntry> parser = Placeholder.build(builder -> builder
                 .then(PatternKey.literal("lang"), TypeMapper.of(e -> langRef.get()), Placeholder.STRING)
-                .overwrite((Placeholder<TranslatableEntry>) translatable.placeholder(), TypeMapper.identity()));
+                .overwrite((Placeholder<DgEntry>) entry.placeholder(), TypeMapper.identity()));
             Function<String, String> preProcess = placeholder -> placeholder.replaceAll("_lang", langRef.get());
             for (String lang : translatable.getLangs()) {
                 langRef.set(lang);
-                String relative = this.getPath().parse(translatable, parser, preProcess);
-                List<String> list = TRANSLATIONS.computeIfAbsent(relative, k -> new LinkedList<>());
-                list.add(this.getTemplate().parse(translatable, parser, preProcess));
+                String path = this.getPath().parse(entry, parser, preProcess);
+                @SuppressWarnings("unchecked")
+                Collection<Object> translations = pack.get(this, path).map(value -> {
+                    if (value instanceof Collection<?> collection) {
+                        return (Collection<Object>) collection;
+                    } else {
+                        return null;
+                    }
+                }).orElseGet(() -> pack.cache(path, new ArrayList<>(), this));
+                translations.add(this.getTemplate().parse(entry, parser, preProcess));
             }
         } else {
-            throw new JsonParseException("Entry %s in %s is not translatable".formatted(entry.getKey(), this.getRegistry().getId()));
+            throw new JsonParseException("Entry %s is not translatable".formatted(entry));
         }
     }
 }

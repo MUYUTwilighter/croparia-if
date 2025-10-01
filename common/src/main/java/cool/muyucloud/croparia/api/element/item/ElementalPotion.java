@@ -1,13 +1,18 @@
 package cool.muyucloud.croparia.api.element.item;
 
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.block.Infusor;
 import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.element.ElementAccess;
 import cool.muyucloud.croparia.util.ItemPlaceable;
+import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -57,5 +62,11 @@ public class ElementalPotion extends Item implements ElementAccess {
 
     public static Optional<ElementalPotion> fromElement(Element element) {
         return Optional.ofNullable(POTIONS.get(element));
+    }
+
+    @Override
+    public @NotNull Component getName(ItemStack itemStack) {
+        MutableComponent elemName = Texts.translatable(this.getElement().getTranslationKey());
+        return Texts.translatable("item." + CropariaIf.MOD_ID + ".element.potion", elemName);
     }
 }

@@ -178,6 +178,6 @@ public class DataGenerator implements DgListener {
     protected void generate(DgEntry entry, PackHandler pack) {
         String relative = this.getPath(entry);
         String replaced = this.getTemplate(entry);
-        pack.cache(relative, replaced);
+        pack.cache(relative, replaced, this);
     }
 }

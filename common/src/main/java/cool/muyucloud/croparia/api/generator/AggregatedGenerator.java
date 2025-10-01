@@ -5,14 +5,14 @@ import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.api.generator.util.DgEntry;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
+import cool.muyucloud.croparia.api.generator.util.PackCacheEntry;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.Template;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -29,7 +29,6 @@ public class AggregatedGenerator extends DataGenerator {
     );
     public static final Placeholder<String> CONTENT_PLACEHOLDER = Placeholder.build(builder -> builder
         .then(Pattern.compile("^content$"), Placeholder.STRING));
-    protected static final Map<String, List<String>> CACHE = new HashMap<>();
 
     private final Template content;
 
@@ -53,21 +52,28 @@ public class AggregatedGenerator extends DataGenerator {
 
     @Override
     protected void generate(DgEntry entry, PackHandler pack) {
-        List<String> list = CACHE.computeIfAbsent(this.getPath(entry), k -> new LinkedList<>());
-        list.add(this.getContent(entry));
+        String path = this.getPath(entry);
+        @SuppressWarnings("unchecked")
+        Collection<Object> cache = pack.get(this, path).map(value -> {
+            if (value instanceof Collection<?> collection) {
+                return (Collection<Object>) collection;
+            } else {
+                return null;
+            }
+        }).orElseGet(() -> pack.cache(path, new ArrayList<>(), this));
+        cache.add(this.getContent(entry));
     }
 
     @Override
     public void onGenerated(PackHandler handler) {
-        for (var entry : CACHE.entrySet()) {
-            String relative = entry.getKey();
+        Collection<PackCacheEntry<Collection<String>>> caches = handler.getAll(this);
+        for (PackCacheEntry<Collection<String>> entry : caches) {
             StringBuilder builder = new StringBuilder();
-            for (String s : entry.getValue()) {
+            for (String s : entry.value()) {
                 builder.append(s).append(",\n");
             }
             String content = builder.isEmpty() ? "" : builder.substring(0, builder.length() - 2);
-            handler.cache(relative, this.getTemplate().parse(content, CONTENT_PLACEHOLDER));
+            handler.cache(entry.path(), this.getTemplate().parse(content, CONTENT_PLACEHOLDER), this);
         }
-        CACHE.clear();
     }
 }
