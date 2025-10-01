@@ -6,7 +6,7 @@ import java.util.*;
 
 public class PackCache {
     private final Map<String, PackCacheEntry<?>> byPath = new HashMap<>();
-    private final Map<DataGenerator, Collection<PackCacheEntry<?>>> byGenerator = new HashMap<>();
+    private final Map<DataGenerator, Set<PackCacheEntry<?>>> byGenerator = new HashMap<>();
 
     public void clear() {
         byPath.clear();
@@ -22,16 +22,17 @@ public class PackCache {
      */
     public <T> T cache(String path, T value, DataGenerator owner) {
         PackCacheEntry<?> entry = byPath.get(path);
-        Collection<PackCacheEntry<?>> entries = byGenerator.computeIfAbsent(entry.owner(), k -> new HashSet<>());
-        entries.remove(entry);
+        if (entry != null) {
+            byGenerator.computeIfAbsent(entry.owner(), k -> new HashSet<>()).remove(entry);
+        }
         entry = new PackCacheEntry<>(owner, path, value);
+        byGenerator.computeIfAbsent(owner, k -> new HashSet<>()).add(entry);
         byPath.put(path, entry);
-        entries.add(entry);
         return value;
     }
 
     /**
-     * Safe query for cached value. If the querier is not the owner of the cached value, it will transfer the ownership to the querier.
+     * Safe query for cached value. If the querier is not the owner of the cached value, this will transfer the ownership to the querier.
      *
      * @param querier The generator querying the value.
      * @param path    The path of the cached value.
@@ -39,8 +40,11 @@ public class PackCache {
      * @return An optional containing the cached value if present, otherwise an empty optional.
      * @throws ClassCastException if the cached value cannot be cast to the expected type.
      */
-    public <T> Optional<T> get(DataGenerator querier, String path) throws ClassCastException {
+    public <T> Optional<T> occupy(DataGenerator querier, String path) throws ClassCastException {
         PackCacheEntry<?> entry = byPath.get(path);
+        if (entry == null) {
+            return Optional.empty();
+        }
         @SuppressWarnings("unchecked")
         T value = (T) entry.value();
         if (entry.owner() != querier) {
@@ -50,18 +54,32 @@ public class PackCache {
     }
 
     /**
+     * Similar to {@link #occupy(DataGenerator, String)}, but will not transfer the ownership.
+     *
+     * @return An optional containing the cached value if present and owned by the querier, otherwise an empty optional.
+     */
+    public <T> Optional<T> query(DataGenerator querier, String path) throws ClassCastException {
+        PackCacheEntry<?> entry = byPath.get(path);
+        if (entry == null) {
+            return Optional.empty();
+        }
+        @SuppressWarnings("unchecked")
+        T value = (T) entry.value();
+        if (entry.owner() != querier) {
+            return Optional.empty();    // Not owned by the querier, reject
+        }
+        return Optional.ofNullable(value);
+    }
+
+    /**
      * Safe query for all cached values owned by the specified generator.
      *
      * @param querier The generator querying the value.
-     * @param <T>     The type of the cached values.
      * @return A collection of cached values owned by the specified generator.
      * @throws ClassCastException if any cached value cannot be cast to the expected type.
      */
-    @SuppressWarnings("unchecked")
-    public <T> Collection<PackCacheEntry<T>> getAll(DataGenerator querier) throws ClassCastException {
-        return this.byGenerator.computeIfAbsent(querier, k -> new HashSet<>()).stream().map(
-            entry -> new PackCacheEntry<>(entry.owner(), entry.path(), (T) entry.value())
-        ).toList();
+    public Set<PackCacheEntry<?>> getAll(DataGenerator querier) {
+        return this.byGenerator.computeIfAbsent(querier, k -> new HashSet<>());
     }
 
     /**

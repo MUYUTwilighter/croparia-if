@@ -14,7 +14,6 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import dev.architectury.platform.Platform;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.NotImplementedException;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -108,16 +107,14 @@ public abstract class PackHandler {
     }
 
     public void onTriggered() {
-        this.writeMeta();
-        if (this.canOverride()) {
-            this.clear();
-        }
+        this.cache.clear(); // In case of exception during last generation
         this.moveBuiltInGenerators();
         this.refreshGenerators();
         this.generate();
         this.onGenerated();
         this.dump();
         this.onDumped();
+        this.cache.clear();
     }
 
     protected void onGenerated() {
@@ -188,7 +185,6 @@ public abstract class PackHandler {
         } catch (Exception e) {
             DataGenerator.LOGGER.error("Failed to write pack data to file system", e);
         }
-        this.cache.clear();
     }
 
     public String proxyPath(String path) {
@@ -207,13 +203,11 @@ public abstract class PackHandler {
         return this.cache.cache(relative, content, owner);
     }
 
-    @Unmodifiable
-    public <T> Optional<T> get(DataGenerator querier, String path) throws ClassCastException {
-        return this.cache.get(querier, path);
+    public <T> Optional<T> occupy(DataGenerator querier, String path) throws ClassCastException {
+        return this.cache.occupy(querier, path);
     }
 
-    @Unmodifiable
-    public <T> Collection<PackCacheEntry<T>> getAll(DataGenerator querier) throws ClassCastException {
+    public Set<PackCacheEntry<?>> getAll(DataGenerator querier) {
         return this.cache.getAll(querier);
     }
 

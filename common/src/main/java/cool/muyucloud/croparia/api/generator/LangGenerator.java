@@ -70,7 +70,7 @@ public class LangGenerator extends DataGenerator {
                 langRef.set(lang);
                 String path = this.getPath().parse(entry, parser, preProcess);
                 @SuppressWarnings("unchecked")
-                Collection<Object> translations = pack.get(this, path).map(value -> {
+                Collection<Object> translations = pack.occupy(this, path).map(value -> {
                     if (value instanceof Collection<?> collection) {
                         return (Collection<Object>) collection;
                     } else {

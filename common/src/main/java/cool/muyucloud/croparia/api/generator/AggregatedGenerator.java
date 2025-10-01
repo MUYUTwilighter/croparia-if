@@ -13,11 +13,9 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
-/**
- *
- **/
 public class AggregatedGenerator extends DataGenerator {
     public static final MapCodec<AggregatedGenerator> CODEC = CodecUtil.extend(
         DataGenerator.CODEC,
@@ -54,7 +52,7 @@ public class AggregatedGenerator extends DataGenerator {
     protected void generate(DgEntry entry, PackHandler pack) {
         String path = this.getPath(entry);
         @SuppressWarnings("unchecked")
-        Collection<Object> cache = pack.get(this, path).map(value -> {
+        Collection<Object> cache = pack.occupy(this, path).map(value -> {
             if (value instanceof Collection<?> collection) {
                 return (Collection<Object>) collection;
             } else {
@@ -66,11 +64,13 @@ public class AggregatedGenerator extends DataGenerator {
 
     @Override
     public void onGenerated(PackHandler handler) {
-        Collection<PackCacheEntry<Collection<String>>> caches = handler.getAll(this);
-        for (PackCacheEntry<Collection<String>> entry : caches) {
+        Set<PackCacheEntry<?>> caches = handler.getAll(this);
+        for (PackCacheEntry<?> entry : caches) {
             StringBuilder builder = new StringBuilder();
-            for (String s : entry.value()) {
-                builder.append(s).append(",\n");
+            if (entry.value() instanceof Collection<?> collection) {
+                for (Object s : collection) {
+                    builder.append(s).append(",\n");
+                }
             }
             String content = builder.isEmpty() ? "" : builder.substring(0, builder.length() - 2);
             handler.cache(entry.path(), this.getTemplate().parse(content, CONTENT_PLACEHOLDER), this);
