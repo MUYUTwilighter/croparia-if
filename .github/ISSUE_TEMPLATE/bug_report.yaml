@@ -63,7 +63,7 @@ body:
         You may submit logs or crash reports on [HasteBin](https://hastebin.com/) or [Pastebin](https://pastebin.com/).
         
         examples: 
-          - **Log: https**://hastebin.com/log.txt
+          - **Log: https://hastebin.com/log.txt
           - **Crash Report**: https://hastebin.com/log.txt
       value: |
         - **Log**: 

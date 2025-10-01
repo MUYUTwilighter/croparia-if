@@ -60,7 +60,7 @@ body:
         你可以借助 [HasteBin](https://hastebin.com/) 或 [Pastebin](https://pastebin.com/) 生成文件链接。
         
         示例： 
-          - **日志**: https**://hastebin.com/log.txt
+          - **日志**: https://hastebin.com/log.txt
           - **错误报告**: https://hastebin.com/log.txt
       value: |
         - **日志**: 
