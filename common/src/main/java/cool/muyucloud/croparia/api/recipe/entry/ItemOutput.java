@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.api.recipe.entry;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.api.codec.TestedCodec;
@@ -66,7 +67,7 @@ public class ItemOutput implements SlotDisplay {
         this.id = id;
         this.components = components;
         this.amount = amount;
-        if (this.amount <= 0) throw new IllegalArgumentException("amount must be greater than 0");
+        if (this.amount <= 0) CropariaIf.LOGGER.warn("Creating ItemOutput with non-positive amount: {}", this.amount);
         this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.getValue(id), components);
         if (this.itemSpec.isEmpty()) throw new IllegalArgumentException("Unknown or invalid item: " + id);
         this.displayStack = this.toSpec().createStack(this.getAmount());

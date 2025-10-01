@@ -7,7 +7,9 @@ import cool.muyucloud.croparia.api.crop.Crop;
 import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
 import cool.muyucloud.croparia.api.crop.util.Material;
+import cool.muyucloud.croparia.api.element.Element;
 import dev.architectury.injectables.targets.ArchitecturyTarget;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
@@ -36,20 +38,20 @@ public class Crops {
      * @param type           crop type that specifies the textures. See also {@link Crop#PRESET_TYPES}
      * @param translationKey translation key for the crop, used for formatting item & block names.
      */
-    public static @NotNull Crop croparia(
-        @NotNull String name, @NotNull String material, int color, int tier, @NotNull String type,
+    protected static @NotNull Crop croparia(
+        @NotNull String name, @NotNull RegistrySupplier<? extends Item> material, int color, int tier, @NotNull String type,
         @NotNull String translationKey
     ) {
-        Crop crop = new Crop(CropariaIf.of(name), new Material(material), new Color(color), tier, type, null, new CropDependencies("croparia", translationKey));
+        Crop crop = new Crop(CropariaIf.of(name), new Material(material.getId().toString()), new Color(color), tier, type, null, new CropDependencies("croparia", translationKey));
         DgRegistries.CROPS.register(crop);
         return crop;
     }
 
-    public static final Crop ELEMENTAL = croparia("elemental", "croparia:gem_elemental", 0x712389, 2, Crop.CROP, "item.croparia.gem_elemental");
-    public static final Crop EARTH = croparia("earth", "croparia:gem_earth", 0xE5C8BB, 3, Crop.CROP, "item.croparia.gem_earth");
-    public static final Crop WATER = croparia("water", "croparia:gem_water", 0x2A5AB2, 4, Crop.CROP, "item.croparia.gem_water");
-    public static final Crop FIRE = croparia("fire", "croparia:gem_fire", 0xC65957, 6, Crop.CROP, "item.croparia.gem_fire");
-    public static final Crop AIR = croparia("air", "croparia:gem_air", 0xA2A9B5, 7, Crop.CROP, "item.croparia.gem_air");
+    public static final Crop ELEMENTAL = croparia("elemental", Element.ELEMENTAL.getGem(), 0x712389, 2, Crop.CROP, "element.croparia.elemental");
+    public static final Crop EARTH = croparia("earth", Element.EARTH.getGem(), 0xE5C8BB, 3, Crop.CROP, "element.croparia.earth");
+    public static final Crop WATER = croparia("water", Element.WATER.getGem(), 0x2A5AB2, 4, Crop.CROP, "element.croparia.water");
+    public static final Crop FIRE = croparia("fire", Element.FIRE.getGem(), 0xC65957, 6, Crop.CROP, "element.croparia.fire");
+    public static final Crop AIR = croparia("air", Element.AIR.getGem(), 0xA2A9B5, 7, Crop.CROP, "element.croparia.air");
 
     /**
      * Add a crop for vanilla material with specified translation key.
@@ -209,17 +211,17 @@ public class Crops {
 
     public static String forIngot(String name) {
         String platform = ArchitecturyTarget.getCurrentTarget();
-        return "c:ingots/" + name;
+        return "#c:ingots/" + name;
     }
 
     public static String forGem(String name) {
         String platform = ArchitecturyTarget.getCurrentTarget();
-        return "c:gems/" + name;
+        return "#c:gems/" + name;
     }
 
     public static String forDust(String name) {
         String platform = ArchitecturyTarget.getCurrentTarget();
-        return "c:dusts/" + name;
+        return "#c:dusts/" + name;
     }
 
     public static final Crop ADAMANTITE = compat("adamantite", forIngot("adamantite"), 0xAD0E19, 3, Crop.CROP, Map.of(
@@ -275,7 +277,7 @@ public class Crops {
         "ae2", "item.ae2.certus_quartz_crystal"
     ));
     public static final Crop CHROMIUM = compat("chromium", forIngot("chromium"), 0xE0E0E0, 3, Crop.CROP, Map.of(
-        "techreborn", "item.techreborn.chromium_ingot",
+        "techreborn", "item.techreborn.chrome_ingot",
         "modern_industrialization", "item.modern_industrialization.chromium_ingot",
         "gtceu", "material.gtceu.chromium"
     ));
