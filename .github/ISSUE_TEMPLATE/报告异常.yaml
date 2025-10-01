@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        我们对你的反馈非常重视，即使它可能不正确也没关系！
+        我们对你的反馈非常重视，不论大小对错！
   - type: checkboxes
     attributes:
       label: 我已经检查过以下事项（别担心，这并不影响我们帮助你）
