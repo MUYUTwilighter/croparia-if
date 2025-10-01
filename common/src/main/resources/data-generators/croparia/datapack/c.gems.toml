@@ -1,5 +1,6 @@
 registry = "croparia:elements"
 path = "c/tags/item/gems/${gem.path}.json"
+startup = true
 content = '    ${gem._qis}'
 template = """
 {

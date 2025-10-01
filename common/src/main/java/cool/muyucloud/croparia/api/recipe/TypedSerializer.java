@@ -37,7 +37,7 @@ public class TypedSerializer<R extends DisplayableRecipe<?>>
     private final ResourceLocation id;
     private final List<Mappable<ItemStack>> stations;
     private final Class<? extends R> recipeClass;
-    private final Codec<R> codec;
+    private final MapCodec<R> codec;
     private final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec;
     private final transient RecipeDisplay.Type<R> displayType;
     private final transient Predicate<RecipeHolder<?>> syncFilter;
@@ -46,25 +46,11 @@ public class TypedSerializer<R extends DisplayableRecipe<?>>
     @SafeVarargs
     public TypedSerializer(ResourceLocation id, Class<? extends R> recipeClass, final MapCodec<R> codec, Predicate<RecipeHolder<?>> syncFilter,
                            Mappable<ItemStack>... stations) {
-        this(id, recipeClass, codec.codec(), CodecUtil.toStream(codec), syncFilter, stations);
+        this(id, recipeClass, codec, CodecUtil.toStream(codec.codec()), syncFilter, stations);
     }
 
     @SafeVarargs
     public TypedSerializer(ResourceLocation id, Class<? extends R> recipeClass, final MapCodec<R> codec,
-                           final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec, Predicate<RecipeHolder<?>> syncFilter,
-                           Mappable<ItemStack>... stations) {
-        this(id, recipeClass, codec.codec(), streamCodec, syncFilter, stations);
-    }
-
-    @SafeVarargs
-    @SuppressWarnings("unused")
-    public TypedSerializer(ResourceLocation id, Class<? extends R> clazz, final Codec<R> codec, Predicate<RecipeHolder<?>> syncFilter,
-                           Mappable<ItemStack>... stations) {
-        this(id, clazz, codec, CodecUtil.toStream(codec), syncFilter, stations);
-    }
-
-    @SafeVarargs
-    public TypedSerializer(ResourceLocation id, Class<? extends R> recipeClass, final Codec<R> codec,
                            final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec, Predicate<RecipeHolder<?>> syncFilter,
                            Mappable<ItemStack>... stations) {
         this.id = id;
@@ -74,7 +60,7 @@ public class TypedSerializer<R extends DisplayableRecipe<?>>
         this.codec = codec;
         this.streamCodec = streamCodec;
         this.syncFilter = syncFilter;
-        this.displayType = new RecipeDisplay.Type<>(CodecUtil.toMap(codec), streamCodec);
+        this.displayType = new RecipeDisplay.Type<>(codec, streamCodec);
     }
 
     public <I extends RecipeInput, T extends DisplayableRecipe<I>> boolean shouldSync(RecipeHolder<T> holder) {
@@ -165,7 +151,7 @@ public class TypedSerializer<R extends DisplayableRecipe<?>>
 
     @Override
     public @NotNull MapCodec<R> codec() {
-        return CodecUtil.toMap(codec);
+        return codec;
     }
 
     @Override

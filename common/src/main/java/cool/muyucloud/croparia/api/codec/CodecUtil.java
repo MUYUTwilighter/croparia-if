@@ -158,11 +158,6 @@ public class CodecUtil {
 
     /**
      * Create a TestedCodec that only wraps the input codec without any tests.
-     *
-     * @param codec codec to convert
-     * @param <T>   Type of the target object
-     * @return Tested codec with always-success tests
-     *
      */
     public static <T> TestedCodec<T> of(Codec<T> codec) {
         return new TestedCodec<>(codec, o -> TestedCodec.success(), (ops, input) -> TestedCodec.success());
@@ -172,14 +167,7 @@ public class CodecUtil {
      * Create a TestedCodec with specified encode test.<br/>
      * It will directly try decoding with input codec without any test, and apply the encode test before encoding.
      *
-     * @param codec      Codec to wrap
-     * @param encodeTest Test for encode
-     * @param <T>        Type of the target object
-     * @return TestedCodec with specified test for encode
-     * @see TestedCodec.EncodeTest
-     * @see TestedCodec#success()
-     * @see TestedCodec#fail()
-     * @see TestedCodec#fail(Supplier)
+     * @see #of(Codec, TestedCodec.EncodeTest, TestedCodec.DecodeTest)
      */
     public static <T> TestedCodec<T> of(Codec<T> codec, TestedCodec.EncodeTest<T> encodeTest) {
         return new TestedCodec<>(codec, encodeTest, (ops, input) -> TestedCodec.success());
@@ -189,14 +177,7 @@ public class CodecUtil {
      * Creates a TestedCodec with a specified decode test.<br/>
      * It will directly try encoding with input codec without any test, and apply the decode test before decoding.
      *
-     * @param codec      The Codec to wrap
-     * @param decodeTest The decode test to apply
-     * @param <T>        The type of the target object
-     * @return A TestedCodec with the specified decode test
-     * @see TestedCodec.DecodeTest
-     * @see TestedCodec#success()
-     * @see TestedCodec#fail()
-     * @see TestedCodec#fail(Supplier)
+     * @see #of(Codec, TestedCodec.EncodeTest, TestedCodec.DecodeTest)
      */
     public static <T> TestedCodec<T> of(Codec<T> codec, TestedCodec.DecodeTest<?> decodeTest) {
         return new TestedCodec<>(codec, o -> TestedCodec.success(), decodeTest);
@@ -276,19 +257,6 @@ public class CodecUtil {
             may -> may.orElse(def),
             t -> Objects.equals(t, def) ? Optional.empty() : Optional.of(t)
         );
-    }
-
-    /**
-     * Map a map codec into stream codec of target type.
-     *
-     * @param codec  original map codec
-     * @param parser transform original type into target type
-     * @param getter get original type from target type
-     * @return stream codec of target type.
-     * @see #mapStream(Codec, Function, Function)
-     */
-    public static <B extends FriendlyByteBuf, T, I> StreamCodec<B, T> mapStream(MapCodec<I> codec, Function<? super I, ? extends T> parser, Function<? super T, ? extends I> getter) {
-        return mapStream(codec.codec(), parser, getter);
     }
 
     /**

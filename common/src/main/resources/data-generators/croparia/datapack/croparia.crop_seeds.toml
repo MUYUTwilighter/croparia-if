@@ -1,6 +1,7 @@
 registry = "croparia:crops"
 path = "croparia/tags/item/crop_seeds.json"
 type = "croparia:aggregated"
+startup = true
 content = '    "${seed}"'
 template = """
 {

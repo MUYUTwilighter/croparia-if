@@ -4,9 +4,9 @@ block = "#croparia:ritual_stands"
 template = """
 {
   "type": "croparia:ritual",
-  "ritual": ${block},
-  "ingredient": ${item},
-  "block": ${ritual_input},
-  "result": ${off_hand}
+  "ritual": ${block._qis},
+  "ingredient": ${item._qis},
+  "block": ${ritual_input._qis},
+  "result": ${off_hand._qis}
 }
 """

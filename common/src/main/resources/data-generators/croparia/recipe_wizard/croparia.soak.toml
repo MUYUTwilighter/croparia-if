@@ -5,8 +5,8 @@ template = """
 {
   "type": "croparia:soak",
   "element": "${soak_element}",
-  "input": ${neighbor},
-  "output": ${below},
+  "input": ${neighbor._qis},
+  "output": ${below._qis},
   "probability": 1.0
 }
 """
