@@ -22,7 +22,7 @@ public class CropCommand {
         NAME.suggests((context, builder) -> Crops.cropSuggestions(builder));
         NAME.executes(context -> {
             ClientCommandRegistrationEvent.ClientCommandSourceStack source = context.getSource();
-            return reportSingular(ResourceLocationArgument.getId(context, "name"), Texts.success(source), Texts.failure(source));
+            return reportSingular(ResourceLocationArgument.getId(context, "id"), Texts.success(source), Texts.failure(source));
         });
         CROP.executes(context -> {
             ClientCommandRegistrationEvent.ClientCommandSourceStack source = context.getSource();
