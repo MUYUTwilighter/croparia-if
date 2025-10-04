@@ -99,7 +99,11 @@ public class CreateCommand {
             return -1;
         }
         Item rawCroparia = player.getOffhandItem().getItem();
-        id = id == null ? CropariaIf.of(Objects.requireNonNull(material.getItem().arch$registryName()).getNamespace()) : id;
+        id = id == null ? CropariaIf.of(Objects.requireNonNull(material.getItem().arch$registryName()).getPath()) : id;
+        if (id.getNamespace().equals("minecraft")) {
+            failure.send(Texts.translatable("commands.croparia.create.namespace"));
+            return -1;
+        }
         Color color;
         try {
             color = new Color(rawColor);

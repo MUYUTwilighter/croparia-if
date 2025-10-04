@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -11,6 +12,10 @@ import java.util.stream.Stream;
 public interface ListReader<E> extends Iterable<E> {
     static JsonArrayReader jsonArray(JsonArray array) {
         return new JsonArrayReader(array);
+    }
+
+    static <E> ListReaderImpl<E> collection(Collection<E> list) {
+        return new ListReaderImpl<>(List.copyOf(list));
     }
 
     static <E> ListReaderImpl<E> list(List<E> list) {

@@ -40,12 +40,11 @@ public class Material {
     );
     public static final Placeholder<Material> PLACEHOLDER = Placeholder.build(node -> node
         .self(TypeMapper.identity(), Material.CODEC)
-        .then(PatternKey.literal("stack"), TypeMapper.of(Material::getStack), ItemStack.CODEC)
         .then(PatternKey.literal("type"), TypeMapper.of(material -> material.isTag() ? "tag" : "item"), Placeholder.STRING)
         .then(PatternKey.literal("name"), TypeMapper.of(Material::getName), Placeholder.STRING)
         .then(PatternKey.literal("count"), TypeMapper.of(Material::getCount), Placeholder.NUMBER)
         .then(PatternKey.literal("components"), TypeMapper.of(Material::getComponents), Placeholder.DATA_COMPONENTS)
-        .overwrite(Placeholder.ID, TypeMapper.of(Material::getId)));
+        .then(PatternKey.literal("id"), TypeMapper.of(Material::getId), Placeholder.ID));
 
     private final boolean tag;
     @NotNull

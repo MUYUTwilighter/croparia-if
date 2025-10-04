@@ -15,10 +15,7 @@ import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualStructureContainer;
 import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.generator.util.DgReader;
-import cool.muyucloud.croparia.api.placeholder.Placeholder;
-import cool.muyucloud.croparia.api.placeholder.PlaceholderException;
-import cool.muyucloud.croparia.api.placeholder.Template;
-import cool.muyucloud.croparia.api.placeholder.TypeMapper;
+import cool.muyucloud.croparia.api.placeholder.*;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
@@ -29,6 +26,7 @@ import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -137,6 +135,81 @@ public class RecipeWizardGenerator {
                 return ItemOutput.of(entities.getFirst().getItem());
             }
         }), Placeholder.ITEM_OUTPUT
+    );
+    public static final Placeholder<UseOnContext> BLOCK_GENERIC = register(
+        ResourceLocation.parse("default"), Placeholder.build(builder -> builder.then(
+            PatternKey.literal("block"), TypeMapper.of(context -> {
+                BlockPos pos = context.getClickedPos();
+                BlockState state = context.getLevel().getBlockState(pos);
+                if (state.isAir()) {
+                    assert context.getPlayer() != null;
+                    Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(pos.toShortString())));
+                    throw new ReplaceException();
+                }
+                return BlockOutput.of(state);
+            }), Placeholder.BLOCK_OUTPUT, blockBuilder -> blockBuilder.then(
+                Pattern.compile("^offset\\((-?\\d+),(-?\\d+),(-?\\d+)\\)$"), (context, placeholder1, matcher) -> {
+                    int x = Integer.parseInt(matcher.group(1));
+                    int y = Integer.parseInt(matcher.group(2));
+                    int z = Integer.parseInt(matcher.group(3));
+                    BlockPos pos = context.getClickedPos().offset(x, y, z);
+                    BlockState state = context.getLevel().getBlockState(pos);
+                    if (state.isAir()) {
+                        assert context.getPlayer() != null;
+                        Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(pos.toShortString())));
+                        throw new ReplaceException();
+                    }
+                    return Optional.of(BlockOutput.of(state));
+                }, Placeholder.BLOCK_OUTPUT
+            ).then(PatternKey.literal("facing"), (context, placeholder1, matcher) -> {
+                    Vec3i offset = context.getClickedFace().getUnitVec3i();
+                    BlockPos pos = context.getClickedPos().offset(offset);
+                    BlockState state = context.getLevel().getBlockState(pos);
+                    if (state.isAir()) {
+                        assert context.getPlayer() != null;
+                        Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(pos.toShortString())));
+                        throw new ReplaceException();
+                    }
+                    return Optional.of(BlockOutput.of(state));
+                }, Placeholder.BLOCK_OUTPUT
+            ).then(
+                PatternKey.literal("opposite"), (context, placeholder1, matcher) -> {
+                    Vec3i offset = context.getClickedFace().getOpposite().getUnitVec3i();
+                    BlockPos pos = context.getClickedPos().offset(offset);
+                    BlockState state = context.getLevel().getBlockState(pos);
+                    if (state.isAir()) {
+                        assert context.getPlayer() != null;
+                        Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(pos.toShortString())));
+                        throw new ReplaceException();
+                    }
+                    return Optional.of(BlockOutput.of(state));
+                }, Placeholder.BLOCK_OUTPUT
+            ).then(
+                PatternKey.literal("left"), (context, placeholder1, matcher) -> {
+                    Vec3i offset = context.getClickedFace().getClockWise().getUnitVec3i();
+                    BlockPos pos = context.getClickedPos().offset(offset);
+                    BlockState state = context.getLevel().getBlockState(pos);
+                    if (state.isAir()) {
+                        assert context.getPlayer() != null;
+                        Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(pos.toShortString())));
+                        throw new ReplaceException();
+                    }
+                    return Optional.of(BlockOutput.of(state));
+                }, Placeholder.BLOCK_OUTPUT
+            ).then(
+                PatternKey.literal("right"), (context, placeholder1, matcher) -> {
+                    Vec3i offset = context.getClickedFace().getCounterClockWise().getUnitVec3i();
+                    BlockPos pos = context.getClickedPos().offset(offset);
+                    BlockState state = context.getLevel().getBlockState(pos);
+                    if (state.isAir()) {
+                        assert context.getPlayer() != null;
+                        Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(pos.toShortString())));
+                        throw new ReplaceException();
+                    }
+                    return Optional.of(BlockOutput.of(state));
+                }, Placeholder.BLOCK_OUTPUT
+            )
+        ))
     );
     public static final Placeholder<UseOnContext> BLOCK = register(
         ResourceLocation.parse("default"), Pattern.compile("^block$"), TypeMapper.of(context -> {

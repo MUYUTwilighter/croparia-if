@@ -8,6 +8,7 @@ import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -68,34 +69,51 @@ public class PlaceholderBuilder<T> {
             return Optional.of(obj);
         }).then(
             PatternKey.literal("_size"), (entry, placeholder, matcher) -> mapper.map(entry, placeholder, matcher).map(MapReader::size), Placeholder.NUMBER
-        ).then(PatternKey.MAP_MAP_KEY, (entry, placeholder, matcher) -> {
+        ).then(PatternKey.MAP_MAP_VALUE, (entry, placeholder, matcher) -> {
             JsonObject obj = new JsonObject();
-            mapper.map(entry, placeholder, matcher).ifPresent(map -> map.forEach(
-                e -> valueParser.parse(e.getValue(), placeholder, matcher).ifPresent(
-                    k -> valueParser.parse(e.getValue(), "", PatternKey.EMPTY.matcher("")).ifPresent(
-                        v -> obj.add(k.getAsString(), v)
-                    )
-                )
-            ));
+            // The placeholder probably is ineffective here, but we still pass it for consistency.
+            var mayMap = mapper.map(entry, placeholder, matcher);
+            if (mayMap.isEmpty()) return Optional.empty();
+            var map = mayMap.get();
+            for (var mapEntry : map) {
+                // Use the param to parse the value into the new value.
+                var mayKey = valueParser.parse(mapEntry.getValue(), matcher.group(1), matcher);
+                mayKey.ifPresent(element -> obj.add(mapEntry.getKey(), element));
+            }
             return Optional.of(obj);
-        }, Placeholder.JSON_OBJECT).then(PatternKey.MAP_MAP_VALUE, (entry, placeholder, matcher) -> {
-            JsonObject obj = new JsonObject();
-            mapper.map(entry, placeholder, matcher).ifPresent(map -> map.forEach(
-                e -> valueParser.parse(e.getValue(), placeholder, matcher).ifPresent(v -> obj.add(e.getKey(), v))
-            ));
-            return Optional.of(obj);
-        }, Placeholder.JSON_OBJECT).then(PatternKey.literal("values()"), (entry, placeholder, matcher) -> {
-            JsonArray array = new JsonArray();
-            mapper.map(entry, placeholder, matcher).ifPresent(map -> map.values().forEach(value -> valueParser.parse(value, placeholder, matcher).ifPresent(array::add)));
-            return Optional.of(array);
-        }, Placeholder.JSON_ARRAY).then(PatternKey.literal("keys()"), (entry, placeholder, matcher) -> {
-            JsonArray array = new JsonArray();
-            mapper.map(entry, placeholder, matcher).ifPresent(map -> map.values().forEach(value -> valueParser.parse(value, placeholder, matcher).ifPresent(array::add)));
-            return Optional.of(array);
-        }, Placeholder.JSON_ARRAY).then(PatternKey.MAP_GET, (entry, placeholder, matcher) -> {
+        }, Placeholder.JSON_OBJECT).thenMap(PatternKey.MAP_MAP_KEY, (entry, placeholder, matcher) -> {
+            Map<String, V> mapped = new HashMap<>();
+            // The placeholder probably is ineffective here, but we still pass it for consistency.
+            var mayMap = mapper.map(entry, placeholder, matcher);
+            if (mayMap.isEmpty()) return Optional.empty();
+            MapReader<String, V> map = mayMap.get();
+            for (var mapEntry : map) {
+                // Use the param to parse the value into the new key.
+                var mayVal = valueParser.parse(mapEntry.getValue(), matcher.group(1), matcher);
+                if (mayVal.isPresent()) {
+                    String key = mayVal.get().isJsonPrimitive() ? mayVal.get().getAsJsonPrimitive().getAsString() : mayVal.get().toString();
+                    mapped.put(key, mapEntry.getValue());
+                }
+            }
+            return Optional.of(MapReader.map(mapped));
+        }, valueParser).thenList(PatternKey.literal("values()"), (entry, placeholder, matcher) -> {
+            var mayMap = mapper.map(entry, placeholder, matcher);
+            if (mayMap.isEmpty()) return Optional.empty();
+            MapReader<String, V> map = mayMap.get();
+            return Optional.of(ListReader.collection(map.values()));
+        }, valueParser).thenList(PatternKey.literal("keys()"), (entry, placeholder, matcher) -> {
+            var mayMap = mapper.map(entry, placeholder, matcher);
+            if (mayMap.isEmpty()) return Optional.empty();
+            MapReader<String, V> map = mayMap.get();
+            return Optional.of(ListReader.collection(map.keys()));
+        }, Placeholder.STRING).then(PatternKey.MAP_GET, (entry, placeholder, matcher) -> {
             String key = matcher.group(1);
-            return mapper.map(entry, placeholder, matcher).map(map -> map.get(key))
-                .flatMap(value -> valueParser.parse(value, placeholder, matcher));
+            var mayMap = mapper.map(entry, placeholder, matcher);
+            if (mayMap.isEmpty()) return Optional.empty();
+            MapReader<String, V> map = mayMap.get();
+            V value = map.get(key);
+            if (value == null) return Optional.empty();
+            return valueParser.parse(value, placeholder, matcher);
         }).then(PatternKey.MAP_GET_OR, (entry, placeholder, matcher) -> {
             String key = matcher.group(1);
             String def = matcher.group(2);
@@ -134,24 +152,24 @@ public class PlaceholderBuilder<T> {
             if (mayList.isEmpty()) return Optional.of(array);
             var list = mayList.get();
             for (E e : list) {
-                elementParser.parse(e, placeholder, matcher).ifPresent(array::add);
+                elementParser.parse(e, matcher.group(1), matcher).ifPresent(array::add);
             }
             return Optional.of(array);
-        }, Placeholder.JSON_ARRAY).then(PatternKey.literal("mapi()"), (entry, placeholder, matcher) -> {
-            JsonObject obj = new JsonObject();
+        }, Placeholder.JSON_ARRAY).thenMap(PatternKey.LIST_MAP_I, (entry, placeholder, matcher) -> {
+            Map<String, E> mapped = new HashMap<>();
             var mayList = mapper.map(entry, placeholder, matcher);
-            if (mayList.isEmpty()) return Optional.of(obj);
+            if (mayList.isEmpty()) return Optional.empty();
             var list = mayList.get();
             int i = 0;
             for (E e : list) {
-                var mayValue = elementParser.parse(e, placeholder, matcher);
-                if (mayValue.isPresent()) {
-                    obj.add(String.valueOf(i), mayValue.get());
+                var mayKey = elementParser.parse(e, matcher.group(1), matcher);
+                if (mayKey.isPresent()) {
+                    mapped.put(String.valueOf(i), e);
                 }
                 i++;
             }
-            return Optional.of(obj);
-        }, Placeholder.JSON_OBJECT).then(PatternKey.LIST_GET, (entry, placeholder, matcher) -> {
+            return Optional.of(MapReader.map(mapped));
+        }, elementParser).then(PatternKey.LIST_GET, (entry, placeholder, matcher) -> {
             try {
                 int index = Integer.parseInt(matcher.group(1).trim());
                 var mayList = mapper.map(entry, placeholder, matcher);
@@ -247,12 +265,14 @@ public class PlaceholderBuilder<T> {
     }
 
     public @NotNull <O> PlaceholderBuilder<T> then(@NotNull Pattern key, TypeMapper<T, O> mapper, @NotNull Placeholder<O> parser) {
-        return then(key, (entry, placeholder, matcher) -> {
-            var mayO = mapper.map(entry, placeholder, matcher);
-            if (mayO.isEmpty()) return Optional.empty();
-            O o = mayO.get();
-            return parser.parse(o, placeholder, matcher);
-        });
+        return then(key, mapper, parser, PlaceholderFactory.identity());
+    }
+
+    public @NotNull <O> PlaceholderBuilder<T> then(@NotNull Pattern key, TypeMapper<T, O> mapper, @NotNull Placeholder<O> parser, PlaceholderFactory<T> factory) {
+        PlaceholderBuilder<T> sub = PlaceholderBuilder.of();
+        sub.self(mapper, parser);
+        factory.apply(sub);
+        return then(key, sub.build());
     }
 
     /**

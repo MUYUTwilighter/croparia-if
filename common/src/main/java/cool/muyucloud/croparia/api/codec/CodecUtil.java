@@ -8,6 +8,7 @@ import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.json.JsonTransformer;
 import cool.muyucloud.croparia.reflection.RecordCodecBuilderReflection;
 import cool.muyucloud.croparia.util.FileUtil;
 import net.minecraft.network.FriendlyByteBuf;
@@ -325,12 +326,15 @@ public class CodecUtil {
 
     public static <T> DataResult<T> readJson(File file, Codec<T> codec) throws IOException {
         try (FileReader reader = new FileReader(file)) {
-            return decodeJson(GSON.fromJson(reader, JsonElement.class), codec);
+            String filename = file.getName();
+            int i = filename.lastIndexOf('.');
+            if (i < 0 || i + 1 == filename.length()) throw new IOException("No file extension found in " + filename);
+            String subfix = filename.substring(i + 1).toLowerCase();
+            JsonTransformer transformer = JsonTransformer.TRANSFORMERS.get(subfix);
+            if (transformer == null) throw new IOException("No transformer found for file extension: " + subfix);
+            JsonElement json = JsonTransformer.transform(file);
+            return decodeJson(json, codec);
         }
-    }
-
-    public static <T> DataResult<T> readJson(File file, MapCodec<T> codec) throws IOException {
-        return readJson(file, codec.codec());
     }
 
     public static <T> DataResult<T> readJson(String json, Codec<T> codec) {

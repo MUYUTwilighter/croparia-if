@@ -50,9 +50,9 @@ public class Crop extends AbstractCrop implements TierAccess {
         Codec.INT.fieldOf("tier").forGetter(Crop::getTier),
         Codec.STRING.optionalFieldOf("type", "crop").forGetter(Crop::getType),
         Codec.unboundedMap(Codec.STRING, Codec.STRING).optionalFieldOf("translations").forGetter(Crop::getTranslationsOptional),
-        CropDependencies.CODEC_ANY.optionalFieldOf("dependencies").forGetter(Crop::getDependenciesOptional)
+        CropDependencies.CODEC_ANY.optionalFieldOf("dependencies", CropDependencies.EMPTY).forGetter(Crop::getDependencies)
     ).apply(instance, (name, material, color, tier, type, translations, dependencies) ->
-        new Crop(name, material, color, tier, type, translations.orElse(null), dependencies.orElse(null))
+        new Crop(name, material, color, tier, type, translations.orElse(null), dependencies)
     ));
 
     public static final Placeholder<Crop> PLACEHOLDER = Placeholder.build(node -> node
@@ -107,14 +107,14 @@ public class Crop extends AbstractCrop implements TierAccess {
 
     public Crop(
         @NotNull ResourceLocation id, @NotNull Material material, @NotNull Color color, int tier, @Nullable String type,
-        @Nullable Map<String, String> translations, @Nullable CropDependencies dependencies
+        @Nullable Map<String, String> translations, @NotNull CropDependencies dependencies
     ) {
         this.id = id;
         this.material = material;
         this.color = color;
         this.tier = tier;
         this.defaultTranslationKey = defaultTranslationKey(id);
-        this.dependencies = dependencies == null || dependencies.isEmpty() ? new CropDependencies(CropariaIf.MOD_ID, this.getDefaultTranslationKey()) : dependencies;
+        this.dependencies = dependencies.isEmpty() ? new CropDependencies(CropariaIf.MOD_ID, this.getDefaultTranslationKey()) : dependencies;
         this.defaultTranslation = defaultTranslation(id);
         Map<String, String> builder = new HashMap<>();
         builder.put("en_us", this.getDefaultTranslation());
@@ -198,7 +198,7 @@ public class Crop extends AbstractCrop implements TierAccess {
 
     public Optional<Map<String, String>> getTranslationsOptional() {
         Map<String, String> translations = this.getTranslations();
-        if (translations.size() == 1 && translations.containsValue(this.getDefaultTranslationKey())) {
+        if (translations.size() == 1 && translations.containsValue(this.getDefaultTranslation())) {
             return Optional.empty();
         } else {
             return Optional.of(translations);
@@ -215,11 +215,6 @@ public class Crop extends AbstractCrop implements TierAccess {
 
     public @NotNull CropDependencies getDependencies() {
         return this.dependencies;
-    }
-
-    public Optional<CropDependencies> getDependenciesOptional() {
-        return this.getDependencies().size() <= 1 && this.getDependencies().getKey(CropariaIf.MOD_ID) != null ? Optional.empty() :
-            Optional.of(this.getDependencies());
     }
 
     public @NotNull ResourceLocation getBlockId() {
