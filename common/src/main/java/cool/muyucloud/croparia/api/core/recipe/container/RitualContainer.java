@@ -21,7 +21,7 @@ public record RitualContainer(BlockState ritual, @NotNull List<ItemStack> stacks
 
     public static RitualContainer of(Level level, BlockPos pos, @NotNull RitualStructure.Result matched) {
         return new RitualContainer(level.getBlockState(pos), level.getEntitiesOfClass(
-            ItemEntity.class, AABB.unitCubeFromLowerCorner(pos.getBottomCenter()),
+            ItemEntity.class, new AABB(pos),
             entity -> !entity.getItem().isEmpty()
         ).stream().map(ItemEntity::getItem).toList(), matched);
     }

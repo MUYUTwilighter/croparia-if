@@ -128,7 +128,7 @@ public class RecipeWizardGenerator {
         ResourceLocation.parse("default"), Pattern.compile("^item$"), TypeMapper.of(context -> {
             List<ItemEntity> entities = context.getLevel().getEntities(
                 EntityTypeTest.forClass(ItemEntity.class),
-                AABB.encapsulatingFullBlocks(context.getClickedPos(), context.getClickedPos().above()),
+                new AABB(context.getClickedPos()),
                 item -> !item.getItem().isEmpty()
             );
             if (entities.isEmpty()) {

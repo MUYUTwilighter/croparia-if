@@ -142,10 +142,11 @@ public class Char3D extends AbstractChar3D<Char3D> implements Iterable<Char2D> {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("[");
+        StringBuilder builder = new StringBuilder();
         for (Char2D layer : pattern) {
             builder.append(layer).append(",\n");
         }
-        return builder.substring(0, builder.length() - 2) + "]";
+        if (builder.isEmpty()) return "[]";
+        return "[" + builder.substring(0, builder.length() - 2) + "]";
     }
 }
