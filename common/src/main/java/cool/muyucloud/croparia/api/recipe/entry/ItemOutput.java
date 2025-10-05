@@ -60,7 +60,7 @@ public class ItemOutput implements SlotDisplay {
     }
 
     public ItemOutput(@NotNull ResourceLocation id, int amount) {
-        this(id, DataComponentPatch.EMPTY, 1L);
+        this(id, DataComponentPatch.EMPTY, amount);
     }
 
     public ItemOutput(@NotNull ResourceLocation id, @NotNull DataComponentPatch components, long amount) {
