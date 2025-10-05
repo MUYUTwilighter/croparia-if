@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * A batch of {@link RepoUnit}s.
  *
- * @apiNote size of the batch is fixed when serializing and deserializing.
+ * @apiNote size of the batch is fixed when serializing and deserializing. As predicate, capacity is not serializable.
  *
  */
 @SuppressWarnings("unused")
