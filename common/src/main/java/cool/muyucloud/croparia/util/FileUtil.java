@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.function.Consumer;
 
@@ -13,6 +14,16 @@ public class FileUtil {
         }
         if (!file.isFile() || override) {
             Files.writeString(file.toPath(), content);
+        }
+    }
+
+    public static void transfer(InputStream stream, File output, boolean override) throws IOException {
+        File parent = output.getParentFile();
+        if (!parent.isDirectory() && !parent.mkdirs()) {
+            throw new IOException("Failed to establish parent directory for " + output);
+        }
+        if (!output.isFile() || override) {
+            stream.transferTo(Files.newOutputStream(output.toPath()));
         }
     }
 

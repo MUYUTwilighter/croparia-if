@@ -44,6 +44,8 @@ public class ConfigFileHandler {
     public static void reload(Config config) {
         CropariaIf.LOGGER.info("Loading config");
         Config newConfig = load();
+        config.setAutoReload(newConfig.getAutoReload());
+        config.setSoakAttempts(newConfig.getSoakAttempts());
         config.setFilePath(newConfig.getFilePath());
         config.setRecipeWizard(newConfig.getRecipeWizard());
         config.setOverride(newConfig.getOverride());

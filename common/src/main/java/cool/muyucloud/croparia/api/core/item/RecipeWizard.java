@@ -26,7 +26,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -43,12 +42,7 @@ public class RecipeWizard extends Item {
             String prefix = "data-generators/%s/%s/".formatted(PACK_ID.getNamespace(), PACK_ID.getPath());
             Path target = CropariaIf.CONFIG.getFilePath().resolve("recipe_wizard/generators").resolve(name.substring(prefix.length()));
             try {
-                entry.forInputStream(inputStream -> {
-                    try (FileOutputStream outputStream = new FileOutputStream(target.toFile())) {
-                        inputStream.transferTo(outputStream);
-                        outputStream.flush();
-                    }
-                });
+                entry.forInputStream(inputStream -> FileUtil.transfer(inputStream, target.toFile(), false));
             } catch (IOException e) {
                 CropariaIf.LOGGER.error("Failed to move built-in recipe wizard template from %s to %s".formatted(name, target), e);
             }
