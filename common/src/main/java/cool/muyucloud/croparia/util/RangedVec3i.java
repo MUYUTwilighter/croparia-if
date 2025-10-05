@@ -74,7 +74,7 @@ public class RangedVec3i extends Vec3i {
 
     @Override
     public @NotNull RangedVec3i relative(@NotNull Direction.Axis axis, int amount) {
-        return amount == 0 ? this : amount > 0 ? this.relative(axis.getPositive(), amount) : this.relative(axis.getNegative(), amount);
+        return amount == 0 ? this : this.relative(axis.getPositive(), amount);
     }
 
     @Override

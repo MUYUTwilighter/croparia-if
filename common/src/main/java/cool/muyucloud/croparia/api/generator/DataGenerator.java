@@ -59,19 +59,24 @@ public class DataGenerator implements DgListener {
     public static Optional<DataGenerator> read(File file) {
         try {
             JsonObject json = DgReader.read(file);
-            JsonElement type = json.get("type");
-            ResourceLocation id = ResourceLocation.parse(type == null ? "croparia:generator" : type.getAsString());
+            JsonElement rawType = json.get("type");
+            ResourceLocation type = ResourceLocation.parse(rawType == null ? "croparia:generator" : rawType.getAsString());
             JsonElement rawDependencies = json.get("dependencies");
             if (rawDependencies != null) {
                 if (!CodecUtil.decodeJson(rawDependencies, Dependencies.CODEC).mapOrElse(Dependencies::available, err -> {
-                    LOGGER.error("Failed to parse dependencies of data generator {}: {}", file, err.message());
+                    LOGGER.error("Failed to read generator {} due to invalid dependencies: {}", file, err.message());
                     return false;
                 })) {
                     LOGGER.debug("Skipped loading data generator {} due to missing dependencies", file);
                     return Optional.empty();
                 }
             }
-            return CodecUtil.decodeJson(json, REGISTRY.get(id)).mapOrElse(Optional::of, err -> {
+            MapCodec<? extends DataGenerator> codec = REGISTRY.get(type);
+            if (codec == null) {
+                LOGGER.error("Unknown data generator type {} in file {}", type, file);
+                return Optional.empty();
+            }
+            return CodecUtil.decodeJson(json, codec).mapOrElse(Optional::of, err -> {
                 LOGGER.error("Failed to parse data generator {}: {}", file, err.message());
                 return Optional.empty();
             });
