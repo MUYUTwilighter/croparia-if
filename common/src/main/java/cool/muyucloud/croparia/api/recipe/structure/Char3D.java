@@ -65,23 +65,23 @@ public class Char3D extends AbstractChar3D<Char3D> implements Iterable<Char2D> {
     }
 
     @Override
-    public int maxY() {
+    public int ySize() {
         return pattern.size();
     }
 
     @Override
-    public int maxZ() {
+    public int zSize() {
         return pattern.isEmpty() ? 0 : pattern.getFirst().zSize();
     }
 
     @Override
-    public int maxX() {
+    public int xSize() {
         return pattern.isEmpty() ? 0 : pattern.getFirst().xSize();
     }
 
     @Override
     public Vec3i size() {
-        return new Vec3i(maxX(), maxY(), maxZ());
+        return new Vec3i(xSize(), ySize(), zSize());
     }
 
     @Override
@@ -107,7 +107,7 @@ public class Char3D extends AbstractChar3D<Char3D> implements Iterable<Char2D> {
     @Override
     public @NotNull Optional<Vec3i> find(char c) {
         if (this.contains(c)) {
-            for (int y = 0; y < maxY(); y++) {
+            for (int y = 0; y < ySize(); y++) {
                 Optional<Vec2i> result = pattern.get(y).find(c);
                 if (result.isPresent()) {
                     Vec2i pos = result.get();

@@ -15,11 +15,11 @@ public abstract class AbstractChar3D<T extends AbstractChar3D<T>> {
 
     public abstract T mirror();
 
-    public abstract int maxY();
+    public abstract int ySize();
 
-    public abstract int maxZ();
+    public abstract int zSize();
 
-    public abstract int maxX();
+    public abstract int xSize();
 
     public abstract Vec3i size();
 

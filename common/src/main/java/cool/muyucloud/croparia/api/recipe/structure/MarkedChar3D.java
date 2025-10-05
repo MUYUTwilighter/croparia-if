@@ -16,7 +16,7 @@ public class MarkedChar3D extends Char3D {
 
     public MarkedChar3D(Char3D pattern, Vec3i mark) {
         super(pattern);
-        if (mark.getX() >= this.maxX() || mark.getY() >= this.maxY() || mark.getZ() >= this.maxZ() || mark.getX() < 0 || mark.getY() < 0 || mark.getZ() < 0) {
+        if (mark.getX() >= this.xSize() || mark.getY() >= this.ySize() || mark.getZ() >= this.zSize() || mark.getX() < 0 || mark.getY() < 0 || mark.getZ() < 0) {
             throw new IllegalArgumentException("Mark position out of bounds");
         }
         this.mark = mark;
@@ -24,7 +24,7 @@ public class MarkedChar3D extends Char3D {
 
     public MarkedChar3D(List<Char2D> structure, Vec3i mark) {
         super(structure);
-        if (mark.getX() >= this.maxX() || mark.getY() >= this.maxY() || mark.getZ() >= this.maxZ() || mark.getX() < 0 || mark.getY() < 0 || mark.getZ() < 0) {
+        if (mark.getX() >= this.xSize() || mark.getY() >= this.ySize() || mark.getZ() >= this.zSize() || mark.getX() < 0 || mark.getY() < 0 || mark.getZ() < 0) {
             throw new IllegalArgumentException("Mark position out of bounds");
         }
         this.mark = mark;
@@ -37,14 +37,14 @@ public class MarkedChar3D extends Char3D {
     @Override
     public MarkedChar3D rotate() {
         int newX = mark.getZ();
-        int newZ = maxZ() - 1 - mark.getX();
+        int newZ = zSize() - 1 - mark.getX();
         Vec3i rotatedMark = new Vec3i(newX, mark.getY(), newZ);
         return new MarkedChar3D(super.rotate(), rotatedMark);
     }
 
     @Override
     public MarkedChar3D mirror() {
-        int newX = maxX() - 1 - mark.getX();
+        int newX = xSize() - 1 - mark.getX();
         int newZ = mark.getZ();
         Vec3i mirroredMark = new Vec3i(newX, mark.getY(), newZ);
         return new MarkedChar3D(super.mirror(), mirroredMark);

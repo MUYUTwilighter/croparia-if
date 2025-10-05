@@ -121,9 +121,9 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
         origin = pattern.getOriginInWorld(origin);
         List<BlockPos> inputPositions = new ArrayList<>();
         List<BlockState> inputBlocks = new ArrayList<>();
-        for (int x = 0; x < pattern.maxX(); x++) {
-            for (int y = 0; y < pattern.maxY(); y++) {
-                for (int z = 0; z < pattern.maxZ(); z++) {
+        for (int x = 0; x < pattern.xSize(); x++) {
+            for (int y = 0; y < pattern.ySize(); y++) {
+                for (int z = 0; z < pattern.zSize(); z++) {
                     BlockPos pos = origin.offset(x, y, z);
                     BlockState state = level.getBlockState(pos);
                     char key = pattern.get(x, y, z);
@@ -194,9 +194,9 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     public void tryBuild(Level level, BlockPos origin) {
         MarkedChar3D pattern = this.getPattern();
         origin = pattern.getOriginInWorld(origin);
-        for (int x = 0; x < pattern.maxX(); x++) {
-            for (int y = 0; y < pattern.maxY(); y++) {
-                for (int z = 0; z < pattern.maxZ(); z++) {
+        for (int x = 0; x < pattern.xSize(); x++) {
+            for (int y = 0; y < pattern.ySize(); y++) {
+                for (int z = 0; z < pattern.zSize(); z++) {
                     char key = pattern.get(x, y, z);
                     if (key == '.') {
                         level.setBlockAndUpdate(origin.offset(x, y, z), Blocks.AIR.defaultBlockState());
