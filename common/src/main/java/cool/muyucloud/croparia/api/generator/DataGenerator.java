@@ -60,7 +60,7 @@ public class DataGenerator implements DgListener {
         try {
             JsonObject json = DgReader.read(file);
             JsonElement rawType = json.get("type");
-            ResourceLocation type = ResourceLocation.parse(rawType == null ? "croparia:generator" : rawType.getAsString());
+            ResourceLocation type = ResourceLocation.tryParse(rawType == null ? "croparia:generator" : rawType.getAsString());
             JsonElement rawDependencies = json.get("dependencies");
             if (rawDependencies != null) {
                 if (!CodecUtil.decodeJson(rawDependencies, Dependencies.CODEC).mapOrElse(Dependencies::available, err -> {

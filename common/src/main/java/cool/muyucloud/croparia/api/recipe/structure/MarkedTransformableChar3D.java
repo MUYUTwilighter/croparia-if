@@ -40,8 +40,10 @@ public class MarkedTransformableChar3D implements Iterable<MarkedChar3D> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof MarkedTransformableChar3D that)) return false;
-        return Objects.deepEquals(transformed, that.transformed);
+        if (!(o instanceof MarkedTransformableChar3D that) || this.transformed.length != that.transformed.length)
+            return false;
+        if (this == that || this.transformed.length == 0) return true;
+        return Objects.equals(this.transformed[0], that.transformed[0]);
     }
 
     @Override

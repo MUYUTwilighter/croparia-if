@@ -8,7 +8,7 @@ import java.util.Objects;
 
 /**
  * A structure with a mark position in it, this mark position is used for locating the center of the structure.
- * @implNote field {@link #mark} is not considered to be part of the structure and is not compared for equality.
+ * @implNote field {@link #mark} is not considered to be part of the structure, but determines the origin of the structure in the world.
  * */
 @SuppressWarnings("unused")
 public class MarkedChar3D extends Char3D {
@@ -56,9 +56,9 @@ public class MarkedChar3D extends Char3D {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof MarkedChar3D char2DS)) return false;
+        if (!(o instanceof MarkedChar3D char3d)) return false;
         if (!super.equals(o)) return false;
-        return Objects.equals(mark, char2DS.mark);
+        return Objects.equals(mark, char3d.mark);
     }
 
     @Override
