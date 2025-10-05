@@ -84,10 +84,8 @@ public record ContainerRepo(@NotNull Container container) implements Repo<ItemSp
         ItemStack stored = this.container().getItem(i);
         ItemStack toPlace = resource.createStack();
         int containerSize = this.container().getMaxStackSize(toPlace);
-        if (stored.isEmpty()) {
+        if (stored.isEmpty() || resource.is(stored)) {
             return containerSize;
-        } else if (resource.is(stored)) {
-            return containerSize - stored.getCount();
         } else {
             return 0;
         }

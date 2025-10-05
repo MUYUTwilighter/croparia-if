@@ -121,4 +121,10 @@ public class CifUtil {
         patch.entrySet().forEach(entry -> builder.expect(TypedDataComponent.createUnchecked(entry.getKey(), entry.getValue())));
         return builder.build();
     }
+
+    public static int toIntSafe(long value) {
+        if (value < Integer.MIN_VALUE) return Integer.MIN_VALUE;
+        if (value > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        return (int) value;
+    }
 }

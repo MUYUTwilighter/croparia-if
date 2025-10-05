@@ -15,6 +15,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.display.DisplayContentsFactory;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import org.jetbrains.annotations.NotNull;
@@ -40,8 +41,10 @@ public class ItemOutput implements SlotDisplay {
     }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemOutput> STREAM_CODEC = CodecUtil.toStream(CODEC);
     public static final Type<ItemOutput> TYPE = new Type<>(CODEC_COMP, STREAM_CODEC);
+    public static final ItemOutput EMPTY = new ItemOutput();
 
     public static ItemOutput of(@NotNull ItemStack stack) {
+        if (stack.isEmpty()) return EMPTY;
         return new ItemOutput(stack);
     }
 
@@ -54,6 +57,14 @@ public class ItemOutput implements SlotDisplay {
     private final transient ItemSpec itemSpec;
     @NotNull
     private final transient ItemStack displayStack;
+
+    private ItemOutput() {
+        this.id = BuiltInRegistries.ITEM.getKey(Items.AIR);
+        this.components = DataComponentPatch.EMPTY;
+        this.amount = 0;
+        this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.getValue(this.id), this.components);
+        this.displayStack = this.toSpec().createStack(this.getAmount());
+    }
 
     public ItemOutput(@NotNull ItemStack stack) {
         this(Objects.requireNonNull(stack.getItem().arch$registryName()), stack.getComponentsPatch(), stack.getCount());

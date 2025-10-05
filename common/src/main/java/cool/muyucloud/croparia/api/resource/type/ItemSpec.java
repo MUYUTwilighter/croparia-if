@@ -9,6 +9,7 @@ import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.TypedResource;
+import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.TagUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.*;
@@ -110,7 +111,7 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
 
     @NotNull
     public ItemStack createStack(long amount) {
-        return new ItemStack(Holder.direct(this.getResource()), (int) Math.min(amount, Integer.MAX_VALUE), this.getComponentsPatch());
+        return new ItemStack(Holder.direct(this.getResource()), CifUtil.toIntSafe(amount), this.getComponentsPatch());
     }
 
     @NotNull

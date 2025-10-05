@@ -113,7 +113,7 @@ public class ItemInput implements SlotDisplay {
         this.displayStacks = OnLoadSupplier.of(() -> {
             if (this.getId().isPresent()) {
                 ItemStack stack = new ItemStack(Holder.direct(BuiltInRegistries.ITEM.getValue(this.getId().get())),
-                    Math.toIntExact(this.getAmount()), this.getComponentsPredicate().asPatch());
+                    CifUtil.toIntSafe(this.getAmount()), this.getComponentsPredicate().asPatch());
                 if (stack.isEmpty()) {
                     DisplayableRecipe.LOGGER.error("Item with id '{}' not found, using placeholder", this.getId().get());
                     return ImmutableList.of(Texts.tooltip(BlockInput.STACK_UNKNOWN.copy(), Texts.literal(this.getTaggable())));
@@ -122,7 +122,7 @@ public class ItemInput implements SlotDisplay {
             } else if (this.getTag().isPresent()) {
                 LinkedList<ItemStack> stacks = new LinkedList<>();
                 TagUtil.forEntries(this.getTag().get()).forEach(entry -> {
-                    ItemStack stack = new ItemStack(entry, (int) Math.min(this.getAmount(), Integer.MAX_VALUE),
+                    ItemStack stack = new ItemStack(entry, CifUtil.toIntSafe(this.getAmount()),
                         this.getComponentsPredicate().asPatch());
                     stacks.addLast(stack);
                 });
@@ -133,7 +133,7 @@ public class ItemInput implements SlotDisplay {
                 return ImmutableList.copyOf(stacks);
             } else {
                 ItemStack stack = new ItemStack(Holder.direct(CropariaItems.PLACEHOLDER.get()),
-                    (int) Math.min(this.getAmount(), Integer.MAX_VALUE),
+                    CifUtil.toIntSafe(this.getAmount()),
                     this.getComponentsPredicate().asPatch());
                 return ImmutableList.of(stack);
             }
