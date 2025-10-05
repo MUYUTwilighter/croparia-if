@@ -37,6 +37,6 @@ public class InfusorContainer implements RecipeInput {
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return this.item.isEmpty() || this.element == Element.EMPTY;
     }
 }

@@ -25,12 +25,16 @@ public class GreenhouseItem extends BlockItem {
         if (!world.isClientSide && !stack.isEmpty()) {
             if (world.isEmptyBlock(pos.above()) && (world.getBlockState(pos).getBlock() instanceof CropBlock || world.getBlockState(pos).getBlock() instanceof StemBlock || world.getBlockState(pos).getBlock() instanceof AttachedStemBlock)) {
                 world.setBlockAndUpdate(pos.above(), this.getBlock().defaultBlockState());
-                stack.shrink(1);
+                if (context.getPlayer() != null && !context.getPlayer().getAbilities().instabuild) {
+                    stack.shrink(1);
+                }
                 return InteractionResult.SUCCESS;
             }
             if (world.isEmptyBlock(pos.above(2)) && world.isEmptyBlock(pos.above())) {
                 world.setBlockAndUpdate(pos.above(2), this.getBlock().defaultBlockState());
-                stack.shrink(1);
+                if (context.getPlayer() != null && !context.getPlayer().getAbilities().instabuild) {
+                    stack.shrink(1);
+                }
                 return InteractionResult.SUCCESS;
             }
         }
