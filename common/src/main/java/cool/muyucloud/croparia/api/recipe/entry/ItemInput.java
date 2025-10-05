@@ -241,11 +241,11 @@ public class ItemInput implements SlotDisplay {
     public boolean equals(Object o) {
         if (!(o instanceof ItemInput itemInput)) return false;
         return amount == itemInput.amount && Objects.equals(id, itemInput.id) && Objects.equals(tag, itemInput.tag)
-            && Objects.equals(componentPredicate, itemInput.componentPredicate) && Objects.equals(displayStacks, itemInput.displayStacks);
+            && Objects.equals(componentPredicate, itemInput.componentPredicate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, tag, componentPredicate, amount, displayStacks);
+        return Objects.hash(id, tag, componentPredicate, amount);
     }
 }

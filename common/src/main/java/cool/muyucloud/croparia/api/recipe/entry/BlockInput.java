@@ -259,11 +259,11 @@ public class BlockInput implements SlotDisplay {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof BlockInput that)) return false;
-        return Objects.equals(id, that.id) && Objects.equals(tag, that.tag) && Objects.equals(properties, that.properties) && Objects.equals(displayStacks, that.displayStacks);
+        return Objects.equals(id, that.id) && Objects.equals(tag, that.tag) && Objects.equals(properties, that.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, tag, properties, displayStacks);
+        return Objects.hash(id, tag, properties);
     }
 }
