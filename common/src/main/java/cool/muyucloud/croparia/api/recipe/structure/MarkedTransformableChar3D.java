@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.util.ArrayIterator;
 import net.minecraft.core.Vec3i;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Objects;
+import java.util.Set;
 
 public class MarkedTransformableChar3D implements Iterable<MarkedChar3D> {
     private final transient MarkedChar3D[] transformed;
@@ -48,6 +51,9 @@ public class MarkedTransformableChar3D implements Iterable<MarkedChar3D> {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(transformed);
+        if (this.transformed.length == 0) return 0;
+        else {
+            return this.transformed[0].hashCode();
+        }
     }
 }
