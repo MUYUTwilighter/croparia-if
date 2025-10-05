@@ -110,7 +110,7 @@ public class Infusor extends Block implements ItemPlaceable {
         }
         ItemStack returnStack = ElementalPotion.fromElement(element).orElseThrow().getDefaultInstance();
         CifUtil.exportItem(world, pos, returnStack, player);
-        return false;
+        return true;
     }
 
     public static Element getElement(BlockState state) {

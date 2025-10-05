@@ -152,7 +152,11 @@ public class RepoUnit<T extends TypedResource<?>> implements Repo<T> {
 
     @Override
     public boolean isEmpty(int i) {
-        return i == 0 || this.getResource().isEmpty();
+        if (i == 0) {
+            return this.getAmount() <= 0 || this.getResource().isEmpty();
+        } else {
+            return true;
+        }
     }
 
     @Override
