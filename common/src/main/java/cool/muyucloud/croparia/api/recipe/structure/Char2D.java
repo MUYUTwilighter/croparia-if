@@ -45,29 +45,29 @@ public class Char2D implements Iterable<char[]> {
         return Arrays.stream(chars).map(String::new).toList();
     }
 
-    public int maxZ() {
+    public int zSize() {
         return chars.length;
     }
 
-    public int maxX() {
+    public int xSize() {
         return chars.length == 0 ? 0 : chars[0].length;
     }
 
     public Char2D rotate() {
-        Char2D rotated = new Char2D(maxX(), maxZ());
-        for (int z = 0; z < maxZ(); z++) {
-            for (int x = 0; x < maxX(); x++) {
-                rotated.chars[x][maxZ() - z - 1] = chars[z][x];
+        Char2D rotated = new Char2D(xSize(), zSize());
+        for (int z = 0; z < zSize(); z++) {
+            for (int x = 0; x < xSize(); x++) {
+                rotated.chars[x][zSize() - z - 1] = chars[z][x];
             }
         }
         return rotated;
     }
 
     public Char2D mirror() {
-        Char2D mirrored = new Char2D(maxZ(), maxX());
-        for (int z = 0; z < maxZ(); z++) {
-            for (int x = 0; x < maxX(); x++) {
-                mirrored.chars[z][maxX() - x - 1] = chars[z][x];
+        Char2D mirrored = new Char2D(zSize(), xSize());
+        for (int z = 0; z < zSize(); z++) {
+            for (int x = 0; x < xSize(); x++) {
+                mirrored.chars[z][xSize() - x - 1] = chars[z][x];
             }
         }
         return mirrored;
@@ -102,8 +102,8 @@ public class Char2D implements Iterable<char[]> {
 
     public Optional<Vec2i> find(char c) {
         if (contains(c)) {
-            for (int z = 0; z < maxZ(); z++) {
-                for (int x = 0; x < maxX(); x++) {
+            for (int z = 0; z < zSize(); z++) {
+                for (int x = 0; x < xSize(); x++) {
                     if (get(x, z) == c) {
                         return Optional.of(Vec2i.of(x, z));
                     }
@@ -142,7 +142,7 @@ public class Char2D implements Iterable<char[]> {
 
         @Override
         public boolean hasNext() {
-            return z >= char2D.maxZ();
+            return z < char2D.zSize();
         }
 
         @Override
@@ -152,7 +152,7 @@ public class Char2D implements Iterable<char[]> {
             }
             char result = char2D.get(z, x);
             x++;
-            if (x == char2D.maxX()) {
+            if (x == char2D.xSize()) {
                 x = 0;
                 z++;
             }

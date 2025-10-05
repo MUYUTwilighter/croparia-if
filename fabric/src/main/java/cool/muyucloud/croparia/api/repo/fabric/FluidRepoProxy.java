@@ -72,7 +72,9 @@ public class FluidRepoProxy extends RepoProxy<FluidSpec> implements Storage<Flui
             if (views.size() <= i) {
                 views.add(new FluidView(i));
             }
-            return views.get(this.i++);
+            FluidView view = views.get(this.i);
+            this.i++;
+            return view;
         }
     }
 

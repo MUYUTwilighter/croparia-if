@@ -72,7 +72,9 @@ public class ItemRepoProxy extends RepoProxy<ItemSpec> implements Storage<ItemVa
             if (views.size() <= i) {
                 views.add(new ItemView(i));
             }
-            return views.get(i++);
+            ItemView view = views.get(i);
+            this.i++;
+            return view;
         }
     }
 

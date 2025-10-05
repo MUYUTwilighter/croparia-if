@@ -25,12 +25,12 @@ public class Char3D extends AbstractChar3D<Char3D> implements Iterable<Char2D> {
 
     public Char3D(List<Char2D> structure) {
         int height = structure.size();
-        int maxZ = structure.getFirst().maxZ();
-        int maxX = structure.getFirst().maxX();
+        int maxZ = structure.getFirst().zSize();
+        int maxX = structure.getFirst().xSize();
         List<Char2D> pattern = new ArrayList<>(height);
         Map<Character, Integer> counts = new HashMap<>();
         for (Char2D layer : structure) {
-            if (layer.maxZ() != maxZ || layer.maxX() != maxX) {
+            if (layer.zSize() != maxZ || layer.xSize() != maxX) {
                 throw new IllegalArgumentException("Varying size: " + structure);
             }
             pattern.add(layer);
@@ -71,12 +71,12 @@ public class Char3D extends AbstractChar3D<Char3D> implements Iterable<Char2D> {
 
     @Override
     public int maxZ() {
-        return pattern.isEmpty() ? 0 : pattern.getFirst().maxZ();
+        return pattern.isEmpty() ? 0 : pattern.getFirst().zSize();
     }
 
     @Override
     public int maxX() {
-        return pattern.isEmpty() ? 0 : pattern.getFirst().maxX();
+        return pattern.isEmpty() ? 0 : pattern.getFirst().xSize();
     }
 
     @Override
