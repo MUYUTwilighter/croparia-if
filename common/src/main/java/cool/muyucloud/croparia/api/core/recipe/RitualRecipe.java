@@ -139,6 +139,9 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
 
     public boolean matches(RitualContainer matcher) {
         ItemStack result = this.getResult().createStack();
+        if (!this.getRitual().matches(matcher.ritual())) {
+            return false;
+        }
         // Handle enchanted book special case
         ItemEnchantments enchantments = result.get(DataComponents.STORED_ENCHANTMENTS);
         if (this.getIngredient().getAmount() == 1L && result.getItem() == Items.ENCHANTED_BOOK && enchantments != null) {
@@ -155,8 +158,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
                 accumulated += stack.getCount();
             }
             if (accumulated >= this.getIngredient().getAmount()) {
-                return matcher.matched().getStates().stream().allMatch(state -> this.getBlock().matches(state))
-                    && this.getRitual().matches(matcher.ritual());
+                return matcher.matched().getStates().stream().allMatch(state -> this.getBlock().matches(state));
             }
         }
         return false;

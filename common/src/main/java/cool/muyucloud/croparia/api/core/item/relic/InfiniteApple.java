@@ -14,9 +14,10 @@ public class InfiniteApple extends Item {
 
     public @NotNull ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
         if (user instanceof Player player) {
+            boolean old = player.getAbilities().instabuild;
             player.getAbilities().instabuild = true;
             super.finishUsingItem(stack, world, user);
-            player.getAbilities().instabuild = false;
+            player.getAbilities().instabuild = old;
             if (!world.isClientSide) {
                 player.getCooldowns().addCooldown(stack, 200);
             }
