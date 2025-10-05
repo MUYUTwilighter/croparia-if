@@ -13,8 +13,11 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A batch of {@link RepoUnit}s
- * */
+ * A batch of {@link RepoUnit}s.
+ *
+ * @apiNote size of the batch is fixed when serializing and deserializing.
+ *
+ */
 @SuppressWarnings("unused")
 public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<RepoUnit<T>> {
     public static <T extends TypedResource<?>> RepoBatch<T> of(TypeToken<T> type) {
@@ -53,6 +56,10 @@ public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<
     }
 
     public void load(@NotNull JsonArray json) {
+        if (json.size() != units.size()) {
+            Repo.LOGGER.error("Tried to load a RepoBatch with a JSON array of size {} but the batch size is {}", json.size(), units.size());
+            return;
+        }
         for (int i = 0; i < json.size(); i++) {
             JsonObject unit = json.get(i).getAsJsonObject();
             units.get(i).load(unit);
@@ -60,6 +67,10 @@ public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<
     }
 
     public void load(@NotNull ListTag nbt) {
+        if (nbt.size() != units.size()) {
+            Repo.LOGGER.error("Tried to load a RepoBatch with a NBT array of size {} but the batch size is {}", nbt.size(), units.size());
+            return;
+        }
         for (int i = 0; i < units.size(); i++) {
             CompoundTag unit = nbt.getCompound(i);
             units.get(i).load(unit);
