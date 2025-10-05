@@ -269,11 +269,11 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof RitualStructure structure)) return false;
-        return Objects.equals(ritual, structure.ritual) && Objects.equals(keys, structure.keys) && Objects.equals(patterns, structure.patterns) && Objects.equals(inputsCache, structure.inputsCache);
+        return Objects.equals(ritual, structure.ritual) && Objects.equals(keys, structure.keys) && Objects.equals(patterns, structure.patterns);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ritual, keys, patterns, inputsCache);
+        return Objects.hash(ritual, keys, patterns);
     }
 }
