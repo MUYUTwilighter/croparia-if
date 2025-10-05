@@ -186,7 +186,7 @@ public class RepoUnit<T extends TypedResource<?>> implements Repo<T> {
         if (i != 0 || !this.isAcceptable() || !this.isFluidValid(resource)) return 0L;
         long accepted = Math.min(this.getCapacity() - this.getAmount(), amount);
         if (accepted <= 0) return 0L;
-        this.setAmount(this.getAmount() + amount);
+        this.setAmount(this.getAmount() + accepted);
         this.setResource(resource);
         this.setChanged(true);
         return accepted;

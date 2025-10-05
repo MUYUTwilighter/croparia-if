@@ -67,9 +67,9 @@ public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<
     }
 
     public void save(@NotNull JsonArray json) {
-        for (int i = 0; i < json.size(); i++) {
+        for (RepoUnit<T> tRepoUnit : units) {
             JsonObject unit = new JsonObject();
-            units.get(i).save(unit);
+            tRepoUnit.save(unit);
             json.add(unit);
         }
     }
