@@ -61,12 +61,12 @@ public class PlatformItemProxyImpl implements PlatformItemProxy {
 
     @Override
     public long simAccept(int i, ItemSpec item, long amount) {
-        return this.get().insertItem(i, item.createStack(amount), true).getCount();
+        return amount - this.get().insertItem(i, item.createStack(amount), true).getCount();
     }
 
     @Override
     public long accept(int i, ItemSpec item, long amount) {
-        return this.get().insertItem(i, item.createStack(amount), false).getCount();
+        return amount - this.get().insertItem(i, item.createStack(amount), false).getCount();
     }
 
     @Override

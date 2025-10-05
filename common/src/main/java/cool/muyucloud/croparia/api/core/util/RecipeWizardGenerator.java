@@ -56,13 +56,17 @@ public class RecipeWizardGenerator {
     public static Optional<RecipeWizardGenerator> read(File file) {
         try {
             JsonElement json = DgReader.read(file);
-            if (!json.isJsonObject() || json.getAsJsonObject().has("dependencies")) {
+            if (!json.isJsonObject()) {
+                CropariaIf.LOGGER.error("Recipe wizard file %s is not a JSON object".formatted(file));
+                return Optional.empty();
+            }
+            if (json.getAsJsonObject().has("dependencies")) {
                 if (!CodecUtil.decodeJson(json.getAsJsonObject().get("dependencies"), Dependencies.CODEC).mapOrElse(Dependencies::available, e -> {
                     CropariaIf.LOGGER.error("Failed to analyze dependencies of recipe wizard file %s".formatted(file));
                     CropariaIf.LOGGER.error(e.message());
                     return false;
                 })) {
-                    CropariaIf.LOGGER.warn("Skipped loading recipe wizard file %s due to missing or bad dependencies".formatted(file));
+                    CropariaIf.LOGGER.info("Skipped loading recipe wizard file %s due to missing or bad dependencies".formatted(file));
                     return Optional.empty();
                 }
             }

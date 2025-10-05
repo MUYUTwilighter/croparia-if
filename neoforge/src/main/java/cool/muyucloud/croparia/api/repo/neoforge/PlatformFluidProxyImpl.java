@@ -98,7 +98,7 @@ public class PlatformFluidProxyImpl implements PlatformFluidProxy {
         int capacity = this.get().getTankCapacity(i);
         FluidStack wanted = ForgeFluidSpec.of(fluid, Math.min(capacity - stored.getAmount(), amount / 81L));
         if (ForgeFluidSpec.matches(fluid, stored) || stored.isEmpty()) {
-            return this.get().fill(wanted, IFluidHandler.FluidAction.SIMULATE) * 81L;
+            return this.get().fill(wanted, IFluidHandler.FluidAction.EXECUTE) * 81L;
         } else {
             return 0;
         }
