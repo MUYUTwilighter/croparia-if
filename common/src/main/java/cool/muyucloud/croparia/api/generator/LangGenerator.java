@@ -47,11 +47,10 @@ public class LangGenerator extends DataGenerator {
     @Override
     public void onGenerated(PackHandler handler) {
         handler.getAll(this).forEach(entry -> {
-            StringBuilder builder = new StringBuilder("{\n");
+            StringBuilder builder = new StringBuilder();
             if (entry.value() instanceof Collection<?> translations) {
                 translations.forEach(translation -> builder.append("  ").append(translation.toString()).append(",\n"));
-                String generated = builder.isEmpty() ? "" : builder.substring(0, builder.length() - 2);
-                generated += "\n}";
+                String generated = "{\n" + (builder.isEmpty() ? "" : builder.substring(0, builder.length() - 2)) + "\n}";
                 handler.cache(entry.path(), generated, this);
             }
         });
