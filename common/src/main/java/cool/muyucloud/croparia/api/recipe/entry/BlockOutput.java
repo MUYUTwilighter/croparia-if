@@ -129,11 +129,11 @@ public class BlockOutput implements SlotDisplay {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof BlockOutput that)) return false;
-        return Objects.equals(id, that.id) && Objects.equals(properties, that.properties) && Objects.equals(displayStack, that.displayStack);
+        return Objects.equals(id, that.id) && Objects.equals(properties, that.properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, properties, displayStack);
+        return Objects.hash(id, properties);
     }
 }

@@ -117,11 +117,11 @@ public class ItemOutput implements SlotDisplay {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ItemOutput that)) return false;
-        return amount == that.amount && Objects.equals(id, that.id) && Objects.equals(components, that.components) && Objects.equals(itemSpec, that.itemSpec) && Objects.equals(displayStack, that.displayStack);
+        return amount == that.amount && Objects.equals(id, that.id) && Objects.equals(components, that.components);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, components, amount, itemSpec, displayStack);
+        return Objects.hash(id, components, amount);
     }
 }

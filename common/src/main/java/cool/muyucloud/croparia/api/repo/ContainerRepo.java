@@ -81,7 +81,16 @@ public record ContainerRepo(@NotNull Container container) implements Repo<ItemSp
 
     @Override
     public long capacityFor(int i, ItemSpec resource) {
-        return Math.min(this.container().getItem(i).getMaxStackSize(), this.container().getMaxStackSize());
+        ItemStack stored = this.container().getItem(i);
+        ItemStack toPlace = resource.createStack();
+        int containerSize = this.container().getMaxStackSize(toPlace);
+        if (stored.isEmpty()) {
+            return containerSize;
+        } else if (resource.is(stored)) {
+            return containerSize - stored.getCount();
+        } else {
+            return 0;
+        }
     }
 
     @Override
