@@ -29,23 +29,25 @@ public record ContainerRepo(@NotNull Container container) implements Repo<ItemSp
 
     @Override
     public long simConsume(int i, ItemSpec resource, long amount) {
-        if (!this.container().canTakeItem(this.container(), i, resource.createStack(amount))) {
+        ItemStack stack = this.container().getItem(i);
+        if (!resource.is(stack)) {
             return 0;
         }
-        ItemStack stored = this.container().getItem(i);
-        if (resource.is(stored)) {
-            return Math.min(amount, stored.getCount());
-        } else {
-            return 0;
-        }
+        long stored = stack.getCount();
+        return Math.min(amount, stored);
     }
 
     @Override
     public long consume(int i, ItemSpec resource, long amount) {
-        if (!this.container().canTakeItem(this.container(), i, resource.createStack(amount))) {
+        ItemStack stack = this.container().getItem(i);
+        if (!resource.is(stack)) {
             return 0;
         }
-        return this.container().removeItem(i, (int) amount).getCount();
+        long stored = stack.getCount();
+        long consumed = Math.min(amount, stored);
+        stack.shrink((int) consumed);
+        this.container().setItem(i, stack);
+        return consumed;
     }
 
     @Override

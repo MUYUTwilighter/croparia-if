@@ -53,16 +53,26 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
                 if (block.isMaxAge(belowState)) {
                     List<ItemStack> droppedStacks = Block.getDrops(belowState, Objects.requireNonNull(level.getServer()).getLevel(level.dimension()), worldPosition.below(), level.getBlockEntity(worldPosition.below()));
                     boolean decreased = false;
+                    boolean hasRoom = true;
                     for (ItemStack stack : droppedStacks) {
                         if (!decreased && stack.is(seed)) {
                             stack.shrink(1);
                             decreased = true;
                         }
-                        gbe.proxy.accept(ItemSpec.of(stack), stack.getCount());
+                        long sim = gbe.proxy.simAccept(ItemSpec.of(stack), stack.getCount());
+                        if (sim < stack.getCount()) {
+                            hasRoom = false;
+                            break;
+                        }
                     }
-                    IntegerProperty property = ((CropBlockAccess) block).cif$getAgeProperty();
-                    int maxAge = block.getMaxAge();
-                    level.setBlockAndUpdate(worldPosition.below(), block.defaultBlockState().setValue(property, maxAge / 2));
+                    if (hasRoom) {
+                        for (ItemStack stack : droppedStacks) {
+                            gbe.proxy.accept(ItemSpec.of(stack), stack.getCount());
+                        }
+                        IntegerProperty property = ((CropBlockAccess) block).cif$getAgeProperty();
+                        int maxAge = block.getMaxAge();
+                        level.setBlockAndUpdate(worldPosition.below(), block.defaultBlockState().setValue(property, maxAge / 2));
+                    }
                 }
             }
         }
