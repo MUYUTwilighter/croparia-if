@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.recipe.structure;
 
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.util.Vec2i;
+import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -13,7 +14,7 @@ public class Char2D implements Iterable<char[]> {
 
     private final char[][] chars;
     private final transient Map<Character, Integer> counts = new HashMap<>();
-    private final transient int hash;
+    private final transient LazySupplier<Integer> hash;
 
     public Char2D(List<String> layer) {
         if (layer.isEmpty()) {
@@ -33,12 +34,12 @@ public class Char2D implements Iterable<char[]> {
                 }
             }
         }
-        this.hash = Arrays.deepHashCode(chars);
+        this.hash = LazySupplier.of(() -> Arrays.deepHashCode(chars));
     }
 
     public Char2D(int maxX, int maxZ) {
         this.chars = new char[maxZ][maxX];
-        this.hash = Arrays.deepHashCode(chars);
+        this.hash = LazySupplier.of(() -> Arrays.deepHashCode(chars));
     }
 
     public List<String> layer() {
@@ -124,7 +125,7 @@ public class Char2D implements Iterable<char[]> {
 
     @Override
     public int hashCode() {
-        return hash;
+        return hash.get();
     }
 
     @Override

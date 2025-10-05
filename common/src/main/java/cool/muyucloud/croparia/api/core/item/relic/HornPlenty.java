@@ -27,11 +27,11 @@ public class HornPlenty extends Item {
         if (player == null) {
             return InteractionResult.PASS;
         }
-        int index = context.getLevel().random.nextInt(PostConstants.FOODS.size());
         ItemStack food = null;
         int xp = 0;
         for (int i = 0; i < MAX_ATTEMPT; ++i) {
-            food = PostConstants.FOODS.get((int) (Math.random() % PostConstants.FOODS.size())).getDefaultInstance();
+            int index = context.getLevel().random.nextInt(PostConstants.FOODS.size());
+            food = PostConstants.FOODS.get(index).getDefaultInstance();
             FoodProperties properties = Objects.requireNonNull(CifUtil.getFoodProperties(food));
             xp = properties.nutrition();
             if (food.is(PostConstants.HORN_PLENTY_BLACKLIST)) {
@@ -51,9 +51,8 @@ public class HornPlenty extends Item {
             context.getClickedPos().getX() + 0.5D,
             context.getClickedPos().getY() + 1D,
             context.getClickedPos().getZ() + 0.5D,
-            PostConstants.FOODS.get(index).getDefaultInstance()
+            food
         ));
-
         return InteractionResult.SUCCESS;
     }
 }
