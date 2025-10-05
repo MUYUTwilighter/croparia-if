@@ -28,14 +28,14 @@ public record Vec2i(int x, int z)  implements Comparable<Vec2i> {
 
     @Override
     public int compareTo(@NotNull Vec2i o) {
-        return x + z - o.x - o.z;
+        return this.x != o.x ? Integer.compare(this.x, o.x) : Integer.compare(this.z, o.z);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Vec2i vec2i)) return false;
-        return x == vec2i.x && z == vec2i.z;
+        if (!(o instanceof Vec2i(int x1, int z1))) return false;
+        return x == x1 && z == z1;
     }
 
     @Override

@@ -3,7 +3,6 @@ package cool.muyucloud.croparia.util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public class FileUtil {
@@ -41,7 +40,9 @@ public class FileUtil {
      */
     public static void deleteUnder(File dir) throws IOException {
         if (dir.isDirectory()) {
-            for (File child : Objects.requireNonNull(dir.listFiles())) {
+            File[] children = dir.listFiles();
+            if (children == null) throw new IOException("Failed to list directory " + dir);
+            for (File child : children) {
                 deleteDir(child);
             }
         }
@@ -60,7 +61,9 @@ public class FileUtil {
      */
     public static void deleteDir(File dir) throws IOException {
         if (dir.isDirectory()) {
-            for (File child : Objects.requireNonNull(dir.listFiles())) {
+            File[] children = dir.listFiles();
+            if (children == null) throw new IOException("Failed to list directory " + dir);
+            for (File child : children) {
                 deleteDir(child);
             }
         }
