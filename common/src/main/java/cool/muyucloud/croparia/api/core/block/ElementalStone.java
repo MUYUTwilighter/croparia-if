@@ -2,10 +2,10 @@ package cool.muyucloud.croparia.api.core.block;
 
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.item.RecipeWizard;
-import cool.muyucloud.croparia.api.core.recipe.SoakRecipe;
 import cool.muyucloud.croparia.api.core.recipe.container.SoakContainer;
 import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.registry.CropariaBlocks;
+import cool.muyucloud.croparia.registry.Recipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -45,8 +45,7 @@ public class ElementalStone extends Block {
     protected void trySoak(ServerLevel level, BlockPos pos, Element element, RandomSource source) {
         BlockState state = level.getBlockState(pos);
         SoakContainer container = new SoakContainer(state, element, source.nextFloat());
-        level.getServer().getRecipeManager().getRecipeFor(SoakRecipe.TYPED_SERIALIZER, container, level).ifPresent(holder -> {
-            SoakRecipe recipe = holder.value();
+        Recipes.SOAK.find(container, level).ifPresent(recipe -> {
             Vec3 particlePos = pos.getCenter();
             level.sendParticles(ParticleTypes.HAPPY_VILLAGER, particlePos.x, particlePos.y + 0.5, particlePos.z, 20, 0.5, 0.1, 0.5, 1);
             level.playSound(null, pos, SoundEvent.createVariableRangeEvent(CropariaIf.of("block.soak.craft")), SoundSource.BLOCKS, 0.5F, 1.0F);

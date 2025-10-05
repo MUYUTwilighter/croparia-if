@@ -22,7 +22,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -129,10 +128,9 @@ public class Infusor extends Block implements ItemPlaceable {
         if (!CropariaIf.CONFIG.getInfusor()) {
             return;
         }
-        RecipeManager manager = world.getServer().getRecipeManager();
         InfusorContainer container = InfusorContainer.of(element, input);
-        manager.getRecipeFor(Recipes.INFUSOR, container, world).ifPresent(
-            recipe -> onCrafting(recipe.value(), container, world, pos, player)
+        Recipes.INFUSOR.find(container, world).ifPresent(
+            recipe -> onCrafting(recipe, container, world, pos, player)
         );
     }
 

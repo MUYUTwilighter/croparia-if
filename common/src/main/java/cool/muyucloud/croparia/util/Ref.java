@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -25,7 +26,7 @@ public class Ref<T> {
     public Ref<T> set(T value) {
         T old = this.value;
         this.value = value;
-        if (!this.value.equals(old)) {
+        if (!Objects.equals(this.value, old)) {
             for (BiConsumer<T, T> consumer : onChanged) {
                 consumer.accept(old, value);
             }

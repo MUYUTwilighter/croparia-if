@@ -49,7 +49,7 @@ public record TypeToken<T extends TypedResource<?>>(@NotNull ResourceLocation id
     public static <T extends TypedResource<?>> Optional<TypeToken<T>> get(ResourceLocation id) {
         TypeToken<?> type = REGISTRY_BY_ID.get(id);
         try {
-            return Optional.of((TypeToken<T>) type);
+            return Optional.ofNullable((TypeToken<T>) type);
         } catch (ClassCastException e) {
             return Optional.empty();
         }

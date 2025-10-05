@@ -22,8 +22,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -71,13 +69,12 @@ public class RitualStand extends Block implements ItemPlaceable {
             CACHED_ITEMS.put(targetPos, cachedItems);
             if (cachedItems.contains(itemEntity)) return;
             cachedItems.add(itemEntity);
-            RecipeManager recipeManager = level.getServer().getRecipeManager();
-            recipeManager.getRecipeFor(
-                Recipes.RITUAL_STRUCTURE, new RitualStructureContainer(level.getBlockState(pos)), level
-            ).map(RecipeHolder::value).map(structure -> structure.validate(pos, level)).ifPresentOrElse(
+            Recipes.RITUAL_STRUCTURE.find(new RitualStructureContainer(level.getBlockState(pos)), level).map(
+                structure -> structure.validate(pos, level)
+            ).ifPresentOrElse(
                 r -> r.ifSuccessOrElse(matched -> {
                     RitualContainer matcher = RitualContainer.of(level.getBlockState(pos), cachedItems, matched);
-                    recipeManager.getRecipeFor(Recipes.RITUAL, matcher, level).map(RecipeHolder::value).ifPresentOrElse(ritual -> {
+                    Recipes.RITUAL.find(matcher, level).ifPresentOrElse(ritual -> {
                         ItemStack result = ritual.assemble(matcher);
                         if (result.getItem() instanceof SpawnEggItem) {
                             FakePlayer.useAllItemsOn(level, pos.above(), result);
