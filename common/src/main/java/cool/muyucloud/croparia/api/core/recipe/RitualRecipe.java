@@ -93,13 +93,13 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
 
     @Override
     public @NotNull List<List<ItemStack>> getOutputs() {
-        ItemStack stack = this.getResult().createStack();
+        ItemStack stack = this.getResult().getDisplayStack().copy();
         if (stack.getItem() instanceof SpawnEggItem) {
             Texts.tooltip(stack, Texts.translatable("tooltip.croparia.spawn_egg"));
         } else if (stack.getItem() == Items.ENCHANTED_BOOK && this.getIngredient().getAmount() == 1L) {
             Texts.tooltip(stack, Texts.translatable("tooltip.croparia.ritual.enchant", stack.getCount()));
         }
-        return List.of(List.of(this.getResult().getDisplayStack()));
+        return List.of(List.of(stack));
     }
 
     public ItemStack assemble(RitualContainer matcher) {

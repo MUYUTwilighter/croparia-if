@@ -60,6 +60,7 @@ public class FakePlayer extends Player {
 
     public InteractionResult useItemOn(@NotNull BlockPos pos, @NotNull ItemStack item) {
         BlockHitResult hit = new BlockHitResult(pos.getCenter(), Direction.UP, pos, false);
+        this.setItemInHand(InteractionHand.MAIN_HAND, item);
         UseOnContext context = new UseOnContext(this, InteractionHand.MAIN_HAND, hit);
         return item.useOn(context);
     }

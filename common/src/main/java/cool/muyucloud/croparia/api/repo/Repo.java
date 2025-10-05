@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 @SuppressWarnings("unused")
 public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
     Logger LOGGER = LogUtils.getLogger();
+    
 
     /**
      * The amount of resource storage units
