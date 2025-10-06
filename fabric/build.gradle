@@ -94,7 +94,10 @@ modrinth {
     uploadFile = remapJar
     gameVersions = [minecraft_version]
     loaders = ["fabric"]
-    changelog = rootProject.file("changelog.md").text
+    File changelogFile = rootProject.file("changelog.md")
+    if (changelogFile.exists()) {
+        changelog = changelogFile.text
+    }
     dependencies {
         required.project "architectury-api"
         required.project "fabric-api"
@@ -107,7 +110,10 @@ tasks.register('curseforge', TaskPublishCurseForge) {
     def mainFile = upload('971004', remapJar)
     mainFile.displayName = archives_name + "-fabric-" + mod_version
     mainFile.releaseType = mod_version.endsWith("a") || mod_version.endsWith("alpha") ? "alpha" : mod_version.endsWith("pre") ? "beta" : "release"
-    mainFile.changelog = rootProject.file("changelog.md").text
+    File changelogFile = rootProject.file("changelog.md")
+    if (changelogFile.exists()) {
+        mainFile.changelog = changelogFile.text
+    }
     mainFile.changelogType = 'markdown'
     mainFile.gameVersions = [minecraft_version]
     mainFile.addJavaVersion("Java 21")

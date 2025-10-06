@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -126,6 +127,7 @@ public class BlockInput implements SlotDisplay {
     @NotNull
     private final BlockProperties properties;
     private transient OnLoadSupplier<ImmutableList<ItemStack>> displayStacks;
+    private boolean virtualRender = false;
 
     protected BlockInput(@Nullable ResourceLocation id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties) {
         this.id = id;
@@ -137,12 +139,16 @@ public class BlockInput implements SlotDisplay {
             if (this.getId().isPresent()) {
                 ItemStack displayStack = BuiltInRegistries.BLOCK.getOptional(this.getId().get()).map(block -> {
                     ItemStack stack = block.asItem().getDefaultInstance();
-                    if (stack.isEmpty()) stack = Texts.rename(STACK_PLACEHOLDER.get(), Texts.translatable(block.getDescriptionId()));
+                    if (stack.isEmpty()) {
+                        stack = Texts.rename(STACK_PLACEHOLDER.get(), Texts.translatable(block.getDescriptionId()));
+                        this.virtualRender = true;
+                    }
                     stack.set(BlockProperties.TYPE, this.getProperties());
                     return stack;
                 }).orElseGet(() -> {
                     DisplayableRecipe.LOGGER.error("Block with id '{}' not found, using placeholder", this.getId().get());
-                    return Texts.tooltip(STACK_UNKNOWN.copy(), Texts.literal(this.getTaggable()));
+                    this.virtualRender = true;
+                    return Texts.tooltip(STACK_PLACEHOLDER.get().copy(), Texts.literal(this.getTaggable()));
                 });
                 return ImmutableList.of(displayStack);
             } else if (this.getTag().isPresent()) {
@@ -150,18 +156,23 @@ public class BlockInput implements SlotDisplay {
                 for (Holder<Block> holder : TagUtil.forEntries(this.getTag().get())) {
                     Block block = holder.value();
                     ItemStack stack = block.asItem().getDefaultInstance();
-                    if (stack.isEmpty()) stack = Texts.rename(STACK_PLACEHOLDER.get(), Texts.translatable(block.getDescriptionId()));
+                    if (stack.isEmpty()) {
+                        stack = Texts.rename(STACK_PLACEHOLDER.get(), Texts.translatable(block.getDescriptionId()));
+                        this.virtualRender = true;
+                    }
                     stack.set(BlockProperties.TYPE, this.getProperties());
                     stacks.add(stack);
                 }
                 if (stacks.isEmpty()) {
                     DisplayableRecipe.LOGGER.error("Block tag '{}' is empty, using placeholder", this.getTag().get().location());
+                    this.virtualRender = true;
                     stacks.add(Texts.tooltip(STACK_UNKNOWN.copy(), Texts.literal(this.getTaggable())));
                 }
                 return ImmutableList.copyOf(stacks);
             } else if (this.getProperties().isEmpty()) {
                 return ImmutableList.of(STACK_ANY);
             } else {
+                this.virtualRender = true;
                 ItemStack stack = STACK_PLACEHOLDER.get();
                 stack.set(BlockProperties.TYPE, this.getProperties());
                 return ImmutableList.of(stack);
@@ -219,8 +230,7 @@ public class BlockInput implements SlotDisplay {
     }
 
     public boolean isVirtualRender() {
-        ItemStack stack = this.getDisplayStacks().getFirst();
-        return stack == STACK_UNKNOWN || stack.getItem() == CropariaItems.PLACEHOLDER_BLOCK.get();
+        return virtualRender;
     }
 
     public boolean isAny() {
@@ -228,7 +238,9 @@ public class BlockInput implements SlotDisplay {
     }
 
     public boolean isUnknown() {
-        return this.getDisplayStacks().getFirst() == STACK_UNKNOWN;
+        List<ItemStack> stacks = this.getDisplayStacks();
+        if (stacks.size() != 1) return false;
+        return Objects.equals(stacks.getFirst().getItem(), Items.BEDROCK) && this.isVirtualRender();
     }
 
     public boolean matches(@NotNull Block block) {
