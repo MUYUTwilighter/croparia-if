@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 public interface MapReader<K, V> extends Iterable<Map.Entry<K, V>> {
-    static <K, V> MapReaderImpl<K, V> map(@NotNull Map<K, V> map) {
+    static <K, V> MapReader<K, V> map(@NotNull Map<K, V> map) {
         return new MapReaderImpl<>(map);
     }
 
-    static JsonObjectReader jsonObject(@NotNull JsonObject object) {
+    static JsonObjectReader json(@NotNull JsonObject object) {
         return new JsonObjectReader(object);
     }
 

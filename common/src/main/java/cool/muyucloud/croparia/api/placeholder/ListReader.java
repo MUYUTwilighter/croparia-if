@@ -14,11 +14,11 @@ public interface ListReader<E> extends Iterable<E> {
         return new JsonArrayReader(array);
     }
 
-    static <E> ListReaderImpl<E> collection(Collection<E> list) {
+    static <E> ListReader<E> collection(Collection<E> list) {
         return new ListReaderImpl<>(List.copyOf(list));
     }
 
-    static <E> ListReaderImpl<E> list(List<E> list) {
+    static <E> ListReader<E> list(List<E> list) {
         return new ListReaderImpl<>(list);
     }
 

@@ -53,7 +53,7 @@ public class Placeholder<T> implements RegexParser<T> {
         });
         return builder;
     });
-    public static final Placeholder<JsonObject> JSON_OBJECT = Placeholder.buildMap(TypeMapper.of(MapReader::jsonObject), Placeholder.JSON, builder -> builder);
+    public static final Placeholder<JsonObject> JSON_OBJECT = Placeholder.buildMap(TypeMapper.of(MapReader::json), Placeholder.JSON, builder -> builder);
     public static final Placeholder<JsonArray> JSON_ARRAY = Placeholder.buildList(TypeMapper.of(ListReader::jsonArray), Placeholder.JSON, builder -> builder);
     public static final Placeholder<ResourceLocation> ID = Placeholder.build(node -> node
         .self(RegexParser.of(ResourceLocation::toString))
@@ -123,6 +123,12 @@ public class Placeholder<T> implements RegexParser<T> {
         PlaceholderBuilder<T> builder = PlaceholderBuilder.of();
         builder.overwrite(this, TypeMapper.identity());
         return new Placeholder<>(builder.map(mapper));
+    }
+
+    public PlaceholderBuilder<T> toBuilder() {
+        PlaceholderBuilder<T> builder = PlaceholderBuilder.of();
+        builder.overwrite(this, TypeMapper.identity());
+        return builder;
     }
 
     /**
