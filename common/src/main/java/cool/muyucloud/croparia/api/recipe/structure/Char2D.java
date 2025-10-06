@@ -133,34 +133,6 @@ public class Char2D implements Iterable<char[]> {
         return Arrays.stream(chars).iterator();
     }
 
-    public static class Char2DIterator implements Iterator<Character> {
-        private final Char2D char2D;
-        private int z = 0, x = 0;
-
-        public Char2DIterator(Char2D surface) {
-            this.char2D = surface;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return z < char2D.zSize();
-        }
-
-        @Override
-        public Character next() {
-            if (!hasNext()) {
-                return null;
-            }
-            char result = char2D.get(z, x);
-            x++;
-            if (x == char2D.xSize()) {
-                x = 0;
-                z++;
-            }
-            return result;
-        }
-    }
-
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("[");

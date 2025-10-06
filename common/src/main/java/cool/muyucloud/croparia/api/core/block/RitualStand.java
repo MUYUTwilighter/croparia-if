@@ -9,6 +9,7 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.registry.Recipes;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.ItemPlaceable;
+import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -37,7 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RitualStand extends Block implements ItemPlaceable {
-    public static final Map<TargetPos, Set<ItemEntity>> CACHED_ITEMS = new HashMap<>();
+    public static final OnLoadSupplier<Map<TargetPos, Set<ItemEntity>>> CACHED_ITEMS = OnLoadSupplier.of(HashMap::new);
 
     protected static final VoxelShape SHAPE = Block.box(0.0, 0.3, 0.0, 16.0, 6.0, 16.0);
     private final int tier;
@@ -62,11 +63,12 @@ public class RitualStand extends Block implements ItemPlaceable {
     @Override
     public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
         if (entity instanceof ItemEntity itemEntity && CropariaIf.CONFIG.getRitual() && world instanceof ServerLevel level) {
+            Map<TargetPos, Set<ItemEntity>> cached = CACHED_ITEMS.get();
             TargetPos targetPos = new TargetPos(level, pos);
-            Set<ItemEntity> cachedItems = CACHED_ITEMS.computeIfAbsent(targetPos, k -> Set.of())
+            Set<ItemEntity> cachedItems = cached.computeIfAbsent(targetPos, k -> Set.of())
                 .stream().filter(item -> item.isAlive() && !item.getItem().isEmpty())
                 .collect(Collectors.toSet());
-            CACHED_ITEMS.put(targetPos, cachedItems);
+            cached.put(targetPos, cachedItems);
             if (cachedItems.contains(itemEntity)) return;
             cachedItems.add(itemEntity);
             Recipes.RITUAL_STRUCTURE.find(new RitualStructureContainer(level.getBlockState(pos)), level).map(
@@ -93,7 +95,7 @@ public class RitualStand extends Block implements ItemPlaceable {
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         super.onRemove(state, level, pos, newState, movedByPiston);
         TargetPos targetPos = new TargetPos(level, pos);
-        CACHED_ITEMS.remove(targetPos);
+        CACHED_ITEMS.get().remove(targetPos);
     }
 
     protected void tryTell(ItemEntity item, Component msg) {
