@@ -9,7 +9,7 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.registry.Recipes;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.ItemPlaceable;
-import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
+import cool.muyucloud.croparia.util.supplier.SemiSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -38,7 +38,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RitualStand extends Block implements ItemPlaceable {
-    public static final OnLoadSupplier<Map<TargetPos, Set<ItemEntity>>> CACHED_ITEMS = OnLoadSupplier.of(HashMap::new);
+    public static final SemiSupplier<Map<TargetPos, Set<ItemEntity>>> CACHED_ITEMS = SemiSupplier.of(HashMap::new);
+    private static final long TIMER = 0L;
 
     protected static final VoxelShape SHAPE = Block.box(0.0, 0.3, 0.0, 16.0, 6.0, 16.0);
     private final int tier;
@@ -62,6 +63,8 @@ public class RitualStand extends Block implements ItemPlaceable {
 
     @Override
     public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - TIMER > 1000L) CACHED_ITEMS.refresh();
         if (entity instanceof ItemEntity itemEntity && CropariaIf.CONFIG.getRitual() && world instanceof ServerLevel level) {
             Map<TargetPos, Set<ItemEntity>> cached = CACHED_ITEMS.get();
             TargetPos targetPos = new TargetPos(level, pos);

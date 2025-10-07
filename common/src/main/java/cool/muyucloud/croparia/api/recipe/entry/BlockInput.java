@@ -136,6 +136,7 @@ public class BlockInput implements SlotDisplay {
             throw new IllegalArgumentException("id and tag cannot be set at the same time");
         this.properties = properties;
         this.displayStacks = OnLoadSupplier.of(() -> {
+            this.virtualRender = false;
             if (this.getId().isPresent()) {
                 ItemStack displayStack = BuiltInRegistries.BLOCK.getOptional(this.getId().get()).map(block -> {
                     ItemStack stack = block.asItem().getDefaultInstance();
