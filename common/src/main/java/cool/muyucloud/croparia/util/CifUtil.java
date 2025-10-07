@@ -112,6 +112,7 @@ public class CifUtil {
         }
         if (player != null) {
             player.addItem(remain);
+            return;
         }
         world.addFreshEntity(new ItemEntity(world, (double) pos.getX() + 0.5, (double) pos.getY() + 0.6, (double) pos.getZ() + 0.5, remain, 0, 0, 0));
     }

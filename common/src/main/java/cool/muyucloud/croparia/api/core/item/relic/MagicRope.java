@@ -3,7 +3,6 @@ package cool.muyucloud.croparia.api.core.item.relic;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.component.TargetPos;
 import cool.muyucloud.croparia.registry.CropariaComponents;
-import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,11 +27,8 @@ public class MagicRope extends Item {
             MinecraftServer server = player.getServer();
             ItemStack itemStack = context.getItemInHand();
             if (player.isShiftKeyDown()) {
-                itemStack.shrink(1);
-                ItemStack newStack = CropariaItems.MAGIC_ROPE.get().getDefaultInstance();
                 TargetPos targetPos = new TargetPos(player);
-                newStack.set(CropariaComponents.TARGET_POS.get(), targetPos);
-                player.addItem(newStack);
+                itemStack.set(CropariaComponents.TARGET_POS.get(), targetPos);
                 Texts.overlay(player, targetPos.getTooltip());
                 return InteractionResult.SUCCESS;
             }

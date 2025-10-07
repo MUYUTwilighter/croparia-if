@@ -31,9 +31,6 @@ public class FakePlayer extends Player {
             if (result != InteractionResult.FAIL && result != InteractionResult.PASS) {
                 ItemStack remainder = finishUseItem(item, world);
                 remainders.add(remainder);
-                if (result == InteractionResult.CONSUME) {
-                    item.shrink(1);
-                }
             } else {
                 break;
             }
@@ -59,7 +56,7 @@ public class FakePlayer extends Player {
 
     public FakePlayer(@NotNull Level level) {
         super(level, BlockPos.ZERO, 0, new GameProfile(UUID.randomUUID(), "FakePlayer"));
-        CropariaIf.LOGGER.debug("Created fake player for {}", level.dimension());
+        CropariaIf.LOGGER.debug("Created fake player for {}", level.dimension().location());
     }
 
     public InteractionResult useItemOn(@NotNull BlockPos pos, @NotNull ItemStack item) {

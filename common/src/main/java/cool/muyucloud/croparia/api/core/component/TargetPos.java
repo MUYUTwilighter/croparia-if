@@ -50,15 +50,12 @@ public class TargetPos implements TooltipProvider {
     public TargetPos(@NotNull ResourceKey<Level> dim, @NotNull BlockPos pos) {
         this.pos = pos;
         this.dimKey = dim;
-        this.dimName = Texts.translatable("dimension.%s.%s".formatted(dim.location().getNamespace(), dim.location().getPath()));
+        this.dimName = Texts.literal(dim.location().toString());
         this.tooltip = Texts.translatable("tooltip.croparia.bounded_position", this.getDimName(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
     }
 
     public TargetPos(@NotNull ResourceLocation dim, @NotNull BlockPos pos) {
-        this.pos = pos;
-        this.dimKey = ResourceKey.create(Registries.DIMENSION, dim);
-        this.dimName = Texts.translatable("dimension.%s.%s".formatted(dim.getNamespace(), dim.getPath()));
-        this.tooltip = Texts.translatable("tooltip.croparia.bounded_position", this.getDimName(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
+        this(ResourceKey.create(Registries.DIMENSION, dim), pos);
     }
 
     @NotNull

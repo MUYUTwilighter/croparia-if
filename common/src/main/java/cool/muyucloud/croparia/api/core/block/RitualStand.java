@@ -33,6 +33,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -85,7 +86,12 @@ public class RitualStand extends Block implements ItemPlaceable {
                     Recipes.RITUAL.find(matcher, level).ifPresentOrElse(ritual -> {
                         ItemStack result = ritual.assemble(matcher);
                         if (result.getItem() instanceof SpawnEggItem) {
-                            FakePlayer.useAllItemsOn(level, pos.above(), result);
+                            List<ItemStack> remainders = FakePlayer.useAllItemsOn(level, pos.above(), result);
+                            for (ItemStack remainder : remainders) {
+                                if (!remainder.isEmpty()) {
+                                    CifUtil.exportItem(level, pos, remainder, itemEntity.getOwner() instanceof Player player ? player : null);
+                                }
+                            }
                         }
                         cachedItems.remove(itemEntity);
                         CifUtil.exportItem(level, pos, result, itemEntity.getOwner() instanceof Player player ? player : null);
