@@ -54,7 +54,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
                     List<ItemStack> droppedStacks = Block.getDrops(belowState, Objects.requireNonNull(level.getServer()).getLevel(level.dimension()), worldPosition.below(), level.getBlockEntity(worldPosition.below()));
                     boolean decreased = false;
                     for (ItemStack stack : droppedStacks) {
-                        if (!decreased && stack.is(seed)) { // We consume one seed to "replant"
+                        if (!decreased && stack.is(seed)) { // We consume one seed to simulate "replant"
                             stack.shrink(1);    // No worry if aborted, the stack is newly created, so no side effect
                             decreased = true;
                         }
@@ -64,6 +64,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
                         }
                     }
                     for (ItemStack stack : droppedStacks) {
+                        if (!stack.isEmpty()) gbe.setChanged();
                         gbe.proxy.accept(ItemSpec.of(stack), stack.getCount());
                     }
                     IntegerProperty property = ((CropBlockAccess) block).cif$getAgeProperty();
@@ -99,7 +100,11 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     public @NotNull ItemStack removeItem(int slot, int amount) {
-        return ContainerHelper.removeItem(this.inventory, slot, amount);
+        ItemStack removed = ContainerHelper.removeItem(this.inventory, slot, amount);
+        if (!removed.isEmpty()) {
+            this.setChanged();
+        }
+        return removed;
     }
 
     public @NotNull ItemStack removeItemNoUpdate(int slot) {
@@ -107,6 +112,11 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     public void setItem(int slot, ItemStack stack) {
+        ItemStack stored = this.getItem(slot);
+        if (ItemStack.isSameItemSameComponents(stored, stack) && stored.getCount() == stack.getCount()) {
+            return;
+        }
+        this.setChanged();
         this.inventory.set(slot, stack);
     }
 
@@ -119,6 +129,8 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     public void clearContent() {
+        if (this.inventory.isEmpty()) return;
+        this.setChanged();
         this.inventory.clear();
     }
 

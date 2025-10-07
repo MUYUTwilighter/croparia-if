@@ -28,7 +28,7 @@ public class OnLoadSupplier<T> extends LazySupplier<T> {
 
     @Override
     public T get() {
-        if (this.getLastCreate() < LAST_DATA_LOAD) {
+        if (this.getLastCreate() <= LAST_DATA_LOAD) {
             this.cache = creator.get();
             this.lastCreate = System.currentTimeMillis();
         }
