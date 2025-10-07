@@ -30,6 +30,6 @@ public class RitualStructureContainer implements RecipeInput {
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return state.isAir();
     }
 }

@@ -28,7 +28,7 @@ public record RitualContainer(BlockState ritual, @NotNull List<ItemStack> stacks
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return stacks.isEmpty() || stacks.stream().allMatch(ItemStack::isEmpty) || matched == RitualStructure.Result.FAIL;
     }
 
     @Override

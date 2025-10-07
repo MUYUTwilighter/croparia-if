@@ -105,7 +105,8 @@ public class Infusor extends Block implements ItemPlaceable {
         } else {
             return false;
         }
-        if (player == null || !player.getAbilities().instabuild) {
+        // Don't consume item in creative mode
+        if (player != null && !player.getAbilities().instabuild) {
             stack.shrink(1);
         }
         ItemStack returnStack = ElementalPotion.fromElement(element).orElseThrow().getDefaultInstance();

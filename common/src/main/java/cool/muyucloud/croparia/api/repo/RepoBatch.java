@@ -78,6 +78,7 @@ public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<
     }
 
     public void save(@NotNull JsonArray json) {
+        while (!json.isEmpty()) json.remove(0);
         for (RepoUnit<T> tRepoUnit : units) {
             JsonObject unit = new JsonObject();
             tRepoUnit.save(unit);
@@ -86,6 +87,7 @@ public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<
     }
 
     public void save(@NotNull ListTag nbt) {
+        nbt.clear();
         for (RepoUnit<T> tRepoUnit : units) {
             CompoundTag unit = new CompoundTag();
             tRepoUnit.save(unit);

@@ -138,9 +138,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
                         if (!state.isAir()) {
                             return Result.FAIL;
                         }
-                    } else if (key == ' ') {
-                        BlockInput.ANY.matches(state);
-                    } else {
+                    } else if (key != ' ') {
                         BlockInput input = this.keys.get(key);
                         if (input == null || !input.matches(state)) {
                             return Result.FAIL;

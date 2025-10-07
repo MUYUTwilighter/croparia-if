@@ -230,6 +230,7 @@ public class BlockInput implements SlotDisplay {
     }
 
     public boolean isVirtualRender() {
+        this.displayStacks.get();
         return virtualRender;
     }
 

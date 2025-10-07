@@ -36,7 +36,7 @@ public class SoakContainer implements RecipeInput {
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return state.isAir() || element == Element.EMPTY || random <= 0;
     }
 
     @Override

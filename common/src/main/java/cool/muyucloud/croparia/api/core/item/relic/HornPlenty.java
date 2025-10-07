@@ -34,11 +34,10 @@ public class HornPlenty extends Item {
             food = PostConstants.FOODS.get(index).getDefaultInstance();
             FoodProperties properties = Objects.requireNonNull(CifUtil.getFoodProperties(food));
             xp = properties.nutrition();
-            if (food.is(PostConstants.HORN_PLENTY_BLACKLIST)) {
-                food = null;
-            } else if (xp <= player.totalExperience) {
+            if (!food.is(PostConstants.HORN_PLENTY_BLACKLIST) && xp <= player.totalExperience) {
                 break;
             }
+            food = null;
         }
         if (food == null) {
             Texts.overlay(player, Constants.INSUFFICIENT_XP);
