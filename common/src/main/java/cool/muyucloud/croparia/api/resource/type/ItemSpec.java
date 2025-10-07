@@ -21,6 +21,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 @SuppressWarnings("unused")
 public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
     public static final MapCodec<ItemSpec> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -154,5 +156,18 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
     @NotNull
     public DataComponentPatch getComponentsPatch() {
         return this.components.asPatch();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ItemSpec itemSpec)) return false;
+        if (this.isEmpty()) return itemSpec.isEmpty();
+        return Objects.equals(resource, itemSpec.resource) && Objects.equals(components, itemSpec.components);
+    }
+
+    @Override
+    public int hashCode() {
+        if (this.isEmpty()) return 0;
+        return Objects.hash(resource, components);
     }
 }

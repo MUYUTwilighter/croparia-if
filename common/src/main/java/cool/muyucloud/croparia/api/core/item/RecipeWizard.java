@@ -108,6 +108,7 @@ public class RecipeWizard extends Item {
                 }
             }
         }
+        // Client-only, we don't want generated files spam on server, while client never get the files.
         if (!level.isClientSide() || !player.isLocalPlayer()) {
             return InteractionResult.PASS;
         }

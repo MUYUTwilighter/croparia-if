@@ -16,6 +16,8 @@ import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 @SuppressWarnings("unused")
 public class FluidSpec implements TypedResource<Fluid>, DataComponentHolder {
     public static final MapCodec<FluidSpec> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -132,5 +134,18 @@ public class FluidSpec implements TypedResource<Fluid>, DataComponentHolder {
     @NotNull
     public DataComponentPatch getComponentsPatch() {
         return this.components.asPatch();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof FluidSpec fluidSpec)) return false;
+        if (this.isEmpty()) return fluidSpec.isEmpty();
+        return Objects.equals(resource, fluidSpec.resource) && Objects.equals(components, fluidSpec.components);
+    }
+
+    @Override
+    public int hashCode() {
+        if (this.isEmpty()) return 0;
+        return Objects.hash(resource, components);
     }
 }
