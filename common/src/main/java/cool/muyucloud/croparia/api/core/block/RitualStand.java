@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 
 public class RitualStand extends Block implements ItemPlaceable {
     public static final SemiSupplier<Map<TargetPos, Set<ItemEntity>>> CACHED_ITEMS = SemiSupplier.of(HashMap::new);
-    private static final long TIMER = 0L;
+    private static long LAST_CLEAR = 0L;
 
     protected static final VoxelShape SHAPE = Block.box(0.0, 0.3, 0.0, 16.0, 6.0, 16.0);
     private final int tier;
@@ -64,7 +64,10 @@ public class RitualStand extends Block implements ItemPlaceable {
     @Override
     public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
         long currentTime = System.currentTimeMillis();
-        if (currentTime - TIMER > 1000L) CACHED_ITEMS.refresh();
+        if (currentTime - LAST_CLEAR > 1000L) {
+            LAST_CLEAR = currentTime;
+            CACHED_ITEMS.refresh();
+        }
         if (entity instanceof ItemEntity itemEntity && CropariaIf.CONFIG.getRitual() && world instanceof ServerLevel level) {
             Map<TargetPos, Set<ItemEntity>> cached = CACHED_ITEMS.get();
             TargetPos targetPos = new TargetPos(level, pos);

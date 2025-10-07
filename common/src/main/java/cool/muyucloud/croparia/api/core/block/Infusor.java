@@ -37,6 +37,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public class Infusor extends Block implements ItemPlaceable {
     protected final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
     public static final EnumProperty<Element> ELEMENT = EnumProperty.create("element", Element.class);
@@ -54,7 +56,7 @@ public class Infusor extends Block implements ItemPlaceable {
         Item item = itemStack.getItem();
         if (item instanceof ElementalPotion potion && this.tryInfuse(world, pos, potion, itemStack, player)) {
             if (world instanceof ServerLevel serverWorld) {
-                this.forceCraft(serverWorld, pos, player);
+                this.craft(serverWorld, pos, player);
             }
             return InteractionResult.SUCCESS;
         } else if (
@@ -86,14 +88,17 @@ public class Infusor extends Block implements ItemPlaceable {
         return true;
     }
 
-    public void forceCraft(ServerLevel world, BlockPos pos, @Nullable Player player) {
+    public void craft(ServerLevel world, BlockPos pos, @Nullable Player player) {
         Element element = world.getBlockState(pos).getValue(ELEMENT);
-        world.getEntities(EntityTypeTest.forClass(ItemEntity.class),
+        List<ItemEntity> list = world.getEntities(EntityTypeTest.forClass(ItemEntity.class),
             AABB.of(new BoundingBox(pos)), entity -> !entity.getItem().isEmpty()
-        ).forEach(entity -> {
-            ItemStack input = entity.getItem();
-            this.tryCraft(world, pos, input, element, player != null ? player : entity.getOwner() instanceof Player owner ? owner : null);
-        });
+        );
+        if (list.isEmpty()) {
+            return;
+        }
+        ItemEntity entity = list.getFirst();
+        ItemStack input = entity.getItem();
+        this.tryCraft(world, pos, input, element, player != null ? player : entity.getOwner() instanceof Player owner ? owner : null);
     }
 
     public boolean tryDefuse(Level world, BlockPos pos, ItemStack stack, @Nullable Player player) {
