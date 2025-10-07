@@ -135,10 +135,11 @@ public class Char2D implements Iterable<char[]> {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("[");
+        StringBuilder builder = new StringBuilder();
         for (char[] row : chars) {
             builder.append(String.valueOf(row)).append(",\n");
         }
-        return builder.substring(0, builder.length() - 2) + "]";
+        if (builder.isEmpty()) return "[]";
+        else return "[" + builder.substring(0, builder.length() - 2) + "]";
     }
 }
