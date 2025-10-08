@@ -80,15 +80,21 @@ public class CifUtil {
             BlockEntity neighbor = world.getBlockEntity(pos.offset(d.getUnitVec3i()));
             if (neighbor instanceof Container container) {
                 for (int i = 0; i < container.getContainerSize(); i++) {
-                    ItemStack containerItem = container.getItem(i);
-                    if (containerItem.isEmpty()) {
-                        container.setItem(i, stack);
+                    if (stack.isEmpty()) {
                         return ItemStack.EMPTY;
-                    } else if (ItemStack.isSameItemSameComponents(containerItem, stack)) {
-                        int space = containerItem.getMaxStackSize() - containerItem.getCount();
-                        int count = Math.min(stack.getCount(), space);
-                        containerItem.setCount(containerItem.getCount() + count);
-                        stack.shrink(count);
+                    }
+                    if (!container.canPlaceItem(i, stack)) {
+                        continue;
+                    }
+                    ItemStack stored = container.getItem(i);
+                    if (ItemStack.isSameItemSameComponents(stored, stack) || stored.isEmpty()) {
+                        int capacity = container.getMaxStackSize(stack);
+                        int room = capacity - stored.getCount();
+                        int toMove = Math.min(room, stack.getCount());
+                        ItemStack moved = stack.split(toMove);
+                        moved.setCount(stored.getCount() + moved.getCount());
+                        container.setItem(i, moved);
+                        container.setChanged();
                     }
                 }
             }
@@ -112,6 +118,8 @@ public class CifUtil {
         }
         if (player != null) {
             player.addItem(remain);
+        }
+        if (remain.isEmpty()) {
             return;
         }
         world.addFreshEntity(new ItemEntity(world, (double) pos.getX() + 0.5, (double) pos.getY() + 0.6, (double) pos.getZ() + 0.5, remain, 0, 0, 0));

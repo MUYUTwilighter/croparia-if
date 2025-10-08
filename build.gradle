@@ -65,8 +65,10 @@ subprojects {
             name = "ModMaven"
             url = "https://modmaven.dev"
         }
-        flatDir {
-            dir(getRootDir().toPath().resolve("flat"))
+        if (getRootDir().toPath().resolve("flat").toFile().exists()) {
+            flatDir {
+                dir(getRootDir().toPath().resolve("flat"))
+            }
         }
     }
 

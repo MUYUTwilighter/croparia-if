@@ -16,7 +16,7 @@ public interface ItemPlaceable {
      * @param owner the entity that owns the item (can be null)
      */
     default void placeItem(Level world, BlockPos pos, ItemStack stack, Entity owner) {
-        ItemStack newStack = stack.copyAndClear();
+        ItemStack newStack = stack.copyAndClear();  // Creative Player is also consuming items, this is intended
         ItemEntity entity = new ItemEntity(world, (double) pos.getX() + 0.5, (double) pos.getY() + 0.6, (double) pos.getZ() + 0.5, newStack, 0, 0, 0);
         entity.setThrower(owner);
         world.addFreshEntity(entity);
