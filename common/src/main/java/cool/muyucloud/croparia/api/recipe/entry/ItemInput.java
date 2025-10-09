@@ -180,6 +180,38 @@ public class ItemInput implements SlotDisplay {
         this.displayStacks = displayStacks.map(mapper);
     }
 
+    public long consume(Iterable<ItemStack> stacks) {
+        long remaining = this.getAmount();
+        for (ItemStack stack : stacks) {
+            if (this.matchType(stack)) {
+                long count = stack.getCount();
+                if (count >= remaining) {
+                    stack.shrink(CifUtil.toIntSafe(remaining));
+                    return 0;
+                } else {
+                    stack.setCount(0);
+                    remaining -= count;
+                }
+            }
+        }
+        return remaining;
+    }
+
+    public boolean matches(Iterable<ItemStack> stacks) {
+        long remaining = this.getAmount();
+        for (ItemStack stack : stacks) {
+            if (this.matchType(stack)) {
+                long count = stack.getCount();
+                if (count >= remaining) {
+                    return true;
+                } else {
+                    remaining -= count;
+                }
+            }
+        }
+        return false;
+    }
+
     public boolean matches(@NotNull Item item) {
         if (this.getId().isPresent()) {
             return this.getId().get().equals(item.arch$registryName());

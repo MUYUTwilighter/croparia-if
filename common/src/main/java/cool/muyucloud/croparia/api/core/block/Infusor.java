@@ -4,6 +4,7 @@ import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.item.RecipeWizard;
 import cool.muyucloud.croparia.api.core.recipe.InfusorRecipe;
 import cool.muyucloud.croparia.api.core.recipe.container.InfusorContainer;
+import cool.muyucloud.croparia.api.core.util.DropsCache;
 import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.element.item.ElementalPotion;
 import cool.muyucloud.croparia.registry.CropariaBlocks;
@@ -28,16 +29,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.entity.EntityTypeTest;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class Infusor extends Block implements ItemPlaceable {
     protected final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
@@ -54,17 +50,17 @@ public class Infusor extends Block implements ItemPlaceable {
         BlockHitResult blockHitResult
     ) {
         Item item = itemStack.getItem();
+        // Infuse if elemental potion
         if (item instanceof ElementalPotion potion && this.tryInfuse(world, pos, potion, itemStack, player)) {
-            if (world instanceof ServerLevel serverWorld) {
-                this.craft(serverWorld, pos, player);
-            }
             return InteractionResult.SUCCESS;
-        } else if (
-            ElementalPotion.fromElement(state.getValue(ELEMENT)).map(potion -> potion.getCraftingRemainder().getItem() == item).orElse(false)
-                && this.tryDefuse(world, pos, itemStack, player)
-        ) {
-            return InteractionResult.SUCCESS;
-        } else if (!(item instanceof RecipeWizard) && hand == InteractionHand.MAIN_HAND) {
+        }
+        Element element = state.getValue(ELEMENT);
+        // Defuse if using the corresponding empty bottle
+        if (ItemStack.isSameItemSameComponents(element.getPotion().get().getCraftingRemainder(), itemStack)) {
+            return this.tryDefuse(world, pos, itemStack, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+        }
+        // Place item if main hand and not using recipe wizard
+        if (!(item instanceof RecipeWizard) && hand == InteractionHand.MAIN_HAND) {
             this.placeItem(world, pos, itemStack, player);
             return InteractionResult.CONSUME;
         }
@@ -86,19 +82,6 @@ public class Infusor extends Block implements ItemPlaceable {
         ItemStack returnStack = potion.getCraftingRemainder();
         CifUtil.exportItem(world, pos, returnStack, player);
         return true;
-    }
-
-    public void craft(ServerLevel world, BlockPos pos, @Nullable Player player) {
-        Element element = world.getBlockState(pos).getValue(ELEMENT);
-        List<ItemEntity> list = world.getEntities(EntityTypeTest.forClass(ItemEntity.class),
-            AABB.of(new BoundingBox(pos)), entity -> !entity.getItem().isEmpty()
-        );
-        if (list.isEmpty()) {
-            return;
-        }
-        ItemEntity entity = list.getFirst();
-        ItemStack input = entity.getItem();
-        this.tryCraft(world, pos, input, element, player != null ? player : entity.getOwner() instanceof Player owner ? owner : null);
     }
 
     public boolean tryDefuse(Level world, BlockPos pos, ItemStack stack, @Nullable Player player) {
@@ -134,14 +117,24 @@ public class Infusor extends Block implements ItemPlaceable {
         if (!CropariaIf.CONFIG.getInfusor()) {
             return;
         }
-        InfusorContainer container = InfusorContainer.of(element, input);
+        if (DropsCache.isTickQueried(world, pos)) return;
+        if (element == Element.EMPTY || input.isEmpty()) {
+            return;
+        }
+        InfusorContainer container = InfusorContainer.of(element, DropsCache.queryStacks(world, pos));
         Recipes.INFUSOR.find(container, world).ifPresent(
             recipe -> onCrafting(recipe, container, world, pos, player)
         );
     }
 
     @Override
-    public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        super.onRemove(state, level, pos, newState, movedByPiston);
+        DropsCache.remove(level, pos);
+    }
+
+    @Override
+    public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {    // Each entity step on the block will trigger crafting
         if (entity instanceof ItemEntity itemEntity && world instanceof ServerLevel serverWorld && CropariaIf.CONFIG.getInfusor()) {
             ItemStack input = itemEntity.getItem();
             Element element = state.getValue(ELEMENT);

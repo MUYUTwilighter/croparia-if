@@ -38,17 +38,17 @@ public class CropariaBlocks {
     ));
     public static final RegistrySupplier<RitualStand> RITUAL_STAND = registerBlock(
         "ritual_stand", properties -> new RitualStand(
-            1, properties.strength(1.0F, 1.0F).sound(SoundType.ANVIL).requiresCorrectToolForDrops()
+            properties.strength(1.0F, 1.0F).sound(SoundType.ANVIL).requiresCorrectToolForDrops()
         )
     );
     public static final RegistrySupplier<RitualStand> RITUAL_STAND_2 = registerBlock(
         "ritual_stand_2", properties -> new RitualStand(
-            2, properties.strength(1.0F, 1.0F).sound(SoundType.ANVIL).requiresCorrectToolForDrops()
+            properties.strength(1.0F, 1.0F).sound(SoundType.ANVIL).requiresCorrectToolForDrops()
         )
     );
     public static final RegistrySupplier<RitualStand> RITUAL_STAND_3 = registerBlock(
         "ritual_stand_3", properties -> new RitualStand(
-            3, properties.strength(1.0F, 1.0F).sound(SoundType.ANVIL).requiresCorrectToolForDrops()
+            properties.strength(1.0F, 1.0F).sound(SoundType.ANVIL).requiresCorrectToolForDrops()
         )
     );
     public static final RegistrySupplier<Block> ELEMENTAL_STONE = registerBlock(

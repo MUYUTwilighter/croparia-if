@@ -76,14 +76,12 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     }
 
     public boolean matches(InfusorContainer container) {
-        ItemStack input = container.getItem(0);
-        return getIngredient().matches(input) && container.getElement() == getElement();
+        return container.getElement() == getElement() && getIngredient().matches(container);
     }
 
     public @NotNull ItemStack assemble(@NotNull InfusorContainer container) {
         if (matches(container)) {
-            ItemStack input = container.getItem(0);
-            input.shrink((int) getIngredient().getAmount());
+            this.getIngredient().consume(container);
             return getResult().createStack();
         } else {
             return ItemStack.EMPTY;

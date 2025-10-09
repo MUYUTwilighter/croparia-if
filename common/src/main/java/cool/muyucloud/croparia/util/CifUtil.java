@@ -136,4 +136,10 @@ public class CifUtil {
         if (value > Integer.MAX_VALUE) return Integer.MAX_VALUE;
         return (int) value;
     }
+
+    public static int toIntSafe(float value) {
+        if (value < Integer.MIN_VALUE) return Integer.MIN_VALUE;
+        if (value > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        return (int) value;
+    }
 }

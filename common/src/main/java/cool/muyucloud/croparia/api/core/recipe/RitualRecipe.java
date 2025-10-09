@@ -152,16 +152,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
             }) && matcher.matched().getStates().stream().allMatch(state -> this.getBlock().matches(state));
         }
         // Handle common case
-        long accumulated = 0;
-        for (ItemStack stack : matcher.stacks()) {
-            if (this.getIngredient().matchType(stack)) {
-                accumulated += stack.getCount();
-            }
-            if (accumulated >= this.getIngredient().getAmount()) {
-                return matcher.matched().getStates().stream().allMatch(state -> this.getBlock().matches(state));
-            }
-        }
-        return false;
+        return this.getIngredient().matches(matcher) && matcher.matched().getStates().stream().allMatch(state -> this.getBlock().matches(state));
     }
 
     @Override

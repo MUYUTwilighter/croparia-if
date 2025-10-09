@@ -4,6 +4,7 @@ import cool.muyucloud.croparia.api.repo.Repo;
 import cool.muyucloud.croparia.api.repo.RepoProxy;
 import cool.muyucloud.croparia.api.resource.neoforge.ForgeFluidSpec;
 import cool.muyucloud.croparia.api.resource.type.FluidSpec;
+import cool.muyucloud.croparia.util.CifUtil;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
@@ -40,9 +41,9 @@ public class FluidRepoProxy extends RepoProxy<FluidSpec> implements IFluidHandle
     public int fill(@NotNull FluidStack input, FluidAction fluidAction) {
         FluidSpec fluid = ForgeFluidSpec.from(input);
         if (fluidAction.simulate()) {
-            return (int) (this.simAccept(fluid, input.getAmount() * 81L) / 81);
+            return CifUtil.toIntSafe(this.simAccept(fluid, input.getAmount() * 81L) / 81);
         } else if (fluidAction.execute()) {
-            return (int) (this.accept(fluid, input.getAmount() * 81L) / 81L);
+            return CifUtil.toIntSafe(this.accept(fluid, input.getAmount() * 81L) / 81);
         } else {
             return 0;
         }

@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.repo;
 
 import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
+import cool.muyucloud.croparia.util.CifUtil;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -43,9 +44,9 @@ public record ContainerRepo(@NotNull Container container) implements Repo<ItemSp
         if (!resource.is(stack)) {
             return 0;
         }
-        long stored = stack.getCount();
-        long consumed = Math.min(amount, stored);
-        stack.shrink((int) consumed);
+        int stored = stack.getCount();
+        int consumed = CifUtil.toIntSafe(Math.min(amount, stored));
+        stack.shrink(consumed);
         this.container().setItem(i, stack);
         return consumed;
     }

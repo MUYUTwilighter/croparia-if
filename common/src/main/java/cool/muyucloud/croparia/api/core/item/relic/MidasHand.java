@@ -1,5 +1,6 @@
 package cool.muyucloud.croparia.api.core.item.relic;
 
+import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.PostConstants;
 import cool.muyucloud.croparia.util.text.Texts;
@@ -38,7 +39,7 @@ public class MidasHand extends Item {
                 return InteractionResult.FAIL;
             }
             player.giveExperiencePoints(-10);
-            player.getCooldowns().addCooldown(context.getItemInHand(), (int) block.getBlock().defaultDestroyTime());
+            player.getCooldowns().addCooldown(context.getItemInHand(), CifUtil.toIntSafe(block.getBlock().defaultDestroyTime()));
             world.destroyBlock(pos, false);
             world.addFreshEntity(new ItemEntity(world, (double) pos.getX() + 0.5, pos.getY(), (double) pos.getZ() + 0.5, new ItemStack(Items.GOLD_INGOT)));
             return InteractionResult.SUCCESS;
@@ -52,10 +53,10 @@ public class MidasHand extends Item {
             int xpConsume;
             int cooldown;
             if (entity instanceof Enemy) {
-                xpConsume = (int) (entity.getHealth() * 2);
+                xpConsume = CifUtil.toIntSafe(entity.getHealth() * 2);
                 cooldown = 400;
             } else {
-                xpConsume = (int) (entity.getHealth());
+                xpConsume = CifUtil.toIntSafe(entity.getHealth());
                 cooldown = 200;
             }
             if (player.totalExperience < xpConsume) {

@@ -1,34 +1,23 @@
 package cool.muyucloud.croparia.api.core.recipe.container;
 
 import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 public record RitualContainer(BlockState ritual, @NotNull List<ItemStack> stacks,
-                              @NotNull RitualStructure.Result matched) implements RecipeInput {
-    public static RitualContainer of(BlockState ritual, @NotNull Collection<ItemEntity> items, @NotNull RitualStructure.Result matched) {
-        return new RitualContainer(ritual, items.stream().map(ItemEntity::getItem).toList(), matched);
-    }
-
-    public static RitualContainer of(Level level, BlockPos pos, @NotNull RitualStructure.Result matched) {
-        return new RitualContainer(level.getBlockState(pos), level.getEntitiesOfClass(
-            ItemEntity.class, new AABB(pos),
-            entity -> !entity.getItem().isEmpty()
-        ).stream().map(ItemEntity::getItem).toList(), matched);
+                              @NotNull RitualStructure.Result matched) implements RecipeInput, Iterable<ItemStack> {
+    public static RitualContainer of(BlockState ritual, @NotNull List<ItemStack> items, @NotNull RitualStructure.Result matched) {
+        return new RitualContainer(ritual, items, matched);
     }
 
     @Override
     public boolean isEmpty() {
-        return stacks.isEmpty() || stacks.stream().allMatch(ItemStack::isEmpty) || matched == RitualStructure.Result.FAIL;
+        return stacks.isEmpty() || matched == RitualStructure.Result.FAIL || stacks.stream().allMatch(ItemStack::isEmpty);
     }
 
     @Override
@@ -39,5 +28,10 @@ public record RitualContainer(BlockState ritual, @NotNull List<ItemStack> stacks
     @Override
     public int size() {
         return stacks.size();
+    }
+
+    @Override
+    public @NotNull Iterator<ItemStack> iterator() {
+        return this.stacks.iterator();
     }
 }
