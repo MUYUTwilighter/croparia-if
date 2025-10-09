@@ -59,6 +59,10 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
         return required - amount;
     }
 
+    default long simConsume(int i, long amount) {
+        return this.simConsume(i, this.resourceFor(i), amount);
+    }
+
     /**
      * Simulates consuming the specified amount of resource from the specified resource storage unit.
      *
@@ -84,6 +88,10 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
         return required - amount;
     }
 
+    default long consume(int i, long amount) {
+        return this.consume(i, this.resourceFor(i), amount);
+    }
+
     /**
      * Consumes the specified amount of resource from the specified resource storage unit.
      *
@@ -93,6 +101,7 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
      * @return The amount actually consumed
      */
     long consume(int i, T resource, long amount);
+
 
     /**
      * Simulates accepting the specified amount of resource into the total storage.

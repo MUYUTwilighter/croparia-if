@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.api.repo.neoforge;
 import cool.muyucloud.croparia.api.repo.Repo;
 import cool.muyucloud.croparia.api.repo.platform.PlatformItemProxy;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
+import cool.muyucloud.croparia.util.CifUtil;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 
@@ -43,7 +44,7 @@ public class PlatformItemProxyImpl implements PlatformItemProxy {
     public long simConsume(int i, ItemSpec item, long amount) {
         ItemStack stored = this.get().getStackInSlot(i);
         if (item.is(stored)) {
-            return this.get().extractItem(i, (int) Math.min(amount, stored.getCount()), true).getCount();
+            return this.get().extractItem(i, CifUtil.toIntSafe(Math.min(amount, stored.getCount())), true).getCount();
         } else {
             return 0;
         }
@@ -53,7 +54,7 @@ public class PlatformItemProxyImpl implements PlatformItemProxy {
     public long consume(int i, ItemSpec item, long amount) {
         ItemStack stored = this.get().getStackInSlot(i);
         if (item.is(stored)) {
-            return this.get().extractItem(i, (int) Math.min(amount, stored.getCount()), false).getCount();
+            return this.get().extractItem(i, CifUtil.toIntSafe(Math.min(amount, stored.getCount())), false).getCount();
         } else {
             return 0;
         }

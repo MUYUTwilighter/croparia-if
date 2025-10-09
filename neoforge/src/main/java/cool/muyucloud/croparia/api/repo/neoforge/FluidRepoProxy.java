@@ -27,7 +27,7 @@ public class FluidRepoProxy extends RepoProxy<FluidSpec> implements IFluidHandle
 
     @Override
     public int getTankCapacity(int i) {
-        return (int) (this.capacityFor(i, this.resourceFor(i)) / 81L);
+        return CifUtil.toIntSafe(this.capacityFor(i) / 81L);
     }
 
     @Override

@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.api.repo.neoforge;
 import cool.muyucloud.croparia.api.repo.Repo;
 import cool.muyucloud.croparia.api.repo.RepoProxy;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
+import cool.muyucloud.croparia.util.CifUtil;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ public class ItemRepoProxy extends RepoProxy<ItemSpec> implements IItemHandler {
             accepted = this.accept(i, ItemSpec.of(input), input.getCount());
         }
         input = input.copy();
-        input.shrink((int) accepted);
+        input.shrink(CifUtil.toIntSafe(accepted));
         return input;
     }
 
@@ -41,18 +42,17 @@ public class ItemRepoProxy extends RepoProxy<ItemSpec> implements IItemHandler {
         ItemStack result = item.createStack();
         long consumed;
         if (simulate) {
-            consumed = this.simConsume(i, item, amount);
+            consumed = this.simConsume(i, amount);
         } else {
-            consumed = this.consume(i, item, amount);
+            consumed = this.consume(i, amount);
         }
-        result.setCount((int) consumed);
+        result.setCount(CifUtil.toIntSafe(consumed));
         return result;
     }
 
     @Override
     public int getSlotLimit(int i) {
-        ItemSpec item = this.resourceFor(i);
-        return (int) this.capacityFor(i, item);
+        return CifUtil.toIntSafe(this.capacityFor(i));
     }
 
     @Override

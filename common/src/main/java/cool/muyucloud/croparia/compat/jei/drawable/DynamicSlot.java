@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.compat.jei.drawable;
 import cool.muyucloud.croparia.compat.jei.category.JeiCategory;
 import cool.muyucloud.croparia.compat.jei.util.MouseKeyHandler;
 import cool.muyucloud.croparia.compat.jei.util.MouseMoveHandler;
+import cool.muyucloud.croparia.util.CifUtil;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.common.Internal;
@@ -50,7 +51,7 @@ public class DynamicSlot extends AbstractInputManager<DynamicSlot> {
             double mouseX = mouseX();
             double mouseY = mouseY();
             if (0 < mouseX && mouseX < this.getWidth() && 0 < mouseY && mouseY < this.getHeight()) {
-                guiGraphics.renderTooltip(Minecraft.getInstance().font, this.getCurrentStack(), (int) parentMouseX(), (int) parentMouseY());
+                guiGraphics.renderTooltip(Minecraft.getInstance().font, this.getCurrentStack(), CifUtil.toIntSafe(parentMouseX()), CifUtil.toIntSafe(parentMouseY()));
             }
         };
     }
@@ -59,7 +60,7 @@ public class DynamicSlot extends AbstractInputManager<DynamicSlot> {
         List<ItemStack> items = this.stacks.apply(this);
         if (items.isEmpty()) return ItemStack.EMPTY;
         else if (items.size() == 1) return items.getFirst();
-        else return items.get((int) (System.currentTimeMillis() / 1000) % items.size());
+        else return items.get(CifUtil.toIntSafe((System.currentTimeMillis() / 1000) % items.size()));
     }
 
     public DrawableIngredient<ItemStack> getCurrentIngredient() {

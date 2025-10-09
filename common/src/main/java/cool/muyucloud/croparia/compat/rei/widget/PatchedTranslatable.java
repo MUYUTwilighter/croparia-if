@@ -1,6 +1,7 @@
 package cool.muyucloud.croparia.compat.rei.widget;
 
 import com.mojang.math.Transformation;
+import cool.muyucloud.croparia.util.CifUtil;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.widgets.DelegateWidget;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
@@ -36,7 +37,7 @@ public class PatchedTranslatable extends DelegateWidget {
         graphics.pose().pushPose();
         graphics.pose().last().pose().mul(translate());
         Vector4f mouse = transformMouse(mouseX, mouseY);
-        super.render(graphics, (int) mouse.x(), (int) mouse.y(), delta);
+        super.render(graphics, CifUtil.toIntSafe(mouse.x()), CifUtil.toIntSafe(mouse.y()), delta);
         graphics.pose().popPose();
     }
 
