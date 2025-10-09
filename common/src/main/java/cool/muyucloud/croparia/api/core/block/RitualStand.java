@@ -56,7 +56,10 @@ public class RitualStand extends Block implements ItemPlaceable {
     @Override
     public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
         if (entity instanceof ItemEntity itemEntity && CropariaIf.CONFIG.getRitual() && world instanceof ServerLevel level) {
-            if (DropsCache.isQueried(world, pos, CRAFT_INTERVAL)) return;
+            if (DropsCache.isQueried(world, pos, CRAFT_INTERVAL)) {
+                DropsCache.mark(level, pos);
+                return;
+            }
             Recipes.RITUAL_STRUCTURE.find(new RitualStructureContainer(level.getBlockState(pos)), level).map(
                 structure -> structure.validate(pos, level)
             ).ifPresentOrElse(
@@ -87,8 +90,10 @@ public class RitualStand extends Block implements ItemPlaceable {
         DropsCache.remove(level, pos);
     }
 
-    protected void tryTell(ItemEntity item, Component msg) {
-        if (item.getOwner() instanceof Player player) Texts.overlay(player, msg);
+    protected void tryTell(ItemEntity drop, Component msg) {
+        if (drop.getOwner() instanceof Player player && drop.position().distanceTo(player.position()) < 10) {
+            Texts.overlay(player, msg);
+        }
     }
 
     protected void playSound(@NotNull ServerLevel level, @NotNull BlockPos pos) {

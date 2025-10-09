@@ -37,6 +37,11 @@ public class DropsCache {
         return currentTime - lastQuery < tickTime;
     }
 
+    public static void mark(Level level, BlockPos pos) {
+        TargetPos key = new TargetPos(level, pos);
+        CACHE.put(key, System.currentTimeMillis());
+    }
+
     public static List<ItemEntity> query(Level level, BlockPos pos) {
         TargetPos key = new TargetPos(level, pos);
         CACHE.put(key, System.currentTimeMillis());
