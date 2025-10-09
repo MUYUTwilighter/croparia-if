@@ -85,7 +85,7 @@ public class RitualStand extends Block implements ItemPlaceable {
                     RitualContainer matcher = RitualContainer.of(level.getBlockState(pos), cachedItems, matched);
                     Recipes.RITUAL.find(matcher, level).ifPresentOrElse(ritual -> {
                         ItemStack result = ritual.assemble(matcher);
-                        if (result.getItem() instanceof SpawnEggItem) {
+                        if (result.getItem() instanceof SpawnEggItem) { // Use all spawn eggs at once
                             List<ItemStack> remainders = FakePlayer.useAllItemsOn(level, pos.above(), result);
                             for (ItemStack remainder : remainders) {
                                 if (!remainder.isEmpty()) {

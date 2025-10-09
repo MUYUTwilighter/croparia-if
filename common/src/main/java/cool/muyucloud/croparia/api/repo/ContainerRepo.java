@@ -52,6 +52,10 @@ public record ContainerRepo(@NotNull Container container) implements Repo<ItemSp
 
     @Override
     public long simAccept(int i, ItemSpec resource, long amount) {
+        // Ensure the amount does not exceed the slot's capacity
+        long capacity = this.capacityFor(i, resource);
+        long room = capacity - this.amountFor(i);
+        amount = Math.min(amount, room);
         if (!this.container().canPlaceItem(i, resource.createStack(amount))) {
             return 0;
         }
@@ -66,6 +70,10 @@ public record ContainerRepo(@NotNull Container container) implements Repo<ItemSp
 
     @Override
     public long accept(int i, ItemSpec resource, long amount) {
+        // Ensure the amount does not exceed the slot's capacity
+        long capacity = this.capacityFor(i, resource);
+        long room = capacity - this.amountFor(i);
+        amount = Math.min(amount, room);
         if (!this.container().canPlaceItem(i, resource.createStack(amount))) {
             return 0;
         }
