@@ -90,6 +90,7 @@ public class CifUtil {
                     if (ItemStack.isSameItemSameComponents(stored, stack) || stored.isEmpty()) {
                         int capacity = container.getMaxStackSize(stack);
                         int room = capacity - stored.getCount();
+                        if (room == 0) continue;
                         int toMove = Math.min(room, stack.getCount());
                         ItemStack moved = stack.split(toMove);
                         moved.setCount(stored.getCount() + moved.getCount());
