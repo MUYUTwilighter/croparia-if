@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Fake players used for block/item interactions. They will only try to use items top of the target block.
+ */
 public class FakePlayer extends Player {
     private static final Map<ServerLevel, FakePlayer> FAKE_PLAYERS = new HashMap<>();
     private static final int MAX_USES = 64;

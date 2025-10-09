@@ -29,15 +29,13 @@ public record TypeToken<T extends TypedResource<?>>(@NotNull ResourceLocation id
     }, TypeToken::id);
 
     private static final Map<ResourceLocation, TypeToken<?>> REGISTRY_BY_ID = new HashMap<>();
-    private static final Map<Object, TypeToken<?>> REGISTRY_BY_TOKEN = new HashMap<>();
 
     public static <T extends TypedResource<?>> Optional<TypeToken<T>> register(ResourceLocation id, T empty, MapCodec<T> codec) {
-        if (REGISTRY_BY_ID.containsKey(id) || REGISTRY_BY_TOKEN.containsKey(empty)) {
+        if (REGISTRY_BY_ID.containsKey(id)) {
             return Optional.empty();
         }
         TypeToken<T> type = new TypeToken<>(id, empty, codec);
         REGISTRY_BY_ID.put(id, type);
-        REGISTRY_BY_TOKEN.put(empty, type);
         return Optional.of(type);
     }
 
@@ -50,16 +48,6 @@ public record TypeToken<T extends TypedResource<?>>(@NotNull ResourceLocation id
         TypeToken<?> type = REGISTRY_BY_ID.get(id);
         try {
             return Optional.ofNullable((TypeToken<T>) type);
-        } catch (ClassCastException e) {
-            return Optional.empty();
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T extends TypedResource<?>> Optional<TypeToken<T>> get(T token) {
-        TypeToken<?> type = REGISTRY_BY_TOKEN.get(token);
-        try {
-            return Optional.of((TypeToken<T>) type);
         } catch (ClassCastException e) {
             return Optional.empty();
         }
