@@ -88,18 +88,14 @@ public class Char2D implements Iterable<char[]> {
     }
 
     public char get(int x, int z) {
+        if (x < 0 || x >= xSize() || z < 0 || z >= zSize()) {
+            throw new IndexOutOfBoundsException("Index out of bounds: " + x + ", " + z + " for size " + xSize() + "x" + zSize());
+        }
         return chars[z][x];
     }
 
     public boolean contains(char c) {
-        for (char[] col : this) {
-            for (char character : col) {
-                if (character == c) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return counts.getOrDefault(c, 0) > 0;
     }
 
     public int count(char c) {
