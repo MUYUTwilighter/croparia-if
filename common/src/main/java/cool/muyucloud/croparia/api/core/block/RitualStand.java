@@ -56,10 +56,8 @@ public class RitualStand extends Block implements ItemPlaceable {
     @Override
     public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {
         if (entity instanceof ItemEntity itemEntity && CropariaIf.CONFIG.getRitual() && world instanceof ServerLevel level) {
-            if (DropsCache.isQueried(world, pos, CRAFT_INTERVAL)) {
-                DropsCache.mark(level, pos);
-                return;
-            }
+            if (DropsCache.isQueried(world, pos, CRAFT_INTERVAL)) return;
+            DropsCache.mark(level, pos);
             Recipes.RITUAL_STRUCTURE.find(new RitualStructureContainer(level.getBlockState(pos)), level).map(
                 structure -> structure.validate(pos, level)
             ).ifPresentOrElse(
