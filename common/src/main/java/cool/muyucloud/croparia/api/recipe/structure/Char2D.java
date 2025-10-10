@@ -37,8 +37,21 @@ public class Char2D implements Iterable<char[]> {
         this.hash = LazySupplier.of(() -> Arrays.deepHashCode(chars));
     }
 
-    public Char2D(int maxX, int maxZ) {
-        this.chars = new char[maxZ][maxX];
+    public Char2D(char[][] chars) {
+        if (chars.length == 0) {
+            throw new IllegalArgumentException("Empty surface");
+        } else {
+            int cols = chars[0].length;
+            for (char[] row : chars) {
+                if (row.length != cols) {
+                    throw new IllegalArgumentException("Varying length: " + Arrays.deepToString(chars));
+                }
+                for (char c : row) {
+                    this.counts.compute(c, (character, integer) -> integer == null ? 1 : integer + 1);
+                }
+            }
+            this.chars = chars;
+        }
         this.hash = LazySupplier.of(() -> Arrays.deepHashCode(chars));
     }
 
@@ -55,23 +68,23 @@ public class Char2D implements Iterable<char[]> {
     }
 
     public Char2D rotate() {
-        Char2D rotated = new Char2D(xSize(), zSize());
+        char[][] rotated = new char[xSize()][zSize()];
         for (int z = 0; z < zSize(); z++) {
             for (int x = 0; x < xSize(); x++) {
-                rotated.chars[x][zSize() - z - 1] = chars[z][x];
+                rotated[x][zSize() - z - 1] = chars[z][x];
             }
         }
-        return rotated;
+        return new Char2D(rotated);
     }
 
     public Char2D mirror() {
-        Char2D mirrored = new Char2D(zSize(), xSize());
+        char[][] mirrored = new char[zSize()][xSize()];
         for (int z = 0; z < zSize(); z++) {
             for (int x = 0; x < xSize(); x++) {
-                mirrored.chars[z][xSize() - x - 1] = chars[z][x];
+                mirrored[z][xSize() - x - 1] = chars[z][x];
             }
         }
-        return mirrored;
+        return new Char2D(mirrored);
     }
 
     public char get(int x, int z) {
