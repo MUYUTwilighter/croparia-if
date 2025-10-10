@@ -33,10 +33,10 @@ public class PlatformItemProxyImpl implements PlatformItemProxy {
 
     @Nullable
     public StorageView<ItemVariant> get(int i) {
-        int v = 0;
+        int v = -1;
         Iterator<StorageView<ItemVariant>> iterator = this.storage.iterator();
         StorageView<ItemVariant> view = null;
-        while (iterator.hasNext() && i >= v) {
+        while (iterator.hasNext() && i > v) {
             v++;
             view = iterator.next();
         }

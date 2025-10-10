@@ -33,10 +33,10 @@ public class PlatformFluidProxyImpl implements PlatformFluidProxy {
 
     @Nullable
     public StorageView<FluidVariant> get(int i) {
-        int v = 0;
+        int v = -1;
         Iterator<StorageView<FluidVariant>> iterator = this.storage.iterator();
         StorageView<FluidVariant> view = null;
-        while (iterator.hasNext() && i >= v) {
+        while (iterator.hasNext() && i > v) {
             v++;
             view = iterator.next();
         }
