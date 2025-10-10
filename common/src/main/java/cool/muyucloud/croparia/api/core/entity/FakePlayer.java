@@ -59,6 +59,7 @@ public class FakePlayer extends Player {
 
     public FakePlayer(@NotNull Level level) {
         super(level, BlockPos.ZERO, 0, new GameProfile(UUID.randomUUID(), "FakePlayer"));
+        this.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), 90);
         CropariaIf.LOGGER.debug("Created fake player for {}", level.dimension().location());
     }
 

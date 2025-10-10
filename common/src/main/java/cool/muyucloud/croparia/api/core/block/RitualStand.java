@@ -66,7 +66,7 @@ public class RitualStand extends Block implements ItemPlaceable {
                     Recipes.RITUAL.find(matcher, level).ifPresentOrElse(ritual -> {
                         ItemStack result = ritual.assemble(matcher);
                         if (result.getItem() instanceof SpawnEggItem) { // Use all spawn eggs at once
-                            List<ItemStack> remainders = FakePlayer.useAllItemsOn(level, pos.above(), result);
+                            List<ItemStack> remainders = FakePlayer.useAllItemsOn(level, pos, result);
                             for (ItemStack remainder : remainders) {
                                 if (!remainder.isEmpty()) {
                                     CifUtil.exportItem(level, pos, remainder, itemEntity.getOwner() instanceof Player player ? player : null);
