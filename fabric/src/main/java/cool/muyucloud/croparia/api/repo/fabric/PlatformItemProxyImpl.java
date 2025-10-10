@@ -36,7 +36,7 @@ public class PlatformItemProxyImpl implements PlatformItemProxy {
         int v = 0;
         Iterator<StorageView<ItemVariant>> iterator = this.storage.iterator();
         StorageView<ItemVariant> view = null;
-        while (iterator.hasNext() && i > v) {
+        while (iterator.hasNext() && i >= v) {
             v++;
             view = iterator.next();
         }

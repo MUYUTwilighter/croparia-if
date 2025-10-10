@@ -36,7 +36,7 @@ public class PlatformFluidProxyImpl implements PlatformFluidProxy {
         int v = 0;
         Iterator<StorageView<FluidVariant>> iterator = this.storage.iterator();
         StorageView<FluidVariant> view = null;
-        while (iterator.hasNext() && i > v) {
+        while (iterator.hasNext() && i >= v) {
             v++;
             view = iterator.next();
         }
