@@ -159,6 +159,7 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
      * @param i        The index of the resource storage unit to check
      * @param resource The resource to check
      * @return The capacity for the specified resource
+     * @apiNote This is not the room left, but the total capacity for the specified resource.
      */
     long capacityFor(int i, T resource);
 
@@ -167,6 +168,7 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
      *
      * @param resource The resource to check
      * @return The total capacity for the specified resource
+     * @apiNote This is not the room left, but the total capacity for the specified resource.
      */
     default long capacityFor(T resource) {
         long amount = 0;
