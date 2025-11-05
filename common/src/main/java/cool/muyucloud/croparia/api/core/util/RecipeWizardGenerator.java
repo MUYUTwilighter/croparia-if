@@ -70,7 +70,7 @@ public class RecipeWizardGenerator {
                     return Optional.empty();
                 }
             }
-            return CodecUtil.decodeJson(json, CODEC).mapOrElse(Optional::of, error -> {
+            return CodecUtil.decodeJson(json, CODEC.codec()).mapOrElse(Optional::of, error -> {
                 CropariaIf.LOGGER.error("Failed to compile recipe wizard file %s".formatted(file), error);
                 return Optional.empty();
             });

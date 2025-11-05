@@ -1,8 +1,0 @@
-@iterable=croparia:elements;
-@path=c/tags/item/{gem_path}.json
-{
-  "replace": false,
-  "values": [
-    "{gem}"
-  ]
-}

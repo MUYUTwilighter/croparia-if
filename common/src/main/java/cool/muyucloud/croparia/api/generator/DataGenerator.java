@@ -76,7 +76,7 @@ public class DataGenerator implements DgListener {
                 LOGGER.error("Unknown data generator type {} in file {}", type, file);
                 return Optional.empty();
             }
-            return CodecUtil.decodeJson(json, codec).mapOrElse(Optional::of, err -> {
+            return CodecUtil.decodeJson(json, codec.codec()).mapOrElse(Optional::of, err -> {
                 LOGGER.error("Failed to parse data generator {}: {}", file, err.message());
                 return Optional.empty();
             });

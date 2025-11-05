@@ -284,24 +284,18 @@ public class CodecUtil {
         return StreamCodec.of((buf, inst) -> buf.writeJsonWithCodec(codec, inst), buf -> buf.readJsonWithCodec(codec));
     }
 
-    public static <B extends FriendlyByteBuf, T> StreamCodec<B, T> toStream(MapCodec<T> codec) {
-        return toStream(codec.codec());
-    }
-
     public static <T> Optional<RegistryOps<T>> getRegistryOps(DynamicOps<T> ops) {
         return CropariaIf.getRegistryAccess().map(access -> RegistryOps.create(ops, access));
     }
 
     public static <T> DynamicOps<T> getOps(DynamicOps<T> ops) {
-        return getRegistryOps(ops).map(o -> (DynamicOps<T>) o).orElse(ops);
+        Optional<RegistryOps<T>> mayOps = getRegistryOps(ops);
+        if (mayOps.isEmpty()) return ops;
+        else return mayOps.get();
     }
 
     public static <T> DataResult<JsonElement> encodeJson(T object, Codec<T> codec) {
         return codec.encodeStart(getOps(JsonOps.INSTANCE), object);
-    }
-
-    public static <T> DataResult<JsonElement> encodeJson(T object, MapCodec<T> codec) {
-        return encodeJson(object, codec.codec());
     }
 
     public static <T> DataResult<JsonElement> dumpJson(T object, Codec<T> codec, Path path, boolean override) throws IOException {
@@ -312,16 +306,8 @@ public class CodecUtil {
         return result;
     }
 
-    public static <T> DataResult<JsonElement> dumpJson(T object, MapCodec<T> codec, Path path, boolean override) throws IOException, IllegalStateException {
-        return dumpJson(object, codec.codec(), path, override);
-    }
-
     public static <T> DataResult<T> decodeJson(JsonElement element, Codec<T> codec) {
         return codec.decode(getOps(JsonOps.INSTANCE), element).map(Pair::getFirst);
-    }
-
-    public static <T> DataResult<T> decodeJson(JsonElement element, MapCodec<T> codec) {
-        return decodeJson(element, codec.codec());
     }
 
     public static <T> DataResult<T> readJson(File file, Codec<T> codec) throws IOException {
