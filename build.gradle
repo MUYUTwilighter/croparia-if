@@ -127,7 +127,7 @@ def findTaskPath = { String projPath, String taskName ->
     return t != null ? "${projPath}:${taskName}" : null
 }
 
-tasks.register("publishAll") {
+tasks.register("publishMod") {
     group = "publishing"
     description = "Publishes all platforms to their configured services (Modrinth, CurseForge, etc)."
 
