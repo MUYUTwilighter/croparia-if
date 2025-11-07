@@ -6,12 +6,12 @@ import cool.muyucloud.croparia.config.Config;
 import cool.muyucloud.croparia.config.ConfigFileHandler;
 import cool.muyucloud.croparia.registry.*;
 import cool.muyucloud.croparia.util.Ref;
-import cool.muyucloud.croparia.util.SidedRef;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
+import dev.architectury.utils.Env;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.RegistryAccess;
@@ -32,7 +32,7 @@ public class CropariaIf {
 
     public static void init() {
         OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
-        CropariaIf.LOGGER.info("=== Croparia common setup ===");
+        CropariaIf.LOGGER.info("=== Croparia common setup on %s ===".formatted(Platform.getEnvironment()));
         LOGGER.info("Croparia IF customize registration");
         DgRegistries.register();
         DataGenerators.register();
@@ -62,7 +62,7 @@ public class CropariaIf {
             }
             if (INSTANCE.getVersion().contains("a") || INSTANCE.getVersion().contains("alpha")) {
                 server.getPlayerList().getPlayers().forEach(player -> player.sendSystemMessage(Texts.translatable(
-                    "chat.croparia.alpha_warning", Texts.literal(INSTANCE.getIssueTracker().orElse(""))
+                        "chat.croparia.alpha_warning", Texts.literal(INSTANCE.getIssueTracker().orElse(""))
                 ).withStyle(style -> style.withColor(0xFF5555).withBold(true))));
             }
         });
@@ -78,8 +78,38 @@ public class CropariaIf {
         return Optional.ofNullable(SERVER);
     }
 
+    /**
+     * Executes the given consumer if the server instance is available,
+     * otherwise executes the provided runnable.
+     */
+    public static void ifServerOrElse(Consumer<MinecraftServer> consumer, Runnable orElse) {
+        if (SERVER != null) consumer.accept(SERVER);
+        else orElse.run();
+    }
+
+    public static void ifServerOrClient(Consumer<MinecraftServer> serverConsumer, Consumer<Ref<Minecraft>> clientConsumer) {
+        if (SERVER != null) serverConsumer.accept(SERVER);
+        else if (Platform.getEnvironment() == Env.CLIENT) {
+            clientConsumer.accept(Ref.of(Minecraft.getInstance()));
+        }
+    }
+
     public static void ifServer(Consumer<MinecraftServer> consumer) {
         if (SERVER != null) consumer.accept(SERVER);
+    }
+
+    public static void ifClientOrElse(Consumer<Ref<Minecraft>> consumer, Consumer<Optional<MinecraftServer>> orElse) {
+        if (Platform.getEnvironment() == Env.CLIENT) {
+            consumer.accept(Ref.of(Minecraft.getInstance()));
+        } else {
+            orElse.accept(Optional.ofNullable(SERVER));
+        }
+    }
+
+    public static void ifClient(Consumer<Ref<Minecraft>> consumer) {
+        if (Platform.getEnvironment() == Env.CLIENT) {
+            consumer.accept(Ref.of(Minecraft.getInstance()));
+        }
     }
 
     public static ResourceLocation of(String path) {
@@ -97,8 +127,8 @@ public class CropariaIf {
 
     public static Optional<RegistryAccess> getRegistryAccess() {
         Ref<RegistryAccess> accessRef = new Ref<>();
-        SidedRef.ifServerOrElse(() -> CropariaIf.ifServer(server -> accessRef.set(server.registryAccess())), () -> {
-            ClientLevel level = Minecraft.getInstance().level;
+        CropariaIf.ifServerOrClient(server -> accessRef.set(server.registryAccess()), ref -> {
+            ClientLevel level = ref.get().level;
             if (level != null) {
                 accessRef.set(level.registryAccess());
             }

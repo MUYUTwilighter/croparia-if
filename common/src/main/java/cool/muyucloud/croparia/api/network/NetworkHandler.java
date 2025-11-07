@@ -1,7 +1,6 @@
 package cool.muyucloud.croparia.api.network;
 
 import cool.muyucloud.croparia.CropariaIf;
-import cool.muyucloud.croparia.util.SidedRef;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,9 +13,9 @@ public interface NetworkHandler extends CustomPacketPayload {
     }
 
     default void send() {
-        SidedRef.ifServerOrElse(() -> {
+        CropariaIf.ifServerOrElse(server -> {
             if (this.handlerType().side() == NetworkManager.Side.S2C) {
-                CropariaIf.ifServer(server -> NetworkManager.sendToPlayers(server.getPlayerList().getPlayers(), this));
+                NetworkManager.sendToPlayers(server.getPlayerList().getPlayers(), this);
             }
         }, () -> {
             if (this.handlerType().side() == NetworkManager.Side.C2S) {

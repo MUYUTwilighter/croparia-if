@@ -135,9 +135,13 @@ public class Infusor extends Block implements ItemPlaceable {
 
     @Override
     public void stepOn(Level world, BlockPos pos, BlockState state, Entity entity) {    // Each entity step on the block will trigger crafting
+        System.out.println("Infusor triggered by item entity: " + entity);
         if (entity instanceof ItemEntity itemEntity && world instanceof ServerLevel serverWorld && CropariaIf.CONFIG.getInfusor()) {
             ItemStack input = itemEntity.getItem();
             Element element = state.getValue(ELEMENT);
+            if (element == Element.EMPTY || input.isEmpty()) {
+                return;
+            }
             this.tryCraft(serverWorld, pos, input, element, itemEntity.getOwner() instanceof Player player ? player : null);
         }
     }

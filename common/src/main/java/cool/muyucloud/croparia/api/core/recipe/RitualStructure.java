@@ -17,17 +17,11 @@ import cool.muyucloud.croparia.registry.CropariaBlocks;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
-import cool.muyucloud.croparia.util.supplier.Mappable;
-import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -46,16 +40,6 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
             Char3D.CODEC.fieldOf("pattern").forGetter(RitualStructure::getPattern)
         ).apply(instance, RitualStructure::new)), TypedSerializer.ALWAYS
     );
-    private static final OnLoadSupplier<Map<RitualStructure, Mappable<ItemStack>>> STRUCTURES = OnLoadSupplier.of(() -> {
-        ImmutableMap.Builder<RitualStructure, Mappable<ItemStack>> builder = ImmutableMap.builder();
-        TYPED_SERIALIZER.getStations().forEach(mappable -> {
-            ResourceLocation id = mappable.get().getItem().arch$registryName();
-            CropariaIf.ifServer(server -> server.getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE, id)).map(RecipeHolder::value).ifPresent(recipe -> {
-                if (recipe instanceof RitualStructure structure) builder.put(structure, mappable);
-            }));
-        });
-        return builder.build();
-    });
     public static final LazySupplier<ItemStack> STACK_INPUT = LazySupplier.of(() -> {
         ItemStack stack = CropariaItems.PLACEHOLDER.get().getDefaultInstance();
         stack.set(DataComponents.CUSTOM_NAME, Constants.INPUT_BLOCK);

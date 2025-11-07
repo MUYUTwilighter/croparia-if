@@ -9,7 +9,6 @@ import cool.muyucloud.croparia.api.recipe.network.S2CSyncClear;
 import cool.muyucloud.croparia.api.recipe.network.S2CSyncRecipe;
 import cool.muyucloud.croparia.registry.Recipes;
 import cool.muyucloud.croparia.util.Ref;
-import cool.muyucloud.croparia.util.SidedRef;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import dev.architectury.platform.Platform;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -78,20 +77,18 @@ public class TypedSerializer<R extends DisplayableRecipe<?>>
     @SuppressWarnings("unchecked")
     public List<R> find() {
         List<R> recipes = new ArrayList<>();
-        SidedRef.ifServerOrElse(
-            () -> CropariaIf.ifServer(server -> recipes.addAll(
-                ((RecipeManagerAccess) server.getRecipeManager()).cif$byType(this.adapt()).stream().map(holder -> (R) holder.value()).toList()
-            )),
-            () -> recipes.addAll(this.getSyncedRecipes())
-        );
+        CropariaIf.ifServerOrElse(server -> recipes.addAll(
+            ((RecipeManagerAccess) server.getRecipeManager()).cif$byType(this.adapt())
+                .stream().map(holder -> (R) holder.value()).toList()
+        ), () -> recipes.addAll(this.getSyncedRecipes()));
         return recipes;
     }
 
     @SuppressWarnings("unchecked")
     public <I extends RecipeInput> Optional<R> find(I input, Level level) {
         Ref<R> result = new Ref<>();
-        SidedRef.ifServerOrElse(() -> CropariaIf.ifServer(
-            server -> result.set((R) server.getRecipeManager().getRecipeFor(this.adapt(), input, level).map(RecipeHolder::value).orElse(null))
+        CropariaIf.ifServerOrElse(server -> result.set(
+            (R) server.getRecipeManager().getRecipeFor(this.adapt(), input, level).map(RecipeHolder::value).orElse(null)
         ), () -> {
             TypedSerializer<? extends DisplayableRecipe<I>> adapted = this.adapt();
             for (DisplayableRecipe<I> recipe : adapted.synced) {
@@ -101,12 +98,16 @@ public class TypedSerializer<R extends DisplayableRecipe<?>>
         return result.optional();
     }
 
+    /**
+     * Sync all recipes of this type to clients.
+     * @apiNote If the server is not started, this method does nothing.
+     */
     public void syncRecipes() {
         CropariaIf.ifServer(server -> {
             S2CSyncClear.of(this).send();
             ((RecipeManagerAccess) server.getRecipeManager()).cif$byType(this.adapt()).forEach(holder -> {
                 if (this.shouldSync(holder)) {
-                    SidedRef.ifClient(() -> this.adapt().recordRecipe(holder.value()));
+                    CropariaIf.ifClientOrElse(client -> this.adapt().recordRecipe(holder.value()), mayServer -> {});
                     S2CSyncRecipe.of(holder.value()).send();
                 }
             });
@@ -118,7 +119,7 @@ public class TypedSerializer<R extends DisplayableRecipe<?>>
             S2CSyncClear.of(this).send(player);
             ((RecipeManagerAccess) server.getRecipeManager()).cif$byType(this.adapt()).forEach(holder -> {
                 if (this.shouldSync(holder)) {
-                    SidedRef.ifClient(() -> this.adapt().recordRecipe(holder.value()));
+                    CropariaIf.ifClient(client -> this.adapt().recordRecipe(holder.value()));
                     S2CSyncRecipe.of(holder.value()).send(player);
                 }
             });

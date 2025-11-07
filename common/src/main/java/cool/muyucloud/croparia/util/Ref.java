@@ -8,6 +8,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class Ref<T> {
+    public static <T> Ref<T> of(T value) {
+        return new Ref<>(value);
+    }
+
     private T value;
     private final List<BiConsumer<T, T>> onChanged = new ArrayList<>();
 
