@@ -56,7 +56,7 @@ public class Infusor extends Block implements ItemPlaceable {
         }
         Element element = state.getValue(ELEMENT);
         // Defuse if using the corresponding empty bottle
-        if (ItemStack.isSameItemSameComponents(element.getPotion().get().getCraftingRemainder(), itemStack)) {
+        if (element != Element.EMPTY && ItemStack.isSameItemSameComponents(element.getPotion().get().getCraftingRemainder(), itemStack)) {
             return this.tryDefuse(world, pos, itemStack, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
         }
         // Place item if main hand and not using recipe wizard
