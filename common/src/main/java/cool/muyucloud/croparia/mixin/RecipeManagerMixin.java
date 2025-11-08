@@ -14,6 +14,7 @@ public abstract class RecipeManagerMixin implements RecipeManagerAccess {
     private RecipeMap recipes;
 
     @Unique
+    @Override
     public <I extends RecipeInput, R extends Recipe<I>> Collection<RecipeHolder<R>> cif$byType(RecipeType<R> type) {
         return this.recipes.byType(type);
     }

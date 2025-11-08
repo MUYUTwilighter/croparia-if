@@ -69,6 +69,10 @@ public class TypedSerializer<R extends DisplayableRecipe<?>>
         return false;
     }
 
+    /**
+     * Adapt this serializer to a more specific type.
+     * @apiNote CHECK TYPE SAFETY BEFORE USE!
+     */
     @SuppressWarnings("unchecked")
     public <I extends RecipeInput, T extends DisplayableRecipe<I>> TypedSerializer<T> adapt() {
         return (TypedSerializer<T>) this;
