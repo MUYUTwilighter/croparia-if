@@ -2,7 +2,7 @@
   "type": "croparia:infusor",
   "element": "elemental",
   "ingredient": {
-    "id": "minecraft:wheat_seeds",
+    "id": "#croparia:seed_ingredient",
     "amount": 4
   },
   "result": {
