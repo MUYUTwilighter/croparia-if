@@ -1,3 +1,5 @@
+archives_name = "$archives_name-$minecraft_version"
+
 architectury {
     common enabled_platforms.split(',')
 }

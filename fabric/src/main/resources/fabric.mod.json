@@ -6,7 +6,8 @@
   "description": "Farm minerals, loots and even more!",
   "authors": [
     "MUYU_Twilighter",
-    "xwjcool"
+    "xwjcool",
+    "Dalarion"
   ],
   "contributors": [
     "Dalarion"
@@ -18,7 +19,7 @@
     "issues": "https://github.com/MUYUTwilighter/croparia-if/issues"
   },
   "license": "MIT with Additional Terms",
-  "icon": "assets/croparia/icon.png",
+  "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [

@@ -7,11 +7,11 @@ license = "MIT with Additional Terms"
 modId = "croparia"
 version = "${version}"
 displayName = "Croparia-If"
-authors = "MUYU_Twilighter, xwjcool"
+authors = "MUYU_Twilighter, xwjcool, Dalarion"
 description = '''
 Farm minerals, loots and even more!
 '''
-logoFile = "assets/croparia/icon.png"
+logoFile = "icon.png"
 
 [[dependencies.croparia]]
 modId = "neoforge"

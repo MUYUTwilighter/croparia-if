@@ -4,6 +4,8 @@ plugins {
     id 'com.gradleup.shadow' version '8.3.6' apply false
 }
 
+archives_name = "$archives_name-$minecraft_version"
+
 architectury {
     minecraft = project.minecraft_version
 }

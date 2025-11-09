@@ -6,6 +6,8 @@ plugins {
     id 'net.darkhax.curseforgegradle' version '1.1.26'
 }
 
+archives_name = "$archives_name-$minecraft_version"
+
 architectury {
     platformSetupLoomIde()
     fabric()
@@ -82,13 +84,13 @@ remapJar {
 
 
 base {
-    archivesName = rootProject.archives_name + "-fabric"
+    archivesName = "$archives_name-fabric"
 }
 
 modrinth {
     token = System.getenv("MODRINTH_MOD_PUBLISH")
     projectId = "croparia-if"
-    versionName = archives_name + "-fabric-" + mod_version
+    versionName = "$archives_name-fabric-$mod_version"
     versionNumber = mod_version
     versionType = mod_version.endsWith("a") || mod_version.endsWith("alpha") ? "alpha" : mod_version.endsWith("pre") ? "beta" : "release"
     uploadFile = remapJar
@@ -109,7 +111,7 @@ tasks.register('curseforge', TaskPublishCurseForge) {
     apiToken = System.getenv("CURSEFORGE_MOD_PUBLISH")
     group = 'publishing'
     def mainFile = upload('971004', remapJar)
-    mainFile.displayName = archives_name + "-fabric-" + mod_version
+    mainFile.displayName = "$archives_name-fabric-$mod_version"
     mainFile.releaseType = mod_version.endsWith("a") || mod_version.endsWith("alpha") ? "alpha" : mod_version.endsWith("pre") ? "beta" : "release"
     File changelogFile = rootProject.file("changelog.md")
     if (changelogFile.exists()) {
