@@ -32,7 +32,7 @@ template = """
       ]
     },
     {
-      "rolls": 0.00,
+      "rolls": 0.01,
       "entries": [
         {
           "type": "minecraft:item",

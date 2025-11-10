@@ -10,7 +10,7 @@ template = """
   "result": [
     {
       "item": "${seed}",
-      "chance": 0.0
+      "chance": 0.01
     },
     {
       "item": "${fruit}",
