@@ -108,6 +108,10 @@ public abstract class PackHandler {
 
     public void onTriggered() {
         this.cache.clear(); // In case of exception during last generation
+        if (this.canOverride()) {
+            this.clear();
+        }
+        this.writeMeta();
         this.moveBuiltInGenerators();
         this.refreshGenerators();
         this.generate();
