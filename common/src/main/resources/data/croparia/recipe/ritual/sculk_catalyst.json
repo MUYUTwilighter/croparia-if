@@ -1,0 +1,7 @@
+{
+  "type": "croparia:ritual",
+  "ritual": "#croparia:ritual_stands",
+  "ingredient": "minecraft:sponge",
+  "block": "minecraft:sculk",
+  "result": "minecraft:sculk_catalyst"
+}

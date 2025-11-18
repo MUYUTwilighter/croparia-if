@@ -11,7 +11,7 @@ import cool.muyucloud.croparia.api.crop.item.CropFruit;
 import cool.muyucloud.croparia.api.crop.item.CropSeed;
 import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
-import cool.muyucloud.croparia.api.crop.util.Material;
+import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
 import cool.muyucloud.croparia.api.crop.util.TierAccess;
 import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
@@ -23,13 +23,14 @@ import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 @SuppressWarnings("unused")
-public class Crop extends AbstractCrop implements TierAccess {
+public class Crop extends AbstractCrop<Item> implements TierAccess {
     public static final Set<String> PRESET_TYPES = new HashSet<>();
     public static final String ANIMAL = addType("animal");
     public static final String CROP = addType("crop");
@@ -45,7 +46,7 @@ public class Crop extends AbstractCrop implements TierAccess {
 
     public static final MapCodec<Crop> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
         CodecUtil.fieldsOf(ResourceLocation.CODEC, "id", "name").forGetter(Crop::getKey),
-        CodecUtil.fieldsOf(Material.CODEC, "material", "tag").forGetter(Crop::getMaterial),
+        CodecUtil.fieldsOf(ItemMaterial.CODEC, "material", "tag").forGetter(Crop::getMaterial),
         Color.CODEC.fieldOf("color").forGetter(Crop::getColor),
         Codec.INT.fieldOf("tier").forGetter(Crop::getTier),
         Codec.STRING.optionalFieldOf("type", "crop").forGetter(Crop::getType),
@@ -58,6 +59,7 @@ public class Crop extends AbstractCrop implements TierAccess {
     public static final Placeholder<Crop> PLACEHOLDER = Placeholder.build(node -> node
         .then(PatternKey.literal("color"), TypeMapper.of(Crop::getColor), Color.PLACEHOLDER)
         .then(PatternKey.literal("type"), TypeMapper.of(Crop::getType), Placeholder.STRING)
+        .then(PatternKey.literal("material"), TypeMapper.of(Crop::getMaterial), ItemMaterial.PLACEHOLDER)
         .then(PatternKey.literal("tier"), TypeMapper.of(Crop::getTier), Placeholder.NUMBER)
         .then(PatternKey.literal("seed"), TypeMapper.of(Crop::getSeedId), Placeholder.ID)
         .then(PatternKey.literal("fruit"), TypeMapper.of(Crop::getFruitId), Placeholder.ID)
@@ -66,16 +68,6 @@ public class Crop extends AbstractCrop implements TierAccess {
         .concat(AbstractCrop.PLACEHOLDER, TypeMapper.of(crop -> crop))
     );
 
-    public static String defaultTranslation(ResourceLocation id) {
-        String name = id.getPath();
-        name = name.replaceAll("_", " ").trim();
-        StringBuilder builder = new StringBuilder();
-        for (String token : name.split(" ")) {
-            builder.append(Character.toUpperCase(token.charAt(0))).append(token.substring(1)).append(" ");
-        }
-        return builder.toString().trim();
-    }
-
     public static String defaultTranslationKey(ResourceLocation id) {
         return "crop.%s.%s".formatted(id.getNamespace(), id.getPath());
     }
@@ -83,7 +75,7 @@ public class Crop extends AbstractCrop implements TierAccess {
     @NotNull
     private final ResourceLocation id;
     @NotNull
-    private final Material material;
+    private final ItemMaterial material;
     @NotNull
     private final Color color;
     private final int tier;
@@ -106,7 +98,7 @@ public class Crop extends AbstractCrop implements TierAccess {
     );
 
     public Crop(
-        @NotNull ResourceLocation id, @NotNull Material material, @NotNull Color color, int tier, @Nullable String type,
+        @NotNull ResourceLocation id, @NotNull ItemMaterial material, @NotNull Color color, int tier, @Nullable String type,
         @Nullable Map<String, String> translations, @NotNull CropDependencies dependencies
     ) {
         this.id = id;
@@ -124,9 +116,6 @@ public class Crop extends AbstractCrop implements TierAccess {
         this.block = HolderSupplier.of(() -> new CropariaCropBlock(this), CifUtil.formatId("block_crop_%s", this.getKey()), Registries.BLOCK);
         this.seed = HolderSupplier.of(() -> new CropSeed(this), CifUtil.formatId("crop_seed_%s", this.getKey()), Registries.ITEM);
         this.fruit = HolderSupplier.of(() -> new CropFruit(this), CifUtil.formatId("fruit_%s", this.getKey()), Registries.ITEM);
-        this.results = this.results.map(stacks -> stacks.stream().filter(stack -> CropariaIf.CONFIG.isModValid(
-            Objects.requireNonNull(stack.getItem().arch$registryName()).getNamespace()
-        )).toList());
     }
 
     @Override
@@ -135,7 +124,7 @@ public class Crop extends AbstractCrop implements TierAccess {
     }
 
     @Override
-    public @NotNull Material getMaterial() {
+    public @NotNull ItemMaterial getMaterial() {
         return material;
     }
 
@@ -149,18 +138,6 @@ public class Crop extends AbstractCrop implements TierAccess {
 
     public int getColorInt() {
         return this.getColor().getValue();
-    }
-
-    public String getColorDec() {
-        return this.getColor().toDecString();
-    }
-
-    public String getColorHex() {
-        return this.getColor().toHexString();
-    }
-
-    public String getColorForm() {
-        return this.getColor().toString();
     }
 
     @Override

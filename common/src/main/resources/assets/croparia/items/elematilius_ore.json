@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "croparia:item/elematilius_ore"
+    "model": "croparia:block/elematilius_ore"
   }
 }

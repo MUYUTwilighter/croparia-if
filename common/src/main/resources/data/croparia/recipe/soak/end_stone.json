@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "air",
+  "input": "minecraft:stone",
+  "output": "minecraft:end_stone",
+  "probability": 1.0
+}

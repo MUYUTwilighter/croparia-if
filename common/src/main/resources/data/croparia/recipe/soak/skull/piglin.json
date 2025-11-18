@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "fire",
+  "input": "minecraft:zombie_head",
+  "output": "minecraft:piglin_head",
+  "probability": 1.0
+}

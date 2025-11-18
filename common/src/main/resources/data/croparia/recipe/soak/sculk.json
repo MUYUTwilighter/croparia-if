@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "air",
+  "input": "minecraft:moss_block",
+  "output": "minecraft:sculk",
+  "probability": 1.0
+}

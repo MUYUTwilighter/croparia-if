@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "croparia:item/activated_shrieker"
+    "model": "croparia:block/activated_shrieker"
   }
 }

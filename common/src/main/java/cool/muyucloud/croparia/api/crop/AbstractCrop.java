@@ -1,56 +1,22 @@
 package cool.muyucloud.croparia.api.crop;
 
-import com.google.common.collect.ImmutableList;
 import cool.muyucloud.croparia.api.crop.util.Material;
 import cool.muyucloud.croparia.api.generator.util.TranslatableEntry;
-import cool.muyucloud.croparia.api.placeholder.PatternKey;
-import cool.muyucloud.croparia.api.placeholder.Placeholder;
-import cool.muyucloud.croparia.api.placeholder.TypeMapper;
-import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public abstract class AbstractCrop implements TranslatableEntry {
-    public static final Placeholder<AbstractCrop> PLACEHOLDER = Placeholder.build(node -> node
-        .then(PatternKey.literal("material"), TypeMapper.of(AbstractCrop::getMaterial), Material.PLACEHOLDER)
-        .then(PatternKey.literal("result"), TypeMapper.of(AbstractCrop::getResult), Placeholder.ITEM_STACK)
-        .concat(TranslatableEntry.PLACEHOLDER, TypeMapper.of(crop -> crop)));
-
-    protected transient OnLoadSupplier<List<ItemStack>> results = OnLoadSupplier.of(() -> {
-        List<ItemStack> items = new ArrayList<>();
-        for (Item item : this.getMaterial().getItems()) {
-            items.add(item.getDefaultInstance().copyWithCount(Math.min(item.getDefaultMaxStackSize(), this.getMaterial().getCount())));
+public abstract class AbstractCrop<T> implements TranslatableEntry {
+    public static String defaultTranslation(ResourceLocation id) {
+        String name = id.getPath();
+        name = name.replaceAll("_", " ").trim();
+        StringBuilder builder = new StringBuilder();
+        for (String token : name.split(" ")) {
+            builder.append(Character.toUpperCase(token.charAt(0))).append(token.substring(1)).append(" ");
         }
-        if (items.isEmpty()) items.add(ItemStack.EMPTY);
-        return ImmutableList.copyOf(items);
-    });
-
-    public ItemStack getResult() {
-        return this.getResults().getFirst();
+        return builder.toString().trim();
     }
 
-    public List<ItemStack> getResults() {
-        return this.results.get();
-    }
-
-    public abstract @NotNull Material getMaterial();
-
-    public ItemStack getMaterialStack() {
-        return this.getMaterial().getStack();
-    }
-
-    public String getMaterialName() {
-        return this.getMaterial().getName();
-    }
+    public abstract @NotNull Material<T> getMaterial();
 
     public abstract void onRegister();
-
-    @Override
-    public Placeholder<? extends AbstractCrop> placeholder() {
-        return PLACEHOLDER;
-    }
 }

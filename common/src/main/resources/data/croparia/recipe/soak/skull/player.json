@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "air",
+  "input": "minecraft:zombie",
+  "output": "minecraft:player_head",
+  "probability": 1.0
+}

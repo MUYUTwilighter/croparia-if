@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "elemental",
+  "input": "minecraft:kelp",
+  "output": "minecraft:sea_pickle",
+  "probability": 1.0
+}

@@ -1,0 +1,25 @@
+registry = "croparia:melons"
+path = "${id.namespace}/blockstates/${attach.path}.json"
+startup = true
+template = """
+{
+  "variants": {
+    "facing=east": {
+      "model": "croparia:block/attached_stem",
+      "y": 180
+    },
+    "facing=north": {
+      "model": "croparia:block/attached_stem",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "croparia:block/attached_stem",
+      "y": 270
+    },
+    "facing=west": {
+      "model": "croparia:block/attached_stem",
+      "y": 0
+    }
+  }
+}
+"""

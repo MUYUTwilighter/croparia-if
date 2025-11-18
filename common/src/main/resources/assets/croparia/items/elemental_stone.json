@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "croparia:item/elemental_stone"
+    "model": "croparia:block/elemental_stone"
   }
 }

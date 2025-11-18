@@ -1,0 +1,11 @@
+registry = "croparia:melons"
+path = "croparia/recipe/ritual/melon/seeds/${id.namespace}/${id.path}.json"
+template = """
+{
+  "type": "croparia:ritual",
+  "ritual": "#croparia:ritual_stands",
+  "ingredient": ${croparia._qis},
+  "block": ${material._qis},
+  "result": ${seed._qis}
+}
+"""

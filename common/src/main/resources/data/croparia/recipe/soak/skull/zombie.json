@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "elemental",
+  "input": "minecraft:skeleton_skull",
+  "output": "minecraft:zombie_head",
+  "probability": 1.0
+}

@@ -22,9 +22,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class CropRegistry<C extends AbstractCrop> implements DgRegistry<C> {
-    public static final CropRegistry<Crop> CROPS = new CropRegistry<>(CropariaIf.CONFIG.getFilePath().resolve("crops"), Crop.CODEC.codec());
-
+public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
     private static final Gson GSON = new Gson();
 
     private final Path path;

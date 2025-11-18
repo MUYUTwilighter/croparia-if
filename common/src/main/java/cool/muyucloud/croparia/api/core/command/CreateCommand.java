@@ -8,7 +8,7 @@ import cool.muyucloud.croparia.api.crop.Crop;
 import cool.muyucloud.croparia.api.crop.item.Croparia;
 import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
-import cool.muyucloud.croparia.api.crop.util.Material;
+import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
 import cool.muyucloud.croparia.registry.DgRegistries;
 import cool.muyucloud.croparia.util.text.FailureMessenger;
 import cool.muyucloud.croparia.util.text.SuccessMessenger;
@@ -141,6 +141,6 @@ public class CreateCommand {
     }
 
     public static Crop buildCrop(ResourceLocation id, ItemStack material, Color color, int tier, String type) {
-        return new Crop(id, new Material(material), color, tier, type, null, new CropDependencies(id.getNamespace(), material.getItem().getDescriptionId()));
+        return new Crop(id, new ItemMaterial(material), color, tier, type, null, new CropDependencies(id.getNamespace(), material.getItem().getDescriptionId()));
     }
 }

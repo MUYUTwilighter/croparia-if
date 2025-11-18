@@ -6,6 +6,6 @@ template = """
   "ingredients": [
     "${fruit}"
   ],
-  "result": ${result.stack}
+  "result": ${material.result.stack}
 }
 """

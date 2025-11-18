@@ -1,0 +1,9 @@
+{
+  "parent": "croparia:block/stem_fruit",
+  "textures": {
+    "stem": "croparia:block/stem_overlay",
+    "upperstem": "croparia:block/attached_stem_overlay",
+    "stem_background": "croparia:block/stem",
+    "upperstem_background": "croparia:block/attached_stem"
+  }
+}

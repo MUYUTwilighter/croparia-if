@@ -1,0 +1,12 @@
+registry = "croparia:melons"
+path = "${id.namespace}/blockstates/${melon.path}.json"
+startup = true
+template = """
+{
+  "variants": {
+    "": {
+      "model": "croparia:block/gourd"
+    }
+  }
+}
+"""

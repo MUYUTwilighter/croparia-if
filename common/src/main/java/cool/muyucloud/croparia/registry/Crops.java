@@ -6,7 +6,7 @@ import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.crop.Crop;
 import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
-import cool.muyucloud.croparia.api.crop.util.Material;
+import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
 import cool.muyucloud.croparia.api.element.Element;
 import dev.architectury.injectables.targets.ArchitecturyTarget;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -42,7 +42,7 @@ public class Crops {
         @NotNull String name, @NotNull RegistrySupplier<? extends Item> material, int color, int tier, @NotNull String type,
         @NotNull String translationKey
     ) {
-        Crop crop = new Crop(CropariaIf.of(name), new Material(material.getId().toString()), new Color(color), tier, type, null, new CropDependencies("croparia", translationKey));
+        Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material.getId().toString()), new Color(color), tier, type, null, new CropDependencies("croparia", translationKey));
         DgRegistries.CROPS.register(crop);
         return crop;
     }
@@ -66,7 +66,7 @@ public class Crops {
         @NotNull String name, Item material, int color, int tier, @NotNull String type
     ) {
         Crop crop = new Crop(
-            CropariaIf.of(name), new Material(Objects.requireNonNull(material.arch$registryName()).toString()),
+            CropariaIf.of(name), new ItemMaterial(Objects.requireNonNull(material.arch$registryName()).toString()),
             new Color(color), tier, type, null, new CropDependencies("minecraft", material.getDescriptionId())
         );
         DgRegistries.CROPS.register(crop);
@@ -118,17 +118,6 @@ public class Crops {
     public static final Crop LARGE_FERN = vanilla("large_fern", Items.LARGE_FERN, 0x4a7240, 1, Crop.NATURE);
     public static final Crop TALL_GRASS = vanilla("tall_grass", Items.TALL_GRASS, 0x2f4728, 1, Crop.NATURE);
     public static final Crop FERN = vanilla("fern", Items.FERN, 0x1b4509, 1, Crop.NATURE);
-    public static final Crop OAK = vanilla("oak", Items.OAK_LOG, 0x9d824c, 1, Crop.NATURE);
-    public static final Crop SPRUCE = vanilla("spruce", Items.SPRUCE_LOG, 0x795933, 1, Crop.NATURE);
-    public static final Crop BIRCH = vanilla("birch", Items.BIRCH_LOG, 0xc6b579, 1, Crop.NATURE);
-    public static final Crop JUNGLE = vanilla("jungle", Items.JUNGLE_LOG, 0xbd8c6a, 1, Crop.NATURE);
-    public static final Crop ACACIA = vanilla("acacia", Items.ACACIA_LOG, 0xb86236, 1, Crop.NATURE);
-    public static final Crop DARK_OAK = vanilla("dark_oak", Items.DARK_OAK_LOG, 0x4e3118, 1, Crop.NATURE);
-    public static final Crop MANGROVE = vanilla("mangrove", Items.MANGROVE_LOG, 0x7d4133, 1, Crop.NATURE);
-    public static final Crop CHERRY = vanilla("cherry", Items.CHERRY_LOG, 0xe3b1ab, 1, Crop.NATURE);
-    public static final Crop BAMBOO = vanilla("bamboo", Items.BAMBOO_PLANKS, 0xe0ca69, 1, Crop.NATURE);
-    public static final Crop CRIMSON = vanilla("crimson", Items.CRIMSON_STEM, 0x5b2f41, 1, Crop.NATURE);
-    public static final Crop WARPED = vanilla("warped", Items.WARPED_STEM, 0x388180, 1, Crop.NATURE);
     public static final Crop APPLE = vanilla("apple", Items.APPLE, 0xff1c2b, 1, Crop.FOOD);
     public static final Crop GOLDEN_APPLE = vanilla("golden_apple", Items.GOLDEN_APPLE, 0xffffb0, 3, Crop.FOOD);
     public static final Crop BREAD = vanilla("bread", Items.BREAD, 0x9e7325, 1, Crop.FOOD);
@@ -184,7 +173,7 @@ public class Crops {
     public static final Crop AMETHYST = vanilla("amethyst", Items.AMETHYST_SHARD, 0xd9cbf2, 3, Crop.CROP);
     public static final Crop ECHO_SHARD = vanilla("echo_shard", Items.ECHO_SHARD, 0x3404f, 4, Crop.MONSTER);
     public static final Crop ARMADILLO = vanilla("armadillo", Items.ARMADILLO_SCUTE, 0xc48682, 2, Crop.ANIMAL);
-    public static final Crop RESIN = vanilla("resin", Items.RESIN_CLUMP, 0xfcd8af, 1, Crop.NATURE);
+    public static final Crop RESIN = vanilla("resin", Items.RESIN_CLUMP, 0xF0781B, 1, Crop.NATURE);
     public static final Crop BREEZE = vanilla("breeze", Items.BREEZE_ROD, 0x7980c2, 3, Crop.NATURE);
     public static final Crop FROGSPAWN = vanilla("frogspawn", Items.FROGSPAWN, 0x7980c2, 3, Crop.ANIMAL);
 
@@ -204,7 +193,7 @@ public class Crops {
     public static @NotNull Crop compat(
         String name, String material, int color, int tier, String type, @NotNull Map<String, String> translationKeys
     ) {
-        Crop crop = new Crop(CropariaIf.of(name), new Material(material), new Color(color), tier, type, null, new CropDependencies(translationKeys));
+        Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material), new Color(color), tier, type, null, new CropDependencies(translationKeys));
         DgRegistries.CROPS.register(crop);
         return crop;
     }

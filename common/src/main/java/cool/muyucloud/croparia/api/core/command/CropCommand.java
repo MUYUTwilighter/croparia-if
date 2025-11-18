@@ -18,6 +18,7 @@ import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -75,9 +76,9 @@ public class CropCommand {
                 Texts.copyText(crop.getTranslationKey()))
         );
         MutableComponent material = Texts.translatable("commands.croparia.crop.material", Texts.literal(
-            crop.getMaterialName(),
-            Texts.suggestCommand("give @s", Objects.requireNonNull(crop.getResult().getItem().arch$registryName()).toString()),
-            Texts.hoverItem(crop.getMaterialStack()),
+            crop.getMaterial().getName(),
+            Texts.suggestCommand("give @s", Objects.requireNonNull(crop.getMaterial().getItem().arch$registryName()).toString()),
+            Texts.hoverItem(crop.getMaterial().getStack()),
             Texts.inlineMouseBehavior()
         ));
         MutableComponent tier = Texts.forStyles(Texts.translatable(
@@ -88,7 +89,7 @@ public class CropCommand {
         ));
         MutableComponent color = Texts.translatable(
             "commands.croparia.crop.color",
-            Texts.literal(crop.getColorForm(), Texts.copyText(crop.getColorForm())).withColor(crop.getColor().getValue())
+            Texts.literal(crop.getColor().toString(), Texts.copyText(crop.getColor().toString())).withColor(crop.getColor().getValue())
         );
         MutableComponent type = Texts.translatable(
             "commands.croparia.crop.type", Texts.literal(crop.getType(), Texts.copyText(crop.getType()))
@@ -128,7 +129,7 @@ public class CropCommand {
     }
 
     public static MutableComponent diagnose(@NotNull Crop crop) {
-        if (crop.getResult().isEmpty()) {
+        if (crop.getMaterial().getItem() == Items.AIR) {
             return Texts.translatable("commands.croparia.crop.status.material").withStyle(ChatFormatting.RED);
         }
         if (!crop.shouldLoad()) {

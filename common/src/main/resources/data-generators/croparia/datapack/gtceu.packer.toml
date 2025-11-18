@@ -26,10 +26,10 @@ template = """
             {
                 "content": {
                     "type": "gtceu:sized",
-                    "count": {result_count},
+                    "count": {material.result.amount},
                     "ingredient": {
-                        "item": "${result.id}",
-                        "components": ${result.components}
+                        "item": "${material.result.id}",
+                        "components": ${material.result.components}
                     }
                 },
                 "chance": 10000,

@@ -78,31 +78,31 @@ public class CropariaItems {
         properties -> new BlockItem(CropariaBlocks.DEEPSLATE_ELEMATILIUS_ORE.get(), properties.arch$tab(Tabs.MAIN))
     );
     @PostReg
-    public static final RegistrySupplier<Item> CROPARIA = registerItem(
+    public static final RegistrySupplier<Croparia> CROPARIA = registerItem(
         "croparia", properties -> new Croparia(1, properties.arch$tab(Tabs.MAIN))
     );
     @PostReg
-    public static final RegistrySupplier<Item> CROPARIA2 = registerItem(
+    public static final RegistrySupplier<Croparia> CROPARIA2 = registerItem(
         "croparia2", properties -> new Croparia(2, properties.arch$tab(Tabs.MAIN))
     );
     @PostReg
-    public static final RegistrySupplier<Item> CROPARIA3 = registerItem(
+    public static final RegistrySupplier<Croparia> CROPARIA3 = registerItem(
         "croparia3", properties -> new Croparia(3, properties.arch$tab(Tabs.MAIN))
     );
     @PostReg
-    public static final RegistrySupplier<Item> CROPARIA4 = registerItem(
+    public static final RegistrySupplier<Croparia> CROPARIA4 = registerItem(
         "croparia4", properties -> new Croparia(4, properties.arch$tab(Tabs.MAIN))
     );
     @PostReg
-    public static final RegistrySupplier<Item> CROPARIA5 = registerItem(
+    public static final RegistrySupplier<Croparia> CROPARIA5 = registerItem(
         "croparia5", properties -> new Croparia(5, properties.arch$tab(Tabs.MAIN))
     );
     @PostReg
-    public static final RegistrySupplier<Item> CROPARIA6 = registerItem(
+    public static final RegistrySupplier<Croparia> CROPARIA6 = registerItem(
         "croparia6", properties -> new Croparia(6, properties.arch$tab(Tabs.MAIN))
     );
     @PostReg
-    public static final RegistrySupplier<Item> CROPARIA7 = registerItem(
+    public static final RegistrySupplier<Croparia> CROPARIA7 = registerItem(
         "croparia7", properties -> new Croparia(7, properties.arch$tab(Tabs.MAIN))
     );
     public static final RegistrySupplier<HornPlenty> HORN = registerItem(
@@ -127,7 +127,7 @@ public class CropariaItems {
     public static final RegistrySupplier<MidasHand> MIDAS_HAND = registerItem(
         "midas_hand", properties -> new MidasHand(properties.arch$tab(Tabs.MAIN).rarity(Rarity.EPIC).stacksTo(1))
     );
-    protected static final List<RegistrySupplier<Item>> CROPARIAS = List.of(
+    protected static final List<RegistrySupplier<Croparia>> CROPARIAS = List.of(
         CROPARIA, CROPARIA2, CROPARIA3, CROPARIA4, CROPARIA5, CROPARIA6, CROPARIA7
     );
     protected static final List<RegistrySupplier<BlockItem>> RITUAL_STANDS = List.of(
@@ -157,7 +157,7 @@ public class CropariaItems {
         ITEMS.register();
     }
 
-    public static @NotNull RegistrySupplier<Item> getCroparia(int tier) {
+    public static @NotNull RegistrySupplier<Croparia> getCroparia(int tier) {
         return CROPARIAS.get(tier - 1);
     }
 

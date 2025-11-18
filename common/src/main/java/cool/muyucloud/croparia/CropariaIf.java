@@ -38,6 +38,7 @@ public class CropariaIf {
         DataGenerators.register();
         PackHandlers.register();
         Crops.register();
+        Melons.register();
         LOGGER.info("Croparia IF vanilla registration");
         NetworkHandlers.register();
         CropariaComponents.register();

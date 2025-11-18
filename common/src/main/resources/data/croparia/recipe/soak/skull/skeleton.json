@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "water",
+  "input": "minecraft:wither_skeleton_skull",
+  "output": "minecraft:skeleton_skull",
+  "probability": 1.0
+}

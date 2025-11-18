@@ -149,4 +149,9 @@ public class CifUtil {
         if (value > Integer.MAX_VALUE) return Integer.MAX_VALUE;
         return (int) value;
     }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T castUnsafe(Object o) {
+        return (T) o;
+    }
 }

@@ -1,0 +1,7 @@
+{
+  "parent": "croparia:block/stem_growth6",
+  "textures": {
+    "stem": "croparia:block/stem_overlay",
+	"background": "croparia:block/stem"
+  }
+}

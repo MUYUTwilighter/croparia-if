@@ -14,9 +14,9 @@ template = """
   ],
   "item_outputs": [
     {
-      "item": "${result.id}",
-      "count": ${result.amount},
-      "components": ${result.components}
+      "item": "${material.result.id}",
+      "count": ${material.result.amount},
+      "components": ${material.result.components}
     }
   ]
 }

@@ -1,0 +1,11 @@
+registry = "croparia:melons"
+path = "croparia/recipe/crafting/melon/material/${id.namespace}/${id.path}.json"
+template = """
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "${melon}"
+  ],
+  "result": ${material.result.stack}
+}
+"""

@@ -1,0 +1,54 @@
+registry = "croparia:melons"
+path = "croparia/loot_table/blocks/melon/${stem.namespace}/${stem.path}.json"
+template = """
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "${seed}"
+        }
+      ]
+    },
+    {
+      "rolls": 0.01,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "${seed}",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "${stem}",
+              "properties": {
+                "age": "7"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls":1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "${melon}",
+          "conditions": [
+            {
+              "condition": "minecraft:block_state_property",
+              "block": "${stem}",
+              "properties": {
+                "age": "7"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+"""

@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "earth",
+  "input": "minecraft:blackstone",
+  "output": "minecraft:gilded_blackstone",
+  "probability": 1.0
+}

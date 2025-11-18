@@ -1,0 +1,7 @@
+{
+  "type": "croparia:soak",
+  "element": "fire",
+  "input": "minecraft:skeleton_skull",
+  "output": "minecraft:creeper_head",
+  "probability": 1.0
+}

@@ -1,0 +1,17 @@
+registry = "croparia:melons"
+path = "${id.namespace}/items/${seed.path}.json"
+startup = true
+template = """
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "croparia:item/template_melon_seed",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": ${color.dec}
+      }
+    ]
+  }
+}
+"""

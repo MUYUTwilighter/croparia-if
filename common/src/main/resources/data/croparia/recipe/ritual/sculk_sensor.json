@@ -1,0 +1,7 @@
+{
+  "type": "croparia:ritual",
+  "ritual": "#croparia:ritual_stands",
+  "ingredient": "minecraft:comparator",
+  "block": "minecraft:sculk",
+  "result": "minecraft:sculk_sensor"
+}

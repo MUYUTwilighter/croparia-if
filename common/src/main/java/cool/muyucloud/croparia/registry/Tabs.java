@@ -20,7 +20,14 @@ public class Tabs {
         "crops",
         () -> CreativeTabRegistry.create(
             Texts.translatable("tab." + CropariaIf.MOD_ID + ".crops"),
-            () -> CropariaItems.CROPARIA.get().getDefaultInstance()
+            () -> Crops.ELEMENTAL.getCropFruit().orElseThrow().getDefaultInstance()
+        )
+    );
+    public static final RegistrySupplier<CreativeModeTab> MELONS = registerTab(
+        "melons",
+        () -> CreativeTabRegistry.create(
+            Texts.translatable("tab." + CropariaIf.MOD_ID + ".melons"),
+            () -> Melons.COBBLESTONE.getMelonItem().get().getDefaultInstance()
         )
     );
     public static final RegistrySupplier<CreativeModeTab> MAIN = registerTab(
