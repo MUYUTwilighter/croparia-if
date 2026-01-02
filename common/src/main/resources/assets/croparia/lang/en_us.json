@@ -104,7 +104,7 @@
   "commands.croparia.create.duplicated": "Duplicated crop definition: %s [%s] [%s]",
   "commands.croparia.create.duplicated.rename": "Rename",
   "commands.croparia.create.duplicated.replace": "Replace",
-  "container.greenhouse": "Greenhouse",
+  "container.croparia.greenhouse": "Greenhouse",
   "element.croparia.air": "Elemental Air",
   "element.croparia.earth": "Elemental Earth",
   "element.croparia.elemental": "Elemental",

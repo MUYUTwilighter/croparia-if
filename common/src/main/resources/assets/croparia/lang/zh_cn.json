@@ -104,7 +104,7 @@
   "commands.croparia.create.duplicated": "已存在作物: %s [%s] [%s]",
   "commands.croparia.create.duplicated.rename": "重命名",
   "commands.croparia.create.duplicated.replace": "覆盖",
-  "container.greenhouse": "温室",
+  "container.croparia.greenhouse": "温室",
   "element.croparia.air": "风元素",
   "element.croparia.earth": "土元素",
   "element.croparia.elemental": "元素",

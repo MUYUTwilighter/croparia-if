@@ -10,11 +10,14 @@ import cool.muyucloud.croparia.api.repo.ContainerRepo;
 import cool.muyucloud.croparia.api.repo.RepoProxy;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
 import cool.muyucloud.croparia.registry.BlockEntities;
+import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
@@ -24,7 +27,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.DispenserMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.AttachedStemBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -34,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
 
 public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, Container {
     private final NonNullList<ItemStack> inventory;
@@ -45,34 +47,65 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         this.inventory = NonNullList.withSize(9, ItemStack.EMPTY);
     }
 
-    public static void tick(Level level, BlockPos worldPosition, GreenhouseBlockEntity gbe) {
-        if (!level.isClientSide) {
-            BlockState belowState = level.getBlockState(worldPosition.below());
-            if (belowState.getBlock() instanceof CropBlock block) {
-                Item seed = block.asItem();
-                if (block.isMaxAge(belowState)) {
-                    List<ItemStack> droppedStacks = Block.getDrops(belowState, Objects.requireNonNull(level.getServer()).getLevel(level.dimension()), worldPosition.below(), level.getBlockEntity(worldPosition.below()));
-                    boolean decreased = false;
-                    for (ItemStack stack : droppedStacks) {
-                        if (!decreased && stack.is(seed)) { // We consume one seed to simulate "replant"
-                            stack.shrink(1);    // No worry if aborted, the stack is newly created, so no side effect
-                            decreased = true;
-                        }
-                        long sim = gbe.proxy.simAccept(ItemSpec.of(stack), stack.getCount());
-                        if (sim < stack.getCount()) {   // Not enough space, abort
-                            return;
-                        }
-                    }
-                    for (ItemStack stack : droppedStacks) {
-                        if (!stack.isEmpty()) gbe.setChanged();
-                        gbe.proxy.accept(ItemSpec.of(stack), stack.getCount());
-                    }
-                    IntegerProperty property = ((CropBlockAccess) block).cif$getAgeProperty();
-                    int maxAge = block.getMaxAge();
-                    level.setBlockAndUpdate(worldPosition.below(), block.defaultBlockState().setValue(property, maxAge / 2));
-                }
+    public void tryHarvest(ServerLevel level, BlockState crop, BlockPos cropPos) {
+        Block belowBlock = crop.getBlock();
+        if (belowBlock instanceof AttachedStemBlock) {
+            tryHarvestMelon(level, crop, cropPos);
+        } else if (belowBlock instanceof CropBlock) {
+            tryHarvestCrop(level, crop, cropPos);
+        }
+    }
+
+    /**
+     * @param level   The current level
+     * @param crop    BlockState of the crop block, must be an instance of {@link CropBlock}
+     * @param cropPos Position of the crop block
+     */
+    public void tryHarvestCrop(ServerLevel level, BlockState crop, BlockPos cropPos) {
+        CropBlock cropBlock = (CropBlock) crop.getBlock();
+        // Age check
+        if (!cropBlock.isMaxAge(crop)) return;
+        Item seed = cropBlock.asItem();
+        List<ItemStack> droppedStacks = Block.getDrops(crop, level, cropPos, level.getBlockEntity(cropPos));
+        boolean decreased = false;
+        // Seed reduction
+        for (ItemStack stack : droppedStacks) {
+            if (!decreased && stack.is(seed)) { // Consume one seed to simulate "replant"
+                stack.shrink(1);    // No worry if aborted, the stack is newly created, so no side effect
+                decreased = true;
             }
         }
+        // Deposit
+        if (!this.tryDeposit(droppedStacks)) return;    // Not enough space, abort
+        // Age update
+        IntegerProperty property = CropBlockAccess.of(cropBlock).cif$getAgeProperty();
+        int maxAge = cropBlock.getMaxAge();
+        level.setBlockAndUpdate(worldPosition.below(), cropBlock.defaultBlockState().setValue(property, maxAge / 2));
+    }
+
+    public void tryHarvestMelon(ServerLevel level, BlockState stem, BlockPos stemPos) {
+        // Find melon
+        Direction facing = stem.getValue(AttachedStemBlock.FACING);
+        BlockPos melonPos = stemPos.offset(facing.getUnitVec3i());
+        BlockState melonState = level.getBlockState(melonPos);
+        // Get drops
+        List<ItemStack> droppedStacks = Block.getDrops(melonState, level, melonPos, level.getBlockEntity(melonPos));
+        // Deposit
+        if (!this.tryDeposit(droppedStacks)) return;    // Not enough space, abort
+        // Remove melon
+        level.removeBlock(melonPos, false);
+    }
+
+    public boolean tryDeposit(List<ItemStack> droppedStacks) {
+        boolean doAccept = false;
+        for (ItemStack stack : droppedStacks) {
+            if (!stack.isEmpty()) this.setChanged();
+            long accepted = this.proxy.accept(ItemSpec.of(stack), stack.getCount());
+            if (!doAccept && accepted >= 0) {   // Not enough space, abort
+                doAccept = true;
+            }
+        }
+        return doAccept;
     }
 
     @Override
@@ -107,10 +140,12 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         return removed;
     }
 
+    @Override
     public @NotNull ItemStack removeItemNoUpdate(int slot) {
         return ContainerHelper.takeItem(this.inventory, slot);
     }
 
+    @Override
     public void setItem(int slot, ItemStack stack) {
         ItemStack stored = this.getItem(slot);
         if (ItemStack.isSameItemSameComponents(stored, stack) && stored.getCount() == stack.getCount()) {
@@ -120,6 +155,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         this.inventory.set(slot, stack);
     }
 
+    @Override
     public boolean stillValid(Player player) {
         if (this.level == null || this.level.getBlockEntity(this.worldPosition) != this) {
             return false;
@@ -128,16 +164,19 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         }
     }
 
+    @Override
     public void clearContent() {
         if (this.inventory.isEmpty()) return;
         this.setChanged();
         this.inventory.clear();
     }
 
+    @Override
     public @NotNull Component getDisplayName() {
-        return Component.nullToEmpty("Greenhouse");
+        return Texts.translatable("container.croparia.greenhouse");
     }
 
+    @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
         return new DispenserMenu(syncId, inv, this);
     }
