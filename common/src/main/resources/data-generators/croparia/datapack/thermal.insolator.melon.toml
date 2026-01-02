@@ -1,5 +1,5 @@
-registry = "croparia:crops"
-path = "thermal/recipe/croparia/insolator_crop/${id.namespace}/${id.path}.json"
+registry = "croparia:melons"
+path = "thermal/recipe/croparia/insolator_melon/${id.namespace}/${id.path}.json"
 dependencies = "thermal_expansion"
 template = """
 {
@@ -13,7 +13,7 @@ template = """
       "chance": 0.01
     },
     {
-      "item": "${fruit}",
+      "item": "${melon}",
       "chance": 1.0
     }
   ],

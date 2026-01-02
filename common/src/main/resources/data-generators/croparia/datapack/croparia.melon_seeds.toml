@@ -1,5 +1,5 @@
-registry = "croparia:crops"
-path = "croparia/tags/item/seeds/crops.json"
+registry = "croparia:melons"
+path = "croparia/tags/item/seeds/melons.json"
 type = "croparia:aggregated"
 startup = true
 content = '    "${seed}"'

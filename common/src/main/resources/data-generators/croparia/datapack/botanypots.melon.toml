@@ -1,5 +1,5 @@
-registry = "croparia:crops"
-path = "botanypots/recipe/${id.namespace}/crop/${id.path}.json"
+registry = "croparia:melons"
+path = "botanypots/recipe/${id.namespace}/melon/${id.path}.json"
 dependencies = "botanypots"
 template = """
 {
@@ -10,16 +10,16 @@ template = """
   "categories": [
     "crop", "farmland"
   ],
-  "growthTicks": 1200,
+  "growthTicks": 600,
   "display": {
     "type": "botanypots:aging",
-    "block": "${crop_block}"
+    "block": "${stem}"
   },
   "drops": [
     {
       "chance": 1.00,
       "output": {
-        "item": "${fruit}"
+        "item": "${melon}"
       }
     },
     {

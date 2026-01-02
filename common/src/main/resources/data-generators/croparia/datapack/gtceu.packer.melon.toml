@@ -1,0 +1,53 @@
+registry = "croparia:melons"
+path = "croparia/recipes/gtceu/packer/melon/${id.namespace}/${id.path}.json"
+dependencies = "gtceu"
+template = """
+{
+    "type": "gtceu:packer",
+    "duration": 10,
+    "inputs": {
+        "item": [
+            {
+                "content": {
+                    "type": "gtceu:sized",
+                    "count": 1,
+                    "ingredient": {
+                        "item": "${melon}"
+                    }
+                },
+                "chance": 10000,
+                "maxChance": 10000,
+                "tierChanceBoost": 0
+            }
+        ]
+    },
+    "outputs": {
+        "item": [
+            {
+                "content": {
+                    "type": "gtceu:sized",
+                    "count": {material.result.amount},
+                    "ingredient": {
+                        "item": "${material.result.id}",
+                        "components": ${material.result.components}
+                    }
+                },
+                "chance": 10000,
+                "maxChance": 10000,
+                "tierChanceBoost": 0
+            }
+        ]
+    },
+    "tickInputs": {
+        "eu": [
+            {
+                "content": 12,
+                "chance": 10000,
+                "maxChance": 10000,
+                "tierChanceBoost": 0
+            }
+        ]
+    },
+    "category": "gtceu:packer"
+}
+"""

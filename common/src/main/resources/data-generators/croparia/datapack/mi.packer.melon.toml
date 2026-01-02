@@ -1,5 +1,5 @@
-registry = "croparia:crops"
-path = "modern_industrialization/recipe/croparia/packer_crop/${id.namespace}/{id.path}.json"
+registry = "croparia:melons"
+path = "modern_industrialization/recipe/croparia/packer_melon/${id.namespace}/{id.path}.json"
 dependencies = "modern_industrialization"
 template = """
 {
@@ -8,7 +8,7 @@ template = """
   "eu": 2,
   "item_inputs": [
     {
-      "item": "${fruit}",
+      "item": "${melon}",
       "count": 1
     }
   ],
