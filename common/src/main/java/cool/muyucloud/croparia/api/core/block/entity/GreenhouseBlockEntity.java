@@ -96,6 +96,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         level.removeBlock(melonPos, false);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean tryDeposit(List<ItemStack> droppedStacks) {
         boolean doAccept = false;
         for (ItemStack stack : droppedStacks) {
