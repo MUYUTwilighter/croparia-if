@@ -72,25 +72,6 @@ public class Greenhouse extends BaseEntityBlock {
         gbe.tryHarvest(serverLevel, belowState, belowPos);
         return state;
     }
-//
-//    /**
-//     * Harvest the crop on neighbor change
-//     */
-//    @Override
-//    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston) {
-//        super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
-//        // Filter client level
-//        if (!(level instanceof ServerLevel serverLevel)) return;
-//        // Filter unharvestable blocks
-//        BlockPos belowPos = pos.below();
-//        BlockState belowState = level.getBlockState(belowPos);
-//        if (TagUtil.isIn(UNHARVESTABLE, belowState.getBlock())) return;
-//        // Filter block entity
-//        BlockEntity be = level.getBlockEntity(pos);
-//        if (!(be instanceof GreenhouseBlockEntity gbe)) return;
-//        // Do harvest
-//        gbe.tryHarvest(serverLevel, belowState, belowPos);
-//    }
 
     @Override
     public void randomTick(@Nullable BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
