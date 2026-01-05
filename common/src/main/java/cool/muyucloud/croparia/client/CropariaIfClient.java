@@ -45,6 +45,9 @@ public class CropariaIfClient {
                 if (tintIndex == 0) {
                     return melon.getColor().getValue();
                 }
+                if (tintIndex == 1) {
+                    return STEM_MATURE;
+                }
                 return -1;
             }, melon.getAttach().get());
             RenderTypeRegistry.register(RenderType.cutoutMipped(), melon.getStem().get());

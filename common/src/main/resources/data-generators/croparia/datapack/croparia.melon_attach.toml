@@ -1,0 +1,27 @@
+registry = "croparia:melons"
+path = "${attach.namespace}/loot_table/blocks/${attach.path}.json"
+template = """
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "${seed}"
+        }
+      ]
+    },
+    {
+      "rolls": 0.01,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "${seed}"
+        }
+      ]
+    }
+  ]
+}
+"""
