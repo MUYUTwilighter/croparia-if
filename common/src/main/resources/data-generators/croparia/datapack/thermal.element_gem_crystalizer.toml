@@ -1,5 +1,5 @@
 registry = "croparia:elements"
-path = "thermal/recipe/croparia/crystallizer/${id_namespace}/${id_path}.json"
+path = "thermal/recipe/croparia/crystallizer/${name}.json"
 dependencies = "thermal_expansion"
 template = """
 {

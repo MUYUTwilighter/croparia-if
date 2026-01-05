@@ -5,6 +5,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import cool.muyucloud.croparia.api.generator.util.DgReader;
+import cool.muyucloud.croparia.util.FileUtil;
 import org.tomlj.Toml;
 import org.tomlj.TomlParseResult;
 
@@ -27,20 +28,21 @@ public interface JsonTransformer {
         }
     ));
 
-    static JsonElement transform(File file) throws IOException {
-        String name = file.getName();
-        int dotIndex = name.lastIndexOf('.');
-        if (dotIndex == -1 || dotIndex == name.length() - 1) {
-            throw new JsonParseException("File must have an extension: " + name);
+    static JsonElement transform(File file) throws IOException, JsonParseException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] data = fis.readAllBytes();
+            String content = new String(data);
+            return transform(content, file.getName());
         }
-        String ext = name.substring(dotIndex + 1).toLowerCase();
+    }
+
+    static JsonElement transform(String content, String filename) {
+        String ext = FileUtil.extension(filename);
         JsonTransformer transformer = TRANSFORMERS.getOrDefault(ext, JsonParser::parseString);
         if (transformer == null) {
             throw new JsonParseException("No transformer found for extension: " + ext);
         }
-        try (FileInputStream stream = new FileInputStream(file)) {
-            return transformer.transform(new String(stream.readAllBytes()));
-        }
+        return transformer.transform(content);
     }
 
     JsonElement transform(String raw);

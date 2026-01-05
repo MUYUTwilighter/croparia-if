@@ -3,21 +3,24 @@ package cool.muyucloud.croparia.api.placeholder;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.Codec;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 
 public class Template {
     public static final Codec<Template> CODEC = Codec.STRING.xmap(Template::new, Template::getTemplate);
+    public static final Template EMPTY = new Template();
+
     private final String template;
-    private final List<Span> spans = new ArrayList<>();
+    private final transient List<Span> spans = new ArrayList<>();
 
     public Template(String template) {
         this.template = template;
         this.read(template);
+    }
+
+    private Template() {
+        this.template = "";
     }
 
     public String getTemplate() {
@@ -75,16 +78,16 @@ public class Template {
         }
     }
 
-    public <T> String parse(T entry, Placeholder<T> placeholder) {
+    public <T> String parse(T entry, Placeholder<T> placeholder) throws JsonParseException {
         return parse(entry, placeholder, Function.identity());
     }
 
     @SuppressWarnings("unchecked")
-    public String parse(PlaceholderAccess entry) {
+    public String parse(PlaceholderAccess entry) throws JsonParseException {
         return parse(entry, (Placeholder<PlaceholderAccess>) entry.placeholder(), Function.identity());
     }
 
-    public <T> String parse(T entry, Placeholder<T> placeholder, Function<String, String> preProcess) {
+    public <T> String parse(T entry, Placeholder<T> placeholder, Function<String, String> preProcess) throws JsonParseException {
         Map<String, String> cache = new HashMap<>();
         StringBuilder sb = new StringBuilder(template.length());
         int cursor = 0;
@@ -92,7 +95,7 @@ public class Template {
             String content = preProcess.apply(span.getContent());
             Matcher m = PatternKey.PLACEHOLDER.matcher(content);
             if (!m.matches()) {
-                throw new JsonParseException("Invalid placeholder format: %s (%s)".formatted(span.getContent(), content));
+                throw new JsonParseException("Malformed placeholder after being read: %s (%s)".formatted(span.getContent(), content));
             }
             String parsed = cache.computeIfAbsent(
                 content,
@@ -106,6 +109,21 @@ public class Template {
         // The rest of the template after the last placeholder
         sb.append(template, cursor, template.length());
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Template template1)) return false;
+        return Objects.equals(template, template1.template);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(template);
+    }
+
+    public boolean isEmpty() {
+        return this.template.isEmpty();
     }
 
     public static class Span {

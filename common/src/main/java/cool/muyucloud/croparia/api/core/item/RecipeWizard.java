@@ -38,7 +38,7 @@ public class RecipeWizard extends Item {
     public static final ResourceLocation PACK_ID = CropariaIf.of("recipe_wizard");
     public static final OnLoadSupplier<Collection<RecipeWizardGenerator>> GENERATORS = OnLoadSupplier.of(() -> {
         for (JarJarEntry entry : PackHandler.getBuiltinGenerators(PACK_ID)) {
-            String name = entry.getEntry().getName();
+            String name = entry.getJarEntry().getName();
             String prefix = "data-generators/%s/%s/".formatted(PACK_ID.getNamespace(), PACK_ID.getPath());
             Path target = CropariaIf.CONFIG.getFilePath().resolve("recipe_wizard/generators").resolve(name.substring(prefix.length()));
             try {

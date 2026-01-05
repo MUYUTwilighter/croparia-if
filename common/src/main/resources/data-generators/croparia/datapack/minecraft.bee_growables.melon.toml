@@ -1,0 +1,13 @@
+registry = "croparia:melons"
+path = "minecraft/tag/block/bee_growables.json"
+type = "croparia:aggregated"
+startup = true
+content = '    "${stem}"'
+template = """
+{
+  "replace": false,
+  "values": [
+${content}
+  ]
+}
+"""

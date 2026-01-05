@@ -171,7 +171,7 @@ public class Placeholder<T> implements RegexParser<T> {
                 return json.toString();
             }
         } catch (PlaceholderException e) {
-            LOGGER.error("Error processing placeholder: " + placeholder, e);
+            LOGGER.debug("Error processing placeholder: " + placeholder, e);
         }
         return "${" + placeholder + "}";
     }

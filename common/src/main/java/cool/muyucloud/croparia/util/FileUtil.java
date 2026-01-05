@@ -83,4 +83,12 @@ public class FileUtil {
         }
         Files.delete(dir.toPath());
     }
+
+    public static String extension(String filename) {
+        int lastDot = filename.lastIndexOf('.');
+        if (lastDot == -1 || lastDot == filename.length() - 1) {
+            return "";
+        }
+        return filename.substring(lastDot + 1);
+    }
 }
