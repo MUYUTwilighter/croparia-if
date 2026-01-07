@@ -9,6 +9,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,5 +81,11 @@ public abstract class Material<T> {
         }
     }
 
+    public boolean isEmpty() {
+        return this.asItem().isEmpty();
+    }
+
     public abstract List<T> candidates();
+
+    public abstract ItemStack asItem();
 }

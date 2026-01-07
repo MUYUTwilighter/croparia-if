@@ -138,7 +138,8 @@ public abstract class PackHandler {
                 entry.forInputStream(input -> {
                     String content = new String(input.readAllBytes());
                     JsonElement json = JsonTransformer.transform(content, name);
-                    if (!json.isJsonObject()) throw new JsonParseException("Generator file is not a JSON object: " + name);
+                    if (!json.isJsonObject())
+                        throw new JsonParseException("Generator file is not a JSON object: " + name);
                     Optional<DataGenerator> mayGenerator = DataGenerator.read(json.getAsJsonObject());
                     if (mayGenerator.isPresent()) {
                         DataGenerator generator = mayGenerator.get();
@@ -160,7 +161,8 @@ public abstract class PackHandler {
                 try (FileInputStream fis = new FileInputStream(file)) {
                     String content = new String(fis.readAllBytes());
                     JsonElement json = JsonTransformer.transform(content, name);
-                    if (!json.isJsonObject()) throw new JsonParseException("Generator file is not a JSON object: " + name);
+                    if (!json.isJsonObject())
+                        throw new JsonParseException("Generator file is not a JSON object: " + name);
                     Optional<DataGenerator> mayGenerator = DataGenerator.read(json.getAsJsonObject());
                     if (mayGenerator.isPresent()) {
                         DataGenerator generator = mayGenerator.get();

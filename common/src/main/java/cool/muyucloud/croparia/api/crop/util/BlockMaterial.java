@@ -13,6 +13,7 @@ import cool.muyucloud.croparia.api.placeholder.TypeMapper;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -37,7 +38,7 @@ public class BlockMaterial extends Material<Block> {
     );
     public static final Placeholder<BlockMaterial> PLACEHOLDER = Placeholder.build(node -> node
         .self(TypeMapper.identity(), BlockMaterial.CODEC)
-        .then(PatternKey.literal("result"), TypeMapper.of(material -> ItemOutput.of(material.getStack())), Placeholder.ITEM_OUTPUT)
+        .then(PatternKey.literal("result"), TypeMapper.of(material -> ItemOutput.of(material.asItem())), Placeholder.ITEM_OUTPUT)
         .concat(Material.PLACEHOLDER, TypeMapper.of(material -> material)));
 
     private transient final OnLoadSupplier<List<Block>> blocks = OnLoadSupplier.of(
@@ -50,6 +51,19 @@ public class BlockMaterial extends Material<Block> {
             return result.isEmpty() ? List.of(Blocks.AIR) : result;
         }
     );
+
+    public static ResourceLocation parse(ItemStack stack) {
+        Item item = stack.getItem();
+        if (item instanceof BlockItem blockItem) {
+            return blockItem.getBlock().arch$registryName();
+        } else {
+            throw new IllegalArgumentException("Not a block item: " + item.arch$registryName());
+        }
+    }
+
+    public BlockMaterial(@NotNull ItemStack stack) {
+        super(parse(stack).toString(), stack.getCount());
+    }
 
     public BlockMaterial(@NotNull String name) {
         super(name, 2);
@@ -64,11 +78,15 @@ public class BlockMaterial extends Material<Block> {
         return blocks.get();
     }
 
-    public Item asItem() {
-        return this.candidates().getFirst().asItem();
+    @Override
+    public ItemStack asItem() {
+        ItemStack stack =  this.candidates().getFirst().asItem().getDefaultInstance();
+        stack.setCount(this.getCount());
+        return stack;
     }
 
-    public ItemStack getStack() {
-        return new ItemStack(this.asItem(), this.getCount());
+    @Override
+    public boolean isEmpty() {
+        return this.asItem().isEmpty();
     }
 }

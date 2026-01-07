@@ -36,7 +36,7 @@ public class ItemMaterial extends Material<Item> {
     );
     public static final Placeholder<ItemMaterial> PLACEHOLDER = Placeholder.build(node -> node
         .self(TypeMapper.identity(), ItemMaterial.CODEC)
-        .then(PatternKey.literal("result"), TypeMapper.of(material -> ItemOutput.of(material.getStack())), Placeholder.ITEM_OUTPUT)
+        .then(PatternKey.literal("result"), TypeMapper.of(material -> ItemOutput.of(material.asItem())), Placeholder.ITEM_OUTPUT)
         .then(PatternKey.literal("components"), TypeMapper.of(ItemMaterial::getComponents), Placeholder.DATA_COMPONENTS)
         .concat(Material.PLACEHOLDER, TypeMapper.of(material -> material)));
 
@@ -65,19 +65,16 @@ public class ItemMaterial extends Material<Item> {
         return components;
     }
 
-    public @NotNull Item getItem() {
-        return this.candidates().getFirst();
+    @Override
+    public @NotNull ItemStack asItem() {
+        ItemStack stack = this.candidates().getFirst().getDefaultInstance();
+        stack.applyComponents(this.getComponents());
+        stack.setCount(this.getCount());
+        return stack;
     }
 
     @Override
     public List<Item> candidates() {
         return this.items.get();
-    }
-
-    public ItemStack getStack() {
-        ItemStack stack = new ItemStack(this.getItem());
-        stack.applyComponents(this.getComponents());
-        stack.setCount(this.getCount());
-        return stack;
     }
 }

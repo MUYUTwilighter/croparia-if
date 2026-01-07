@@ -1,5 +1,6 @@
 package cool.muyucloud.croparia.util.text;
 
+import com.mojang.brigadier.context.CommandContext;
 import cool.muyucloud.croparia.api.core.component.Text;
 import cool.muyucloud.croparia.registry.CropariaComponents;
 import dev.architectury.event.events.client.ClientCommandRegistrationEvent;
@@ -71,6 +72,16 @@ public class Texts {
         player.displayClientMessage(message, true);
     }
 
+    public static <S> SuccessMessenger success(@NotNull CommandContext<S> context) {
+        S source = context.getSource();
+        if (source instanceof CommandSourceStack commandSourceStack) {
+            return success(commandSourceStack);
+        } else if (source instanceof ClientCommandRegistrationEvent.ClientCommandSourceStack clientSourceStack) {
+            return success(clientSourceStack);
+        }
+        throw new IllegalArgumentException("Unsupported command source type: " + source.getClass().getName());
+    }
+
     public static SuccessMessenger success(@NotNull CommandSourceStack source) {
         return (msg, broadcast) -> success(source, msg, broadcast);
     }
@@ -101,6 +112,16 @@ public class Texts {
 
     public static void broadcastSuccess(@NotNull ClientCommandRegistrationEvent.ClientCommandSourceStack source, Component message) {
         source.arch$sendSuccess(() -> message, true);
+    }
+
+    public static <S> FailureMessenger failure(@NotNull CommandContext<S> context) {
+        S source = context.getSource();
+        if (source instanceof CommandSourceStack commandSourceStack) {
+            return failure(commandSourceStack);
+        } else if (source instanceof ClientCommandRegistrationEvent.ClientCommandSourceStack clientSourceStack) {
+            return failure(clientSourceStack);
+        }
+        throw new IllegalArgumentException("Unsupported command source type: " + source.getClass().getName());
     }
 
     public static FailureMessenger failure(@NotNull CommandSourceStack source) {

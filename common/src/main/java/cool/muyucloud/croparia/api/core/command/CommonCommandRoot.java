@@ -14,8 +14,8 @@ import static net.minecraft.commands.CommandSourceStack.ERROR_NOT_PLAYER;
 public class CommonCommandRoot {
     private static final LiteralArgumentBuilder<CommandSourceStack> ROOT = Commands.literal("cropariaServer")
         .requires(s -> s.hasPermission(2))
-        .then(DumpCommand.build())
-        .then(CropCommand.build())
+        .then(CropCommand.buildCrop(false))
+        .then(CropCommand.buildMelon(false))
         .then(ConfigCommand.buildFilePath())
         .then(ConfigCommand.buildRecipeWizard())
         .then(ConfigCommand.buildInfusor())
@@ -24,8 +24,7 @@ public class CommonCommandRoot {
         .then(ConfigCommand.buildAutoReload())
         .then(ConfigCommand.buildOverride())
         .then(ConfigCommand.buildSoakAttempts())
-        .then(ConfigCommand.buildReset())
-        .then(CreateCommand.build());
+        .then(ConfigCommand.buildReset());
 
     public static void register() {
         CropariaIf.LOGGER.debug("Registering commands");

@@ -34,7 +34,7 @@ public class Color {
         this.value = value;
     }
 
-    public Color(String format) {
+    public Color(String format) throws NumberFormatException {
         if (format.startsWith("#")) this.value = Integer.parseInt(format.substring(1), 16);
         else if (format.startsWith("0x")) this.value = Integer.parseInt(format.substring(2), 16);
         else this.value = Integer.parseInt(format) | 0xFF000000;

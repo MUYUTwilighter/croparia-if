@@ -40,6 +40,7 @@ public class CropariaIf {
         Crops.register();
         Melons.register();
         LOGGER.info("Croparia IF vanilla registration");
+        ArgumentTypes.register();
         NetworkHandlers.register();
         CropariaComponents.register();
         CropariaFluids.register();

@@ -161,6 +161,7 @@ public class DataGenerator implements DgListener {
     }
 
     public void generate(PackHandler pack) {
+        if (!this.isEnabled()) return;
         if (this.isStartup() || CropariaIf.isServerStarted()) {
             if (this.getWhitelist().isEmpty()) {
                 for (DgEntry entry : this.getRegistry()) {
