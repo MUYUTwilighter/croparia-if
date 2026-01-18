@@ -16,6 +16,7 @@ public class CommonCommandRoot {
         .requires(s -> s.hasPermission(2))
         .then(CropCommand.buildCrop(false))
         .then(CropCommand.buildMelon(false))
+        .then(GeneratorCommand.buildGenerator(false))
         .then(ConfigCommand.buildFilePath())
         .then(ConfigCommand.buildRecipeWizard())
         .then(ConfigCommand.buildInfusor())

@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.generator;
 
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.MapCodec;
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.api.generator.util.DgEntry;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
@@ -36,6 +37,7 @@ public class LangGenerator extends DataGenerator {
             throw new IllegalArgumentException("Iterable %s is not translatable".formatted(dg.getRegistry()), e);
         }
     }, lg -> lg);
+    public static final ResourceLocation TYPE = CropariaIf.of("lang");
 
     public LangGenerator(
         boolean enabled, boolean startup, List<ResourceLocation> whitelist, Template path,
@@ -81,5 +83,10 @@ public class LangGenerator extends DataGenerator {
         } else {
             throw new JsonParseException("Entry %s is not translatable".formatted(entry));
         }
+    }
+
+    @Override
+    public ResourceLocation getType() {
+        return TYPE;
     }
 }

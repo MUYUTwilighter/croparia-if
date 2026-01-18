@@ -67,6 +67,10 @@ public class ItemMaterial extends Material<Item> {
 
     @Override
     public @NotNull ItemStack asItem() {
+        List<Item> stacks = this.candidates();
+        if (stacks.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
         ItemStack stack = this.candidates().getFirst().getDefaultInstance();
         stack.applyComponents(this.getComponents());
         stack.setCount(this.getCount());

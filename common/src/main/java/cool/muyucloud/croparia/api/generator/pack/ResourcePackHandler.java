@@ -29,6 +29,7 @@ public class ResourcePackHandler extends PackHandler {
 
     public static <P extends ResourcePackHandler> P register(P pack) {
         REGISTRY.put(pack.getId(), pack);
+        PackHandler.register(pack);
         return pack;
     }
 

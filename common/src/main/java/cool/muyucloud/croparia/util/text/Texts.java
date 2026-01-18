@@ -1,6 +1,5 @@
 package cool.muyucloud.croparia.util.text;
 
-import com.mojang.brigadier.context.CommandContext;
 import cool.muyucloud.croparia.api.core.component.Text;
 import cool.muyucloud.croparia.registry.CropariaComponents;
 import dev.architectury.event.events.client.ClientCommandRegistrationEvent;
@@ -64,64 +63,8 @@ public class Texts {
         source.sendSystemMessage(msg);
     }
 
-    public static void chat(@NotNull ClientCommandRegistrationEvent.ClientCommandSourceStack source, Component msg) {
-        success(source, msg);
-    }
-
     public static void overlay(@NotNull Player player, Component message) {
         player.displayClientMessage(message, true);
-    }
-
-    public static <S> SuccessMessenger success(@NotNull CommandContext<S> context) {
-        S source = context.getSource();
-        if (source instanceof CommandSourceStack commandSourceStack) {
-            return success(commandSourceStack);
-        } else if (source instanceof ClientCommandRegistrationEvent.ClientCommandSourceStack clientSourceStack) {
-            return success(clientSourceStack);
-        }
-        throw new IllegalArgumentException("Unsupported command source type: " + source.getClass().getName());
-    }
-
-    public static SuccessMessenger success(@NotNull CommandSourceStack source) {
-        return (msg, broadcast) -> success(source, msg, broadcast);
-    }
-
-    public static SuccessMessenger success(@NotNull ClientCommandRegistrationEvent.ClientCommandSourceStack source) {
-        return (msg, broadcast) -> success(source, msg, broadcast);
-    }
-
-    public static void success(@NotNull CommandSourceStack source, Component message, boolean broadcast) {
-        source.sendSuccess(() -> message, broadcast);
-    }
-
-    public static void success(@NotNull CommandSourceStack source, Component message) {
-        success(source, message, false);
-    }
-
-    public static void success(@NotNull ClientCommandRegistrationEvent.ClientCommandSourceStack source, Component message, boolean broadcast) {
-        source.arch$sendSuccess(() -> message, broadcast);
-    }
-
-    public static void success(@NotNull ClientCommandRegistrationEvent.ClientCommandSourceStack source, Component message) {
-        success(source, message, false);
-    }
-
-    public static void broadcastSuccess(@NotNull CommandSourceStack source, Component message) {
-        source.sendSuccess(() -> message, true);
-    }
-
-    public static void broadcastSuccess(@NotNull ClientCommandRegistrationEvent.ClientCommandSourceStack source, Component message) {
-        source.arch$sendSuccess(() -> message, true);
-    }
-
-    public static <S> FailureMessenger failure(@NotNull CommandContext<S> context) {
-        S source = context.getSource();
-        if (source instanceof CommandSourceStack commandSourceStack) {
-            return failure(commandSourceStack);
-        } else if (source instanceof ClientCommandRegistrationEvent.ClientCommandSourceStack clientSourceStack) {
-            return failure(clientSourceStack);
-        }
-        throw new IllegalArgumentException("Unsupported command source type: " + source.getClass().getName());
     }
 
     public static FailureMessenger failure(@NotNull CommandSourceStack source) {
@@ -160,12 +103,20 @@ public class Texts {
         );
     }
 
+    public static MutableComponent openFileButton(String path) {
+        return Texts.translatable("commands.croparia.openFile")
+            .withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, path)))
+            .withStyle(Texts.blockMouseBehavior())
+            .withStyle(ChatFormatting.GREEN);
+    }
+
     public static Style openFile(String path) {
         return Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, path));
     }
 
     public static Style hoverItem(ResourceLocation id) {
-        return hoverItem(BuiltInRegistries.ITEM.getValue(id));
+        Item item = BuiltInRegistries.ITEM.getValue(id);
+        return hoverItem(item);
     }
 
     public static Style hoverItem(Item item) {

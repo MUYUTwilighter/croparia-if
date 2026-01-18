@@ -1,6 +1,7 @@
 package cool.muyucloud.croparia.api.generator;
 
 import com.mojang.serialization.MapCodec;
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.api.generator.util.DgEntry;
@@ -25,6 +26,7 @@ public class AggregatedGenerator extends DataGenerator {
             base.getPath(), base.getRegistry(), content, base.getTemplate()
         )
     );
+    public static final ResourceLocation TYPE = CropariaIf.of("aggregated");
     public static final Placeholder<String> CONTENT_PLACEHOLDER = Placeholder.build(builder -> builder
         .then(PatternKey.literal("content"), Placeholder.STRING));
 
@@ -75,5 +77,10 @@ public class AggregatedGenerator extends DataGenerator {
             String content = builder.isEmpty() ? "" : builder.substring(0, builder.length() - 2);
             handler.cache(entry.path(), this.getTemplate().parse(content, CONTENT_PLACEHOLDER), this);
         }
+    }
+
+    @Override
+    public ResourceLocation getType() {
+        return TYPE;
     }
 }

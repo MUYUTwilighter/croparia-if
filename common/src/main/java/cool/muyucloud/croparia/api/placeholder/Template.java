@@ -78,16 +78,16 @@ public class Template {
         }
     }
 
-    public <T> String parse(T entry, Placeholder<T> placeholder) throws JsonParseException {
+    public <T> String parse(T entry, Placeholder<T> placeholder) {
         return parse(entry, placeholder, Function.identity());
     }
 
     @SuppressWarnings("unchecked")
-    public String parse(PlaceholderAccess entry) throws JsonParseException {
+    public String parse(PlaceholderAccess entry) {
         return parse(entry, (Placeholder<PlaceholderAccess>) entry.placeholder(), Function.identity());
     }
 
-    public <T> String parse(T entry, Placeholder<T> placeholder, Function<String, String> preProcess) throws JsonParseException {
+    public <T> String parse(T entry, Placeholder<T> placeholder, Function<String, String> preProcess) {
         Map<String, String> cache = new HashMap<>();
         StringBuilder sb = new StringBuilder(template.length());
         int cursor = 0;
@@ -95,7 +95,7 @@ public class Template {
             String content = preProcess.apply(span.getContent());
             Matcher m = PatternKey.PLACEHOLDER.matcher(content);
             if (!m.matches()) {
-                throw new JsonParseException("Malformed placeholder after being read: %s (%s)".formatted(span.getContent(), content));
+                throw new RuntimeException("Malformed placeholder after being read: %s (%s)".formatted(span.getContent(), content));
             }
             String parsed = cache.computeIfAbsent(
                 content,

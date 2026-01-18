@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.generator.DataGenerator;
 import cool.muyucloud.croparia.api.generator.util.JarJarEntry;
@@ -33,6 +34,7 @@ import java.util.regex.Pattern;
  */
 public abstract class PackHandler {
     public static final Gson GSON = new Gson();
+    private static final Map<ResourceLocation, PackHandler> PACKS = new HashMap<>();  // For command suggestion only
     private static final Pattern PATTERN = Pattern.compile("^data-generators/([^/]+)/([^/]+)/[^/]+$");
     private static final LazySupplier<Map<ResourceLocation, Collection<JarJarEntry>>> BUILTIN_GENERATORS = LazySupplier.of(() -> {
         Map<ResourceLocation, Collection<JarJarEntry>> map = new HashMap<>();
@@ -61,6 +63,18 @@ public abstract class PackHandler {
         });
         return map;
     });
+
+    public static void register(PackHandler handler) {
+        PACKS.put(handler.getId(), handler);
+    }
+
+    public static void suggestPacks(SuggestionsBuilder builder) {
+        PACKS.forEach((resourceLocation, handler) -> builder.suggest(resourceLocation.toString()));
+    }
+
+    public static Optional<PackHandler> byId(ResourceLocation id) {
+        return Optional.ofNullable(PACKS.get(id));
+    }
 
     @ExpectPlatform
     public static void forEachJar(BiConsumer<File, String> consumer) {
@@ -154,7 +168,7 @@ public abstract class PackHandler {
     }
 
     protected void readGenerators() {
-        File parent = this.getRoot().resolve("generators").toFile();
+        File parent = this.getGeneratorRoot().toFile();
         try {
             FileUtil.forFilesIn(parent, file -> {
                 String name = file.getAbsolutePath().substring(parent.getAbsolutePath().length() + 1);
@@ -225,5 +239,17 @@ public abstract class PackHandler {
 
     public Path getRoot() {
         return this.root;
+    }
+
+    public Path getGeneratorRoot() {
+        return this.getRoot().resolve("generator");
+    }
+
+    public void suggestGenerators(SuggestionsBuilder builder) {
+        this.generators.forEach((name, generator) -> builder.suggest(name));
+    }
+
+    public Optional<DataGenerator> getGenerator(String name) {
+        return Optional.ofNullable(this.generators.get(name));
     }
 }

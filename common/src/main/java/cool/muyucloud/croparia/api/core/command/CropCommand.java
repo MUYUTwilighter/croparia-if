@@ -10,10 +10,7 @@ import cool.muyucloud.croparia.api.crop.*;
 import cool.muyucloud.croparia.api.crop.block.CropariaCropBlock;
 import cool.muyucloud.croparia.api.crop.block.MelonStem;
 import cool.muyucloud.croparia.api.crop.item.Croparia;
-import cool.muyucloud.croparia.api.crop.util.BlockMaterial;
-import cool.muyucloud.croparia.api.crop.util.Color;
-import cool.muyucloud.croparia.api.crop.util.CropDependencies;
-import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
+import cool.muyucloud.croparia.api.crop.util.*;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.registry.DgRegistries;
 import cool.muyucloud.croparia.util.CifUtil;
@@ -30,6 +27,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -50,6 +48,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
             );
             MutableComponent seed = reportSeed(crop.getSeedId());
             MutableComponent fruit = reportFruit(crop.getFruitId());
+
             MutableComponent cropBlock = Texts.translatable(
                 "commands.croparia.crop.query.cropBlock",
                 Texts.literal(crop.getBlockId().toString(),
@@ -257,22 +256,28 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         ));
     }
 
-    private static @NotNull MutableComponent reportMaterial(AbstractCrop<?> crop) {
-        return Texts.translatable("commands.croparia.crop.query.material", Texts.literal(
-            crop.getMaterial().getName(),
-            Texts.suggestCommand("give", "@s", Objects.requireNonNull(crop.getMaterial().asItem().getItem().arch$registryName()).toString()),
-            Texts.hoverItem(crop.getMaterial().asItem()),
-            Texts.inlineMouseBehavior()
-        ));
+    private static @NotNull <T> MutableComponent reportMaterial(AbstractCrop<T> crop) {
+        Material<T> material = crop.getMaterial();
+        MutableComponent name = Texts.literal(material.getName(), Texts.copyText(material.getName()), Texts.inlineMouseBehavior());
+        if (material.isEmpty()) {
+            return Texts.translatable("commands.croparia.crop.query.material", name);
+        } else {
+            ItemStack stack = material.asItem();
+            name.withStyle(Texts.hoverItem(stack));
+            name.withStyle(Texts.suggestCommand("give", "@s", Objects.requireNonNull(stack.getItem().arch$registryName()).toString()));
+            return Texts.translatable("commands.croparia.crop.query.material", name);
+        }
     }
 
     private static @NotNull MutableComponent reportTranslation(AbstractCrop<?> crop) {
-        return Texts.translatable(
-            "commands.croparia.crop.query.translationKey",
-            Texts.forStyles(Texts.translatable(crop.getTranslationKey()),
-                Texts.hoverText(crop.getTranslationKey()),
-                Texts.copyText(crop.getTranslationKey()))
-        );
+        @Nullable
+        String key = crop.getTranslationKey();
+        MutableComponent keyComp;
+        if (key == null) keyComp = Texts.literal("not loaded");
+        else keyComp = Texts.forStyles(Texts.translatable(key),
+            Texts.hoverText(key),
+            Texts.copyText(key));
+        return Texts.translatable("commands.croparia.crop.query.translationKey", keyComp);
     }
 
     private static @NotNull MutableComponent reportName(AbstractCrop<?> crop) {
@@ -280,13 +285,13 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
     }
 
     public static MutableComponent diagnose(@NotNull AbstractCrop<?> crop) {
-        if (crop.getMaterial().isEmpty()) {
-            return Texts.translatable("commands.croparia.crop.status.material").withStyle(ChatFormatting.RED);
-        }
         if (!crop.shouldLoad()) {
-            return Texts.translatable("commands.croparia.crop.status.unavailable").withStyle(ChatFormatting.YELLOW);
+            return Texts.translatable("commands.croparia.crop.query.status.unavailable").withStyle(ChatFormatting.YELLOW);
         }
-        return Texts.translatable("commands.croparia.crop.status.good").withStyle(ChatFormatting.GREEN);
+        if (crop.getMaterial().isEmpty()) {
+            return Texts.translatable("commands.croparia.crop.query.status.material").withStyle(ChatFormatting.RED);
+        }
+        return Texts.translatable("commands.croparia.crop.query.status.good").withStyle(ChatFormatting.GREEN);
     }
 
     /* DUMP */
@@ -294,8 +299,10 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         int size = this.getRegistry().size();
         MutableComponent component = Texts.translatable("commands.croparia.crop.dump.perform", size);
         if (openFile) {
-            component.withStyle(Texts.openFile(this.getRegistry().getPath().toString()));
-            component.withStyle(Texts.blockMouseBehavior());
+            MutableComponent openFileButton = Texts.openFileButton(
+                this.getRegistry().getPath().toAbsolutePath().toString()
+            );
+            component.append(Texts.literal(" ")).append(openFileButton);
         }
         success.success(component, true);
         this.getRegistry().dumpCrops();
@@ -311,11 +318,11 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         }
         Path dumped = this.getRegistry().dumpCrop(optional.get());
         if (dumped != null) {
-            MutableComponent nameComponent = Texts.literal(id.toString());
-            if (openFile) {
-                nameComponent.withStyle(Texts.openFile(dumped.toString()));
-            }
             MutableComponent component = Texts.translatable("commands.croparia.crop.dump.singular", id);
+            if (openFile) {
+                MutableComponent openFileButton = Texts.openFileButton(dumped.toAbsolutePath().toString());
+                component.append(openFileButton);
+            }
             messenger.success(component, true);
             return 1;
         } else {
@@ -354,9 +361,10 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
             Path result = DgRegistries.MELONS.dumpCrop(melon);
             MutableComponent resultComponent = Texts.literal(result.toString());
             if (client) {
-                resultComponent.withStyle(Texts.openFile(result.toString())).withStyle(Texts.inlineMouseBehavior());
+                MutableComponent openFileButton = Texts.openFileButton(result.toAbsolutePath().toString());
+                resultComponent.append(Texts.literal(" ")).append(openFileButton);
             }
-            source.success(Texts.translatable("commands.croparia.crop.create.success", resultComponent), true);
+            source.success(Texts.translatable("commands.croparia.crop.create.success"), true);
             return tier;
         } catch (IllegalArgumentException e) {
             return -1;
@@ -394,7 +402,8 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
             Path result = DgRegistries.CROPS.dumpCrop(crop);
             MutableComponent resultComponent = Texts.literal(result.toString());
             if (client) {
-                resultComponent.withStyle(Texts.openFile(result.toString())).withStyle(Texts.inlineMouseBehavior());
+                MutableComponent openFileButton = Texts.openFileButton(result.toAbsolutePath().toString());
+                resultComponent.append(Texts.literal(" ")).append(openFileButton);
             }
             source.success(Texts.translatable("commands.croparia.crop.create.success", resultComponent), true);
             return tier;

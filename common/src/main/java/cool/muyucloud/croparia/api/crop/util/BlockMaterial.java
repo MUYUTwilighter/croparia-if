@@ -18,7 +18,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -42,14 +41,11 @@ public class BlockMaterial extends Material<Block> {
         .concat(Material.PLACEHOLDER, TypeMapper.of(material -> material)));
 
     private transient final OnLoadSupplier<List<Block>> blocks = OnLoadSupplier.of(
-        () -> {
-            List<Block> result = this.candidates(BuiltInRegistries.BLOCK.key().location()).stream().filter(block -> {
-                boolean blacklist = CropariaIf.CONFIG.isModValid(Objects.requireNonNull(block.arch$registryName()).getNamespace());
-                boolean hasItem = block.asItem() instanceof BlockItem;
-                return blacklist & hasItem;
-            }).toList();
-            return result.isEmpty() ? List.of(Blocks.AIR) : result;
-        }
+        () -> this.candidates(BuiltInRegistries.BLOCK.key().location()).stream().filter(block -> {
+            boolean blacklist = CropariaIf.CONFIG.isModValid(Objects.requireNonNull(block.arch$registryName()).getNamespace());
+            boolean hasItem = block.asItem() instanceof BlockItem;
+            return blacklist & hasItem;
+        }).toList()
     );
 
     public static ResourceLocation parse(ItemStack stack) {
@@ -80,6 +76,10 @@ public class BlockMaterial extends Material<Block> {
 
     @Override
     public ItemStack asItem() {
+        List<Block> candidates = this.candidates();
+        if (candidates.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
         ItemStack stack =  this.candidates().getFirst().asItem().getDefaultInstance();
         stack.setCount(this.getCount());
         return stack;

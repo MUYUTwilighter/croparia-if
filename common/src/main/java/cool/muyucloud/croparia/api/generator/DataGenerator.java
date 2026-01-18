@@ -83,6 +83,8 @@ public class DataGenerator implements DgListener {
         enabled.orElse(true), startup.orElse(false), whitelist.orElse(List.of()), path, registry, template
     )));
 
+    private static final ResourceLocation TYPE = CropariaIf.of("generator");
+
     private final boolean enabled;
     private final boolean startup;
     private final List<ResourceLocation> whitelist;
@@ -181,5 +183,13 @@ public class DataGenerator implements DgListener {
         String relative = this.getPath(entry);
         String replaced = this.getTemplate(entry);
         pack.cache(relative, replaced, this);
+    }
+
+    public ResourceLocation getType() {
+        return TYPE;
+    }
+
+    public Optional<MapCodec<? extends DataGenerator>> getCodec() {
+        return Optional.ofNullable(REGISTRY.get(this.getType()));
     }
 }
