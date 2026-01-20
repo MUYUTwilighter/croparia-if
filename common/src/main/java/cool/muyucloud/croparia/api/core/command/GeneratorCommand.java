@@ -7,13 +7,13 @@ import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.generator.DataGenerator;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.api.generator.util.JarJarEntry;
+import cool.muyucloud.croparia.util.FileUtil;
 import cool.muyucloud.croparia.util.ResourceLocationArgument;
 import cool.muyucloud.croparia.util.text.DelegateSource;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -47,11 +47,7 @@ public class GeneratorCommand {
                 String generatorVal = jarJarEntry.getJarEntry().getName().substring(prefix.length());
                 Path target = packRoot.resolve(generatorVal);
                 try {
-                    jarJarEntry.forInputStream(inputStream -> {
-                        try (FileOutputStream outputStream = new FileOutputStream(target.toFile())) {
-                            inputStream.transferTo(outputStream);
-                        }
-                    });
+                    jarJarEntry.forInputStream(inputStream -> FileUtil.transfer(inputStream, target.toFile(), true));
                     success.incrementAndGet();
                 } catch (IOException e) {
                     source.failure(Texts.translatable("commands.croparia.generator.dumpBuiltin.fail", generatorVal));
@@ -90,11 +86,7 @@ public class GeneratorCommand {
                 if (entry.getJarEntry().getName().equals(entryName)) {
                     Path target = generatorRoot.resolve(generatorVal);
                     try {
-                        entry.forInputStream(inputStream -> {
-                            try (FileOutputStream outputStream = new FileOutputStream(target.toFile())) {
-                                inputStream.transferTo(outputStream);
-                            }
-                        });
+                        entry.forInputStream(inputStream -> FileUtil.transfer(inputStream, target.toFile(), true));
                         MutableComponent result = Texts.translatable("commands.croparia.generator.dumpBuiltin.success", 1);
                         if (client) {
                             MutableComponent openOp = Texts.openFileButton(target.toAbsolutePath().toString());
