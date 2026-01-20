@@ -302,7 +302,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
             MutableComponent openFileButton = Texts.openFileButton(
                 this.getRegistry().getPath().toAbsolutePath().toString()
             );
-            component.append(Texts.literal(" ")).append(openFileButton);
+            component.append(" ").append(openFileButton);
         }
         success.success(component, true);
         this.getRegistry().dumpCrops();
@@ -321,7 +321,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
             MutableComponent component = Texts.translatable("commands.croparia.crop.dump.singular", id);
             if (openFile) {
                 MutableComponent openFileButton = Texts.openFileButton(dumped.toAbsolutePath().toString());
-                component.append(openFileButton);
+                component.append(" ").append(openFileButton);
             }
             messenger.success(component, true);
             return 1;
@@ -403,7 +403,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
             MutableComponent resultComponent = Texts.literal(result.toString());
             if (client) {
                 MutableComponent openFileButton = Texts.openFileButton(result.toAbsolutePath().toString());
-                resultComponent.append(Texts.literal(" ")).append(openFileButton);
+                resultComponent.append(" ").append(openFileButton);
             }
             source.success(Texts.translatable("commands.croparia.crop.create.success", resultComponent), true);
             return tier;

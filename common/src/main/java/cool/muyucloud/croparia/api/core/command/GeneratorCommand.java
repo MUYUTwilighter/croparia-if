@@ -40,7 +40,7 @@ public class GeneratorCommand {
                 source.failure(Texts.translatable("commands.croparia.generator.badPack"));
                 return -1;
             }
-            Path packRoot = mayHandler.get().getRoot();
+            Path packRoot = mayHandler.get().getGeneratorRoot();
             String prefix = "data-generators/%s/%s/".formatted(packId.getNamespace(), packId.getNamespace());
             AtomicInteger success = new AtomicInteger();
             PackHandler.getBuiltinGenerators(packId).forEach(jarJarEntry -> {
@@ -61,7 +61,7 @@ public class GeneratorCommand {
             MutableComponent result = Texts.translatable("commands.croparia.generator.dumpBuiltin.success", success.get());
             if (client) {
                 MutableComponent openOp = Texts.openFileButton(packRoot.toAbsolutePath().toString());
-                result.append(openOp);
+                result.append(" ").append(openOp);
             }
             source.success(result, false);
             return success.get();
@@ -98,7 +98,7 @@ public class GeneratorCommand {
                         MutableComponent result = Texts.translatable("commands.croparia.generator.dumpBuiltin.success", 1);
                         if (client) {
                             MutableComponent openOp = Texts.openFileButton(target.toAbsolutePath().toString());
-                            result.append(openOp);
+                            result.append(" ").append(openOp);
                         }
                         source.success(result, false);
                         return 1;
