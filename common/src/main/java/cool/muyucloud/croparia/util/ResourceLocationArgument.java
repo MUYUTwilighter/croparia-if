@@ -17,7 +17,11 @@ public class ResourceLocationArgument implements ArgumentType<ResourceLocation> 
     }
 
     public static <S> ResourceLocation getId(CommandContext<S> commandContext, String string) {
-        return commandContext.getArgument(string, ResourceLocation.class);
+        try {
+            return commandContext.getArgument(string, ResourceLocation.class);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public ResourceLocation parse(StringReader stringReader) throws CommandSyntaxException {

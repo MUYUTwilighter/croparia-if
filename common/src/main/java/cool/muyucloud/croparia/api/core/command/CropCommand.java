@@ -359,12 +359,12 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
                 materialId.getNamespace(), material.getItem().getDescriptionId()
             )));
             Path result = DgRegistries.MELONS.dumpCrop(melon);
-            MutableComponent resultComponent = Texts.literal(result.toString());
+            MutableComponent resultComponent = Texts.translatable("commands.croparia.crop.create.success");
             if (client) {
                 MutableComponent openFileButton = Texts.openFileButton(result.toAbsolutePath().toString());
-                resultComponent.append(Texts.literal(" ")).append(openFileButton);
+                resultComponent.append(" ").append(openFileButton);
             }
-            source.success(Texts.translatable("commands.croparia.crop.create.success"), true);
+            source.success(resultComponent, false);
             return tier;
         } catch (IllegalArgumentException e) {
             return -1;
@@ -378,8 +378,12 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
             ResourceLocation materialId = Objects.requireNonNull(material.getItem().arch$registryName());
             int tier = testTier(context);
             Color color = testColor(context, "color");
-            String type = StringArgumentType.getString(context, "type");
-            if (type == null) type = "crop";
+            String type;
+            try {
+                type = StringArgumentType.getString(context, "type");
+            } catch (IllegalArgumentException e) {
+                type = "crop";
+            }
             ResourceLocation id = testId(context, "id");
             if (id == null) id = CropariaIf.of(materialId.getPath());
             if (!forced && DgRegistries.CROPS.exists(id)) {
@@ -400,12 +404,12 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
                 materialId.getNamespace(), material.getItem().getDescriptionId()
             ));
             Path result = DgRegistries.CROPS.dumpCrop(crop);
-            MutableComponent resultComponent = Texts.literal(result.toString());
+            MutableComponent resultComponent = Texts.translatable("commands.croparia.crop.create.success");
             if (client) {
                 MutableComponent openFileButton = Texts.openFileButton(result.toAbsolutePath().toString());
                 resultComponent.append(" ").append(openFileButton);
             }
-            source.success(Texts.translatable("commands.croparia.crop.create.success", resultComponent), true);
+            source.success(resultComponent, false);
             return tier;
         } catch (IllegalArgumentException e) {
             return -1;
