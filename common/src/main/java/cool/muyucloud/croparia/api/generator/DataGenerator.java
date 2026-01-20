@@ -69,7 +69,7 @@ public class DataGenerator implements DgListener {
         if (codec == null) {
             throw new JsonParseException("Unknown data generator type: " + type);
         }
-        return Optional.ofNullable(CodecUtil.decodeJson(json, codec.codec()).getOrThrow());
+        return Optional.of(CodecUtil.decodeJson(json, codec.codec()).getOrThrow());
     }
 
     public static final MapCodec<DataGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(

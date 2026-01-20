@@ -182,6 +182,8 @@ public abstract class PackHandler {
                         DataGenerator generator = mayGenerator.get();
                         generator.setName(name);
                         this.generators.put(name, generator);
+                    } else {
+                        this.generators.remove(name);
                     }
                 } catch (IOException | JsonParseException | IllegalStateException e) {
                     DataGenerator.LOGGER.error("Failed to read generator from file \"%s\"".formatted(file), e);
