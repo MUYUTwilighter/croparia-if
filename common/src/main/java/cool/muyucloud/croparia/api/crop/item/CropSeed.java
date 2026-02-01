@@ -11,10 +11,8 @@ import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.registry.DgRegistries;
 import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -26,7 +24,7 @@ public class CropSeed extends BlockItem implements CropAccess<Crop> {
 
     public CropSeed(Crop crop) {
         super(crop.getCropBlock().orElseThrow(),
-            new Properties().arch$tab(Tabs.CROPS).setId(ResourceKey.create(Registries.ITEM, crop.getSeedId())));
+            new Properties().arch$tab(Tabs.CROPS));
         this.cropId = crop.getKey();
     }
 

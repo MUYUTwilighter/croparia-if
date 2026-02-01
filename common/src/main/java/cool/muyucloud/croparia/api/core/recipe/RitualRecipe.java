@@ -32,7 +32,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
             BlockInput.CODEC.fieldOf("block").forGetter(RitualRecipe::getBlock),
             ItemInput.CODEC.fieldOf("ingredient").forGetter(RitualRecipe::getIngredient),
             ItemOutput.CODEC.fieldOf("result").forGetter(RitualRecipe::getResult)
-        ).apply(instance, RitualRecipe::new)), TypedSerializer.JEI,
+        ).apply(instance, RitualRecipe::new)),
         Mappable.of(CropariaItems.RITUAL_STAND, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
         Mappable.of(CropariaItems.RITUAL_STAND_2, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
         Mappable.of(CropariaItems.RITUAL_STAND_3, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL))
@@ -93,7 +93,8 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
 
     @Override
     public @NotNull List<List<ItemStack>> getOutputs() {
-        ItemStack stack = this.getResult().getDisplayStack().copy();
+        List<ItemStack> results = this.getResult().getDisplayStacks();
+        ItemStack stack = results.isEmpty() ? ItemStack.EMPTY : results.getFirst().copy();
         if (stack.getItem() instanceof SpawnEggItem) {
             Texts.tooltip(stack, Texts.translatable("tooltip.croparia.spawn_egg"));
         } else if (stack.getItem() == Items.ENCHANTED_BOOK && this.getIngredient().getAmount() == 1L) {
@@ -166,14 +167,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     }
 
     @Override
-    @NotNull
-    public ItemOutput result() {
-        return this.getResult();
-    }
-
-    @Override
-    @NotNull
-    public BlockInput craftingStation() {
+    public @NotNull BlockInput craftingStation() {
         return this.getRitual();
     }
 

@@ -16,18 +16,15 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.display.DisplayContentsFactory;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
 public class BlockOutput implements SlotDisplay {
@@ -43,7 +40,6 @@ public class BlockOutput implements SlotDisplay {
         return TestedCodec.success();
     }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockOutput> STREAM_CODEC = CodecUtil.toStream(CODEC);
-    public static final SlotDisplay.Type<BlockOutput> TYPE = new SlotDisplay.Type<>(CODEC_COMP, STREAM_CODEC);
     public static final ItemStack STACK_UNKNOWN = Items.BEDROCK.getDefaultInstance();
     public static final ItemStack STACK_AIR = Items.BARRIER.getDefaultInstance();
 
@@ -93,8 +89,8 @@ public class BlockOutput implements SlotDisplay {
     }
 
     @NotNull
-    public ItemStack getDisplayStack() {
-        return displayStack;
+    public List<ItemStack> getDisplayStacks() {
+        return List.of(displayStack);
     }
 
     public boolean matches(@NotNull Block block) {
@@ -109,21 +105,6 @@ public class BlockOutput implements SlotDisplay {
         BlockState state = this.getBlock().defaultBlockState();
         state = StateHolderAccess.apply(state, this.getProperties());
         level.setBlock(pos, state, 3);
-    }
-
-    @Override
-    @NotNull
-    public <T> Stream<T> resolve(ContextMap contextMap, DisplayContentsFactory<T> factory) {
-        if (factory instanceof DisplayContentsFactory.ForStacks<T> forStacks) {
-            return Stream.of(forStacks.forStack(this.getDisplayStack()));
-        }
-        return Stream.empty();
-    }
-
-    @Override
-    @NotNull
-    public SlotDisplay.Type<? extends SlotDisplay> type() {
-        return TYPE;
     }
 
     @Override

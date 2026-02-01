@@ -4,9 +4,15 @@ template = """
 {
   "type": "minecraft:crafting_shaped",
   "key": {
-    "C": "${croparia}",
-    "M": "${material.name}",
-    "S": "#croparia:seed_ingredient"
+    "C": {
+      "item": "${croparia}"
+    },
+    "M": {
+      "${material.type}": "${material.id}"
+    },
+    "S": {
+      "tag": "croparia:seed_ingredient"
+    }
   },
   "pattern": [
     "MSM",

@@ -28,10 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public class RecipeWizard extends Item {
@@ -66,23 +63,33 @@ public class RecipeWizard extends Item {
 
     static {
         OPERATIONS.put(
+            // Build Ritual Structure
             BlockInput.ofTag(TagKey.create(Registries.BLOCK, ResourceLocation.parse("croparia:ritual_stands"))),
             context -> {
                 BlockState state = context.getLevel().getBlockState(context.getClickedPos());
                 return RitualStructure.TYPED_SERIALIZER.find(new RitualStructureContainer(state), context.getLevel()).map(structure -> {
                     structure.tryBuild(context.getLevel(), context.getClickedPos());
-                    return (InteractionResult) InteractionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }).orElse(InteractionResult.PASS);
             }
         );
         OPERATIONS.put(
+            // Shuffle Infusor element
             BlockInput.of(CropariaBlocks.INFUSOR.getId()),
             context -> {
+                if (Infusor.ELEMENT.getPossibleValues().isEmpty()) return InteractionResult.PASS;
                 BlockState state = context.getLevel().getBlockState(context.getClickedPos());
-                int i = (Infusor.ELEMENT.getInternalIndex(state.getValue(Infusor.ELEMENT)) + 1) % Infusor.ELEMENT.getPossibleValues().size();
-                Element element = Infusor.ELEMENT.getPossibleValues().get(i);
-                context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(Infusor.ELEMENT, element));
-                return InteractionResult.SUCCESS;
+                Iterator<Element> iterator = Infusor.ELEMENT.getPossibleValues().iterator();
+                while (iterator.hasNext()) {
+                    Element tmp = iterator.next();
+                    if (tmp == state.getValue(Infusor.ELEMENT)) {
+                        Element next = iterator.hasNext() ? iterator.next() : Infusor.ELEMENT.getPossibleValues().iterator().next();
+                        context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(Infusor.ELEMENT, next));
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+                // No matching element
+                return InteractionResult.PASS;
             }
         );
     }
@@ -102,7 +109,7 @@ public class RecipeWizard extends Item {
             for (var entry : OPERATIONS.entrySet()) {
                 if (entry.getKey().matches(level.getBlockState(context.getClickedPos()))) {
                     InteractionResult result = entry.getValue().apply(context);
-                    if (!(result instanceof InteractionResult.Pass)) {
+                    if (result != InteractionResult.PASS) {
                         return result;
                     }
                 }
@@ -116,7 +123,7 @@ public class RecipeWizard extends Item {
         for (RecipeWizardGenerator generator : GENERATORS.get()) {
             if (generator.matches(target)) {
                 generator.handle(context);
-                player.getCooldowns().addCooldown(context.getItemInHand(), 5);
+                player.getCooldowns().addCooldown(context.getItemInHand().getItem(), 5);
                 return InteractionResult.SUCCESS;
             }
         }

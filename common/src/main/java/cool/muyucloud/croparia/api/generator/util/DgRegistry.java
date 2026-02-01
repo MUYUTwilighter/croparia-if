@@ -11,13 +11,13 @@ public interface DgRegistry<E extends DgEntry> extends Iterable<E> {
     Map<DgRegistry<? extends DgEntry>, ResourceLocation> BY_INSTANCE = new HashMap<>();
     Codec<DgRegistry<? extends DgEntry>> CODEC = ResourceLocation.CODEC.xmap(REGISTRY::get, BY_INSTANCE::get);
 
-    static <E extends DgEntry, T extends DgRegistry<E>> T register(ResourceLocation id, T iterable) {
-        REGISTRY.put(id, iterable);
-        BY_INSTANCE.put(iterable, id);
-        return iterable;
+    static <E extends DgEntry, T extends DgRegistry<E>> T register(ResourceLocation id, T registry) {
+        REGISTRY.put(id, registry);
+        BY_INSTANCE.put(registry, id);
+        return registry;
     }
 
-    static <E extends DgEntry> DgRegistry<E> ofEnum(Class<E> enumClass) {
+    static <E extends DgEntry> EnumRegistry<E> ofEnum(Class<E> enumClass) {
         return new EnumRegistry<>(enumClass);
     }
 

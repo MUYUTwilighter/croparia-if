@@ -1,0 +1,8 @@
+registry = "croparia:crops"
+path = "${id.namespace}/models/item/${fruit.path}.json"
+startup = true
+template = """
+{
+  "parent": "croparia:item/template_fruit_${type}"
+}
+"""

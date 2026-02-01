@@ -13,7 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Relative;
+import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
@@ -92,7 +92,7 @@ public class TargetPos implements TooltipProvider {
     }
 
     public void teleport(@NotNull Entity entity, @NotNull MinecraftServer server) {
-        this.getLevel(server).ifPresent(level -> entity.teleportTo(level, getPos().getX(), getPos().getY(), getPos().getZ(), Relative.ROTATION, 0, 0, true));
+        this.getLevel(server).ifPresent(level -> entity.teleportTo(level, getPos().getX(), getPos().getY(), getPos().getZ(), RelativeMovement.ROTATION, 0, 0));
     }
 
     @Override

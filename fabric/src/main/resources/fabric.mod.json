@@ -28,9 +28,6 @@
     "client": [
       "cool.muyucloud.croparia.fabric.CropariaIfClientFabric"
     ],
-    "rei_common": [
-      "cool.muyucloud.croparia.compat.rei.ReiCommon"
-    ],
     "rei_client": [
       "cool.muyucloud.croparia.compat.rei.ReiClient"
     ]

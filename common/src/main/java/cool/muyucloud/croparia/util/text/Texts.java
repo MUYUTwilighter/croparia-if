@@ -115,7 +115,7 @@ public class Texts {
     }
 
     public static Style hoverItem(ResourceLocation id) {
-        Item item = BuiltInRegistries.ITEM.getValue(id);
+        Item item = BuiltInRegistries.ITEM.get(id);
         return hoverItem(item);
     }
 

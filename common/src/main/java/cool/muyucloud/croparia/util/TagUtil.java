@@ -1,5 +1,6 @@
 package cool.muyucloud.croparia.util;
 
+import cool.muyucloud.croparia.CropariaIf;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,7 +15,8 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 public class TagUtil {
     public static <T> Optional<Registry<T>> getRegistry(ResourceKey<? extends Registry<T>> key) {
-        Optional<? extends Registry<?>> maybeRegistry = BuiltInRegistries.REGISTRY.getOptional(key.location());
+        Optional<? extends Registry<?>> maybeRegistry = CropariaIf.getRegistryAccess().flatMap(registryAccess -> registryAccess.registry(key));
+        if (maybeRegistry.isEmpty()) maybeRegistry = BuiltInRegistries.REGISTRY.getOptional(key.location());
         if (maybeRegistry.isEmpty()) return Optional.empty();
         try {
             if (key.equals(maybeRegistry.get().key())) {
@@ -46,6 +48,6 @@ public class TagUtil {
         if (maybeRegistry.isEmpty()) return false;
         Registry<T> registry = maybeRegistry.get();
         Optional<ResourceKey<T>> maybeKey = registry.getResourceKey(entry);
-        return maybeKey.map(tResourceKey -> registry.getOrThrow(tResourceKey).is(tagKey)).orElse(false);
+        return maybeKey.filter(tResourceKey -> registry.getHolderOrThrow(tResourceKey).is(tagKey)).isPresent();
     }
 }

@@ -1,8 +1,6 @@
 package cool.muyucloud.croparia.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import cool.muyucloud.croparia.api.recipe.TypedSerializer;
-import cool.muyucloud.croparia.registry.Recipes;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -26,9 +24,6 @@ public abstract class MinecraftServerMixin {
 
     @Inject(method = "reloadResources", at = @At("RETURN"))
     public void onReloaded(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir, @Local CompletableFuture<Void> completableFuture) {
-        completableFuture.whenComplete((v, t) -> {
-            OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
-            Recipes.forEach(TypedSerializer::syncRecipes);
-        });
+        completableFuture.whenComplete((v, t) -> OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis());
     }
 }

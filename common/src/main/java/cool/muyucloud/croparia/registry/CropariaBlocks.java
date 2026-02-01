@@ -5,7 +5,6 @@ import cool.muyucloud.croparia.api.core.block.*;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
@@ -75,7 +74,7 @@ public class CropariaBlocks {
         @NotNull String name, @NotNull Function<BlockBehaviour.Properties, T> supplier
     ) {
         return BLOCKS.register(name, () -> supplier.apply(
-            BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, CropariaIf.of(name)))
+            BlockBehaviour.Properties.of()
         ));
     }
 
@@ -83,7 +82,7 @@ public class CropariaBlocks {
         @NotNull ResourceLocation id, @NotNull Function<BlockBehaviour.Properties, T> supplier
     ) {
         return BLOCKS.register(id, () -> supplier.apply(
-            BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, id))
+            BlockBehaviour.Properties.of()
         ));
     }
 

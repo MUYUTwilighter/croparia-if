@@ -50,9 +50,11 @@ public class ReiUtil {
     }
 
     public static EntryIngredient toIngredient(BlockOutput output, Consumer<EntryStack<ItemStack>> processor) {
-        EntryStack<ItemStack> stack = EntryStack.of(VanillaEntryTypes.ITEM, output.getDisplayStack());
-        processor.accept(stack);
-        return EntryIngredient.of(stack);
+        return EntryIngredient.of(output.getDisplayStacks().stream().map(stack -> {
+            EntryStack<ItemStack> entry = EntryStack.of(VanillaEntryTypes.ITEM, stack);
+            processor.accept(entry);
+            return entry;
+        }).toList());
     }
 
     public static EntryIngredient toIngredient(ItemInput input, Consumer<EntryStack<ItemStack>> processor) {
@@ -70,17 +72,15 @@ public class ReiUtil {
     }
 
     public static EntryIngredient toIngredient(ItemOutput output, Consumer<EntryStack<ItemStack>> processor) {
-        EntryStack<ItemStack> stack = toStack(output);
-        processor.accept(stack);
-        return EntryIngredient.of(stack);
+        return EntryIngredient.of(output.getDisplayStacks().stream().map(stack -> {
+            EntryStack<ItemStack> entry = EntryStack.of(VanillaEntryTypes.ITEM, stack);
+            processor.accept(entry);
+            return entry;
+        }).toList());
     }
 
     public static EntryIngredient toIngredient(ItemOutput output) {
         return toIngredient(output, stack -> {
         });
-    }
-
-    public static EntryStack<ItemStack> toStack(ItemOutput output) {
-        return EntryStack.of(VanillaEntryTypes.ITEM, output.getDisplayStack());
     }
 }

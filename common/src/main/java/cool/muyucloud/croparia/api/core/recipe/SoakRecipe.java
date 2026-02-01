@@ -10,6 +10,8 @@ import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
+import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
+import cool.muyucloud.croparia.api.recipe.entry.SlotDisplay;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
@@ -17,7 +19,6 @@ import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +33,7 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
             Codec.FLOAT.fieldOf("probability").forGetter(SoakRecipe::getProbability),
             BlockInput.CODEC.fieldOf("input").forGetter(SoakRecipe::getInput),
             BlockOutput.CODEC.fieldOf("output").forGetter(SoakRecipe::getOutput)
-        ).apply(instance, SoakRecipe::new)), TypedSerializer.JEI,
+        ).apply(instance, SoakRecipe::new)),
         Mappable.of(CropariaItems.ELEMENTAL_STONE, Item::getDefaultInstance)
     );
 
@@ -80,7 +81,7 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
 
     @Override
     public @NotNull List<List<ItemStack>> getOutputs() {
-        return List.of(List.of(this.getOutput().getDisplayStack()));
+        return List.of(this.getOutput().getDisplayStacks());
     }
 
     @Override
@@ -100,13 +101,8 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
     }
 
     @Override
-    public @NotNull SlotDisplay result() {
-        return this.getOutput();
-    }
-
-    @Override
     public @NotNull SlotDisplay craftingStation() {
-        return new SlotDisplay.ItemStackSlotDisplay(this.getTypedSerializer().getStations().getFirst().get());
+        return ItemOutput.of(CropariaItems.ELEMENTAL_STONE.get().getDefaultInstance());
     }
 
     @Override

@@ -24,7 +24,7 @@ public class Color {
         return new Color(value);
     }
 
-    public static Color of(String format) {
+    public static Color of(String format) throws NumberFormatException {
         return new Color(format);
     }
 
@@ -35,9 +35,9 @@ public class Color {
     }
 
     public Color(String format) throws NumberFormatException {
-        if (format.startsWith("#")) this.value = Integer.parseInt(format.substring(1), 16);
-        else if (format.startsWith("0x")) this.value = Integer.parseInt(format.substring(2), 16);
-        else this.value = Integer.parseInt(format);
+        if (format.startsWith("#")) this.value = Integer.parseUnsignedInt(format.substring(1), 16);
+        else if (format.startsWith("0x")) this.value = Integer.parseUnsignedInt(format.substring(2), 16);
+        else this.value = Integer.parseUnsignedInt(format);
     }
 
     public int getValue() {

@@ -28,9 +28,9 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
     public static final MapCodec<ItemSpec> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
         ResourceLocation.CODEC.fieldOf("id").forGetter(itemSpec -> itemSpec.getResource().arch$registryName()),
         CodecUtil.optionalFieldsOf(DataComponentPatch.CODEC, DataComponentPatch.EMPTY, "components", "nbt").forGetter(ItemSpec::getComponentsPatch)
-    ).apply(instance, (id, components) -> new ItemSpec(BuiltInRegistries.ITEM.getValue(id), components)));
+    ).apply(instance, (id, components) -> new ItemSpec(BuiltInRegistries.ITEM.get(id), components)));
     public static final Codec<ItemSpec> CODEC_STR = ResourceLocation.CODEC.xmap(
-        id -> new ItemSpec(BuiltInRegistries.ITEM.getValue(id), DataComponentPatch.EMPTY),
+        id -> new ItemSpec(BuiltInRegistries.ITEM.get(id), DataComponentPatch.EMPTY),
         itemSpec -> itemSpec.getResource().arch$registryName()
     );
     public static final MultiCodec<ItemSpec> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {

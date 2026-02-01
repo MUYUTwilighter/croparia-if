@@ -23,7 +23,7 @@ public class FluidSpec implements TypedResource<Fluid>, DataComponentHolder {
     public static final MapCodec<FluidSpec> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
         ResourceLocation.CODEC.fieldOf("id").forGetter(fluidSpec -> fluidSpec.getResource().arch$registryName()),
         DataComponentMap.CODEC.fieldOf("components").forGetter(FluidSpec::getComponents)
-    ).apply(instance, (id, nbt) -> new FluidSpec(BuiltInRegistries.FLUID.getValue(id), nbt)));
+    ).apply(instance, (id, nbt) -> new FluidSpec(BuiltInRegistries.FLUID.get(id), nbt)));
     public static final FluidSpec EMPTY = FluidSpec.of(Fluids.EMPTY);
     public static final TypeToken<FluidSpec> TYPE = TypeToken.register(CropariaIf.of("fluid_spec"), EMPTY, CODEC).orElseThrow();
 

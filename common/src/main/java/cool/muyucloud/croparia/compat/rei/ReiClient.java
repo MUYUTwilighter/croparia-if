@@ -1,9 +1,13 @@
 package cool.muyucloud.croparia.compat.rei;
 
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
+import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.compat.rei.category.*;
+import cool.muyucloud.croparia.compat.rei.util.ReiDisplay;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
+import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 
 import java.util.ArrayList;
 
@@ -11,10 +15,10 @@ public class ReiClient implements REIClientPlugin {
     public static final ArrayList<ReiCategory<?>> CATEGORIES = new ArrayList<>();
 
     static {
-        CATEGORIES.add(new ReiInfusorRecipe(ReiCommon.INFUSOR));
-        CATEGORIES.add(new ReiRitualRecipe(ReiCommon.RITUAL));
-        CATEGORIES.add(new ReiRitualStructure(ReiCommon.RITUAL_STRUCTURE));
-        CATEGORIES.add(new ReiSoakRecipe(ReiCommon.SOAK));
+        CATEGORIES.add(new ReiInfusorRecipe());
+        CATEGORIES.add(new ReiRitualRecipe());
+        CATEGORIES.add(new ReiRitualStructure());
+        CATEGORIES.add(new ReiSoakRecipe());
     }
 
     public void registerCategories(CategoryRegistry registry) {
@@ -23,5 +27,19 @@ public class ReiClient implements REIClientPlugin {
             registry.add(category);
             registry.addWorkstations(category.getCategoryIdentifier(), category.stations());
         });
+    }
+
+    @Override
+    public void registerDisplays(DisplayRegistry registry) {
+        CropariaIf.LOGGER.debug("Registering rei recipe displays...");
+        CATEGORIES.forEach(category -> registerDisplay(registry, category));
+    }
+
+    private static <R extends DisplayableRecipe<?>> void registerDisplay(DisplayRegistry registry, ReiCategory<R> category) {
+        TypedSerializer<R> type = category.getRecipeType();
+        registry.registerRecipeFiller(
+            type.getRecipeClass(), type,
+            holder -> new ReiDisplay<>(holder, category)
+        );
     }
 }

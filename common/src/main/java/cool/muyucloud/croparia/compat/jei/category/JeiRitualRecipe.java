@@ -26,10 +26,10 @@ public class JeiRitualRecipe extends JeiCategory<RitualRecipe> {
 
     @Override
     public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull RitualRecipe recipe, @NotNull IFocusGroup focuses) {
-        builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 40).add(recipe.craftingStation());
-        builder.addInputSlot(72, 8).add(recipe.getIngredient());
-        builder.addInputSlot(40, 40).add(recipe.getBlock());
-        builder.addOutputSlot(112, 40).add(recipe.getResult());
+        builder.addSlot(RecipeIngredientRole.CATALYST, 72, 40).addItemStacks(recipe.craftingStation().getDisplayStacks());
+        builder.addInputSlot(72, 8).addItemStacks(recipe.getIngredient().getDisplayStacks());
+        builder.addInputSlot(40, 40).addItemStacks(recipe.getBlock().getDisplayStacks());
+        builder.addOutputSlot(112, 40).addItemStacks(recipe.getResult().getDisplayStacks());
     }
 
     @Override

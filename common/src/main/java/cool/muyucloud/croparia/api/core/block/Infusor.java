@@ -17,12 +17,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -45,26 +46,26 @@ public class Infusor extends Block implements ItemPlaceable {
     }
 
     @Override
-    protected @NotNull InteractionResult useItemOn(
+    protected @NotNull ItemInteractionResult useItemOn(
         ItemStack itemStack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
         BlockHitResult blockHitResult
     ) {
         Item item = itemStack.getItem();
         // Infuse if elemental potion
         if (item instanceof ElementalPotion potion && this.tryInfuse(world, pos, potion, itemStack, player)) {
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
         Element element = state.getValue(ELEMENT);
         // Defuse if using the corresponding empty bottle
-        if (element != Element.EMPTY && ItemStack.isSameItemSameComponents(element.getPotion().get().getCraftingRemainder(), itemStack)) {
-            return this.tryDefuse(world, pos, itemStack, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+        if (element != Element.EMPTY && element.getPotion().get().getCraftingRemainingItem() == item) {
+            return this.tryDefuse(world, pos, itemStack, player) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         // Place item if main hand and not using recipe wizard
         if (!(item instanceof RecipeWizard) && hand == InteractionHand.MAIN_HAND) {
             this.placeItem(world, pos, itemStack, player);
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     public boolean tryInfuse(Level world, BlockPos pos, ElementalPotion potion, @NotNull ItemStack stack, @Nullable Player player) {
@@ -79,7 +80,9 @@ public class Infusor extends Block implements ItemPlaceable {
             return true;
         }
         stack.shrink(1);
-        ItemStack returnStack = potion.getCraftingRemainder();
+        Item returnItem = potion.getCraftingRemainingItem();
+        if (returnItem == null) returnItem = Items.AIR;
+        ItemStack returnStack = returnItem.getDefaultInstance();
         CifUtil.exportItem(world, pos, returnStack, player);
         return true;
     }
@@ -88,7 +91,7 @@ public class Infusor extends Block implements ItemPlaceable {
         Item item = stack.getItem();
         BlockState state = world.getBlockState(pos);
         Element element = state.getValue(ELEMENT);
-        if (element != Element.EMPTY && ElementalPotion.fromElement(element).orElseThrow().getCraftingRemainder().getItem() == item) {
+        if (element != Element.EMPTY && ElementalPotion.fromElement(element).orElseThrow().getCraftingRemainingItem() == item) {
             world.setBlockAndUpdate(pos, CropariaBlocks.INFUSOR.get().defaultBlockState().setValue(ELEMENT, Element.EMPTY));
         } else {
             return false;

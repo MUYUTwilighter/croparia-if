@@ -10,6 +10,7 @@ import cool.muyucloud.croparia.api.core.recipe.container.RitualStructureContaine
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
+import cool.muyucloud.croparia.api.recipe.entry.SlotDisplay;
 import cool.muyucloud.croparia.api.recipe.structure.Char3D;
 import cool.muyucloud.croparia.api.recipe.structure.MarkedChar3D;
 import cool.muyucloud.croparia.api.recipe.structure.MarkedTransformableChar3D;
@@ -38,7 +39,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
             BlockInput.CODEC.fieldOf("ritual").forGetter(RitualStructure::getRitual),
             Codec.unboundedMap(CodecUtil.CHAR, BlockInput.CODEC).fieldOf("keys").forGetter(RitualStructure::getKeys),
             Char3D.CODEC.fieldOf("pattern").forGetter(RitualStructure::getPattern)
-        ).apply(instance, RitualStructure::new)), TypedSerializer.ALWAYS
+        ).apply(instance, RitualStructure::new))
     );
     public static final LazySupplier<ItemStack> STACK_INPUT = LazySupplier.of(() -> {
         ItemStack stack = CropariaItems.PLACEHOLDER.get().getDefaultInstance();
@@ -194,6 +195,11 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
 
     public Vec3i size() {
         return this.getPattern().size();
+    }
+
+    @Override
+    public @NotNull SlotDisplay craftingStation() {
+        return null;
     }
 
     @Override

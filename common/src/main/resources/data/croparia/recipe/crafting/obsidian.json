@@ -2,8 +2,12 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "croparia:gem_water",
-    "croparia:gem_fire"
+    {
+      "item": "croparia:gem_water"
+    },
+    {
+      "item": "croparia:gem_fire"
+    }
   ],
   "result": {
     "id": "minecraft:obsidian"

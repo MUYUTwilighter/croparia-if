@@ -13,16 +13,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.display.DisplayContentsFactory;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
 public class ItemOutput implements SlotDisplay {
@@ -40,7 +37,6 @@ public class ItemOutput implements SlotDisplay {
         return TestedCodec.success();
     }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemOutput> STREAM_CODEC = CodecUtil.toStream(CODEC);
-    public static final Type<ItemOutput> TYPE = new Type<>(CODEC_COMP, STREAM_CODEC);
     public static final ItemOutput EMPTY = new ItemOutput();
 
     public static ItemOutput of(@NotNull ItemStack stack) {
@@ -62,7 +58,7 @@ public class ItemOutput implements SlotDisplay {
         this.id = BuiltInRegistries.ITEM.getKey(Items.AIR);
         this.components = DataComponentPatch.EMPTY;
         this.amount = 0;
-        this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.getValue(this.id), this.components);
+        this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.get(this.id), this.components);
         this.displayStack = this.toSpec().createStack(this.getAmount());
     }
 
@@ -79,13 +75,13 @@ public class ItemOutput implements SlotDisplay {
         this.components = components;
         this.amount = amount;
         if (this.amount <= 0) CropariaIf.LOGGER.warn("Creating ItemOutput with non-positive amount: {}", this.amount);
-        this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.getValue(id), components);
+        this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.get(id), components);
         if (this.itemSpec.isEmpty()) throw new IllegalArgumentException("Unknown or invalid item: " + id);
         this.displayStack = this.toSpec().createStack(this.getAmount());
     }
 
-    public @NotNull ItemStack getDisplayStack() {
-        return this.displayStack;
+    public @NotNull List<ItemStack> getDisplayStacks() {
+        return List.of(this.displayStack);
     }
 
     @NotNull
@@ -108,21 +104,6 @@ public class ItemOutput implements SlotDisplay {
 
     public ItemStack createStack() {
         return this.toSpec().createStack(getAmount());
-    }
-
-    @Override
-    @NotNull
-    public <T> Stream<T> resolve(ContextMap contextMap, DisplayContentsFactory<T> factory) {
-        if (factory instanceof DisplayContentsFactory.ForStacks<T> forStacks) {
-            return Stream.of(forStacks.forStack(this.getDisplayStack()));
-        }
-        return Stream.empty();
-    }
-
-    @Override
-    @NotNull
-    public Type<? extends SlotDisplay> type() {
-        return TYPE;
     }
 
     @Override

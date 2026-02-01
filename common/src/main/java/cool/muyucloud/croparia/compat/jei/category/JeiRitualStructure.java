@@ -54,15 +54,15 @@ public class JeiRitualStructure extends JeiCategory<RitualStructure> {
 
     @Override
     public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull RitualStructure recipe, @NotNull IFocusGroup focuses) {
-        builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).add(recipe.getRitual());
+        builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStacks(recipe.getRitual().getDisplayStacks());
         for (int x = 0; x < recipe.size().getX(); x++) {
             for (int y = 0; y < recipe.size().getY(); y++) {
                 for (int z = 0; z < recipe.size().getZ(); z++) {
                     char key = recipe.getPattern().get(x, y, z);
                     if (key == '*')
-                        builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).add(recipe.getRitual());
+                        builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStacks(recipe.getRitual().getDisplayStacks());
                     else if (key != ' ' && key != '.' && key != '$')
-                        builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).add(recipe.getKeys().get(key));
+                        builder.addInvisibleIngredients(RecipeIngredientRole.INPUT).addItemStacks(recipe.getKeys().get(key).getDisplayStacks());
                 }
             }
         }

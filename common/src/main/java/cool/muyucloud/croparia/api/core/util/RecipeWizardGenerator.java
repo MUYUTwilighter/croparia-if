@@ -166,7 +166,7 @@ public class RecipeWizardGenerator {
                     return Optional.of(BlockOutput.of(state));
                 }, Placeholder.BLOCK_OUTPUT
             ).then(PatternKey.literal("facing"), (context, placeholder1, matcher) -> {
-                    Vec3i offset = context.getClickedFace().getUnitVec3i();
+                    Vec3i offset = context.getClickedFace().getNormal();
                     BlockPos pos = context.getClickedPos().offset(offset);
                     BlockState state = context.getLevel().getBlockState(pos);
                     if (state.isAir()) {
@@ -178,7 +178,7 @@ public class RecipeWizardGenerator {
                 }, Placeholder.BLOCK_OUTPUT
             ).then(
                 PatternKey.literal("opposite"), (context, placeholder1, matcher) -> {
-                    Vec3i offset = context.getClickedFace().getOpposite().getUnitVec3i();
+                    Vec3i offset = context.getClickedFace().getOpposite().getNormal();
                     BlockPos pos = context.getClickedPos().offset(offset);
                     BlockState state = context.getLevel().getBlockState(pos);
                     if (state.isAir()) {
@@ -190,7 +190,7 @@ public class RecipeWizardGenerator {
                 }, Placeholder.BLOCK_OUTPUT
             ).then(
                 PatternKey.literal("left"), (context, placeholder1, matcher) -> {
-                    Vec3i offset = context.getClickedFace().getClockWise().getUnitVec3i();
+                    Vec3i offset = context.getClickedFace().getClockWise().getNormal();
                     BlockPos pos = context.getClickedPos().offset(offset);
                     BlockState state = context.getLevel().getBlockState(pos);
                     if (state.isAir()) {
@@ -202,7 +202,7 @@ public class RecipeWizardGenerator {
                 }, Placeholder.BLOCK_OUTPUT
             ).then(
                 PatternKey.literal("right"), (context, placeholder1, matcher) -> {
-                    Vec3i offset = context.getClickedFace().getCounterClockWise().getUnitVec3i();
+                    Vec3i offset = context.getClickedFace().getCounterClockWise().getNormal();
                     BlockPos pos = context.getClickedPos().offset(offset);
                     BlockState state = context.getLevel().getBlockState(pos);
                     if (state.isAir()) {
@@ -231,7 +231,7 @@ public class RecipeWizardGenerator {
         Level level = context.getLevel();
         for (Direction direction : Direction.values()) {
             if (direction == Direction.UP || direction == Direction.DOWN) continue;
-            BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getUnitVec3i()));
+            BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getNormal()));
             if (!state.isAir()) {
                 return BlockOutput.of(state);
             }
@@ -319,7 +319,7 @@ public class RecipeWizardGenerator {
             Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_fuel"));
             throw new ReplaceException();
         }
-        return String.valueOf(((AbstractFurnaceBlockEntityAccess) furnace).cif$getBurnDuration(context.getLevel(), fuel) * fuel.getCount());
+        return String.valueOf(((AbstractFurnaceBlockEntityAccess) furnace).cif$getBurnDuration(fuel) * fuel.getCount());
     }));
 
     protected static Collection<Placeholder<UseOnContext>> getExtensions(ResourceLocation id) {

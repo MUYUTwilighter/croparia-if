@@ -19,7 +19,7 @@ public class InfiniteApple extends Item {
             super.finishUsingItem(stack, world, user);
             player.getAbilities().instabuild = old;
             if (!world.isClientSide) {
-                player.getCooldowns().addCooldown(stack, 200);
+                player.getCooldowns().addCooldown(stack.getItem(), 200);
             }
         }
         return stack;

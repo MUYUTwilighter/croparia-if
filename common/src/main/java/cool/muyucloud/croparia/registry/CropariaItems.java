@@ -13,7 +13,6 @@ import cool.muyucloud.croparia.api.crop.item.Croparia;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -21,8 +20,6 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.component.Consumable;
-import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -34,7 +31,6 @@ public class CropariaItems {
 
     public static final RegistrySupplier<RecipeWizard> RECIPE_WIZARD = registerItem(
         "recipe_wizard", properties -> new RecipeWizard(new Item.Properties()
-            .setId(ResourceKey.create(Registries.ITEM, CropariaIf.of("recipe_wizard")))
             .arch$tab(Tabs.MAIN).rarity(Rarity.UNCOMMON).stacksTo(1))
     );
     public static final RegistrySupplier<BlockItem> ACTIVATED_SHRIEKER = registerItem(
@@ -113,13 +109,12 @@ public class CropariaItems {
     );
     public static final RegistrySupplier<InfiniteApple> INFINITE_APPLE = registerItem(
         "infinite_apple", properties -> new InfiniteApple(properties.food(
-            new FoodProperties.Builder().alwaysEdible().nutrition(5).saturationModifier(4.0F).build(),
-            Consumable.builder().onConsume(new ApplyStatusEffectsConsumeEffect(List.of(
-                new MobEffectInstance(MobEffects.REGENERATION, 100, 1),
-                new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 0),
-                new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 100, 0),
-                new MobEffectInstance(MobEffects.ABSORPTION, 100, 3)
-            ))).build()
+            new FoodProperties.Builder().alwaysEdible().nutrition(5).saturationModifier(4.0F)
+                .effect(new MobEffectInstance(MobEffects.REGENERATION, 100, 1), 1F)
+                .effect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 0), 1F)
+                .effect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 100, 0), 1F)
+                .effect(new MobEffectInstance(MobEffects.ABSORPTION, 100, 3), 1F)
+                .build()
         ).stacksTo(1).arch$tab(Tabs.MAIN).rarity(Rarity.EPIC)));
     public static final RegistrySupplier<MagicRope> MAGIC_ROPE = registerItem(
         "magic_rope", properties -> new MagicRope(properties.arch$tab(Tabs.MAIN).rarity(Rarity.EPIC).stacksTo(1))
@@ -139,7 +134,7 @@ public class CropariaItems {
         @NotNull String name, @NotNull Function<Item.Properties, T> supplier
     ) {
         return ITEMS.register(name, () -> supplier.apply(
-            new Item.Properties().setId(ResourceKey.create(Registries.ITEM, CropariaIf.of(name)))
+            new Item.Properties()
         ));
     }
 
@@ -148,7 +143,7 @@ public class CropariaItems {
         @NotNull ResourceLocation id, @NotNull Function<Item.Properties, T> supplier
     ) {
         return ITEMS.register(id, () -> supplier.apply(
-            new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))
+            new Item.Properties()
         ));
     }
 

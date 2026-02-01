@@ -1,6 +1,7 @@
 package cool.muyucloud.croparia.compat.jei;
 
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.compat.jei.category.*;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import mezz.jei.api.IModPlugin;
@@ -38,17 +39,19 @@ public class JeiClient implements IModPlugin {
 
     @Override
     public void registerRecipes(@NotNull IRecipeRegistration registration) {
-        CATEGORIES.forEach(category -> registration.addRecipes(
-            category.adapt(), category.adapt().getTypedSerializer().find())
-        );
+        CATEGORIES.forEach(category -> registerRecipes(registration, category));
     }
 
     @Override
     public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
         for (JeiCategory<?> category : CATEGORIES) {
             for (Mappable<ItemStack> stack : category.getTypedSerializer().getStations()) {
-                registration.addCraftingStation(category.getRecipeType(), stack.get());
+                registration.addRecipeCatalysts(category.getRecipeType(), stack.get());
             }
         }
+    }
+
+    private static <R extends DisplayableRecipe<?>> void registerRecipes(@NotNull IRecipeRegistration registration, JeiCategory<R> category) {
+        registration.addRecipes(category.getRecipeType(), category.getTypedSerializer().find());
     }
 }

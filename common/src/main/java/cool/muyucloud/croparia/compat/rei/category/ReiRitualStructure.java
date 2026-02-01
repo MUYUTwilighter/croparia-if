@@ -4,7 +4,6 @@ import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.compat.rei.util.ReiDisplay;
-import cool.muyucloud.croparia.compat.rei.util.ReiType;
 import cool.muyucloud.croparia.compat.rei.util.ReiUtil;
 import cool.muyucloud.croparia.compat.rei.widget.Item2DWidget;
 import cool.muyucloud.croparia.compat.rei.widget.PatchedOverflow;
@@ -38,10 +37,6 @@ public class ReiRitualStructure extends ReiCategory<RitualStructure> {
     public static final int LABEL_MARGIN = 6;
     public static final int FRAME_PADDING = 9;
     public static final int BUTTON_SIZE = 10;
-
-    public ReiRitualStructure(ReiType<RitualStructure> proxy) {
-        super(proxy);
-    }
 
     @Override
     public Renderer getIcon() {

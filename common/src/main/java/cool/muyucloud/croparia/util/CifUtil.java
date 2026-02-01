@@ -4,8 +4,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentPredicate;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -77,7 +77,7 @@ public class CifUtil {
      */
     public static ItemStack transferItemNear(Level world, BlockPos pos, ItemStack stack) {
         for (Direction d : Direction.values()) {
-            BlockEntity neighbor = world.getBlockEntity(pos.offset(d.getUnitVec3i()));
+            BlockEntity neighbor = world.getBlockEntity(pos.offset(d.getNormal()));
             if (neighbor instanceof Container container) {
                 for (int i = 0; i < container.getContainerSize(); i++) {
                     if (stack.isEmpty()) {
@@ -126,9 +126,10 @@ public class CifUtil {
         world.addFreshEntity(new ItemEntity(world, (double) pos.getX() + 0.5, (double) pos.getY() + 0.6, (double) pos.getZ() + 0.5, remain, 0, 0, 0));
     }
 
+    @SuppressWarnings("unchecked")
     public static DataComponentPredicate extractPredicate(DataComponentPatch patch) {
         DataComponentPredicate.Builder builder = DataComponentPredicate.builder();
-        patch.entrySet().forEach(entry -> builder.expect(TypedDataComponent.createUnchecked(entry.getKey(), entry.getValue())));
+        patch.entrySet().forEach(entry -> builder.expect((DataComponentType<Object>) entry.getKey(), (Object) entry.getValue()));
         return builder.build();
     }
 

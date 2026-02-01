@@ -173,7 +173,8 @@ public class Crops {
     public static final Crop AMETHYST = vanilla("amethyst", Items.AMETHYST_SHARD, 0xd9cbf2, 3, Crop.CROP);
     public static final Crop ECHO_SHARD = vanilla("echo_shard", Items.ECHO_SHARD, 0x3404f, 4, Crop.MONSTER);
     public static final Crop ARMADILLO = vanilla("armadillo", Items.ARMADILLO_SCUTE, 0xc48682, 2, Crop.ANIMAL);
-    public static final Crop RESIN = vanilla("resin", Items.RESIN_CLUMP, 0xF0781B, 1, Crop.NATURE);
+    // Resin only in 1.21.4+
+    // public static final Crop RESIN = vanilla("resin", Items.RESIN_CLUMP, 0xF0781B, 1, Crop.NATURE);
     public static final Crop BREEZE = vanilla("breeze", Items.BREEZE_ROD, 0x7980c2, 3, Crop.NATURE);
     public static final Crop FROGSPAWN = vanilla("frogspawn", Items.FROGSPAWN, 0x7980c2, 3, Crop.ANIMAL);
 

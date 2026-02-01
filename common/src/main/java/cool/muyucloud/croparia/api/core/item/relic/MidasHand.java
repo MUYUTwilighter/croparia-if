@@ -39,7 +39,7 @@ public class MidasHand extends Item {
                 return InteractionResult.FAIL;
             }
             player.giveExperiencePoints(-10);
-            player.getCooldowns().addCooldown(context.getItemInHand(), CifUtil.toIntSafe(block.getBlock().defaultDestroyTime()));
+            player.getCooldowns().addCooldown(context.getItemInHand().getItem(), CifUtil.toIntSafe(block.getBlock().defaultDestroyTime()));
             world.destroyBlock(pos, false);
             world.addFreshEntity(new ItemEntity(world, (double) pos.getX() + 0.5, pos.getY(), (double) pos.getZ() + 0.5, new ItemStack(Items.GOLD_INGOT)));
             return InteractionResult.SUCCESS;
@@ -64,7 +64,7 @@ public class MidasHand extends Item {
                 return InteractionResult.FAIL;
             }
             player.giveExperiencePoints(-xpConsume);
-            player.getCooldowns().addCooldown(stack, cooldown);
+            player.getCooldowns().addCooldown(stack.getItem(), cooldown);
             ServerLevel world = (ServerLevel) entity.getCommandSenderWorld();
             world.destroyBlock(entity.blockPosition(), true);
             world.setBlock(entity.blockPosition(), Blocks.GOLD_BLOCK.defaultBlockState(), 2);

@@ -19,8 +19,6 @@ import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.CifUtil;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import dev.architectury.registry.registries.RegistrySupplier;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Items;
@@ -51,8 +49,8 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
         .then(PatternKey.literal("name"), TypeMapper.of(Element::getSerializedName), Placeholder.STRING)
         .then(PatternKey.literal("color"), TypeMapper.of(Element::getColor), Color.PLACEHOLDER)
         .then(PatternKey.literal("fluid_source"), TypeMapper.of(element -> element.getFluidSource().getId()), Placeholder.ID)
-        .then(PatternKey.literal("fluid_flowing"),TypeMapper.of(element -> element.getFluidFlowing().getId()), Placeholder.ID)
-        .then(PatternKey.literal("liquid_block"),TypeMapper.of(element -> element.getFluidBlock().getId()), Placeholder.ID)
+        .then(PatternKey.literal("fluid_flowing"), TypeMapper.of(element -> element.getFluidFlowing().getId()), Placeholder.ID)
+        .then(PatternKey.literal("liquid_block"), TypeMapper.of(element -> element.getFluidBlock().getId()), Placeholder.ID)
         .then(PatternKey.literal("bucket"), TypeMapper.of(element -> element.getBucket().getId()), Placeholder.ID)
         .then(PatternKey.literal("potion"), TypeMapper.of(element -> element.getPotion().getId()), Placeholder.ID)
         .then(PatternKey.literal("gem"), TypeMapper.of(element -> element.getGem().getId()), Placeholder.ID)
@@ -98,10 +96,10 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
         appendix.accept(attr);
         this.fluidSource = CropariaFluids.registerFluid(parseId("fluid_%s"), () -> new ElementalSource(this, attr));
         this.fluidFlowing = CropariaFluids.registerFluid(parseId("fluid_%s_flow"), () -> new ElementalFlowing(this, attr));
-        this.fluidBlock = CropariaBlocks.registerBlock(parseId("fluid_%s"), properties -> new ElementalLiquidBlock(this, BlockBehaviour.Properties
-            .of().setId(ResourceKey.create(Registries.BLOCK, parseId("fluid_%s")))
-            .lightLevel(state -> 8).noCollission().strength(100.0F).noLootTable()
-        ));
+        this.fluidBlock = CropariaBlocks.registerBlock(parseId("fluid_%s"),
+            properties -> new ElementalLiquidBlock(this, BlockBehaviour.Properties.of().replaceable()
+                .lightLevel(state -> 8).noCollission().strength(100.0F).noLootTable()
+            ));
         this.bucket = CropariaItems.registerItem(parseId("bucket_%s"), properties -> new ElementalBucket(
             this, this.getFluidSource(),
             properties.stacksTo(1).arch$tab(Tabs.MAIN).craftRemainder(Items.GLASS_BOTTLE)

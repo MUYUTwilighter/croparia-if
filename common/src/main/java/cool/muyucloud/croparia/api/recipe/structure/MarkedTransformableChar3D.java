@@ -1,13 +1,9 @@
 package cool.muyucloud.croparia.api.recipe.structure;
 
-import com.fasterxml.jackson.databind.util.ArrayIterator;
 import net.minecraft.core.Vec3i;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class MarkedTransformableChar3D implements Iterable<MarkedChar3D> {
     private final transient MarkedChar3D[] transformed;
@@ -38,7 +34,7 @@ public class MarkedTransformableChar3D implements Iterable<MarkedChar3D> {
     @NotNull
     @Override
     public Iterator<MarkedChar3D> iterator() {
-        return new ArrayIterator<>(transformed);
+        return Arrays.stream(transformed).iterator();
     }
 
     @Override

@@ -3,7 +3,6 @@ package cool.muyucloud.croparia.compat.rei.category;
 import cool.muyucloud.croparia.api.core.recipe.SoakRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.compat.rei.util.ReiDisplay;
-import cool.muyucloud.croparia.compat.rei.util.ReiType;
 import cool.muyucloud.croparia.compat.rei.util.ReiUtil;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
@@ -26,10 +25,6 @@ public class ReiSoakRecipe extends ReiCategory<SoakRecipe> {
     public static final LazySupplier<EntryStack<ItemStack>> STATION = LazySupplier.of(
         () -> EntryStack.of(VanillaEntryTypes.ITEM, CropariaItems.ELEMENTAL_STONE.get().getDefaultInstance())
     );
-
-    public ReiSoakRecipe(ReiType<SoakRecipe> proxy) {
-        super(proxy);
-    }
 
     @Override
     public TypedSerializer<SoakRecipe> getRecipeType() {

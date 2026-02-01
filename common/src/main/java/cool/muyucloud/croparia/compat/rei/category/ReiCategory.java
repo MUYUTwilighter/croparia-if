@@ -3,7 +3,6 @@ package cool.muyucloud.croparia.compat.rei.category;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.compat.rei.util.ReiDisplay;
-import cool.muyucloud.croparia.compat.rei.util.ReiType;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
 import me.shedaniel.rei.api.client.gui.Renderer;
@@ -18,8 +17,8 @@ import net.minecraft.world.item.ItemStack;
 public abstract class ReiCategory<R extends DisplayableRecipe<?>> implements DisplayCategory<ReiDisplay<R>> {
     private final CategoryIdentifier<ReiDisplay<R>> categoryIdentifier;
 
-    public ReiCategory(ReiType<R> proxy) {
-        this.categoryIdentifier = proxy.getId();
+    public ReiCategory() {
+        this.categoryIdentifier = CategoryIdentifier.of(this.getRecipeType().getId());
     }
 
     @Override

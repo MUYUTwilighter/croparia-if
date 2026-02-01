@@ -3,7 +3,6 @@ package cool.muyucloud.croparia.compat.rei.category;
 import cool.muyucloud.croparia.api.core.recipe.RitualRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.compat.rei.util.ReiDisplay;
-import cool.muyucloud.croparia.compat.rei.util.ReiType;
 import cool.muyucloud.croparia.compat.rei.util.ReiUtil;
 import cool.muyucloud.croparia.util.Constants;
 import me.shedaniel.math.Point;
@@ -14,10 +13,6 @@ import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import java.util.List;
 
 public class ReiRitualRecipe extends ReiCategory<RitualRecipe> {
-    public ReiRitualRecipe(ReiType<RitualRecipe> proxy) {
-        super(proxy);
-    }
-
     @Override
     public TypedSerializer<RitualRecipe> getRecipeType() {
         return RitualRecipe.TYPED_SERIALIZER;

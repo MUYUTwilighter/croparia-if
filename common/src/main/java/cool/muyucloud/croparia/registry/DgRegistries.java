@@ -15,7 +15,7 @@ public class DgRegistries {
         CropariaIf.of("melons"), new CropRegistry<>(CropariaIf.CONFIG.getFilePath().resolve("melons"), Melon.CODEC.codec())
     );
     @SuppressWarnings("unused")
-    public static final DgRegistry<Element> ELEMENTS = DgRegistry.register(
+    public static final DgRegistry.EnumRegistry<Element> ELEMENTS = DgRegistry.register(
         CropariaIf.of("elements"), DgRegistry.ofEnum(Element.class)
     );
 

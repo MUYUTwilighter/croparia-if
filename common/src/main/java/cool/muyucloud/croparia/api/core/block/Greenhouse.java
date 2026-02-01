@@ -19,15 +19,14 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
@@ -57,8 +56,8 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
-    protected @NotNull BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
-        super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
+    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        super.updateShape(state, direction, neighborState, level, pos, neighborPos);
         // Filter client level
         if (!(level instanceof ServerLevel serverLevel)) return state;
         // Filter unharvestable blocks
@@ -81,7 +80,7 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
-    protected @NotNull InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+    protected @NotNull ItemInteractionResult useItemOn(ItemStack itemStack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
         if (!world.isClientSide) {
             MenuProvider screenHandlerFactory = state.getMenuProvider(world, pos);
             if (screenHandlerFactory != null) {
@@ -89,7 +88,7 @@ public class Greenhouse extends BaseEntityBlock {
             }
         }
 
-        return InteractionResult.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
     @Override

@@ -86,7 +86,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     public void tryHarvestMelon(ServerLevel level, BlockState stem, BlockPos stemPos) {
         // Find melon
         Direction facing = stem.getValue(AttachedStemBlock.FACING);
-        BlockPos melonPos = stemPos.offset(facing.getUnitVec3i());
+        BlockPos melonPos = stemPos.offset(facing.getNormal());
         BlockState melonState = level.getBlockState(melonPos);
         // Get drops
         List<ItemStack> droppedStacks = Block.getDrops(melonState, level, melonPos, level.getBlockEntity(melonPos));

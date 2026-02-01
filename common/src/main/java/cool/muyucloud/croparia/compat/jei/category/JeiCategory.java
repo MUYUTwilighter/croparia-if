@@ -9,8 +9,8 @@ import cool.muyucloud.croparia.util.text.Texts;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.common.Internal;
 import mezz.jei.common.gui.elements.DrawableIngredient;
 import mezz.jei.common.gui.elements.DrawableResource;
@@ -27,7 +27,13 @@ import java.util.List;
 import java.util.Objects;
 
 @SuppressWarnings("unused")
-public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeInput>> implements IRecipeCategory<R>, IRecipeType<R> {
+public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeInput>> implements IRecipeCategory<R> {
+    private final RecipeType<R> recipeType = RecipeType.create(
+        this.getTypedSerializer().getId().getNamespace(),
+        this.getTypedSerializer().getId().getPath(),
+        this.getTypedSerializer().getRecipeClass()
+    );
+
     @SuppressWarnings("unchecked")
     public <I extends RecipeInput, T extends DisplayableRecipe<I>> JeiCategory<T> adapt() {
         return (JeiCategory<T>) this;
@@ -36,8 +42,8 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
     public abstract TypedSerializer<R> getTypedSerializer();
 
     @Override
-    public @NotNull IRecipeType<R> getRecipeType() {
-        return this;
+    public @NotNull RecipeType<R> getRecipeType() {
+        return this.recipeType;
     }
 
     @Override
@@ -52,12 +58,10 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
         else return toDrawable(stations.getFirst().get());
     }
 
-    @Override
     public @NotNull ResourceLocation getUid() {
         return this.getTypedSerializer().getId();
     }
 
-    @Override
     public @NotNull Class<? extends R> getRecipeClass() {
         return this.getTypedSerializer().getRecipeClass();
     }

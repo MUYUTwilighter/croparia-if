@@ -16,7 +16,6 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.TagUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.jcip.annotations.Immutable;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -25,11 +24,8 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.display.DisplayContentsFactory;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,9 +38,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
-@Immutable
 @SuppressWarnings("unused")
 public class BlockInput implements SlotDisplay {
     public static final ItemStack STACK_UNKNOWN = Items.BEDROCK.getDefaultInstance();
@@ -62,7 +56,6 @@ public class BlockInput implements SlotDisplay {
         return TestedCodec.success();
     }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockInput> STREAM_CODEC = CodecUtil.toStream(CODEC);
-    public static final Type<BlockInput> TYPE = new Type<>(CODEC_COMP, STREAM_CODEC);
 
     static {
         STACK_UNKNOWN.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.unknown"));
@@ -201,7 +194,7 @@ public class BlockInput implements SlotDisplay {
     public BlockState getExampleState() {
         BlockState state;
         if (this.getId().isPresent()) {
-            state = BuiltInRegistries.BLOCK.getValue(this.getId().get()).defaultBlockState();
+            state = BuiltInRegistries.BLOCK.get(this.getId().get()).defaultBlockState();
         } else if (this.getTag().isPresent()) {
             Iterable<Holder<Block>> candidates = TagUtil.forEntries(this.getTag().get());
             if (candidates.iterator().hasNext()) {
@@ -253,21 +246,6 @@ public class BlockInput implements SlotDisplay {
 
     public boolean matches(@NotNull BlockState state) {
         return this.matches(state.getBlock()) && this.getProperties().isSubsetOf(state);
-    }
-
-    @Override
-    @NotNull
-    public <T> Stream<T> resolve(ContextMap contextMap, DisplayContentsFactory<T> factory) {
-        if (factory instanceof DisplayContentsFactory.ForStacks<T> forStacks) {
-            return this.getDisplayStacks().stream().map(forStacks::forStack);
-        }
-        return Stream.empty();
-    }
-
-    @Override
-    @NotNull
-    public Type<? extends SlotDisplay> type() {
-        return TYPE;
     }
 
     @Override

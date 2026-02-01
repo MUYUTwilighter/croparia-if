@@ -17,18 +17,14 @@ import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPredicate;
-import net.minecraft.core.component.TypedDataComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.display.DisplayContentsFactory;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +32,6 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
 public class ItemInput implements SlotDisplay {
@@ -61,7 +56,6 @@ public class ItemInput implements SlotDisplay {
         }
     }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemInput> STREAM_CODEC = CodecUtil.toStream(CODEC);
-    public static final Type<ItemInput> TYPE = new Type<>(CODEC_COMP, STREAM_CODEC);
 
     public static ItemInput of(ResourceLocation id) {
         return new ItemInput(id, null, DataComponentPredicate.EMPTY, 1L);
@@ -72,11 +66,12 @@ public class ItemInput implements SlotDisplay {
     }
 
     public static ItemInput of(final ItemStack stack) {
-        DataComponentPredicate.Builder builder = DataComponentPredicate.builder();
-        stack.getComponentsPatch().entrySet().forEach(entry -> entry.getValue().ifPresent(
-            value -> builder.expect(TypedDataComponent.createUnchecked(entry.getKey(), value))
-        ));
-        return new ItemInput(stack.getItem().arch$registryName(), null, builder.build(), stack.getCount());
+        return new ItemInput(
+            stack.getItem().arch$registryName(),
+            null,
+            CifUtil.extractPredicate(stack.getComponentsPatch()),
+            stack.getCount()
+        );
     }
 
     @Nullable
@@ -112,7 +107,7 @@ public class ItemInput implements SlotDisplay {
         this.amount = amount;
         this.displayStacks = OnLoadSupplier.of(() -> {
             if (this.getId().isPresent()) {
-                ItemStack stack = new ItemStack(Holder.direct(BuiltInRegistries.ITEM.getValue(this.getId().get())),
+                ItemStack stack = new ItemStack(Holder.direct(BuiltInRegistries.ITEM.get(this.getId().get())),
                     CifUtil.toIntSafe(this.getAmount()), this.getComponentsPredicate().asPatch());
                 if (stack.isEmpty()) {
                     DisplayableRecipe.LOGGER.error("Item with id '{}' not found, using placeholder", this.getId().get());
@@ -252,21 +247,6 @@ public class ItemInput implements SlotDisplay {
 
     public boolean matches(@NotNull ItemSpec item, long amount) {
         return this.matches(item) && this.getAmount() <= amount;
-    }
-
-    @Override
-    @NotNull
-    public <T> Stream<T> resolve(ContextMap contextMap, DisplayContentsFactory<T> factory) {
-        if (factory instanceof DisplayContentsFactory.ForStacks<T> forStacks) {
-            return this.getDisplayStacks().stream().map(forStacks::forStack);
-        }
-        return Stream.empty();
-    }
-
-    @Override
-    @NotNull
-    public Type<? extends SlotDisplay> type() {
-        return TYPE;
     }
 
     @Override

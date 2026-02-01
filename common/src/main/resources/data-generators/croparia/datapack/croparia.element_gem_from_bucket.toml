@@ -5,7 +5,9 @@ template = """
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "${bucket}"
+    {
+      "item": "${bucket}"
+    }
   ],
   "result": {
     "id": "${gem}"

@@ -11,6 +11,7 @@ import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.ItemInput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
+import cool.muyucloud.croparia.api.recipe.entry.SlotDisplay;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
@@ -18,7 +19,6 @@ import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +33,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
             ElementAccess.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
             ItemInput.CODEC.fieldOf("ingredient").forGetter(InfusorRecipe::getIngredient),
             ItemOutput.CODEC.fieldOf("result").forGetter(InfusorRecipe::getResult)
-        ).apply(instance, InfusorRecipe::new)), TypedSerializer.JEI,
+        ).apply(instance, InfusorRecipe::new)),
         Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance)
     );
     public static final TypedSerializer<InfusorRecipe> OLD_TYPED_SERIALIZER = new TypedSerializer<>(
@@ -45,7 +45,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
             Codec.INT.fieldOf("count").forGetter(recipe -> Math.toIntExact(recipe.getResult().getAmount()))
         ).apply(instance, (element, input, output, count) ->
             new InfusorRecipe(element, input, new ItemOutput(output.getId(), output.getComponentsPatch(), count)))),
-        TypedSerializer.JEI, Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance)
+        Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance)
     );
 
     protected final Element element;
@@ -101,7 +101,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     }
 
     public @NotNull List<List<ItemStack>> getOutputs() {
-        return List.of(List.of(this.getResult().getDisplayStack()));
+        return List.of(this.getResult().getDisplayStacks());
     }
 
     @Override
@@ -114,7 +114,6 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
         return assemble(recipeInput);
     }
 
-    @Override
     @NotNull
     public ItemOutput result() {
         return this.getResult();
@@ -122,8 +121,8 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
 
     @Override
     @NotNull
-    public SlotDisplay.ItemStackSlotDisplay craftingStation() {
-        return new SlotDisplay.ItemStackSlotDisplay(CropariaItems.INFUSOR.get().getDefaultInstance());
+    public SlotDisplay craftingStation() {
+        return new ItemOutput(CropariaItems.INFUSOR.get().getDefaultInstance());
     }
 
     @Override

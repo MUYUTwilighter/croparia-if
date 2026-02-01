@@ -5,8 +5,12 @@ template = """
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "minecraft:glass_bottle",
-    "${gem}"
+    {
+      "item": "${gem}"
+    },
+    {
+      "item": "minecraft:glass_bottle"
+    }
   ],
   "result": {
     "id": "${potion}"

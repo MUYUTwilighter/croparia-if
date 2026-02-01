@@ -47,7 +47,6 @@ public class CropariaIf {
         CropariaBlocks.register();
         BlockEntities.register();
         CropariaItems.register();
-        SlotDisplays.register();
         Recipes.register();
         Tabs.register();
         CommonCommandRoot.register();
@@ -72,6 +71,7 @@ public class CropariaIf {
             SERVER_STARTED = false;
             ConfigFileHandler.save(CONFIG);
         });
+        // TODO: Clear generated files on server stopped
         LifecycleEvent.SERVER_STOPPED.register(server -> SERVER = null);
         CropariaIf.LOGGER.info("=== Croparia common setup done ===");
     }

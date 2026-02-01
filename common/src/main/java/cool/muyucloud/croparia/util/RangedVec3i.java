@@ -1,9 +1,9 @@
 package cool.muyucloud.croparia.util;
 
-import net.jcip.annotations.Immutable;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import org.jetbrains.annotations.NotNull;
+import oshi.annotation.concurrent.Immutable;
 
 import java.util.Objects;
 
@@ -74,7 +74,19 @@ public class RangedVec3i extends Vec3i {
 
     @Override
     public @NotNull RangedVec3i relative(@NotNull Direction.Axis axis, int amount) {
-        return amount == 0 ? this : this.relative(axis.getPositive(), amount);
+        if (amount == 0) return this;
+        switch (axis) {
+            case X -> {
+                return this.offset(amount, 0, 0);
+            }
+            case Y -> {
+                return this.offset(0, amount, 0);
+            }
+            case Z -> {
+                return this.offset(0, 0, amount);
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + axis);
+        }
     }
 
     @Override

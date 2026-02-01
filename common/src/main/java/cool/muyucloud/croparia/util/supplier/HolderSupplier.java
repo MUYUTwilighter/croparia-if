@@ -33,7 +33,7 @@ public class HolderSupplier<T> implements DeferredSupplier<T> {
     public HolderSupplier(@NotNull Supplier<T> value, @NotNull ResourceKey<? super T> key) {
         this.value = LazySupplier.of(value);
         this.key = key;
-        this.registry = (Registry<T>) BuiltInRegistries.REGISTRY.getValue(this.getRegistryId());
+        this.registry = (Registry<T>) BuiltInRegistries.REGISTRY.get(this.getRegistryId());
         if (this.registry == null) throw new IllegalArgumentException("Invalid registry id: " + this.getRegistryId());
     }
 
@@ -71,7 +71,7 @@ public class HolderSupplier<T> implements DeferredSupplier<T> {
     @Override
     @SuppressWarnings("unchecked")
     public T get() {
-        return (T) this.getRegistry().getValue(this.getId());
+        return (T) this.getRegistry().get(this.getId());
     }
 
     public void register() {

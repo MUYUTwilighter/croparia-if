@@ -73,7 +73,7 @@ public class ItemMaterial extends Material<Item> {
         }
         ItemStack stack = this.candidates().getFirst().getDefaultInstance();
         stack.applyComponents(this.getComponents());
-        stack.setCount(this.getCount());
+        stack.setCount(Math.min(stack.getMaxStackSize(), this.getCount()));
         return stack;
     }
 

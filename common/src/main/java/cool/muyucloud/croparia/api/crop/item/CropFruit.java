@@ -6,10 +6,8 @@ import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.registry.DgRegistries;
 import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -23,7 +21,7 @@ public class CropFruit extends Item implements CropAccess<Crop> {
     private final ResourceLocation cropId;
 
     public CropFruit(Crop crop) {
-        super(new Properties().arch$tab(Tabs.CROPS).setId(ResourceKey.create(Registries.ITEM, crop.getFruitId())));
+        super(new Properties().arch$tab(Tabs.CROPS));
         this.cropId = crop.getKey();
     }
 

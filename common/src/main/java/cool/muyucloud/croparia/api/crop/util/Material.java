@@ -59,7 +59,7 @@ public abstract class Material<T> {
 
     protected Collection<T> candidates(ResourceLocation registryName) {
         @Nullable
-        Registry<T> registry = CifUtil.castUnsafe(BuiltInRegistries.REGISTRY.getValue(registryName));
+        Registry<T> registry = CifUtil.castUnsafe(BuiltInRegistries.REGISTRY.get(registryName));
         if (registry == null) {
             return Collections.emptyList();
         }
@@ -72,7 +72,7 @@ public abstract class Material<T> {
             }
             return result;
         } else {
-            T value = registry.getValue(this.getId());
+            T value = registry.get(this.getId());
             if (value != null) {
                 return Collections.singletonList(value);
             } else {

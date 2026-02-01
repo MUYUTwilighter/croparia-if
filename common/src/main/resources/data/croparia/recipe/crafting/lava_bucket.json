@@ -2,8 +2,12 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "minecraft:bucket",
-    "croparia:gem_fire"
+    {
+      "item": "minecraft:bucket"
+    },
+    {
+      "item": "croparia:gem_fire"
+    }
   ],
   "result": {
     "id": "minecraft:lava_bucket"

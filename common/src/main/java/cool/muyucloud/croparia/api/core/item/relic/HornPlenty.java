@@ -44,7 +44,7 @@ public class HornPlenty extends Item {
             return InteractionResult.FAIL;
         }
         player.giveExperiencePoints(-xp);
-        player.getCooldowns().addCooldown(context.getItemInHand(), 100);
+        player.getCooldowns().addCooldown(context.getItemInHand().getItem(), 100);
         context.getLevel().addFreshEntity(new ItemEntity(
             context.getLevel(),
             context.getClickedPos().getX() + 0.5D,

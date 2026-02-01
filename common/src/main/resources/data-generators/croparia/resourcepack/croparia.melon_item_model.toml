@@ -1,0 +1,8 @@
+registry = "croparia:melons"
+path = "${id.namespace}/models/item/${melon.path}.json"
+startup = true
+template = """
+{
+  "parent": "croparia:block/gourd"
+}
+"""

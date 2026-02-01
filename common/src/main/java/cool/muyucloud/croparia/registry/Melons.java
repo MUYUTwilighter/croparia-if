@@ -68,7 +68,8 @@ public class Melons {
     public static final Melon MOSS_BLOCK = vanilla("moss_block", Blocks.MOSS_BLOCK, 0x6CA66C, 2);
     public static final Melon MYCELIUM = vanilla("mycelium", Blocks.MYCELIUM, 0x7F6A93, 2);
     public static final Melon OBSIDIAN = vanilla("obsidian", Blocks.OBSIDIAN, 0x1C1C2A, 2);
-    public static final Melon PALE_MOSS_BLOCK = vanilla("pale_moss_block", Blocks.PALE_MOSS_BLOCK, 0xA2C5A2, 2);
+    // Pale Moss Block only in 1.21.4+
+    // public static final Melon PALE_MOSS_BLOCK = vanilla("pale_moss_block", Blocks.PALE_MOSS_BLOCK, 0xA2C5A2, 2);
     public static final Melon PODZOL = vanilla("podzol", Blocks.PODZOL, 0x8B5A2B, 2);
     public static final Melon SCULK = vanilla("sculk", Blocks.SCULK, 0x0B3B2E, 2);
     public static final Melon WARPED_NYLIUM = vanilla("warped_nylium", Blocks.WARPED_NYLIUM, 0x2E7C7A, 2);

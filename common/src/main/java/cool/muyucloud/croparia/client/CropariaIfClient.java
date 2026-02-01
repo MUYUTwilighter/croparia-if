@@ -18,16 +18,29 @@ public class CropariaIfClient {
         ClientCommandRoot.register();
         CropariaIf.LOGGER.debug("Registering crop color");
         DgRegistries.CROPS.forLoaded(crop -> {
+            // Crop Color
             ColorHandlerRegistry.registerBlockColors((state, getter, pos, i) -> crop.getColor().getValue(), crop.getCropBlock().orElseThrow());
             RenderTypeRegistry.register(RenderType.cutoutMipped(), crop.getCropBlock().orElseThrow());
+            // Fruit Color
+            ColorHandlerRegistry.registerItemColors((stack, i) -> i == 1 ? 0xFF000000 | crop.getColor().getValue() : -1, crop.getCropFruit().orElseThrow());
+            // Seed Color
+            ColorHandlerRegistry.registerItemColors((stack, i) -> crop.getColor().getValue(), crop.getCropSeed().orElseThrow());
         });
         DgRegistries.MELONS.forLoaded(melon -> {
+            // Melon Block Color
             ColorHandlerRegistry.registerBlockColors((state, getter, pos, tintIndex) -> {
                 if (tintIndex == 0) {
                     return melon.getColor().getValue();
                 }
                 return -1;
-            }, melon.getMelon().get());
+            }, melon.getMelon());
+            ColorHandlerRegistry.registerItemColors((stack, i) -> {
+                if (i == 0) {
+                    return melon.getColor().getValue();
+                }
+                return -1;
+            }, melon.getMelonItem());
+            // Stem Color
             ColorHandlerRegistry.registerBlockColors((state, getter, pos, tintIndex) -> {
                 if (tintIndex == 0) {
                     int age = state.getValue(StemBlock.AGE);
@@ -40,7 +53,9 @@ public class CropariaIfClient {
                     return melon.getColor().getValue();
                 }
                 return -1;
-            }, melon.getStem().get());
+            }, melon.getStem());
+            RenderTypeRegistry.register(RenderType.cutoutMipped(), melon.getStem().get());
+            // Attach Color
             ColorHandlerRegistry.registerBlockColors((state, getter, pos, tintIndex) -> {
                 if (tintIndex == 0) {
                     return melon.getColor().getValue();
@@ -49,9 +64,18 @@ public class CropariaIfClient {
                     return STEM_MATURE;
                 }
                 return -1;
-            }, melon.getAttach().get());
-            RenderTypeRegistry.register(RenderType.cutoutMipped(), melon.getStem().get());
+            }, melon.getAttach());
             RenderTypeRegistry.register(RenderType.cutoutMipped(), melon.getAttach().get());
+            // Seed Color
+            ColorHandlerRegistry.registerItemColors((stack, i) -> melon.getColor().getValue(), melon.getSeed().get());
+        });
+        DgRegistries.ELEMENTS.forEach(element -> {
+            if (!element.shouldLoad()) return;
+            // Elemental Bucket Color
+            ColorHandlerRegistry.registerItemColors((stack, i) -> {
+                if (i == 1) return 0xFF000000 | element.getColor().getValue();
+                return -1;
+            }, element.getBucket());
         });
         CropariaIf.LOGGER.debug("Registering cutout rendering");
         RenderTypeRegistry.register(RenderType.cutout(), CropariaBlocks.GREENHOUSE.get());

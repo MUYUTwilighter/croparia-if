@@ -2,7 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "croparia:gem_earth"
+    {
+      "item": "croparia:gem_earth"
+    }
   ],
   "result": {
     "id": "minecraft:dirt"

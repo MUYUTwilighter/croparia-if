@@ -2,8 +2,12 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "minecraft:bucket",
-    "croparia:gem_water"
+    {
+      "item": "minecraft:bucket"
+    },
+    {
+      "item": "croparia:gem_water"
+    }
   ],
   "result": {
     "id": "minecraft:water_bucket"

@@ -16,7 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -42,13 +42,13 @@ public class RitualStand extends Block implements ItemPlaceable {
     }
 
     @Override
-    protected @NotNull InteractionResult useItemOn(ItemStack itemStack, BlockState blockState, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult blockHitResult) {
+    protected @NotNull ItemInteractionResult useItemOn(ItemStack itemStack, BlockState blockState, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult blockHitResult) {
         if (hand == InteractionHand.MAIN_HAND) {
             if (itemStack.getItem() == CropariaItems.RECIPE_WIZARD.get()) {
-                return InteractionResult.PASS;
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
             this.placeItem(world, pos, itemStack, player);
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
         return super.useItemOn(itemStack, blockState, world, pos, player, hand, blockHitResult);
     }
