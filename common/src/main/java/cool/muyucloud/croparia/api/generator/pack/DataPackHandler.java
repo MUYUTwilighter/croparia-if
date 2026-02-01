@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import cool.muyucloud.croparia.api.generator.util.AlwaysEnabledFileResourcePackProvider;
 import cool.muyucloud.croparia.mixin.PackRepositoryMixin;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.PackSource;
 
@@ -49,7 +50,13 @@ public class DataPackHandler extends PackHandler {
     }
 
     @Override
-    public String proxyPath(String path) {
-        return path.startsWith("data/") ? path : "data/" + path;
+    public Path getDumpRoot() {
+        return this.getRoot().resolve("data");
+    }
+
+    @Override
+    public void onServerStopping(MinecraftServer server) {
+        super.onServerStopping(server);
+        if (this.canOverride()) this.clear();
     }
 }

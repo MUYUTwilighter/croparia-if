@@ -2,6 +2,7 @@ package cool.muyucloud.croparia;
 
 import com.mojang.logging.LogUtils;
 import cool.muyucloud.croparia.api.core.command.CommonCommandRoot;
+import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.config.Config;
 import cool.muyucloud.croparia.config.ConfigFileHandler;
 import cool.muyucloud.croparia.registry.*;
@@ -63,7 +64,7 @@ public class CropariaIf {
             }
             if (INSTANCE.getVersion().contains("a") || INSTANCE.getVersion().contains("alpha")) {
                 server.getPlayerList().getPlayers().forEach(player -> player.sendSystemMessage(Texts.translatable(
-                        "chat.croparia.alpha_warning", Texts.literal(INSTANCE.getIssueTracker().orElse(""))
+                    "chat.croparia.alpha_warning", Texts.literal(INSTANCE.getIssueTracker().orElse(""))
                 ).withStyle(style -> style.withColor(0xFF5555).withBold(true))));
             }
         });
@@ -72,7 +73,10 @@ public class CropariaIf {
             ConfigFileHandler.save(CONFIG);
         });
         // TODO: Clear generated files on server stopped
-        LifecycleEvent.SERVER_STOPPED.register(server -> SERVER = null);
+        LifecycleEvent.SERVER_STOPPED.register(server -> {
+            SERVER = null;
+            PackHandler.forEach(pack -> pack.onServerStopping(server));
+        });
         CropariaIf.LOGGER.info("=== Croparia common setup done ===");
     }
 

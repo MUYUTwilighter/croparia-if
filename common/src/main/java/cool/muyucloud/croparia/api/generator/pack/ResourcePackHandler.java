@@ -2,7 +2,9 @@ package cool.muyucloud.croparia.api.generator.pack;
 
 import com.google.gson.JsonObject;
 import cool.muyucloud.croparia.mixin.ReloadableResourceManagerImplMixin;
+import cool.muyucloud.croparia.util.Ref;
 import cool.muyucloud.croparia.util.text.Texts;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
@@ -56,12 +58,18 @@ public class ResourcePackHandler extends PackHandler {
         super(id, path, meta, override);
     }
 
+    @Override
+    public void onClientStopping(Ref<Minecraft> client) {
+        super.onClientStopping(client);
+        if (this.canOverride()) this.clear();
+    }
+
     public PackResources getResourcePack() {
         return this.resourcePack;
     }
 
     @Override
-    public String proxyPath(String path) {
-        return path.startsWith("assets/") ? path : "assets/" + path;
+    public Path getDumpRoot() {
+        return this.getRoot().resolve("assets");
     }
 }

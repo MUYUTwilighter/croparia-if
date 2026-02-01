@@ -1,9 +1,12 @@
 package cool.muyucloud.croparia.client;
 
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.client.command.ClientCommandRoot;
 import cool.muyucloud.croparia.registry.CropariaBlocks;
 import cool.muyucloud.croparia.registry.DgRegistries;
+import cool.muyucloud.croparia.util.Ref;
+import dev.architectury.event.events.client.ClientLifecycleEvent;
 import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
 import net.minecraft.client.renderer.RenderType;
@@ -80,5 +83,8 @@ public class CropariaIfClient {
         CropariaIf.LOGGER.debug("Registering cutout rendering");
         RenderTypeRegistry.register(RenderType.cutout(), CropariaBlocks.GREENHOUSE.get());
         RenderTypeRegistry.register(RenderType.cutout(), CropariaBlocks.ACTIVATED_SHRIEKER.get());
+        ClientLifecycleEvent.CLIENT_STOPPING.register(client -> PackHandler.forEach(
+            pack -> pack.onClientStopping(Ref.of(client))
+        ));
     }
 }

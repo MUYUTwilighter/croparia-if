@@ -12,9 +12,12 @@ import cool.muyucloud.croparia.api.generator.util.PackCache;
 import cool.muyucloud.croparia.api.generator.util.PackCacheEntry;
 import cool.muyucloud.croparia.api.json.JsonTransformer;
 import cool.muyucloud.croparia.util.FileUtil;
+import cool.muyucloud.croparia.util.Ref;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.File;
@@ -23,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -72,6 +76,10 @@ public abstract class PackHandler {
         PACKS.forEach((resourceLocation, handler) -> builder.suggest(resourceLocation.toString()));
     }
 
+    public static void forEach(Consumer<PackHandler> consumer) {
+        PACKS.values().forEach(consumer);
+    }
+
     public static Optional<PackHandler> byId(ResourceLocation id) {
         return Optional.ofNullable(PACKS.get(id));
     }
@@ -100,8 +108,14 @@ public abstract class PackHandler {
         this.writeMeta();
     }
 
+    public void onServerStopping(MinecraftServer server) {
+    }
+
+    public void onClientStopping(Ref<Minecraft> client) {
+    }
+
     public void clear() {
-        Path path = this.getRoot().resolve(this.proxyPath("/"));
+        Path path = this.getDumpRoot();
         File file = path.toFile();
         if (file.isDirectory()) {
             try {
@@ -207,7 +221,7 @@ public abstract class PackHandler {
             for (PackCacheEntry<?> entry : this.cache.entries()) {
                 Optional<?> value = entry.getCache();
                 if (value.isPresent()) {
-                    FileUtil.write(this.getRoot().resolve(this.proxyPath(entry.path())).toFile(), value.get().toString(), true);
+                    FileUtil.write(this.getDumpRoot().resolve(entry.path()).toFile(), value.get().toString(), true);
                 }
             }
         } catch (Exception e) {
@@ -215,8 +229,8 @@ public abstract class PackHandler {
         }
     }
 
-    public String proxyPath(String path) {
-        return path;
+    public Path getDumpRoot() {
+        return this.getRoot();
     }
 
     protected void writeMeta() {
