@@ -14,6 +14,7 @@ import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -23,8 +24,10 @@ public class GeneratorCommand {
     public static <S> LiteralArgumentBuilder<S> buildGenerator(boolean client) {
         LiteralArgumentBuilder<S> generator = LiteralArgumentBuilder.literal("generator");
         LiteralArgumentBuilder<S> dumpBuiltin = buildDumpBuiltin(client);
+        LiteralArgumentBuilder<S> clearBuiltin = buildClearBuiltin();
         LiteralArgumentBuilder<S> query = buildQuery();
         generator.then(dumpBuiltin);
+        generator.then(clearBuiltin);
         generator.then(query);
         return generator;
     }
@@ -36,7 +39,7 @@ public class GeneratorCommand {
             DelegateSource<S> source = DelegateSource.of(context);
             ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
             Optional<PackHandler> mayHandler = PackHandler.byId(packId);
-            if (mayHandler.isEmpty()) {
+            if (mayHandler.isEmpty() || packId == null) {
                 source.failure(Texts.translatable("commands.croparia.generator.badPack"));
                 return -1;
             }
@@ -65,6 +68,7 @@ public class GeneratorCommand {
         RequiredArgumentBuilder<S, String> generator = RequiredArgumentBuilder.argument("generator", StringArgumentType.greedyString());
         generator.suggests((context, builder) -> {
             ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            if (packId == null) return builder.buildFuture();
             String prefix = "data-generators/%s/%s/".formatted(packId.getNamespace(), packId.getPath());
             PackHandler.getBuiltinGenerators(packId).forEach(jarJarEntry -> {
                 String entryName = jarJarEntry.getJarEntry().getName().substring(prefix.length());
@@ -75,7 +79,7 @@ public class GeneratorCommand {
             DelegateSource<S> source = DelegateSource.of(context);
             ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
             Optional<PackHandler> mayHandler = PackHandler.byId(packId);
-            if (mayHandler.isEmpty()) {
+            if (mayHandler.isEmpty() || packId == null) {
                 source.failure(Texts.translatable("commands.croparia.generator.badPack"));
                 return -1;
             }
@@ -106,6 +110,85 @@ public class GeneratorCommand {
             return -1;
         });
         return dumpBuiltin.then(pack.then(generator));
+    }
+
+    public static <S> LiteralArgumentBuilder<S> buildClearBuiltin() {
+        LiteralArgumentBuilder<S> clearBuiltin = LiteralArgumentBuilder.literal("clearBuiltin");
+        RequiredArgumentBuilder<S, ResourceLocation> pack = buildPack();
+        pack.executes(context -> {
+            DelegateSource<S> source = DelegateSource.of(context);
+            ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            Optional<PackHandler> mayHandler = PackHandler.byId(packId);
+            if (mayHandler.isEmpty() || packId == null) {
+                source.failure(Texts.translatable("commands.croparia.generator.badPack"));
+                return -1;
+            }
+            Path packRoot = mayHandler.get().getGeneratorRoot();
+            String prefix = "data-generators/%s/%s/".formatted(packId.getNamespace(), packId.getNamespace());
+            AtomicInteger success = new AtomicInteger();
+            PackHandler.getBuiltinGenerators(packId).forEach(jarJarEntry -> {
+                String generatorVal = jarJarEntry.getJarEntry().getName().substring(prefix.length());
+                Path target = packRoot.resolve(generatorVal);
+                File targetFile = target.toFile();
+                if (targetFile.exists()) {
+                    if (targetFile.delete()) {
+                        success.incrementAndGet();
+                    } else {
+                        source.failure(Texts.translatable("commands.croparia.generator.clearBuiltin.fail"));
+                        CropariaIf.LOGGER.error("Failed to clear dumped generator %s from pack %s".formatted(generatorVal, packId.toString()));
+                    }
+                }
+            });
+            source.success(Texts.translatable("commands.croparia.generator.clearBuiltin.success", success.get()), false);
+            return success.get();
+        });
+        RequiredArgumentBuilder<S, String> generator = RequiredArgumentBuilder.argument("generator", StringArgumentType.greedyString());
+        generator.suggests((context, builder) -> {
+            ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            if (packId == null) return builder.buildFuture();
+            String prefix = "data-generators/%s/%s/".formatted(packId.getNamespace(), packId.getPath());
+            PackHandler.getBuiltinGenerators(packId).forEach(jarJarEntry -> {
+                String entryName = jarJarEntry.getJarEntry().getName().substring(prefix.length());
+                builder.suggest(entryName);
+            });
+            return builder.buildFuture();
+        }).executes(context -> {
+            DelegateSource<S> source = DelegateSource.of(context);
+            ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            Optional<PackHandler> mayHandler = PackHandler.byId(packId);
+            if (mayHandler.isEmpty() || packId == null) {
+                source.failure(Texts.translatable("commands.croparia.generator.badPack"));
+                return -1;
+            }
+            Path generatorRoot = mayHandler.get().getGeneratorRoot();
+            String generatorVal = StringArgumentType.getString(context, "generator");
+            String entryName = "data-generators/%s/%s/%s".formatted(packId.getNamespace(), packId.getPath(), generatorVal);
+            for (JarJarEntry entry : PackHandler.getBuiltinGenerators(packId)) {
+                if (entry.getJarEntry().getName().equals(entryName)) {
+                    Path target = generatorRoot.resolve(generatorVal);
+                    File targetFile = target.toFile();
+                    if (targetFile.exists()) {
+                        if (targetFile.delete()) {
+                            source.success(Texts.translatable("commands.croparia.generator.clearBuiltin.success", 1), false);
+                            return 1;
+                        } else {
+                            MutableComponent io = Texts.translatable("commands.croparia.generator.clearBuiltin.fail");
+                            source.failure(io);
+                            CropariaIf.LOGGER.error("Failed to clear dumped generator %s from pack %s".formatted(generatorVal, packId.toString()));
+                            return -1;
+                        }
+                    } else {
+                        MutableComponent noFile = Texts.translatable("commands.croparia.generator.clearBuiltin.noFile");
+                        source.failure(noFile);
+                        return -1;
+                    }
+                }
+            }
+            MutableComponent badGen = Texts.translatable("commands.croparia.generator.badGenerator");
+            source.failure(badGen);
+            return -1;
+        });
+        return clearBuiltin.then(pack.then(generator));
     }
 
     public static <S> LiteralArgumentBuilder<S> buildQuery() {
