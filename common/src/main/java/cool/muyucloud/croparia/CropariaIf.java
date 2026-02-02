@@ -7,6 +7,7 @@ import cool.muyucloud.croparia.config.Config;
 import cool.muyucloud.croparia.config.ConfigFileHandler;
 import cool.muyucloud.croparia.registry.*;
 import cool.muyucloud.croparia.util.Ref;
+import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import dev.architectury.event.events.common.LifecycleEvent;
@@ -24,7 +25,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class CropariaIf {
-    public static final Mod INSTANCE = Platform.getMod("croparia");
+    public static final LazySupplier<Mod> INSTANCE = LazySupplier.of(() -> Platform.getMod("croparia"));
     public static final String MOD_ID = "croparia";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final Config CONFIG = ConfigFileHandler.load();
@@ -62,9 +63,9 @@ public class CropariaIf {
                 LOGGER.info("Croparia IF is performing a datapack reload to apply data generators");
                 server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "schedule function croparia:auto_reload %s".formatted(CONFIG.getAutoReload()));
             }
-            if (INSTANCE.getVersion().contains("a") || INSTANCE.getVersion().contains("alpha")) {
+            if (INSTANCE.get().getVersion().contains("a") || INSTANCE.get().getVersion().contains("alpha")) {
                 server.getPlayerList().getPlayers().forEach(player -> player.sendSystemMessage(Texts.translatable(
-                    "chat.croparia.alpha_warning", Texts.literal(INSTANCE.getIssueTracker().orElse(""))
+                    "chat.croparia.alpha_warning", Texts.literal(INSTANCE.get().getIssueTracker().orElse(""))
                 ).withStyle(style -> style.withColor(0xFF5555).withBold(true))));
             }
         });

@@ -14,6 +14,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class BlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(CropariaIf.MOD_ID, Registries.BLOCK_ENTITY_TYPE);
@@ -21,22 +23,22 @@ public class BlockEntities {
     public static final RegistrySupplier<BlockEntityType<GreenhouseBlockEntity>> GREENHOUSE_BE = register(
         "greenhouse",
         GreenhouseBlockEntity::new,
-        Set.of(CropariaBlocks.GREENHOUSE.get())
+        Set.of(CropariaBlocks.GREENHOUSE)
     );
     public static final RegistrySupplier<BlockEntityType<ActivatedShriekerBlockEntity>> ACTIVATED_SHRIEKER = register(
         "activated_shrieker",
         ActivatedShriekerBlockEntity::new,
-        Set.of(CropariaBlocks.ACTIVATED_SHRIEKER.get())
+        Set.of(CropariaBlocks.ACTIVATED_SHRIEKER)
     );
 
     @NotNull
     public static <T extends BlockEntity> RegistrySupplier<BlockEntityType<T>> register(
         @NotNull String name,
         @NotNull BlockEntityType.BlockEntitySupplier<? extends T> factory,
-        @NotNull Set<Block> validBlocks
-    ) {
+        @NotNull Set<? extends Supplier<? extends Block>> validBlocks
+        ) {
         return BLOCK_ENTITIES.register(name, () -> new BlockEntityType<>(
-            factory, validBlocks, Util.fetchChoiceType(References.BLOCK_ENTITY, CropariaIf.of(name).toString())
+            factory, validBlocks.stream().map(Supplier::get).collect(Collectors.toSet()), Util.fetchChoiceType(References.BLOCK_ENTITY, CropariaIf.of(name).toString())
         ));
     }
 
