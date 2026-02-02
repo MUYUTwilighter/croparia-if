@@ -67,12 +67,11 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         if (!cropBlock.isMaxAge(crop)) return;
         Item seed = cropBlock.asItem();
         List<ItemStack> droppedStacks = Block.getDrops(crop, level, cropPos, level.getBlockEntity(cropPos));
-        boolean decreased = false;
         // Seed reduction
         for (ItemStack stack : droppedStacks) {
-            if (!decreased && stack.is(seed)) { // Consume one seed to simulate "replant"
+            if (stack.is(seed)) { // Consume one seed to simulate "replant"
                 stack.shrink(1);    // No worry if aborted, the stack is newly created, so no side effect
-                decreased = true;
+                break;
             }
         }
         // Deposit
@@ -80,7 +79,11 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         // Age update
         IntegerProperty property = CropBlockAccess.of(cropBlock).cif$getAgeProperty();
         int maxAge = cropBlock.getMaxAge();
-        level.setBlockAndUpdate(worldPosition.below(), cropBlock.defaultBlockState().setValue(property, maxAge / 2));
+        if (maxAge == 0) {
+            level.destroyBlock(worldPosition.below(), false);
+        } else {
+            level.setBlockAndUpdate(worldPosition.below(), cropBlock.defaultBlockState().setValue(property, maxAge / 2));
+        }
     }
 
     public void tryHarvestMelon(ServerLevel level, BlockState stem, BlockPos stemPos) {
