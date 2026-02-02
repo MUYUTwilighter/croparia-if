@@ -43,6 +43,11 @@ public class HolderSupplier<T> implements DeferredSupplier<T> {
         return (ResourceKey<T>) this.key;
     }
 
+    @SuppressWarnings("unchecked")
+    public <S> ResourceKey<S> adaptKey() {
+        return (ResourceKey<S>) this.key;
+    }
+
     public @NotNull Registry<? super T> getRegistry() {
         return this.registry;
     }
