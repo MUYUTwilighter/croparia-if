@@ -49,7 +49,7 @@ public class Color {
     }
 
     public String toString() {
-        return String.format("#%08x", this.getValue()).toLowerCase(Locale.ROOT);
+        return String.format("#%08x", this.getValue()).toUpperCase(Locale.ROOT);
     }
 
     public String toHexString() {
