@@ -60,6 +60,7 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
     private final ResourceLocation id;
     private final Color color;
     private final String translationKey;
+    private final SimpleArchitecturyFluidAttributes fluidAttr;
     private final RegistrySupplier<ElementalSource> fluidSource;
     private final RegistrySupplier<ElementalFlowing> fluidFlowing;
     private final RegistrySupplier<ElementalLiquidBlock> fluidBlock;
@@ -71,6 +72,7 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
         this.id = CropariaIf.of("empty");
         this.color = new Color(-1);
         this.translationKey = "element." + CropariaIf.MOD_ID + ".empty";
+        this.fluidAttr = null;
         this.fluidSource = null;
         this.fluidFlowing = null;
         this.fluidBlock = null;
@@ -87,15 +89,15 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
         this.id = CropariaIf.of(name);
         this.color = color;
         this.translationKey = "element." + CropariaIf.MOD_ID + "." + name;
-        SimpleArchitecturyFluidAttributes attr = SimpleArchitecturyFluidAttributes.of(
+        this.fluidAttr = SimpleArchitecturyFluidAttributes.of(
             () -> Element.this.getFluidFlowing().get(),
             () -> Element.this.getFluidSource().get()
         ).block(() -> Optional.ofNullable(Element.this.getFluidBlock().get())).bucketItem(
             () -> Optional.ofNullable(Element.this.getBucket().get())
         ).sourceTexture(parseId("block/%s_still")).flowingTexture(parseId("block/%s_flow"));
-        appendix.accept(attr);
-        this.fluidSource = CropariaFluids.registerFluid(parseId("fluid_%s"), () -> new ElementalSource(this, attr));
-        this.fluidFlowing = CropariaFluids.registerFluid(parseId("fluid_%s_flow"), () -> new ElementalFlowing(this, attr));
+        appendix.accept(fluidAttr);
+        this.fluidSource = CropariaFluids.registerFluid(parseId("fluid_%s"), () -> new ElementalSource(this, fluidAttr));
+        this.fluidFlowing = CropariaFluids.registerFluid(parseId("fluid_%s_flow"), () -> new ElementalFlowing(this, fluidAttr));
         this.fluidBlock = CropariaBlocks.registerBlock(parseId("fluid_%s"),
             properties -> new ElementalLiquidBlock(this, BlockBehaviour.Properties.of().replaceable()
                 .lightLevel(state -> 8).noCollission().strength(100.0F).noLootTable()
@@ -118,6 +120,10 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
 
     public Color getColor() {
         return color;
+    }
+
+    public SimpleArchitecturyFluidAttributes getFluidAttr() {
+        return fluidAttr;
     }
 
     public RegistrySupplier<ElementalFlowing> getFluidFlowing() {
