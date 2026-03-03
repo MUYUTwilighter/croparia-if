@@ -73,7 +73,6 @@ public class CropariaIf {
             SERVER_STARTED = false;
             ConfigFileHandler.save(CONFIG);
         });
-        // TODO: Clear generated files on server stopped
         LifecycleEvent.SERVER_STOPPED.register(server -> {
             SERVER = null;
             PackHandler.forEach(pack -> pack.onServerStopping(server));
