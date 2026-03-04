@@ -20,8 +20,13 @@ public class SemiSupplier<T> extends LazySupplier<T> {
     }
 
     @Override
+    protected Supplier<T> mapSource() {
+        return creator;
+    }
+
+    @Override
     public <O, M extends O> SemiSupplier<O> map(Function<T, M> mapper) {
-        return new SemiSupplier<>(() -> mapper.apply(creator.get()));
+        return new SemiSupplier<>(mapCreator(mapper));
     }
 
     public void refresh() {

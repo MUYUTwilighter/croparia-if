@@ -23,9 +23,18 @@ public class LazySupplier<T> implements Mappable<T> {
         this.creator = creator;
     }
 
+    protected Supplier<T> mapSource() {
+        return this::get;
+    }
+
+    protected <O, M extends O> Supplier<O> mapCreator(Function<T, M> mapper) {
+        Supplier<T> source = mapSource();
+        return () -> mapper.apply(source.get());
+    }
+
     @Override
     public <O, M extends O> LazySupplier<O> map(Function<T, M> mapper) {
-        return new LazySupplier<>(() -> mapper.apply(this.get()));
+        return new LazySupplier<>(mapCreator(mapper));
     }
 
     @SuppressWarnings("unused")

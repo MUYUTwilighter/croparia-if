@@ -22,8 +22,13 @@ public class OnLoadSupplier<T> extends LazySupplier<T> {
     }
 
     @Override
+    protected Supplier<T> mapSource() {
+        return creator;
+    }
+
+    @Override
     public <O, M extends O> OnLoadSupplier<O> map(Function<T, M> mapper) {
-        return new OnLoadSupplier<>(() -> mapper.apply(creator.get()));
+        return new OnLoadSupplier<>(mapCreator(mapper));
     }
 
     @Override
