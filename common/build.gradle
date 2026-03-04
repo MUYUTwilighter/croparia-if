@@ -32,4 +32,7 @@ dependencies {
 
     // EMI: waiting for update to 1.21.3
 //    modCompileOnly "dev.emi:emi-xplat-intermediary:${emi_version}:api"
+
+    testImplementation platform("org.junit:junit-bom:5.10.2")
+    testImplementation "org.junit.jupiter:junit-jupiter"
 }
