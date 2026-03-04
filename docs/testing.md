@@ -51,6 +51,17 @@ To expand:
 2. Add/choose proper structure templates if required by your scenarios
 3. Launch dev server (for example `:neoforge:runServer`) and run tests with `/test runall croparia`
 
+## 4) NeoForge JUnit (module smoke tests)
+
+This project also enables regular JUnit tests in `neoforge`:
+
+- `neoforge/src/test/java`
+- sample: `neoforge/src/test/java/cool/muyucloud/croparia/neoforge/NeoForgeSmokeTest.java`
+
+Runtime note:
+
+- `neoforge:test` adds `:common` runtime artifacts (`namedElements` + `transformProductionNeoForge`) to ensure common classes are available during test execution.
+
 ## Full Validation
 
 Run all module tests:

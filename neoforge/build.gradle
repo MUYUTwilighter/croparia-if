@@ -71,6 +71,11 @@ dependencies {
 //    modRuntimeOnly "dev.emi:emi-neoforge:${emi_version}"
     // KubeJs
 //    modApi "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
+
+    testImplementation platform("org.junit:junit-bom:5.10.2")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testRuntimeOnly project(path: ':common', configuration: 'namedElements')
+    testRuntimeOnly project(path: ':common', configuration: 'transformProductionNeoForge')
 }
 
 processResources {
