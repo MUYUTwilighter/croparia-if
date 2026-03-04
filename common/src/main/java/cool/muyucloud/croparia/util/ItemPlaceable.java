@@ -25,7 +25,7 @@ public interface ItemPlaceable {
         } else {    // Otherwise, place only one item
             newStack = stack.split(1);
         }
-        ItemEntity entity = new ItemEntity(world, (double) pos.getX() + 0.5, (double) pos.getY() + 0.6, (double) pos.getZ() + 0.5, newStack, 0, 0, 0);
+        ItemEntity entity = CifUtil.createItemEntity(world, pos, newStack);
         entity.setThrower(owner);
         world.addFreshEntity(entity);
     }

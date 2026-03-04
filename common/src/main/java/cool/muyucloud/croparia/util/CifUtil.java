@@ -123,7 +123,11 @@ public class CifUtil {
         if (remain.isEmpty()) {
             return;
         }
-        world.addFreshEntity(new ItemEntity(world, (double) pos.getX() + 0.5, (double) pos.getY() + 0.6, (double) pos.getZ() + 0.5, remain, 0, 0, 0));
+        world.addFreshEntity(createItemEntity(world, pos, remain));
+    }
+
+    public static ItemEntity createItemEntity(Level world, BlockPos pos, ItemStack stack) {
+        return new ItemEntity(world, (double) pos.getX() + 0.5, (double) pos.getY() + 0.6, (double) pos.getZ() + 0.5, stack, 0, 0, 0);
     }
 
     @SuppressWarnings("unchecked")
@@ -134,15 +138,11 @@ public class CifUtil {
     }
 
     public static int toIntSafe(long value) {
-        if (value < Integer.MIN_VALUE) return Integer.MIN_VALUE;
-        if (value > Integer.MAX_VALUE) return Integer.MAX_VALUE;
-        return (int) value;
+        return toIntSafe((double) value);
     }
 
     public static int toIntSafe(float value) {
-        if (value < Integer.MIN_VALUE) return Integer.MIN_VALUE;
-        if (value > Integer.MAX_VALUE) return Integer.MAX_VALUE;
-        return (int) value;
+        return toIntSafe((double) value);
     }
 
     public static int toIntSafe(double value) {

@@ -17,7 +17,6 @@ import net.minecraft.resources.RegistryOps;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
@@ -311,16 +310,13 @@ public class CodecUtil {
     }
 
     public static <T> DataResult<T> readJson(File file, Codec<T> codec) throws IOException {
-        try (FileReader reader = new FileReader(file)) {
-            String filename = file.getName();
-            int i = filename.lastIndexOf('.');
-            if (i < 0 || i + 1 == filename.length()) throw new IOException("No file extension found in " + filename);
-            String subfix = filename.substring(i + 1).toLowerCase();
-            JsonTransformer transformer = JsonTransformer.TRANSFORMERS.get(subfix);
-            if (transformer == null) throw new IOException("No transformer found for file extension: " + subfix);
-            JsonElement json = JsonTransformer.transform(file);
-            return decodeJson(json, codec);
-        }
+        String filename = file.getName();
+        String subfix = FileUtil.extension(filename).toLowerCase();
+        if (subfix.isEmpty()) throw new IOException("No file extension found in " + filename);
+        JsonTransformer transformer = JsonTransformer.TRANSFORMERS.get(subfix);
+        if (transformer == null) throw new IOException("No transformer found for file extension: " + subfix);
+        JsonElement json = JsonTransformer.transform(file);
+        return decodeJson(json, codec);
     }
 
     public static <T> DataResult<T> readJson(String json, Codec<T> codec) {
