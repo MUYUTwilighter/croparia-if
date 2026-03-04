@@ -33,6 +33,7 @@ Use this when tests need a Fabric Loader runtime.
 Note:
 
 - Fabric loader JUnit will bootstrap Fabric/Mixin. If test runtime classpath is incomplete (for example missing mixin config resources), tests can fail before any assertion runs.
+- This project adds a test-only `croparia-if-common.mixins.json` override under `fabric/src/test/resources` so loader-backed tests can run without loading production mixins.
 
 ## 3) NeoForge GameTest (integration)
 
@@ -47,8 +48,8 @@ Current sample:
 To expand:
 
 1. Add more `@GameTest` methods
-2. Add/choose proper test structures if required by your scenarios
-3. Run via a GameTest-enabled dev server flow
+2. Add/choose proper structure templates if required by your scenarios
+3. Launch dev server (for example `:neoforge:runServer`) and run tests with `/test runall croparia`
 
 ## Full Validation
 
