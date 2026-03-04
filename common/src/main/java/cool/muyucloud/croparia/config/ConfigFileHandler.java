@@ -3,9 +3,9 @@ package cool.muyucloud.croparia.config;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.util.FileUtil;
 import dev.architectury.platform.Platform;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,9 +17,10 @@ public class ConfigFileHandler {
 
     public static void save(Config config) {
         CropariaIf.LOGGER.info("Saving config");
-        File parent = CONFIG_PATH.getParent().toFile();
-        if (!parent.exists() && !parent.mkdirs()) {
-            throw new IllegalStateException("Failed to create config directory");
+        try {
+            FileUtil.ensureParentDirectory(CONFIG_PATH.toFile());
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to create config directory", e);
         }
         try (JsonWriter writer = new JsonWriter(new FileWriter(CONFIG_PATH.toFile()))) {
             writer.setIndent("  ");

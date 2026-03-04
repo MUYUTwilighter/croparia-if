@@ -14,7 +14,6 @@ import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -129,14 +128,13 @@ public class GeneratorCommand {
             PackHandler.getBuiltinGenerators(packId).forEach(jarJarEntry -> {
                 String generatorVal = jarJarEntry.getJarEntry().getName().substring(prefix.length());
                 Path target = packRoot.resolve(generatorVal);
-                File targetFile = target.toFile();
-                if (targetFile.exists()) {
-                    if (targetFile.delete()) {
+                try {
+                    if (FileUtil.deleteIfExists(target.toFile())) {
                         success.incrementAndGet();
-                    } else {
-                        source.failure(Texts.translatable("commands.croparia.generator.clearBuiltin.fail"));
-                        CropariaIf.LOGGER.error("Failed to clear dumped generator %s from pack %s".formatted(generatorVal, packId.toString()));
                     }
+                } catch (IOException e) {
+                    source.failure(Texts.translatable("commands.croparia.generator.clearBuiltin.fail"));
+                    CropariaIf.LOGGER.error("Failed to clear dumped generator %s from pack %s".formatted(generatorVal, packId.toString()), e);
                 }
             });
             source.success(Texts.translatable("commands.croparia.generator.clearBuiltin.success", success.get()), false);
@@ -166,20 +164,19 @@ public class GeneratorCommand {
             for (JarJarEntry entry : PackHandler.getBuiltinGenerators(packId)) {
                 if (entry.getJarEntry().getName().equals(entryName)) {
                     Path target = generatorRoot.resolve(generatorVal);
-                    File targetFile = target.toFile();
-                    if (targetFile.exists()) {
-                        if (targetFile.delete()) {
+                    try {
+                        if (FileUtil.deleteIfExists(target.toFile())) {
                             source.success(Texts.translatable("commands.croparia.generator.clearBuiltin.success", 1), false);
                             return 1;
                         } else {
-                            MutableComponent io = Texts.translatable("commands.croparia.generator.clearBuiltin.fail");
-                            source.failure(io);
-                            CropariaIf.LOGGER.error("Failed to clear dumped generator %s from pack %s".formatted(generatorVal, packId.toString()));
+                            MutableComponent noFile = Texts.translatable("commands.croparia.generator.clearBuiltin.noFile");
+                            source.failure(noFile);
                             return -1;
                         }
-                    } else {
-                        MutableComponent noFile = Texts.translatable("commands.croparia.generator.clearBuiltin.noFile");
-                        source.failure(noFile);
+                    } catch (IOException e) {
+                        MutableComponent io = Texts.translatable("commands.croparia.generator.clearBuiltin.fail");
+                        source.failure(io);
+                        CropariaIf.LOGGER.error("Failed to clear dumped generator %s from pack %s".formatted(generatorVal, packId.toString()), e);
                         return -1;
                     }
                 }

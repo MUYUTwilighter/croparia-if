@@ -8,21 +8,32 @@ import java.nio.file.Files;
 import java.util.function.Consumer;
 
 public class FileUtil {
-    public static void write(File file, String content, boolean override) throws IOException {
-        File parent = file.getParentFile();
-        if (!parent.isDirectory() && !parent.mkdirs()) {
-            throw new IOException("Failed to establish parent directory for " + file);
+    public static void ensureDirectory(File dir) throws IOException {
+        if (!dir.isDirectory() && !dir.mkdirs()) {
+            throw new IOException("Failed to establish directory " + dir);
         }
+    }
+
+    public static void ensureParentDirectory(File file) throws IOException {
+        File parent = file.getParentFile();
+        if (parent != null) {
+            ensureDirectory(parent);
+        }
+    }
+
+    public static boolean deleteIfExists(File file) throws IOException {
+        return Files.deleteIfExists(file.toPath());
+    }
+
+    public static void write(File file, String content, boolean override) throws IOException {
+        ensureParentDirectory(file);
         if (!file.isFile() || override) {
             Files.writeString(file.toPath(), content);
         }
     }
 
     public static void transfer(InputStream stream, File output, boolean override) throws IOException {
-        File parent = output.getParentFile();
-        if (!parent.isDirectory() && !parent.mkdirs()) {
-            throw new IOException("Failed to establish parent directory for " + output);
-        }
+        ensureParentDirectory(output);
         if (!output.isFile() || override) {
             try (OutputStream outputStream = Files.newOutputStream(output.toPath())) {
                 stream.transferTo(outputStream);
@@ -31,8 +42,7 @@ public class FileUtil {
     }
 
     public static void forFilesIn(File path, Consumer<File> consumer) throws IOException {
-        if (!path.isDirectory() && !path.mkdirs())
-            throw new IOException("Failed to establish directory " + path);
+        ensureDirectory(path);
         File[] files = path.listFiles();
         if (files == null) throw new IOException("Failed to list directory " + path);
         for (File file : files) {

@@ -13,14 +13,12 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
     private static final Gson GSON = new Gson();
@@ -60,24 +58,11 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
     }
 
     public void readCrops() {
-        File file = this.getPath().toFile();
-        if (!file.isDirectory() && !file.mkdirs()) {
-            throw new IllegalStateException("Failed to establish directory \"%s\"".formatted(file));
-        }
-        this.readCrops(this.getPath());
-    }
-
-    protected void readCrops(Path parent) {
-        try (Stream<Path> paths = Files.list(parent)) {
-            paths.forEach(path -> {
-                File file = path.toFile();
-                if (file.isFile()) {
-                    readCrop(file);
-                } else {
-                    readCrops(path);
-                }
-            });
-        }  catch (IOException e) {
+        File parent = this.getPath().toFile();
+        try {
+            FileUtil.ensureDirectory(parent);
+            FileUtil.forFilesIn(parent, this::readCrop);
+        } catch (IOException e) {
             CropariaIf.LOGGER.error("Failed to read crops", e);
         }
     }
