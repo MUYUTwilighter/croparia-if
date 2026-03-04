@@ -27,13 +27,13 @@ public class FluidRepoProxy extends RepoProxy<FluidSpec> implements IFluidHandle
 
     @Override
     public int getTankCapacity(int i) {
-        return CifUtil.toIntSafe(this.capacityFor(i) / 81L);
+        return CifUtil.toIntSafe(this.capacityFor(i) / ForgeFluidSpec.NEO_TO_INTERNAL_RATIO);
     }
 
     @Override
     public boolean isFluidValid(int i, @NotNull FluidStack input) {
         FluidSpec fluid = ForgeFluidSpec.from(input);
-        long amount = input.getAmount() * 81L;
+        long amount = ForgeFluidSpec.toInternalAmount(input.getAmount());
         return this.simAccept(i, fluid, amount) >= amount;
     }
 
@@ -41,9 +41,9 @@ public class FluidRepoProxy extends RepoProxy<FluidSpec> implements IFluidHandle
     public int fill(@NotNull FluidStack input, FluidAction fluidAction) {
         FluidSpec fluid = ForgeFluidSpec.from(input);
         if (fluidAction.simulate()) {
-            return CifUtil.toIntSafe(this.simAccept(fluid, input.getAmount() * 81L) / 81);
+            return CifUtil.toIntSafe(this.simAccept(fluid, ForgeFluidSpec.toInternalAmount(input.getAmount())) / ForgeFluidSpec.NEO_TO_INTERNAL_RATIO);
         } else if (fluidAction.execute()) {
-            return CifUtil.toIntSafe(this.accept(fluid, input.getAmount() * 81L) / 81);
+            return CifUtil.toIntSafe(this.accept(fluid, ForgeFluidSpec.toInternalAmount(input.getAmount())) / ForgeFluidSpec.NEO_TO_INTERNAL_RATIO);
         } else {
             return 0;
         }
@@ -53,10 +53,10 @@ public class FluidRepoProxy extends RepoProxy<FluidSpec> implements IFluidHandle
     public @NotNull FluidStack drain(@NotNull FluidStack input, FluidAction fluidAction) {
         FluidSpec fluid = ForgeFluidSpec.from(input);
         if (fluidAction.simulate()) {
-            long consumed = this.simConsume(ForgeFluidSpec.from(input), input.getAmount() * 81L);
+            long consumed = this.simConsume(ForgeFluidSpec.from(input), ForgeFluidSpec.toInternalAmount(input.getAmount()));
             return ForgeFluidSpec.of(fluid, consumed);
         } else if (fluidAction.execute()) {
-            long consumed = this.consume(ForgeFluidSpec.from(input), input.getAmount() * 81L);
+            long consumed = this.consume(ForgeFluidSpec.from(input), ForgeFluidSpec.toInternalAmount(input.getAmount()));
             return ForgeFluidSpec.of(fluid, consumed);
         } else {
             return FluidStack.EMPTY;
@@ -68,10 +68,10 @@ public class FluidRepoProxy extends RepoProxy<FluidSpec> implements IFluidHandle
         if (this.size() < 1) return FluidStack.EMPTY;
         FluidSpec fluid = this.resourceFor(0);
         if (fluidAction.simulate()) {
-            long consumed = this.simConsume(fluid, amount * 81L);
+            long consumed = this.simConsume(fluid, ForgeFluidSpec.toInternalAmount(amount));
             return ForgeFluidSpec.of(fluid, consumed);
         } else if (fluidAction.execute()) {
-            long consumed = this.consume(fluid, amount * 81L);
+            long consumed = this.consume(fluid, ForgeFluidSpec.toInternalAmount(amount));
             return ForgeFluidSpec.of(fluid, consumed);
         } else {
             return FluidStack.EMPTY;

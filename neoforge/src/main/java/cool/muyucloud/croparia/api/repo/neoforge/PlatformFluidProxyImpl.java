@@ -42,7 +42,7 @@ public class PlatformFluidProxyImpl implements PlatformFluidProxy {
 
     @Override
     public long simConsume(FluidSpec fluid, long amount) {
-        return this.get().drain(ForgeFluidSpec.of(fluid, amount), IFluidHandler.FluidAction.SIMULATE).getAmount() * 81L;
+        return ForgeFluidSpec.toInternalAmount(this.get().drain(ForgeFluidSpec.of(fluid, amount), IFluidHandler.FluidAction.SIMULATE).getAmount());
     }
 
     @Override
@@ -50,14 +50,14 @@ public class PlatformFluidProxyImpl implements PlatformFluidProxy {
         FluidStack stored = this.get().getFluidInTank(i);
         FluidStack wanted = ForgeFluidSpec.of(resource, Math.min(stored.getAmount(), amount));
         if (ForgeFluidSpec.matches(resource, stored)) {
-            return this.get().drain(wanted, IFluidHandler.FluidAction.SIMULATE).getAmount() * 81L;
+            return ForgeFluidSpec.toInternalAmount(this.get().drain(wanted, IFluidHandler.FluidAction.SIMULATE).getAmount());
         }
         return 0;
     }
 
     @Override
     public long consume(FluidSpec resource, long amount) {
-        return this.get().drain(ForgeFluidSpec.of(resource, amount), IFluidHandler.FluidAction.EXECUTE).getAmount() * 81L;
+        return ForgeFluidSpec.toInternalAmount(this.get().drain(ForgeFluidSpec.of(resource, amount), IFluidHandler.FluidAction.EXECUTE).getAmount());
     }
 
     @Override
@@ -65,23 +65,23 @@ public class PlatformFluidProxyImpl implements PlatformFluidProxy {
         FluidStack stored = this.get().getFluidInTank(i);
         FluidStack wanted = ForgeFluidSpec.of(resource, amount);
         if (FluidStack.isSameFluidSameComponents(stored, wanted) && stored.getAmount() >= wanted.getAmount()) {
-            return this.consume(resource, Math.min(amount, stored.getAmount() * 81L));
+            return this.consume(resource, Math.min(amount, ForgeFluidSpec.toInternalAmount(stored.getAmount())));
         }
         return 0;
     }
 
     @Override
     public long simAccept(FluidSpec resource, long amount) {
-        return this.get().fill(ForgeFluidSpec.of(resource, amount), IFluidHandler.FluidAction.SIMULATE) * 81L;
+        return ForgeFluidSpec.toInternalAmount(this.get().fill(ForgeFluidSpec.of(resource, amount), IFluidHandler.FluidAction.SIMULATE));
     }
 
     @Override
     public long simAccept(int i, FluidSpec resource, long amount) {
         FluidStack stored = this.get().getFluidInTank(i);
         int capacity = this.get().getTankCapacity(i);
-        FluidStack wanted = ForgeFluidSpec.of(resource, Math.min(capacity - stored.getAmount(), amount / 81L));
+        FluidStack wanted = ForgeFluidSpec.of(resource, Math.min(capacity - stored.getAmount(), amount / ForgeFluidSpec.NEO_TO_INTERNAL_RATIO));
         if (ForgeFluidSpec.matches(resource, stored) || stored.isEmpty()) {
-            return this.get().fill(wanted, IFluidHandler.FluidAction.SIMULATE) * 81L;
+            return ForgeFluidSpec.toInternalAmount(this.get().fill(wanted, IFluidHandler.FluidAction.SIMULATE));
         } else {
             return 0;
         }
@@ -89,16 +89,16 @@ public class PlatformFluidProxyImpl implements PlatformFluidProxy {
 
     @Override
     public long accept(FluidSpec fluid, long amount) {
-        return this.get().fill(ForgeFluidSpec.of(fluid, amount), IFluidHandler.FluidAction.EXECUTE) * 81L;
+        return ForgeFluidSpec.toInternalAmount(this.get().fill(ForgeFluidSpec.of(fluid, amount), IFluidHandler.FluidAction.EXECUTE));
     }
 
     @Override
     public long accept(int i, FluidSpec fluid, long amount) {
         FluidStack stored = this.get().getFluidInTank(i);
         int capacity = this.get().getTankCapacity(i);
-        FluidStack wanted = ForgeFluidSpec.of(fluid, Math.min(capacity - stored.getAmount(), amount / 81L));
+        FluidStack wanted = ForgeFluidSpec.of(fluid, Math.min(capacity - stored.getAmount(), amount / ForgeFluidSpec.NEO_TO_INTERNAL_RATIO));
         if (ForgeFluidSpec.matches(fluid, stored) || stored.isEmpty()) {
-            return this.get().fill(wanted, IFluidHandler.FluidAction.EXECUTE) * 81L;
+            return ForgeFluidSpec.toInternalAmount(this.get().fill(wanted, IFluidHandler.FluidAction.EXECUTE));
         } else {
             return 0;
         }
@@ -108,16 +108,16 @@ public class PlatformFluidProxyImpl implements PlatformFluidProxy {
     public long capacityFor(int i, FluidSpec fluid) {
         FluidStack stored = this.get().getFluidInTank(i);
         if (stored.isEmpty() && this.get().isFluidValid(i, ForgeFluidSpec.of(fluid, 1))) {
-            return this.get().getTankCapacity(i) * 81L;
+            return ForgeFluidSpec.toInternalAmount(this.get().getTankCapacity(i));
         } else {
-            return ForgeFluidSpec.matches(fluid, stored) ? this.get().getTankCapacity(i) * 81L : 0;
+            return ForgeFluidSpec.matches(fluid, stored) ? ForgeFluidSpec.toInternalAmount(this.get().getTankCapacity(i)) : 0;
         }
     }
 
     @Override
     public long amountFor(int i, FluidSpec fluid) {
         FluidStack stack = this.get().getFluidInTank(i);
-        return ForgeFluidSpec.matches(fluid, stack) ? stack.getAmount() * 81L : 0;
+        return ForgeFluidSpec.matches(fluid, stack) ? ForgeFluidSpec.toInternalAmount(stack.getAmount()) : 0;
     }
 
     @Override
