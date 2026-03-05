@@ -162,6 +162,7 @@ public class PlaceholderBuilder<T> {
             (entry, placeholder, matcher) -> mapper.map(entry, placeholder, matcher).map(ListReader::size),
             Placeholder.NUMBER
         ).then(PatternKey.LIST_MAP, (entry, placeholder, matcher) -> {
+            String mappedPlaceholder = matcher.group(1);
             PlaceholderBuilder<T> mappedBuilder = ofMap((e, p, m) -> {
                 JsonObject json = new JsonObject();
                 var mayList = mapper.map(e, p, m);
@@ -169,7 +170,7 @@ public class PlaceholderBuilder<T> {
                 var list = mayList.get();
                 int i = 0;
                 for (E elem : list) {
-                    var mayVal = elementParser.parse(elem, m.group(1), m);
+                    var mayVal = elementParser.parse(elem, mappedPlaceholder, matcher);
                     if (mayVal.isPresent()) {
                         json.add(String.valueOf(i), mayVal.get());
                     }

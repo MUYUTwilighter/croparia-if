@@ -23,8 +23,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import cool.muyucloud.croparia.util.supplier.LazySupplier;
 
 /**
  * A placeholder parser that can parse placeholders in the format of "field.sublist.[].subfield".<br/>
@@ -36,6 +39,11 @@ import java.util.regex.Pattern;
  */
 public class Placeholder<T> implements RegexParser<T> {
     public static final Logger LOGGER = LogUtils.getLogger();
+
+    private static <T> Placeholder<T> lazy(Supplier<Placeholder<T>> delegate) {
+        return new LazyPlaceholder<>(delegate);
+    }
+
     public static final Placeholder<String> STRING = Placeholder.build(node -> node.self(RegexParser.of(JsonPrimitive::new)));
     public static final Placeholder<Number> NUMBER = Placeholder.build(node -> node.self(RegexParser.of(JsonPrimitive::new)));
     @SuppressWarnings("unused")
@@ -60,23 +68,14 @@ public class Placeholder<T> implements RegexParser<T> {
         .then(PatternKey.literal("namespace"), RegexParser.of(ResourceLocation::getNamespace))
         .then(PatternKey.literal("path"), RegexParser.of(ResourceLocation::getPath))
     );
-    public static final Placeholder<DataComponentPatch> DATA_COMPONENTS = Placeholder.build(DataComponentPatch.CODEC, PlaceholderFactory.identity());
-    public static final Placeholder<BlockOutput> BLOCK_OUTPUT = build(BlockOutput.CODEC, builder -> builder
-        .then(PatternKey.literal("id"), TypeMapper.of(BlockOutput::getId), ID)
-        .thenMap(PatternKey.literal("properties"), TypeMapper.of(block -> MapReader.map(block.getProperties().getProperties())), Placeholder.STRING)
-    );
-    public static final Placeholder<ItemOutput> ITEM_OUTPUT = build(
-        ItemOutput.CODEC, builder -> builder
-            .then(PatternKey.literal("id"), TypeMapper.of(ItemOutput::getId), ID)
-            .then(PatternKey.literal("amount"), TypeMapper.of(ItemOutput::getAmount), NUMBER)
-            .then(PatternKey.literal("components"), TypeMapper.of(ItemOutput::getComponentsPatch), Placeholder.DATA_COMPONENTS)
-            .then(PatternKey.literal("stack"), TypeMapper.of(ItemOutput::createStack), ItemStack.CODEC)
-    );
-    public static final Placeholder<Item> ITEM = ID.map(TypeMapper.of(Item::arch$registryName));
-    public static final Placeholder<ItemStack> ITEM_STACK = ITEM_OUTPUT.map(TypeMapper.of(ItemOutput::of));
-    public static final Placeholder<Block> BLOCK = ID.map(TypeMapper.of(Block::arch$registryName));
+    public static final Placeholder<DataComponentPatch> DATA_COMPONENTS = lazy(Builtins::dataComponents);
+    public static final Placeholder<BlockOutput> BLOCK_OUTPUT = lazy(Builtins::blockOutput);
+    public static final Placeholder<ItemOutput> ITEM_OUTPUT = lazy(Builtins::itemOutput);
+    public static final Placeholder<Item> ITEM = lazy(Builtins::item);
+    public static final Placeholder<ItemStack> ITEM_STACK = lazy(Builtins::itemStack);
+    public static final Placeholder<Block> BLOCK = lazy(Builtins::block);
     @SuppressWarnings("unused")
-    public static final Placeholder<BlockState> BLOCK_STATE = BLOCK_OUTPUT.map(TypeMapper.of(BlockOutput::of));
+    public static final Placeholder<BlockState> BLOCK_STATE = lazy(Builtins::blockState);
 
     public static <T> Placeholder<T> build(Function<PlaceholderBuilder<T>, PlaceholderBuilder<T>> factory) {
         return factory.apply(PlaceholderBuilder.of()).build();
@@ -174,5 +173,91 @@ public class Placeholder<T> implements RegexParser<T> {
             LOGGER.debug("Error processing placeholder: {} (entry type: {})", placeholder, entry == null ? "null" : entry.getClass().getName(), e);
         }
         return "${" + placeholder + "}";
+    }
+
+    private static final class LazyPlaceholder<T> extends Placeholder<T> {
+        private final LazySupplier<Placeholder<T>> delegate;
+
+        private LazyPlaceholder(Supplier<Placeholder<T>> supplier) {
+            super(PlaceholderBuilder.of());
+            this.delegate = LazySupplier.of(supplier);
+        }
+
+        private Placeholder<T> delegate() {
+            return this.delegate.get();
+        }
+
+        @Override
+        public Optional<JsonElement> parse(@NotNull T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws PlaceholderException {
+            return this.delegate().parse(entry, placeholder, matcher);
+        }
+
+        @Override
+        public String parseStart(T entry, String placeholder, Matcher matcher) {
+            return this.delegate().parseStart(entry, placeholder, matcher);
+        }
+
+        @Override
+        public <O> Placeholder<O> map(TypeMapper<O, T> mapper) {
+            return this.delegate().map(mapper);
+        }
+
+        @Override
+        public PlaceholderBuilder<T> toBuilder() {
+            return this.delegate().toBuilder();
+        }
+
+        @Override
+        protected Map<PatternKey, RegexParser<T>> getSubNodes() {
+            return this.delegate().getSubNodes();
+        }
+    }
+
+    private static final class Builtins {
+        private static final LazySupplier<Placeholder<DataComponentPatch>> DATA_COMPONENTS_IMPL =
+            LazySupplier.of(() -> Placeholder.build(DataComponentPatch.CODEC, PlaceholderFactory.identity()));
+        private static final LazySupplier<Placeholder<BlockOutput>> BLOCK_OUTPUT_IMPL = LazySupplier.of(() -> build(BlockOutput.CODEC, builder -> builder
+            .then(PatternKey.literal("id"), TypeMapper.of(BlockOutput::getId), ID)
+            .thenMap(PatternKey.literal("properties"), TypeMapper.of(block -> MapReader.map(block.getProperties().getProperties())), Placeholder.STRING)
+        ));
+        private static final LazySupplier<Placeholder<ItemOutput>> ITEM_OUTPUT_IMPL = LazySupplier.of(() -> build(
+            ItemOutput.CODEC, builder -> builder
+                .then(PatternKey.literal("id"), TypeMapper.of(ItemOutput::getId), ID)
+                .then(PatternKey.literal("amount"), TypeMapper.of(ItemOutput::getAmount), NUMBER)
+                .then(PatternKey.literal("components"), TypeMapper.of(ItemOutput::getComponentsPatch), Placeholder.DATA_COMPONENTS)
+                .then(PatternKey.literal("stack"), TypeMapper.of(ItemOutput::createStack), ItemStack.CODEC)
+        ));
+        private static final LazySupplier<Placeholder<Item>> ITEM_IMPL = LazySupplier.of(() -> ID.map(TypeMapper.of(Item::arch$registryName)));
+        private static final LazySupplier<Placeholder<ItemStack>> ITEM_STACK_IMPL = LazySupplier.of(() -> ITEM_OUTPUT.map(TypeMapper.of(ItemOutput::of)));
+        private static final LazySupplier<Placeholder<Block>> BLOCK_IMPL = LazySupplier.of(() -> ID.map(TypeMapper.of(Block::arch$registryName)));
+        private static final LazySupplier<Placeholder<BlockState>> BLOCK_STATE_IMPL = LazySupplier.of(() -> BLOCK_OUTPUT.map(TypeMapper.of(BlockOutput::of)));
+
+        private static Placeholder<DataComponentPatch> dataComponents() {
+            return DATA_COMPONENTS_IMPL.get();
+        }
+
+        private static Placeholder<BlockOutput> blockOutput() {
+            return BLOCK_OUTPUT_IMPL.get();
+        }
+
+        private static Placeholder<ItemOutput> itemOutput() {
+            return ITEM_OUTPUT_IMPL.get();
+        }
+
+        private static Placeholder<Item> item() {
+            return ITEM_IMPL.get();
+        }
+
+        private static Placeholder<ItemStack> itemStack() {
+            return ITEM_STACK_IMPL.get();
+        }
+
+        private static Placeholder<Block> block() {
+            return BLOCK_IMPL.get();
+        }
+
+        private static Placeholder<BlockState> blockState() {
+            return BLOCK_STATE_IMPL.get();
+        }
     }
 }

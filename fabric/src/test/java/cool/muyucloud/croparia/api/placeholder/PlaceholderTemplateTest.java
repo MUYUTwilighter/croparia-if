@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -65,6 +66,40 @@ class PlaceholderTemplateTest {
 
         assertEquals("y", listParser.parseStart(List.of("x", "y"), "get(1)", matcherFor("get(1)")));
         assertEquals("fallback", listParser.parseStart(List.of("x"), "getOr(2,fallback)", matcherFor("getOr(2,fallback)")));
+    }
+
+    @Test
+    void mapKeyMapValueAndMapiCombinationsWork() {
+        Placeholder<String> stringWithLen = Placeholder.build(builder -> builder
+            .self(RegexParser.of(entry -> entry))
+            .then(PatternKey.literal("len"), TypeMapper.of(String::length), Placeholder.NUMBER)
+        );
+        Placeholder<Map<String, String>> mapParser =
+            Placeholder.buildMap(TypeMapper.of(map -> MapReader.map(map)), stringWithLen, builder -> builder);
+        Placeholder<List<String>> listParser =
+            Placeholder.buildList(TypeMapper.of(ListReader::list), stringWithLen, builder -> builder);
+
+        Map<String, String> ordered = new LinkedHashMap<>();
+        ordered.put("a", "x");
+        ordered.put("b", "yy");
+
+        String mappedKey = mapParser.parseStart(ordered, "mapKey(len)", matcherFor("mapKey(len)"));
+        assertTrue(mappedKey.contains("\"1\""));
+        assertTrue(mappedKey.contains("\"2\""));
+
+        String mappedValue = mapParser.parseStart(ordered, "mapValue(len)", matcherFor("mapValue(len)"));
+        assertTrue(mappedValue.contains("\"a\""));
+        assertTrue(mappedValue.contains("\"b\""));
+
+        String listMap = listParser.parseStart(List.of("x", "yy"), "map(len)", matcherFor("map(len)"));
+        assertTrue(listMap.contains("\"0\""));
+        assertTrue(listMap.contains("1"));
+        assertTrue(listMap.contains("\"1\""));
+        assertTrue(listMap.contains("2"));
+
+        String listMapI = listParser.parseStart(List.of("x", "yy"), "mapi(len)", matcherFor("mapi(len)"));
+        assertTrue(listMapI.contains("\"0\""));
+        assertTrue(listMapI.contains("\"1\""));
     }
 
     @Test
