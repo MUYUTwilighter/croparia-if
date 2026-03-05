@@ -83,4 +83,17 @@ class CodecUtilTest {
         var original = Codec.INT.fieldOf("value");
         assertSame(original, CodecUtil.toMap(original.codec()));
     }
+
+    @Test
+    void charCodecRoundTripAndValidation() {
+        assertEquals("a", CodecUtil.CHAR.encodeStart(JsonOps.INSTANCE, 'a').getOrThrow().getAsString());
+        assertEquals('b', CodecUtil.CHAR.parse(JsonOps.INSTANCE, new JsonPrimitive("b")).getOrThrow());
+        assertThrows(IllegalArgumentException.class, () -> CodecUtil.CHAR.parse(JsonOps.INSTANCE, new JsonPrimitive("xx")));
+    }
+
+    @Test
+    void readJsonStringWorksWithoutGameRegistryContext() {
+        assertEquals(5, CodecUtil.readJson("5", Codec.INT).getOrThrow());
+        assertThrows(RuntimeException.class, () -> CodecUtil.readJson("{", Codec.INT));
+    }
 }

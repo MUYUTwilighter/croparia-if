@@ -284,7 +284,12 @@ public class CodecUtil {
     }
 
     public static <T> Optional<RegistryOps<T>> getRegistryOps(DynamicOps<T> ops) {
-        return CropariaIf.getRegistryAccess().map(access -> RegistryOps.create(ops, access));
+        try {
+            return CropariaIf.getRegistryAccess().map(access -> RegistryOps.create(ops, access));
+        } catch (RuntimeException | AssertionError e) {
+            // In plain unit tests or early bootstrap stages, platform/game context may be unavailable.
+            return Optional.empty();
+        }
     }
 
     public static <T> DynamicOps<T> getOps(DynamicOps<T> ops) {
