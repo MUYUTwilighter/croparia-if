@@ -120,6 +120,16 @@ class MultiCodecTest {
     }
 
     @Test
+    void optionalMultiFieldCodecReturnsEncodeErrorWhenAllFieldsRejectValue() {
+        Map<String, TestedCodec<? extends Integer>> codecs = new LinkedHashMap<>();
+        codecs.put("id", CodecUtil.of(Codec.INT, value -> TestedCodec.fail(() -> "id-encode-fail")));
+        OptionalMultiFieldCodec<Integer> codec = new OptionalMultiFieldCodec<>(codecs);
+
+        var error = codec.codec().encodeStart(JsonOps.INSTANCE, Optional.of(8)).error().orElseThrow().message();
+        assertTrue(error.contains("id-encode-fail"));
+    }
+
+    @Test
     void multiFieldAndOptionalIteratorsExposeConfiguredKeys() {
         Map<String, TestedCodec<? extends Integer>> codecs = new LinkedHashMap<>();
         codecs.put("x", CodecUtil.of(Codec.INT));

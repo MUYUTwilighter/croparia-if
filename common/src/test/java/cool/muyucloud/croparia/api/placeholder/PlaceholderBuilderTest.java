@@ -97,4 +97,31 @@ class PlaceholderBuilderTest {
         assertEquals("\"12\"", numberParser.parseStart(12, "_q", matcherFor("_q")));
         assertEquals("12", numberParser.parseStart(12, "_qis", matcherFor("_qis")));
     }
+
+    @Test
+    void removeConcatOverwriteAndMapBehaveAsExpected() {
+        PlaceholderBuilder<String> baseBuilder = PlaceholderBuilder.<String>of()
+            .self(RegexParser.of(entry -> entry))
+            .then(PatternKey.literal("a"), RegexParser.of(entry -> "base-a"));
+        PlaceholderBuilder<String> otherBuilder = PlaceholderBuilder.<String>of()
+            .self(RegexParser.of(entry -> entry))
+            .then(PatternKey.literal("a"), RegexParser.of(entry -> "other-a"))
+            .then(PatternKey.literal("b"), RegexParser.of(entry -> "other-b"));
+
+        Placeholder<String> base = baseBuilder.build();
+        Placeholder<String> other = otherBuilder.build();
+
+        Placeholder<String> removed = base.toBuilder().remove(PatternKey.literal("a")).build();
+        assertEquals("${a}", removed.parseStart("x", "a", matcherFor("a")));
+
+        Placeholder<String> concat = base.toBuilder().concat(other, TypeMapper.identity()).build();
+        assertEquals("base-a", concat.parseStart("x", "a", matcherFor("a")));
+        assertEquals("other-b", concat.parseStart("x", "b", matcherFor("b")));
+
+        Placeholder<String> overwritten = base.toBuilder().overwrite(other, TypeMapper.identity()).build();
+        assertEquals("other-a", overwritten.parseStart("x", "a", matcherFor("a")));
+
+        Placeholder<Integer> mapped = base.map(TypeMapper.of((Integer i) -> String.valueOf(i)));
+        assertEquals("123", mapped.parseStart(123, "", matcherFor("a")));
+    }
 }
