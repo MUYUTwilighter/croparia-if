@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TemplateTest {
     @Test
@@ -37,5 +38,29 @@ class TemplateTest {
     @Test
     void throwsForUnclosedPlaceholderAfterRead() {
         assertThrows(JsonParseException.class, () -> new Template("abc ${x"));
+    }
+
+    @Test
+    void keepsEscapedPlaceholderLiteral() {
+        Placeholder<String> parser = Placeholder.build(builder -> builder
+            .self(RegexParser.of(entry -> entry))
+            .then(PatternKey.literal("id"), RegexParser.of(entry -> entry))
+        );
+        Template template = new Template("\\${id} ${id}");
+        assertEquals("\\${id} x", template.parse("x", parser));
+    }
+
+    @Test
+    void parseThrowsWhenPreprocessBreaksPlaceholderSyntax() {
+        Placeholder<String> parser = Placeholder.build(builder -> builder
+            .self(RegexParser.of(entry -> entry))
+            .then(PatternKey.literal("id"), RegexParser.of(entry -> entry))
+        );
+        Template template = new Template("${id}");
+        RuntimeException exception = assertThrows(
+            RuntimeException.class,
+            () -> template.parse("x", parser, content -> content.substring(1))
+        );
+        assertTrue(exception.getMessage().contains("Malformed placeholder"));
     }
 }

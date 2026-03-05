@@ -85,4 +85,16 @@ class PlaceholderBuilderTest {
         assertTrue(exception.getMessage().contains("segment 'missing'"));
         assertTrue(exception.getMessage().contains("remaining: 'path'"));
     }
+
+    @Test
+    void quoteHelpersFollowStringAndNonStringRules() {
+        Placeholder<String> stringParser = Placeholder.build(builder -> builder.self(RegexParser.of(entry -> entry)));
+        Placeholder<Number> numberParser = Placeholder.build(builder -> builder.self(RegexParser.of(entry -> entry)));
+
+        assertEquals("\"abc\"", stringParser.parseStart("abc", "_q", matcherFor("_q")));
+        assertEquals("\"abc\"", stringParser.parseStart("abc", "_qis", matcherFor("_qis")));
+
+        assertEquals("\"12\"", numberParser.parseStart(12, "_q", matcherFor("_q")));
+        assertEquals("12", numberParser.parseStart(12, "_qis", matcherFor("_qis")));
+    }
 }
