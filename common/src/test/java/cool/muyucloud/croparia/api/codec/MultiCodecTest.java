@@ -10,8 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MultiCodecTest {
     @Test
@@ -70,7 +69,7 @@ class MultiCodecTest {
 
         assertEquals("value", decoded);
         assertTrue(encoded.has("b"));
-        assertTrue(!encoded.has("a"));
+        assertFalse(encoded.has("a"));
     }
 
     @Test

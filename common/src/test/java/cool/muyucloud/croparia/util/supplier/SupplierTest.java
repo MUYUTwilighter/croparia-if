@@ -13,7 +13,7 @@ class SupplierTest {
     @Test
     void lazySupplierLoadsOnceAndCachesValue() {
         AtomicInteger calls = new AtomicInteger(0);
-        LazySupplier<Integer> supplier = LazySupplier.of(() -> calls.incrementAndGet());
+        LazySupplier<Integer> supplier = LazySupplier.of(calls::incrementAndGet);
 
         assertFalse(supplier.isLoaded());
         assertEquals(1, supplier.get());
@@ -25,7 +25,7 @@ class SupplierTest {
     @Test
     void lazySupplierMapUsesCachedSourceValue() {
         AtomicInteger calls = new AtomicInteger(0);
-        LazySupplier<Integer> supplier = LazySupplier.of(() -> calls.incrementAndGet());
+        LazySupplier<Integer> supplier = LazySupplier.of(calls::incrementAndGet);
         LazySupplier<String> mapped = supplier.map(v -> "v=" + v);
 
         assertEquals("v=1", mapped.get());
@@ -36,7 +36,7 @@ class SupplierTest {
     @Test
     void semiSupplierRefreshForcesRecompute() {
         AtomicInteger calls = new AtomicInteger(0);
-        SemiSupplier<Integer> supplier = SemiSupplier.of(() -> calls.incrementAndGet());
+        SemiSupplier<Integer> supplier = SemiSupplier.of(calls::incrementAndGet);
 
         assertEquals(1, supplier.get());
         assertEquals(1, supplier.get());
@@ -50,7 +50,7 @@ class SupplierTest {
         long original = OnLoadSupplier.LAST_DATA_LOAD;
         try {
             AtomicInteger calls = new AtomicInteger(0);
-            OnLoadSupplier<Integer> supplier = OnLoadSupplier.of(() -> calls.incrementAndGet());
+            OnLoadSupplier<Integer> supplier = OnLoadSupplier.of(calls::incrementAndGet);
 
             assertEquals(1, supplier.get());
             assertEquals(1, supplier.get());

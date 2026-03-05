@@ -5,10 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PlaceholderCoreTest {
     private static Matcher matcherFor(String inner) {
@@ -29,9 +26,9 @@ class PlaceholderCoreTest {
     @Test
     void patternKeyEqualityMatchesPatternAndPatternKey() {
         PatternKey key = PatternKey.of(PatternKey.literal("abc"));
-        assertTrue(key.equals(PatternKey.literal("abc")));
-        assertTrue(key.equals(PatternKey.of(PatternKey.literal("abc"))));
-        assertFalse(key.equals(PatternKey.literal("abcd")));
+        assertEquals(key, PatternKey.literal("abc"));
+        assertEquals(key, PatternKey.of(PatternKey.literal("abc")));
+        assertNotEquals(key, PatternKey.literal("abcd"));
     }
 
     @Test

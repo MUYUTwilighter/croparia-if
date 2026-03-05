@@ -10,10 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CodecUtilTest {
     @Test
@@ -81,7 +78,7 @@ class CodecUtilTest {
 
     @Test
     void toMapWrapsNonMapCodecAndKeepsMapCodec() {
-        assertTrue(CodecUtil.toMap(Codec.INT) != null);
+        assertNotNull(CodecUtil.toMap(Codec.INT));
 
         var original = Codec.INT.fieldOf("value");
         assertSame(original, CodecUtil.toMap(original.codec()));
