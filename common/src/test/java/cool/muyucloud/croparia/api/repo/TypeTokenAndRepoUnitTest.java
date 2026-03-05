@@ -147,4 +147,79 @@ class TypeTokenAndRepoUnitTest {
         DummyResource.TOKEN = first;
         assertThrows(IllegalArgumentException.class, () -> TypeToken.registerOrThrow(id, new DummyResource(""), DummyResource.CODEC));
     }
+
+    @Test
+    void repoBatchAggregatesUnitsAndDelegatesOperations() {
+        TypeToken<DummyResource> token = registerDummyToken("batch");
+        RepoUnit<DummyResource> u1 = new RepoUnit<>(token, r -> true, 10);
+        RepoUnit<DummyResource> u2 = new RepoUnit<>(token, r -> true, 10);
+        DummyResource a = new DummyResource("a");
+        DummyResource b = new DummyResource("b");
+
+        u1.setAcceptable(true);
+        u2.setAcceptable(true);
+        u1.accept(0, a, 4);
+        u2.accept(0, b, 3);
+        u1.setConsumable(true);
+        u2.setConsumable(true);
+
+        RepoBatch<DummyResource> batch = RepoBatch.of(token, u1, u2);
+        assertEquals(2, batch.size());
+        assertEquals(4, batch.amountFor(a));
+        assertEquals(3, batch.amountFor(b));
+        assertTrue(batch.isChanged());
+
+        assertEquals(5, batch.simAccept(a, 5));
+        assertEquals(2, batch.consume(a, 2));
+        assertEquals(2, batch.amountFor(a));
+
+        RepoUnit<DummyResource> removed = batch.remove(1);
+        assertEquals("b", removed.getResource().getResource());
+        assertEquals(1, batch.size());
+        batch.clear();
+        assertEquals(0, batch.size());
+    }
+
+    @Test
+    void repoBatchSaveLoadAndSizeMismatchBehaveSafely() {
+        TypeToken<DummyResource> token = registerDummyToken("batch_io");
+        RepoUnit<DummyResource> u1 = new RepoUnit<>(token, r -> true, 10);
+        RepoUnit<DummyResource> u2 = new RepoUnit<>(token, r -> true, 10);
+        u1.setAcceptable(true);
+        u2.setAcceptable(true);
+        u1.accept(0, new DummyResource("x"), 6);
+        u2.accept(0, new DummyResource("y"), 2);
+
+        RepoBatch<DummyResource> src = RepoBatch.of(token, u1, u2);
+        com.google.gson.JsonArray json = new com.google.gson.JsonArray();
+        net.minecraft.nbt.ListTag nbt = new net.minecraft.nbt.ListTag();
+        src.save(json);
+        src.save(nbt);
+
+        RepoBatch<DummyResource> dst = RepoBatch.of(token,
+            new RepoUnit<>(token, r -> true, 10),
+            new RepoUnit<>(token, r -> true, 10));
+        dst.load(json);
+        assertEquals(6, dst.amountFor(0));
+        assertEquals(2, dst.amountFor(1));
+
+        RepoBatch<DummyResource> dstNbt = RepoBatch.of(token,
+            new RepoUnit<>(token, r -> true, 10),
+            new RepoUnit<>(token, r -> true, 10));
+        dstNbt.load(nbt);
+        assertEquals(6, dstNbt.amountFor(0));
+        assertEquals(2, dstNbt.amountFor(1));
+
+        com.google.gson.JsonArray wrongJson = new com.google.gson.JsonArray();
+        wrongJson.add(new com.google.gson.JsonObject());
+        long before = dst.amountFor(0);
+        dst.load(wrongJson);
+        assertEquals(before, dst.amountFor(0));
+
+        net.minecraft.nbt.ListTag wrongNbt = new net.minecraft.nbt.ListTag();
+        wrongNbt.add(new CompoundTag());
+        long beforeNbt = dstNbt.amountFor(0);
+        dstNbt.load(wrongNbt);
+        assertEquals(beforeNbt, dstNbt.amountFor(0));
+    }
 }
