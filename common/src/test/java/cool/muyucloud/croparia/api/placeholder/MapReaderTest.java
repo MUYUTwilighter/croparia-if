@@ -27,7 +27,7 @@ class MapReaderTest {
     @Test
     void mappedReaderTransformsKeysAndUsesGetter() {
         MapReader<String, Integer> reader = MapReader.map(Map.of("x", 2, "y", 3));
-        MapReader<String, Integer> mapped = reader.map(k -> "k-" + k, k2 -> k2.length());
+        MapReader<String, Integer> mapped = reader.map(k -> "k-" + k, String::length);
 
         assertEquals(2, mapped.size());
         assertEquals(3, mapped.get("abc"));
