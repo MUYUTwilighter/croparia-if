@@ -124,4 +124,39 @@ class PlaceholderBuilderTest {
         Placeholder<Integer> mapped = base.map(TypeMapper.of((Integer i) -> String.valueOf(i)));
         assertEquals("123", mapped.parseStart(123, "", matcherFor("a")));
     }
+
+    @Test
+    void codecAndMapperHelpersEncodeExpectedValues() {
+        Placeholder<Integer> parser = Placeholder.build(builder -> builder
+            .self(TypeMapper.identity(), com.mojang.serialization.Codec.INT)
+            .then(PatternKey.literal("plus"), TypeMapper.of((Integer i) -> i + 1), com.mojang.serialization.Codec.INT)
+        );
+        assertEquals("7", parser.parseStart(7, "", matcherFor("x")));
+        assertEquals("8", parser.parseStart(7, "plus", matcherFor("plus")));
+    }
+
+    @Test
+    void thenMapAndThenListHelpersDelegateToMapAndListParsers() {
+        record Entry(Map<String, String> map, List<String> list) {}
+        Placeholder<Entry> parser = Placeholder.build(builder -> builder
+            .self(RegexParser.of(entry -> "entry"))
+            .thenMap(PatternKey.literal("m"), TypeMapper.of(entry -> MapReader.map(entry.map())), Placeholder.STRING)
+            .thenList(PatternKey.literal("l"), TypeMapper.of(entry -> ListReader.list(entry.list())), Placeholder.STRING)
+        );
+        Entry entry = new Entry(Map.of("k", "v"), List.of("a", "b"));
+
+        assertEquals("v", parser.parseStart(entry, "m.get(k)", matcherFor("m.get(k)")));
+        assertEquals("b", parser.parseStart(entry, "l.get(1)", matcherFor("l.get(1)")));
+    }
+
+    @Test
+    void mappedPlaceholderFallsBackWhenMapperReturnsEmpty() {
+        Placeholder<String> base = Placeholder.build(builder -> builder
+            .self(RegexParser.of(entry -> entry))
+            .then(PatternKey.literal("len"), TypeMapper.of(String::length), Placeholder.NUMBER)
+        );
+        Placeholder<Integer> mapped = base.map((entry, placeholder, matcher) -> java.util.Optional.empty());
+
+        assertEquals("${len}", mapped.parseStart(1, "len", matcherFor("len")));
+    }
 }
