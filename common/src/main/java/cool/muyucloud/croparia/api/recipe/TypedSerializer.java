@@ -7,13 +7,11 @@ import cool.muyucloud.croparia.access.RecipeManagerAccess;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.registry.Recipes;
 import cool.muyucloud.croparia.util.supplier.Mappable;
-import dev.architectury.platform.Platform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -24,15 +22,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 @SuppressWarnings("unused")
 public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeType<R>, RecipeSerializer<R> {
     public static final Codec<TypedSerializer<?>> CODEC = ResourceLocation.CODEC.xmap(Recipes::find, TypedSerializer::getId);
-
-    public static Predicate<RecipeHolder<?>> JEI = holder -> Platform.isModLoaded("jei") && !Platform.isModLoaded("emi");
-    public static Predicate<RecipeHolder<?>> NEVER = holder -> false;
-    public static Predicate<RecipeHolder<?>> ALWAYS = holder -> true;
 
     private final ResourceLocation id;
     private final List<Mappable<ItemStack>> stations;
