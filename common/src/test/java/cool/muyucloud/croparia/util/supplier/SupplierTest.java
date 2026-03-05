@@ -65,6 +65,26 @@ class SupplierTest {
     }
 
     @Test
+    void onLoadSupplierMapRecomputesAfterDataLoadTick() {
+        long original = OnLoadSupplier.LAST_DATA_LOAD;
+        try {
+            AtomicInteger calls = new AtomicInteger(0);
+            OnLoadSupplier<Integer> base = OnLoadSupplier.of(() -> calls.incrementAndGet());
+            OnLoadSupplier<String> mapped = base.map(v -> "v" + v);
+
+            assertEquals("v1", mapped.get());
+            assertEquals("v1", mapped.get());
+            assertEquals(1, calls.get());
+
+            OnLoadSupplier.LAST_DATA_LOAD = mapped.getLastCreate();
+            assertEquals("v2", mapped.get());
+            assertEquals(2, calls.get());
+        } finally {
+            OnLoadSupplier.LAST_DATA_LOAD = original;
+        }
+    }
+
+    @Test
     void mappableHelpersPreserveAndTransformValues() {
         Mappable<Integer> source = Mappable.of(() -> 3);
         Mappable<String> mapped = source.map(v -> "n=" + v);

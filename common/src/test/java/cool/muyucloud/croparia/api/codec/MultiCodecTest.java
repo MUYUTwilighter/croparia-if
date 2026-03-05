@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -90,5 +91,46 @@ class MultiCodecTest {
         assertEquals(0, encodedEmpty.size());
         assertEquals(5, valueDecoded.orElseThrow());
         assertTrue(encodedValue.has("id"));
+    }
+
+    @Test
+    void multiFieldCodecReturnsErrorWhenNoFieldCanDecode() {
+        Map<String, TestedCodec<? extends String>> codecs = new LinkedHashMap<>();
+        codecs.put("a", CodecUtil.of(Codec.STRING, (ops, input) -> TestedCodec.fail(() -> "a-decode-fail")));
+        codecs.put("b", CodecUtil.of(Codec.STRING, (ops, input) -> TestedCodec.fail(() -> "b-decode-fail")));
+        MultiFieldCodec<String> codec = new MultiFieldCodec<>(codecs);
+
+        JsonObject json = new JsonObject();
+        json.addProperty("a", "x");
+        var error = codec.codec().parse(JsonOps.INSTANCE, json).error().orElseThrow().message();
+        assertTrue(error.contains("a-decode-fail"));
+        assertTrue(error.contains("b-decode-fail"));
+    }
+
+    @Test
+    void optionalMultiFieldCodecReturnsErrorForPresentButInvalidValue() {
+        Map<String, TestedCodec<? extends Integer>> codecs = new LinkedHashMap<>();
+        codecs.put("id", CodecUtil.of(Codec.INT, (ops, input) -> TestedCodec.fail(() -> "id-invalid")));
+        OptionalMultiFieldCodec<Integer> codec = new OptionalMultiFieldCodec<>(codecs);
+
+        JsonObject json = new JsonObject();
+        json.addProperty("id", 3);
+        var error = codec.codec().parse(JsonOps.INSTANCE, json).error().orElseThrow().message();
+        assertTrue(error.contains("id-invalid"));
+    }
+
+    @Test
+    void multiFieldAndOptionalIteratorsExposeConfiguredKeys() {
+        Map<String, TestedCodec<? extends Integer>> codecs = new LinkedHashMap<>();
+        codecs.put("x", CodecUtil.of(Codec.INT));
+        codecs.put("y", CodecUtil.of(Codec.INT));
+
+        MultiFieldCodec<Integer> multi = new MultiFieldCodec<>(codecs);
+        OptionalMultiFieldCodec<Integer> optional = new OptionalMultiFieldCodec<>(codecs);
+
+        var multiKeys = StreamSupport.stream(multi.spliterator(), false).map(Map.Entry::getKey).toList();
+        var optionalKeys = StreamSupport.stream(optional.spliterator(), false).map(Map.Entry::getKey).toList();
+        assertEquals(java.util.List.of("x", "y"), multiKeys);
+        assertEquals(java.util.List.of("x", "y"), optionalKeys);
     }
 }
