@@ -6,6 +6,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,12 @@ class FileUtilTest {
 
         FileUtil.transfer(new ByteArrayInputStream("b".getBytes()), out, true);
         assertEquals("b", FileUtil.readUtf8(out));
+    }
+
+    @Test
+    void readUtf8FromInputStreamReturnsContent() throws IOException {
+        ByteArrayInputStream stream = new ByteArrayInputStream("hello".getBytes(StandardCharsets.UTF_8));
+        assertEquals("hello", FileUtil.readUtf8(stream));
     }
 
     @Test
