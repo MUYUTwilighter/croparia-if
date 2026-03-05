@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class Vec2iTest {
@@ -15,9 +16,11 @@ class Vec2iTest {
         Vec2i a = Vec2i.of(1, 5);
         Vec2i b = Vec2i.of(2, 0);
         Vec2i c = Vec2i.of(2, 3);
+        Vec2i d = Vec2i.of(2, 3);
 
         assertTrue(a.compareTo(b) < 0);
         assertTrue(b.compareTo(c) < 0);
+        assertEquals(0, c.compareTo(d));
     }
 
     @Test
@@ -40,5 +43,16 @@ class Vec2iTest {
         var encoded = Vec2i.CODEC.encodeStart(JsonOps.INSTANCE, input).getOrThrow();
         Vec2i decoded = Vec2i.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
         assertEquals(input, decoded);
+    }
+
+    @Test
+    void equalsAndHashCodeFollowValueSemantics() {
+        Vec2i a = Vec2i.of(1, 2);
+        Vec2i b = Vec2i.of(1, 2);
+        Vec2i c = Vec2i.of(2, 1);
+
+        assertEquals(a, b);
+        assertEquals(a.hashCode(), b.hashCode());
+        assertNotEquals(a, c);
     }
 }
