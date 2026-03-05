@@ -157,7 +157,7 @@ public class Placeholder<T> implements RegexParser<T> {
                 }
             }
         }
-        throw new PlaceholderException("No matching key for: " + next);
+        throw PlaceholderException.noMatchingKey(next, forwarded, this.subNodes.keySet());
     }
 
     public String parseStart(T entry, String placeholder, Matcher matcher) {
@@ -171,7 +171,7 @@ public class Placeholder<T> implements RegexParser<T> {
                 return json.toString();
             }
         } catch (PlaceholderException e) {
-            LOGGER.debug("Error processing placeholder: " + placeholder, e);
+            LOGGER.debug("Error processing placeholder: {} (entry type: {})", placeholder, entry == null ? "null" : entry.getClass().getName(), e);
         }
         return "${" + placeholder + "}";
     }

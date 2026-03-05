@@ -214,7 +214,7 @@ public class PlaceholderBuilder<T> {
                 var mayList = mapper.map(entry, placeholder, matcher);
                 if (mayList.isEmpty()) return Optional.empty();
                 var list = mayList.get();
-                return list.size() > index ? elementParser.parse(list.get(index), placeholder, matcher) : Optional.empty();
+                return list.size() > index ? elementParser.parse(list.get(index), placeholder, matcher) : Optional.of(new JsonPrimitive(def));
             } catch (NumberFormatException e) {
                 throw new PlaceholderException(e);
             } catch (IndexOutOfBoundsException e) {
