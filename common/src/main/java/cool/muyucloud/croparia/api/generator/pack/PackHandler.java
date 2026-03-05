@@ -164,7 +164,7 @@ public abstract class PackHandler {
             String name = entry.getJarEntry().getName().substring(prefix.length());
             try {
                 entry.forInputStream(input -> {
-                    String content = new String(input.readAllBytes());
+                    String content = FileUtil.readUtf8(input);
                     JsonElement json = JsonTransformer.transform(content, name);
                     if (!json.isJsonObject())
                         throw new JsonParseException("Generator file is not a JSON object: " + name);
@@ -186,8 +186,8 @@ public abstract class PackHandler {
         try {
             FileUtil.forFilesIn(parent, file -> {
                 String name = file.getAbsolutePath().substring(parent.getAbsolutePath().length() + 1);
-                try (FileInputStream fis = new FileInputStream(file)) {
-                    String content = new String(fis.readAllBytes());
+                try {
+                    String content = FileUtil.readUtf8(file);
                     JsonElement json = JsonTransformer.transform(content, name);
                     if (!json.isJsonObject())
                         throw new JsonParseException("Generator file is not a JSON object: " + name);

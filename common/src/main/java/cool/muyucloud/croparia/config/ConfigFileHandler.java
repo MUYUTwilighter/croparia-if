@@ -6,9 +6,9 @@ import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.util.FileUtil;
 import dev.architectury.platform.Platform;
 
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ConfigFileHandler {
@@ -22,7 +22,7 @@ public class ConfigFileHandler {
         } catch (IOException e) {
             throw new IllegalStateException("Failed to create config directory", e);
         }
-        try (JsonWriter writer = new JsonWriter(new FileWriter(CONFIG_PATH.toFile()))) {
+        try (JsonWriter writer = new JsonWriter(Files.newBufferedWriter(CONFIG_PATH, StandardCharsets.UTF_8))) {
             writer.setIndent("  ");
             GSON.toJson(config.toRaw(), RawConfig.class, writer);
         } catch (IOException e) {
@@ -32,7 +32,7 @@ public class ConfigFileHandler {
 
     public static Config load() {
         Config config;
-        try (FileReader reader = new FileReader(CONFIG_PATH.toFile())) {
+        try (var reader = Files.newBufferedReader(CONFIG_PATH, StandardCharsets.UTF_8)) {
             config = new Config(GSON.fromJson(reader, RawConfig.class));
         } catch (Exception e) {
             CropariaIf.LOGGER.warn("Config file not found or could not be read, creating a new one");

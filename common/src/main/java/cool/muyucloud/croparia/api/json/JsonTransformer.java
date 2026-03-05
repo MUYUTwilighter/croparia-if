@@ -30,9 +30,7 @@ public interface JsonTransformer {
 
     static JsonElement transform(File file) throws IOException, JsonParseException {
         try (FileInputStream fis = new FileInputStream(file)) {
-            byte[] data = fis.readAllBytes();
-            String content = new String(data);
-            return transform(content, file.getName());
+            return transform(FileUtil.readUtf8(fis), file.getName());
         }
     }
 

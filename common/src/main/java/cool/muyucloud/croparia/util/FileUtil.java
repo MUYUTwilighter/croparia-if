@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.function.Consumer;
 
@@ -28,8 +29,16 @@ public class FileUtil {
     public static void write(File file, String content, boolean override) throws IOException {
         ensureParentDirectory(file);
         if (!file.isFile() || override) {
-            Files.writeString(file.toPath(), content);
+            Files.writeString(file.toPath(), content, StandardCharsets.UTF_8);
         }
+    }
+
+    public static String readUtf8(File file) throws IOException {
+        return Files.readString(file.toPath(), StandardCharsets.UTF_8);
+    }
+
+    public static String readUtf8(InputStream input) throws IOException {
+        return new String(input.readAllBytes(), StandardCharsets.UTF_8);
     }
 
     public static void transfer(InputStream stream, File output, boolean override) throws IOException {
