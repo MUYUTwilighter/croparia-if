@@ -47,7 +47,7 @@ public class Ref<T> {
         T old = value;
         T newValue = mapper.apply(value);
         set(newValue);
-        return newValue.equals(old);
+        return Objects.equals(newValue, old);
     }
 
     @SuppressWarnings("UnusedReturnValue")
