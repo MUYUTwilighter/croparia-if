@@ -1,10 +1,26 @@
 package cool.muyucloud.croparia.util;
 
+import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CifUtilTest {
+    @Test
+    void formatIdAllNullAndCastUnsafeWork() {
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("croparia", "seed");
+        ResourceLocation formatted = CifUtil.formatId("x_%s", id);
+        assertEquals("croparia:x_seed", formatted.toString());
+
+        assertTrue(CifUtil.allNull(null, null, null));
+        assertFalse(CifUtil.allNull(null, "x", null));
+
+        Object value = "abc";
+        assertEquals("abc", CifUtil.<String>castUnsafe(value));
+    }
+
     @Test
     void toIntSafeClampsLongRange() {
         assertEquals(Integer.MIN_VALUE, CifUtil.toIntSafe((long) Integer.MIN_VALUE - 1L));
