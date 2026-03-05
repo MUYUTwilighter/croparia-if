@@ -112,4 +112,10 @@ class FileUtilTest {
         FileUtil.deleteUnder(file);
         assertTrue(file.exists());
     }
+
+    @Test
+    void ensureParentDirectoryAllowsParentlessFile() throws IOException {
+        File parentless = new File("temp_parentless_name.txt");
+        FileUtil.ensureParentDirectory(parentless);
+    }
 }

@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -97,5 +98,45 @@ class SupplierTest {
         LazySupplier<Integer> base = new LazySupplier<>(() -> 7);
         LazySupplier<Integer> wrapped = LazySupplier.of(base);
         assertSame(base, wrapped);
+    }
+
+    @Test
+    void lazyAndSemiEmptyReturnNullByDefault() {
+        assertNull(LazySupplier.empty().get());
+        assertNull(SemiSupplier.empty().get());
+    }
+
+    @Test
+    void semiSupplierOfReturnsSameInstanceWhenAlreadySemiSupplier() {
+        SemiSupplier<Integer> base = SemiSupplier.of(() -> 1);
+        assertSame(base, SemiSupplier.of(base));
+    }
+
+    @Test
+    void semiSupplierMapProducesMappedSemiSupplier() {
+        AtomicInteger calls = new AtomicInteger(0);
+        SemiSupplier<Integer> base = SemiSupplier.of(() -> calls.incrementAndGet());
+        SemiSupplier<String> mapped = base.map(v -> "s" + v);
+
+        assertEquals("s1", mapped.get());
+        assertEquals("s1", mapped.get());
+        mapped.refresh();
+        assertEquals("s2", mapped.get());
+    }
+
+    @Test
+    void mappableOfUsesDifferentPathsForMappableAndPlainSupplier() {
+        AtomicInteger calls = new AtomicInteger(0);
+        Mappable<Integer> mappableSource = Mappable.of(() -> {
+            calls.incrementAndGet();
+            return 2;
+        });
+        Mappable<String> mappedFromMappable = Mappable.of(mappableSource, v -> "m" + v);
+        assertEquals("m2", mappedFromMappable.get());
+
+        java.util.function.Supplier<Integer> plain = () -> 3;
+        Mappable<String> mappedFromPlain = Mappable.of(plain, v -> "p" + v);
+        assertEquals("p3", mappedFromPlain.get());
+        assertEquals(1, calls.get());
     }
 }
