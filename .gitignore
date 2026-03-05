@@ -24,3 +24,5 @@ classes/
 /data_process/
 /gradle/wrapper/gradle-wrapper.jar
 /flat/
+common/logs/
+fabric/logs/
