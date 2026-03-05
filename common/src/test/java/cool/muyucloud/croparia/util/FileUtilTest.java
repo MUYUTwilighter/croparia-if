@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FileUtilTest {
@@ -85,5 +86,23 @@ class FileUtilTest {
         assertEquals("txt", FileUtil.extension("a.txt"));
         assertEquals("", FileUtil.extension("a"));
         assertEquals("", FileUtil.extension("a."));
+    }
+
+    @Test
+    void ensureDirectoryAndForFilesInFailOnRegularFilePath() throws IOException {
+        File file = tempDir.resolve("plain.txt").toFile();
+        FileUtil.write(file, "x", true);
+
+        assertThrows(IOException.class, () -> FileUtil.ensureDirectory(file));
+        assertThrows(IOException.class, () -> FileUtil.forFilesIn(file, f -> {}));
+    }
+
+    @Test
+    void deleteUnderIgnoresRegularFile() throws IOException {
+        File file = tempDir.resolve("single.txt").toFile();
+        FileUtil.write(file, "x", true);
+
+        FileUtil.deleteUnder(file);
+        assertTrue(file.exists());
     }
 }

@@ -63,4 +63,24 @@ class TemplateTest {
         );
         assertTrue(exception.getMessage().contains("Malformed placeholder"));
     }
+
+    @Test
+    void placeholderCanBeFollowedByNormalBracesText() {
+        Placeholder<String> parser = Placeholder.build(builder -> builder
+            .self(RegexParser.of(entry -> entry))
+            .then(PatternKey.literal("id"), RegexParser.of(entry -> entry))
+        );
+        Template template = new Template("${id}{tail}");
+        assertEquals("x{tail}", template.parse("x", parser));
+    }
+
+    @Test
+    void escapedBackslashBeforePlaceholderKeepsPlaceholderEscaped() {
+        Placeholder<String> parser = Placeholder.build(builder -> builder
+            .self(RegexParser.of(entry -> entry))
+            .then(PatternKey.literal("id"), RegexParser.of(entry -> entry))
+        );
+        Template template = new Template("\\\\${id}");
+        assertEquals("\\\\x", template.parse("x", parser));
+    }
 }
