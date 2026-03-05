@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -67,59 +68,20 @@ public class PlaceholderBuilder<T> {
         }).then(
             PatternKey.literal("_size"), (entry, placeholder, matcher) -> mapper.map(entry, placeholder, matcher).map(MapReader::size), Placeholder.NUMBER
         ).then(PatternKey.MAP_MAP_VALUE, (entry, placeholder, matcher) -> {
-            PlaceholderBuilder<T> mappedBuilder = ofMap((e, p, m) -> {
-                Map<String, V> mapped = new HashMap<>();
-                // The placeholder probably is ineffective here, but we still pass it for consistency.
-                var mayMap = mapper.map(e, p, m);
-                if (mayMap.isEmpty()) return Optional.<MapReader<String, V>>empty();
-                MapReader<String, V> map = mayMap.get();
-                for (var mapEntry : map) {
-                    // Use the param to parse the value into the new value.
-                    var mayVal = valueParser.parse(mapEntry.getValue(), matcher.group(1), matcher);
-                    if (mayVal.isPresent()) {
-                        mapped.put(mapEntry.getKey(), mapEntry.getValue());
-                    }
-                }
-                return Optional.of(MapReader.map(mapped));
-            }, valueParser);
+            String mappedPlaceholder = matcher.group(1);
+            PlaceholderBuilder<T> mappedBuilder = ofMap((e, p, m) ->
+                filterMapByParsedValue(mapper, valueParser, e, p, m, mappedPlaceholder, matcher), valueParser);
             return mappedBuilder.build().parse(entry, placeholder, matcher);
         }).then(PatternKey.MAP_MAP_KEY, (entry, placeholder, matcher) -> {
-            PlaceholderBuilder<T> mappedBuilder = ofMap((e, p, m) -> {
-                Map<String, V> mapped = new HashMap<>();
-                // The placeholder probably is ineffective here, but we still pass it for consistency.
-                var mayMap = mapper.map(e, p, m);
-                if (mayMap.isEmpty()) return Optional.<MapReader<String, V>>empty();
-                MapReader<String, V> map = mayMap.get();
-                for (var mapEntry : map) {
-                    // Use the param to parse the value into the new key.
-                    var mayVal = valueParser.parse(mapEntry.getValue(), matcher.group(1), matcher);
-                    if (mayVal.isPresent()) {
-                        String key = mayVal.get().isJsonPrimitive() ? mayVal.get().getAsJsonPrimitive().getAsString() : mayVal.get().toString();
-                        mapped.put(key, mapEntry.getValue());
-                    }
-                }
-                return Optional.of(MapReader.map(mapped));
-            }, valueParser);
+            String mappedPlaceholder = matcher.group(1);
+            PlaceholderBuilder<T> mappedBuilder = ofMap((e, p, m) ->
+                remapMapKeysByParsedValue(mapper, valueParser, e, p, m, mappedPlaceholder, matcher), valueParser);
             return mappedBuilder.build().parse(entry, placeholder, matcher);
         }).then(PatternKey.literal("values()"), (entry, placeholder, matcher) -> {
-            PlaceholderBuilder<T> mappedBuilder = PlaceholderBuilder.ofList((e, p, m) -> {
-                var mayMap = mapper.map(entry, placeholder, matcher);
-                if (mayMap.isEmpty()) return Optional.empty();
-                MapReader<String, V> map = mayMap.get();
-                List<V> values = new ArrayList<>(map.values());
-                ListReader<V> list = ListReader.list(values);
-                return Optional.of(list);
-            }, valueParser);
+            PlaceholderBuilder<T> mappedBuilder = PlaceholderBuilder.ofList((e, p, m) -> mapValuesAsList(mapper, e, p, m), valueParser);
             return mappedBuilder.build().parse(entry, placeholder, matcher);
         }).then(PatternKey.literal("keys()"), (entry, placeholder, matcher) -> {
-            PlaceholderBuilder<T> mappedBuilder = PlaceholderBuilder.ofList((e, p, m) -> {
-                var mayMap = mapper.map(e, p, m);
-                if (mayMap.isEmpty()) return Optional.empty();
-                MapReader<String, V> map = mayMap.get();
-                List<String> keys = new ArrayList<>(map.keys());
-                ListReader<String> list = ListReader.list(keys);
-                return Optional.of(list);
-            }, Placeholder.STRING);
+            PlaceholderBuilder<T> mappedBuilder = PlaceholderBuilder.ofList((e, p, m) -> mapKeysAsList(mapper, e, p, m), Placeholder.STRING);
             return mappedBuilder.build().parse(entry, placeholder, matcher);
         }).then(PatternKey.MAP_GET, (entry, placeholder, matcher) -> {
             String key = matcher.group(1);
@@ -163,38 +125,13 @@ public class PlaceholderBuilder<T> {
             Placeholder.NUMBER
         ).then(PatternKey.LIST_MAP, (entry, placeholder, matcher) -> {
             String mappedPlaceholder = matcher.group(1);
-            PlaceholderBuilder<T> mappedBuilder = ofMap((e, p, m) -> {
-                JsonObject json = new JsonObject();
-                var mayList = mapper.map(e, p, m);
-                if (mayList.isEmpty()) return Optional.empty();
-                var list = mayList.get();
-                int i = 0;
-                for (E elem : list) {
-                    var mayVal = elementParser.parse(elem, mappedPlaceholder, matcher);
-                    if (mayVal.isPresent()) {
-                        json.add(String.valueOf(i), mayVal.get());
-                    }
-                    i++;
-                }
-                return Optional.of(MapReader.json(json));
-            }, Placeholder.JSON);
+            PlaceholderBuilder<T> mappedBuilder = ofMap((e, p, m) ->
+                mapListToJsonByParsedElement(mapper, elementParser, e, p, m, mappedPlaceholder, matcher), Placeholder.JSON);
             return mappedBuilder.build().parse(entry, placeholder, matcher);
         }).then(PatternKey.LIST_MAP_I, (entry, placeholder, matcher) -> {
-            PlaceholderBuilder<T> mappedBuilder = ofMap((e, p, m) -> {
-                Map<String, E> mapped = new HashMap<>();
-                var mayList = mapper.map(e, p, m);
-                if (mayList.isEmpty()) return Optional.empty();
-                var list = mayList.get();
-                int i = 0;
-                for (E elem : list) {
-                    var mayKey = elementParser.parse(elem, matcher.group(1), matcher);
-                    if (mayKey.isPresent()) {
-                        mapped.put(String.valueOf(i), elem);
-                    }
-                    i++;
-                }
-                return Optional.of(MapReader.map(mapped));
-            }, elementParser);
+            String mappedPlaceholder = matcher.group(1);
+            PlaceholderBuilder<T> mappedBuilder = ofMap((e, p, m) ->
+                mapListToIndexedMapWhenParsed(mapper, elementParser, e, p, m, mappedPlaceholder, matcher), elementParser);
             return mappedBuilder.build().parse(entry, placeholder, matcher);
         }).then(PatternKey.LIST_GET, (entry, placeholder, matcher) -> {
             try {
@@ -222,6 +159,114 @@ public class PlaceholderBuilder<T> {
                 return Optional.of(new JsonPrimitive(def));
             }
         }));
+    }
+
+    private static <T, V> Optional<MapReader<String, V>> filterMapByParsedValue(
+        TypeMapper<T, @NotNull MapReader<String, V>> mapper,
+        Placeholder<V> valueParser,
+        T entry,
+        String placeholder,
+        Matcher mapperMatcher,
+        String mappedPlaceholder,
+        Matcher parseMatcher
+    ) {
+        return mapper.map(entry, placeholder, mapperMatcher).map(map -> {
+            Map<String, V> mapped = new HashMap<>();
+            for (var mapEntry : map) {
+                var mayParsed = valueParser.parse(mapEntry.getValue(), mappedPlaceholder, parseMatcher);
+                if (mayParsed.isPresent()) {
+                    mapped.put(mapEntry.getKey(), mapEntry.getValue());
+                }
+            }
+            return MapReader.<String, V>map(mapped);
+        });
+    }
+
+    private static <T, V> Optional<MapReader<String, V>> remapMapKeysByParsedValue(
+        TypeMapper<T, @NotNull MapReader<String, V>> mapper,
+        Placeholder<V> valueParser,
+        T entry,
+        String placeholder,
+        Matcher mapperMatcher,
+        String mappedPlaceholder,
+        Matcher parseMatcher
+    ) {
+        return mapper.map(entry, placeholder, mapperMatcher).map(map -> {
+            Map<String, V> mapped = new HashMap<>();
+            for (var mapEntry : map) {
+                var mayParsed = valueParser.parse(mapEntry.getValue(), mappedPlaceholder, parseMatcher);
+                if (mayParsed.isPresent()) {
+                    JsonElement parsed = mayParsed.get();
+                    String key = parsed.isJsonPrimitive() ? parsed.getAsJsonPrimitive().getAsString() : parsed.toString();
+                    mapped.put(key, mapEntry.getValue());
+                }
+            }
+            return MapReader.<String, V>map(mapped);
+        });
+    }
+
+    private static <T, V> Optional<ListReader<V>> mapValuesAsList(
+        TypeMapper<T, @NotNull MapReader<String, V>> mapper,
+        T entry,
+        String placeholder,
+        Matcher matcher
+    ) {
+        return mapper.map(entry, placeholder, matcher).map(map -> ListReader.list(new ArrayList<>(map.values())));
+    }
+
+    private static <T, V> Optional<ListReader<String>> mapKeysAsList(
+        TypeMapper<T, @NotNull MapReader<String, V>> mapper,
+        T entry,
+        String placeholder,
+        Matcher matcher
+    ) {
+        return mapper.map(entry, placeholder, matcher).map(map -> ListReader.list(new ArrayList<>(map.keys())));
+    }
+
+    private static <T, E> Optional<MapReader<String, JsonElement>> mapListToJsonByParsedElement(
+        TypeMapper<T, ListReader<E>> mapper,
+        Placeholder<E> elementParser,
+        T entry,
+        String placeholder,
+        Matcher mapperMatcher,
+        String mappedPlaceholder,
+        Matcher parseMatcher
+    ) {
+        return mapper.map(entry, placeholder, mapperMatcher).map(list -> {
+            JsonObject json = new JsonObject();
+            int i = 0;
+            for (E elem : list) {
+                var mayVal = elementParser.parse(elem, mappedPlaceholder, parseMatcher);
+                if (mayVal.isPresent()) {
+                    json.add(String.valueOf(i), mayVal.get());
+                }
+                i++;
+            }
+            return MapReader.json(json);
+        });
+    }
+
+    private static <T, E> Optional<MapReader<String, E>> mapListToIndexedMapWhenParsed(
+        TypeMapper<T, ListReader<E>> mapper,
+        Placeholder<E> elementParser,
+        T entry,
+        String placeholder,
+        Matcher mapperMatcher,
+        String mappedPlaceholder,
+        Matcher parseMatcher
+    ) {
+        return mapper.map(entry, placeholder, mapperMatcher).map(list -> {
+            Map<String, E> mapped = new HashMap<>();
+            int i = 0;
+            for (E elem : list) {
+                var mayKey = elementParser.parse(elem, mappedPlaceholder, parseMatcher);
+                if (mayKey.isPresent()) {
+                    mapped.put(String.valueOf(i), elem);
+                }
+                i++;
+            }
+            return MapReader.<String, E>map(mapped);
+        });
     }
 
     private final Map<PatternKey, RegexParser<T>> subNodes = new LinkedHashMap<>();
