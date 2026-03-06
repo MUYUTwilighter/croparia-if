@@ -43,9 +43,21 @@ class DgReaderTest {
     }
 
     @Test
+    void supportsEscapedCharactersInQuotedString() throws CdgFormatException {
+        JsonObject json = DgReader.read("@text=\"line1\\nline2\\t\\\\\";");
+        assertEquals("line1\nline2\t\\", json.get("text").getAsString());
+    }
+
+    @Test
     void throwsWhenSemicolonIsMissing() {
         CdgFormatException exception = assertThrows(CdgFormatException.class, () -> DgReader.read("@x=1"));
         assertTrue(exception.getMessage().contains("Semicolon ';' not found"));
+    }
+
+    @Test
+    void throwsWhenQuotesAreUnclosed() {
+        CdgFormatException exception = assertThrows(CdgFormatException.class, () -> DgReader.read("@x=\"abc;"));
+        assertTrue(exception.getMessage().contains("Unclosed quotes"));
     }
 
     @Test
