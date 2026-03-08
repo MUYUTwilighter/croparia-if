@@ -72,3 +72,81 @@
 
 完成定义：
 - 每个里程碑包含可复现执行步骤、通过日志、失败定位说明。
+
+## 7. 基于 resources 的可测清单（可直接转 GameTest）
+
+### 7.1 Infusor（配方与状态）
+
+- 数据来源：
+  - `common/src/main/resources/data/croparia/recipe/infusor/dragon_breath.json`
+  - `common/src/main/resources/data/croparia/recipe/infusor/elemental_stone.json`
+  - `common/src/main/resources/data/croparia/recipe/infusor/activated_shrieker.json`
+- 建议用例：
+  1. `infusor_air_awkward_to_dragon_breath`
+  2. `infusor_elemental_stone_result`
+  3. `infusor_elemental_activated_shrieker_result`
+- 断言重点：
+  - 输入消耗、产物正确、Infusor 元素状态符合预期。
+
+### 7.2 Ritual（结构/标签/产物）
+
+- 数据来源：
+  - `common/src/main/resources/data/croparia/recipe/ritual/sculk_sensor.json`
+  - `common/src/main/resources/data/croparia/recipe/ritual/relic/magic_rope.json`
+  - `common/src/main/resources/data/croparia/recipe/ritual/enchantment/mending.json`
+  - `common/src/main/resources/data/croparia/tags/block/ritual_stands*.json`
+- 建议用例：
+  1. `ritual_stand_tag_chain_accepts_level1`
+  2. `ritual_stand_tag_chain_accepts_level2`
+  3. `ritual_enchant_book_mending_components`
+- 断言重点：
+  - 结构匹配成功/失败、tag 层级匹配、附魔书 `components` 精确性。
+
+### 7.3 Soak（高影响细节，优先 100% 概率）
+
+- 数据来源：
+  - `common/src/main/resources/data/croparia/recipe/soak/crying_obsidian.json`（`probability: 1.0`）
+  - `common/src/main/resources/data/croparia/recipe/soak/sculk.json`（`probability: 1.0`）
+  - `common/src/main/resources/data/croparia/recipe/soak/infusor/croparia_air.json`
+- 建议用例：
+  1. `soak_obsidian_to_crying_obsidian_deterministic`
+  2. `soak_moss_to_sculk_deterministic`
+  3. `soak_infusor_state_empty_to_air`
+- 断言重点：
+  - 方块转换正确、Infusor 方块属性变化正确。
+
+### 7.4 Crafting 与掉落（体验敏感）
+
+- 数据来源：
+  - `common/src/main/resources/data/croparia/recipe/crafting/infusor.json`
+  - `common/src/main/resources/data/croparia/recipe/crafting/greenhouse.json`
+  - `common/src/main/resources/data/croparia/loot_table/blocks/infusor.json`
+  - `common/src/main/resources/data/croparia/loot_table/blocks/greenhouse.json`
+- 建议用例：
+  1. `craft_infusor_recipe_valid`
+  2. `craft_greenhouse_recipe_valid`
+  3. `break_infusor_drops_self`
+  4. `break_greenhouse_drops_self`
+
+### 7.5 进度数据（Advancement）
+
+- 数据来源：
+  - `common/src/main/resources/data/croparia/advancement/croparia/infusor.json`
+  - `common/src/main/resources/data/croparia/advancement/croparia/ritual_stand.json`
+  - `common/src/main/resources/data/croparia/advancement/croparia/greenhouse.json`
+- 建议用例：
+  1. `adv_infusor_inventory_changed_grants`
+  2. `adv_ritual_stand_inventory_changed_grants`
+  3. `adv_greenhouse_inventory_changed_grants`
+- 断言重点：
+  - 给予物品后 advancement 达成，避免“有物品但不触发”的体验级故障。
+
+## 8. 模板资源现状与补充计划
+
+- 当前仓库未发现现成 `data/*/structures` GameTest 结构模板。
+- 建议先新增最小模板集：
+  1. `croparia:gametest/infusor_basic`
+  2. `croparia:gametest/ritual_basic`
+  3. `croparia:gametest/soak_basic`
+  4. `croparia:gametest/crafting_and_loot`
+- 所有 P0/P1 用例优先绑定上述模板，减少搭建成本。
