@@ -15,7 +15,6 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public class AggregatedGenerator extends DataGenerator {
     public static final MapCodec<AggregatedGenerator> CODEC = CodecUtil.extend(
@@ -66,7 +65,7 @@ public class AggregatedGenerator extends DataGenerator {
 
     @Override
     public void onGenerated(PackHandler handler) {
-        Set<PackCacheEntry<?>> caches = handler.getAll(this);
+        List<PackCacheEntry<?>> caches = List.copyOf(handler.getAll(this));
         for (PackCacheEntry<?> entry : caches) {
             StringBuilder builder = new StringBuilder();
             if (entry.value() instanceof Collection<?> collection) {

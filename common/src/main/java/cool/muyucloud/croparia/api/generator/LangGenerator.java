@@ -48,7 +48,7 @@ public class LangGenerator extends DataGenerator {
 
     @Override
     public void onGenerated(PackHandler handler) {
-        handler.getAll(this).forEach(entry -> {
+        List.copyOf(handler.getAll(this)).forEach(entry -> {
             StringBuilder builder = new StringBuilder();
             if (entry.value() instanceof Collection<?> translations) {
                 translations.forEach(translation -> builder.append("  ").append(translation.toString()).append(",\n"));
