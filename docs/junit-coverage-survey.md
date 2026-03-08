@@ -15,6 +15,26 @@
 - 已覆盖重点：`util`、`api/codec`、`api/json`、`api/placeholder`、`api/repo`（部分）、`api/recipe/structure`（部分）
 - 缺口集中：`api/generator`、`config`、`api/crop`、`api/core/recipe`、平台桥接层
 
+## 进度更新（2026-03-08）
+
+- 已新增 `common/src/test/java/cool/muyucloud/croparia/api/generator/DataGeneratorFlowTest.java`：
+  覆盖 `DataGenerator` 的 `enabled/startup/whitelist` 生成分支，
+  以及 `AggregatedGenerator`、`LangGenerator` 的聚合输出流程与异常分支。
+- 已新增 `common/src/test/java/cool/muyucloud/croparia/api/core/recipe/container/RecipeContainerTest.java`：
+  覆盖 `InfusorContainer`、`SoakContainer`、`RitualContainer` 的 `isEmpty/getItem/size` 核心行为。
+- 已纳入并保留 `common/src/test/java/cool/muyucloud/croparia/util/DependenciesTest.java`。
+- 将运行时依赖较强的新增测试迁移到 Fabric loader-backed 层：
+  - `fabric/src/test/java/cool/muyucloud/croparia/api/generator/DataGeneratorFlowFabricTest.java`
+  - `fabric/src/test/java/cool/muyucloud/croparia/api/core/recipe/container/RecipeContainerFabricTest.java`
+- 在 NeoForge JUnit 层新增镜像测试（以运行时可用性为前置）：
+  - `neoforge/src/test/java/cool/muyucloud/croparia/api/generator/DataGeneratorFlowNeoForgeTest.java`
+  - `neoforge/src/test/java/cool/muyucloud/croparia/api/core/recipe/container/RecipeContainerNeoForgeTest.java`
+- 为了让 NeoForge 测试可编译，补充了 `neoforge` 对 `:common` 的测试编译依赖：
+  - `neoforge/build.gradle` 增加 `testImplementation(project(path: ':common', configuration: 'namedElements'))`
+- 在迁移过程中修复生成器并发修改缺陷：
+  - `LangGenerator.onGenerated` 改为对缓存条目快照遍历
+  - `AggregatedGenerator.onGenerated` 改为对缓存条目快照遍历
+
 ## A. 可直接补 JUnit 的文件（优先）
 
 这些类主要是字符串/集合/缓存/编解码或“纯业务流程”，可在 `common` 的 JVM 单测直接覆盖。
@@ -94,4 +114,3 @@
 5. `common/src/test/java/cool/muyucloud/croparia/api/core/recipe/container/RecipeContainerTest.java`
 6. `common/src/test/java/cool/muyucloud/croparia/config/ConfigTest.java`（解耦后）
 7. `common/src/test/java/cool/muyucloud/croparia/api/crop/CropRegistryTest.java`（解耦后）
-
