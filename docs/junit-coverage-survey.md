@@ -43,6 +43,7 @@
   覆盖 `ConfigFileHandler` 的 `load/save/reload` 主分支（含“配置文件缺失时自动创建默认配置”）。
 - 新增 `common/src/test/java/cool/muyucloud/croparia/api/crop/CropRegistryTest.java`：
   覆盖 `CropRegistry` 的 `register/readCrops/dumpCrop` 主流程与 `onRegister` 触发语义。
+  已补充异常与边界分支：目录缺失自动创建、损坏 JSON 跳过、`dumpCrops` 批量输出。
 - 新增 `common/src/test/java/cool/muyucloud/croparia/api/generator/pack/PackHandlerFlowTest.java`：
   覆盖 `PackHandler.onTriggered` 生命周期顺序、`override` 清理分支与缓存清理语义。
 - 为支持 `ConfigFileHandler` 在纯 JVM 场景下测试，做了最小解耦：
@@ -51,6 +52,7 @@
   - 增加 package-private 的 game folder supplier 测试注入点。
 - 进一步增强 `Config.resolvePath` 的稳健性：当平台目录不可用时回退为绝对路径字符串。
 - 进一步增强 `ConfigFileHandler` 的稳健性：当平台目录不可用时回退到临时目录路径，避免静态初始化时崩溃。
+- 进一步增强 `CropRegistry.readCrop` 的健壮性：捕获解析期运行时异常，避免单个坏配置中断全量读取。
 
 ## A. 可直接补 JUnit 的文件（优先）
 

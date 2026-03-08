@@ -78,6 +78,26 @@ class CropRegistryTest {
     }
 
     @Test
+    void readCropsCreatesDirectoryAndSkipsMalformedJson(@TempDir Path tempDir) throws IOException {
+        Path missingDir = tempDir.resolve("missing_registry_root");
+        CropRegistry<DummyCrop> registry = new CropRegistry<>(missingDir, DummyCrop.CODEC);
+        assertFalse(Files.exists(missingDir));
+
+        registry.readCrops();
+        assertTrue(Files.exists(missingDir));
+        assertEquals(0, registry.size());
+
+        Files.writeString(missingDir.resolve("broken.json"), "{\"id\":", StandardCharsets.UTF_8);
+        Files.writeString(missingDir.resolve("valid.json"),
+            "{\"id\":\"croparia_test:ok\",\"load\":true,\"translation_key\":\"k\",\"translations\":{\"en_us\":\"OK\"}}",
+            StandardCharsets.UTF_8);
+        registry.readCrops();
+
+        assertEquals(1, registry.size());
+        assertTrue(registry.exists(ResourceLocation.fromNamespaceAndPath("croparia_test", "ok")));
+    }
+
+    @Test
     void dumpCropWritesNamespacedPath(@TempDir Path tempDir) throws IOException {
         CropRegistry<DummyCrop> registry = new CropRegistry<>(tempDir, DummyCrop.CODEC);
         DummyCrop crop = new DummyCrop(
@@ -94,6 +114,20 @@ class CropRegistryTest {
         String content = Files.readString(dumped, StandardCharsets.UTF_8);
         assertTrue(content.contains("\"id\": \"croparia_test:dump_target\""));
         assertTrue(content.contains("\"translation_key\": \"key.dump\""));
+    }
+
+    @Test
+    void dumpCropsWritesAllRegisteredCrops(@TempDir Path tempDir) throws IOException {
+        CropRegistry<DummyCrop> registry = new CropRegistry<>(tempDir, DummyCrop.CODEC);
+        DummyCrop a = new DummyCrop(ResourceLocation.fromNamespaceAndPath("croparia_test", "a"), true, "k.a", Map.of("en_us", "A"));
+        DummyCrop b = new DummyCrop(ResourceLocation.fromNamespaceAndPath("croparia_test", "b"), false, "k.b", Map.of("en_us", "B"));
+        registry.register(a);
+        registry.register(b);
+
+        registry.dumpCrops();
+
+        assertTrue(Files.exists(tempDir.resolve("croparia_test/a.json")));
+        assertTrue(Files.exists(tempDir.resolve("croparia_test/b.json")));
     }
 
     private static List<DummyCrop> registryLoaded(CropRegistry<DummyCrop> registry) {

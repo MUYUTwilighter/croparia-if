@@ -71,7 +71,7 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
         if (!file.getName().endsWith(".json")) return;
         try {
             CodecUtil.readJson(file, this.getCodec()).ifSuccess(this::register);
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) {
             CropariaIf.LOGGER.error("Failed to read crop from file \"%s\"".formatted(file), e);
         }
     }
