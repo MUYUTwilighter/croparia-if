@@ -41,6 +41,8 @@
   - `orElse(...)` 调整为 `orElseGet(...)`，避免在已有绝对路径时仍触发 `Platform.getGameFolder()`
 - 新增 `common/src/test/java/cool/muyucloud/croparia/config/ConfigFileHandlerTest.java`：
   覆盖 `ConfigFileHandler` 的 `load/save/reload` 主分支（含“配置文件缺失时自动创建默认配置”）。
+- 新增 `common/src/test/java/cool/muyucloud/croparia/api/crop/CropRegistryTest.java`：
+  覆盖 `CropRegistry` 的 `register/readCrops/dumpCrop` 主流程与 `onRegister` 触发语义。
 - 为支持 `ConfigFileHandler` 在纯 JVM 场景下测试，做了最小解耦：
   - `ConfigFileHandler` 移除对 `CropariaIf.LOGGER` 的静态依赖，改为本地 logger；
   - 配置路径改为惰性解析；
