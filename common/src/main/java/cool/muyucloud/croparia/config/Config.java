@@ -27,12 +27,17 @@ public class Config {
 
     public static @NotNull String resolvePath(@NotNull Path path) {
         Path normalizedPath = path.normalize();
-        Path normalizedBasePath = Platform.getGameFolder().normalize();
-        if (normalizedPath.startsWith(normalizedBasePath)) {
-            return normalizedBasePath.relativize(normalizedPath).toString();
-        } else {
-            return normalizedPath.toAbsolutePath().toString();
+        try {
+            Path basePath = Platform.getGameFolder();
+            if (basePath != null) {
+                Path normalizedBasePath = basePath.normalize();
+                if (normalizedPath.startsWith(normalizedBasePath)) {
+                    return normalizedBasePath.relativize(normalizedPath).toString();
+                }
+            }
+        } catch (Throwable ignored) {
         }
+        return normalizedPath.toAbsolutePath().toString();
     }
 
     @NotNull

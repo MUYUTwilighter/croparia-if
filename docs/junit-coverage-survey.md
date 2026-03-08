@@ -39,6 +39,13 @@
   - `common/src/test/java/cool/muyucloud/croparia/config/ConfigTest.java`（覆盖非平台分支）
 - 为支持 `ConfigTest` 的纯 JVM 场景，修复了 `Config(RawConfig)` 的提前平台调用：
   - `orElse(...)` 调整为 `orElseGet(...)`，避免在已有绝对路径时仍触发 `Platform.getGameFolder()`
+- 新增 `common/src/test/java/cool/muyucloud/croparia/config/ConfigFileHandlerTest.java`：
+  覆盖 `ConfigFileHandler` 的 `load/save/reload` 主分支（含“配置文件缺失时自动创建默认配置”）。
+- 为支持 `ConfigFileHandler` 在纯 JVM 场景下测试，做了最小解耦：
+  - `ConfigFileHandler` 移除对 `CropariaIf.LOGGER` 的静态依赖，改为本地 logger；
+  - 配置路径改为惰性解析；
+  - 增加 package-private 的 game folder supplier 测试注入点。
+- 进一步增强 `Config.resolvePath` 的稳健性：当平台目录不可用时回退为绝对路径字符串。
 
 ## A. 可直接补 JUnit 的文件（优先）
 
