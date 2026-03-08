@@ -4,6 +4,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -86,5 +88,20 @@ class ConfigFileHandlerTest {
         assertEquals(9, target.getAutoReload());
         assertEquals(2, target.getSoakAttempts());
         assertEquals(List.of("minecraft:carrot", "@neo.*"), target.getBlacklist());
+    }
+
+    @Test
+    void loadRecoversFromMalformedJsonAndRewritesConfigFile() throws IOException {
+        ConfigFileHandler.setGameFolderSupplierForTest(() -> tempDir);
+        Path configPath = tempDir.resolve("config/croparia.json");
+        Files.createDirectories(configPath.getParent());
+        Files.writeString(configPath, "{\"filePath\":", StandardCharsets.UTF_8);
+
+        Config loaded = ConfigFileHandler.load();
+        String rewritten = Files.readString(configPath, StandardCharsets.UTF_8);
+
+        assertEquals(tempDir.resolve("croparia"), loaded.getFilePath());
+        assertTrue(rewritten.contains("\"filePath\""));
+        assertTrue(rewritten.contains("\"autoReload\""));
     }
 }

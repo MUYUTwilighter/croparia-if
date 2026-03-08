@@ -41,6 +41,7 @@
   - `orElse(...)` 调整为 `orElseGet(...)`，避免在已有绝对路径时仍触发 `Platform.getGameFolder()`
 - 新增 `common/src/test/java/cool/muyucloud/croparia/config/ConfigFileHandlerTest.java`：
   覆盖 `ConfigFileHandler` 的 `load/save/reload` 主分支（含“配置文件缺失时自动创建默认配置”）。
+  已补充损坏配置恢复分支：当配置 JSON 损坏时自动回退默认配置并覆写文件。
 - 新增 `common/src/test/java/cool/muyucloud/croparia/api/crop/CropRegistryTest.java`：
   覆盖 `CropRegistry` 的 `register/readCrops/dumpCrop` 主流程与 `onRegister` 触发语义。
   已补充异常与边界分支：目录缺失自动创建、损坏 JSON 跳过、`dumpCrops` 批量输出。
