@@ -34,6 +34,11 @@
 - 在迁移过程中修复生成器并发修改缺陷：
   - `LangGenerator.onGenerated` 改为对缓存条目快照遍历
   - `AggregatedGenerator.onGenerated` 改为对缓存条目快照遍历
+- 新增 `common` 侧第二批覆盖：
+  - `common/src/test/java/cool/muyucloud/croparia/api/crop/util/CropDependenciesTest.java`
+  - `common/src/test/java/cool/muyucloud/croparia/config/ConfigTest.java`（覆盖非平台分支）
+- 为支持 `ConfigTest` 的纯 JVM 场景，修复了 `Config(RawConfig)` 的提前平台调用：
+  - `orElse(...)` 调整为 `orElseGet(...)`，避免在已有绝对路径时仍触发 `Platform.getGameFolder()`
 
 ## A. 可直接补 JUnit 的文件（优先）
 

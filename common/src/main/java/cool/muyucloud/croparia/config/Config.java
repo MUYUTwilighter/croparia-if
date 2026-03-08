@@ -74,8 +74,8 @@ public class Config {
      * Deserialize config
      */
     public Config(RawConfig raw) {
-        this.filePath = parsePath(raw.filePath()).orElse(Platform.getGameFolder().resolve("croparia"));
-        this.recipeWizard = parsePath(raw.recipeWizard()).orElse(Platform.getGameFolder().resolve("croparia/recipe_wizard/dump"));
+        this.filePath = parsePath(raw.filePath()).orElseGet(() -> Platform.getGameFolder().resolve("croparia"));
+        this.recipeWizard = parsePath(raw.recipeWizard()).orElseGet(() -> Platform.getGameFolder().resolve("croparia/recipe_wizard/dump"));
         this.autoReload = raw.autoReload() != null ? raw.autoReload() : 20;
         this.override = raw.override() != null ? raw.override() : true;
         this.fruitUse = raw.fruitUse() != null ? raw.fruitUse() : true;
