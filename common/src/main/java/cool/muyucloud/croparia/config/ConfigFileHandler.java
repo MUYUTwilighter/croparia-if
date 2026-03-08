@@ -19,12 +19,21 @@ public class ConfigFileHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static Supplier<Path> gameFolderSupplier = Platform::getGameFolder;
 
+    private static Path gameFolder() {
+        try {
+            Path path = gameFolderSupplier.get();
+            if (path != null) return path;
+        } catch (Throwable ignored) {
+        }
+        return Path.of(System.getProperty("java.io.tmpdir"), "croparia");
+    }
+
     private static Path configPath() {
-        return gameFolderSupplier.get().resolve("config/croparia.json");
+        return gameFolder().resolve("config/croparia.json");
     }
 
     private static Config defaultConfig() {
-        Path gameFolder = gameFolderSupplier.get();
+        Path gameFolder = gameFolder();
         return new Config(new RawConfig(
             gameFolder.resolve("croparia").toString(),
             gameFolder.resolve("croparia/recipe_wizard/dump").toString(),
