@@ -20,7 +20,7 @@
     "frame": "task",
     "hidden": false,
     "icon": {
-      "id": "minecraft:melon_seeds"
+      "id": "croparia:melon_seed_dirt"
     },
     "show_toast": true,
     "title": {
