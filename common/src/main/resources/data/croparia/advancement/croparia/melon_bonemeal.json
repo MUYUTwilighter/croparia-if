@@ -3,18 +3,18 @@
   "criteria": {
     "melon_bonemeal": {
       "conditions": {
-        "items": [
-          {
-            "tag": "croparia:seeds/melons"
-          },
-          {
-            "items": [
-              "minecraft:bone_meal"
-            ]
+        "item": {
+          "items": [
+            "minecraft:bone_meal"
+          ]
+        },
+        "location": {
+          "block": {
+            "tag": "croparia:stem/grown"
           }
-        ]
+        }
       },
-      "trigger": "minecraft:inventory_changed"
+      "trigger": "minecraft:item_used_on_block"
     }
   },
   "display": {

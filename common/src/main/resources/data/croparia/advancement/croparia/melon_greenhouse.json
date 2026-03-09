@@ -1,5 +1,5 @@
 {
-  "parent": "croparia:croparia/melon_bonemeal",
+  "parent": "croparia:croparia/melon_seed",
   "criteria": {
     "melon_greenhouse": {
       "conditions": {
