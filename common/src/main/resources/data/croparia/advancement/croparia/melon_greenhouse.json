@@ -1,9 +1,14 @@
 {
-  "parent": "croparia:croparia/melon_seed",
+  "parent": "croparia:croparia/melon_bonemeal",
   "criteria": {
-    "melon_trait": {
+    "melon_greenhouse": {
       "conditions": {
         "items": [
+          {
+            "items": [
+              "croparia:greenhouse"
+            ]
+          },
           {
             "items": [
               "minecraft:melon"
@@ -17,21 +22,21 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.croparia.melon_trait.description"
+      "translate": "advancements.croparia.melon_greenhouse.description"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "id": "minecraft:melon"
+      "id": "croparia:greenhouse"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.croparia.melon_trait.title"
+      "translate": "advancements.croparia.melon_greenhouse.title"
     }
   },
   "requirements": [
     [
-      "melon_trait"
+      "melon_greenhouse"
     ]
   ],
   "sends_telemetry_event": true

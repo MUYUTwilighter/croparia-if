@@ -1,12 +1,17 @@
 {
-  "parent": "croparia:croparia/ritual_stand",
+  "parent": "croparia:croparia/melon_seed",
   "criteria": {
-    "melon_source": {
+    "melon_bonemeal": {
       "conditions": {
         "items": [
           {
             "items": [
-              "croparia:croparia"
+              "minecraft:melon_seeds"
+            ]
+          },
+          {
+            "items": [
+              "minecraft:bone_meal"
             ]
           }
         ]
@@ -17,21 +22,21 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.croparia.melon_source.description"
+      "translate": "advancements.croparia.melon_bonemeal.description"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "id": "croparia:croparia"
+      "id": "minecraft:bone_meal"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.croparia.melon_source.title"
+      "translate": "advancements.croparia.melon_bonemeal.title"
     }
   },
   "requirements": [
     [
-      "melon_source"
+      "melon_bonemeal"
     ]
   ],
   "sends_telemetry_event": true

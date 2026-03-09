@@ -1,5 +1,5 @@
 {
-  "parent": "croparia:croparia/melon_source",
+  "parent": "croparia:croparia/ritual_stand",
   "criteria": {
     "melon_seed": {
       "conditions": {
