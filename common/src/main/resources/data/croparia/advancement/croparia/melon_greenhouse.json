@@ -3,20 +3,11 @@
   "criteria": {
     "melon_greenhouse": {
       "conditions": {
-        "items": [
-          {
-            "items": [
-              "croparia:greenhouse"
-            ]
-          },
-          {
-            "items": [
-              "minecraft:melon"
-            ]
-          }
-        ]
+        "item": {
+          "tag": "croparia:seeds/melons"
+        }
       },
-      "trigger": "minecraft:inventory_changed"
+      "trigger": "minecraft:item_used_on_block"
     }
   },
   "display": {
