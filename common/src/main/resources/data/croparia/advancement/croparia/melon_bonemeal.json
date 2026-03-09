@@ -10,7 +10,7 @@
         },
         "location": {
           "block": {
-            "tag": "croparia:stem/grown"
+            "tag": "croparia:attach"
           }
         }
       },

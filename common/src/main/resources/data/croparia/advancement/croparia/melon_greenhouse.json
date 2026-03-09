@@ -3,9 +3,12 @@
   "criteria": {
     "melon_greenhouse": {
       "conditions": {
+        "item": {
+          "tag": "croparia:seeds/melons"
+        },
         "location": {
           "block": {
-            "tag": "croparia:stem/growing"
+            "tag": "croparia:stem"
           }
         }
       },
