@@ -21,7 +21,7 @@
     "amount": 4
   },
   "fluid_inputs": {
-    "fluid": "croparia:fluid_elematilius",
+    "fluid": "croparia:fluid_elemental",
     "amount": 250
   },
   "item_outputs": {
