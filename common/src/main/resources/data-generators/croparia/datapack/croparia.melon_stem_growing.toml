@@ -1,0 +1,13 @@
+registry = "croparia:melons"
+path = "croparia/tags/block/stem/growing.json"
+type = "croparia:aggregated"
+startup = true
+content = '    "${stem}"'
+template = """
+{
+  "replace": false,
+  "values": [
+${content}
+  ]
+}
+"""
