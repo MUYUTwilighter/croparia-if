@@ -3,16 +3,21 @@
   "criteria": {
     "melon_bonemeal": {
       "conditions": {
-        "item": {
-          "items": [
-            "minecraft:bone_meal"
-          ]
-        },
-        "location": {
-          "block": {
-            "tag": "croparia:attach"
+        "location": [
+          {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "minecraft:bone_meal"
+            }
+          },
+          {
+            "condition": "croparia:block_input",
+            "tag": "croparia:stem",
+            "properties": {
+              "age": "7"
+            }
           }
-        }
+        ]
       },
       "trigger": "minecraft:item_used_on_block"
     }

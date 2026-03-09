@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.core.item;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -23,8 +24,13 @@ public class GreenhouseItem extends BlockItem {
         BlockPos pos = context.getClickedPos();
         ItemStack stack = context.getItemInHand();
         if (!world.isClientSide && !stack.isEmpty()) {
-            if (world.isEmptyBlock(pos.above()) && (world.getBlockState(pos).getBlock() instanceof CropBlock || world.getBlockState(pos).getBlock() instanceof StemBlock || world.getBlockState(pos).getBlock() instanceof AttachedStemBlock)) {
+            if (world.isEmptyBlock(pos.above()) && (world.getBlockState(pos).getBlock() instanceof CropBlock
+                || world.getBlockState(pos).getBlock() instanceof StemBlock || world.getBlockState(pos).getBlock() instanceof AttachedStemBlock)) {
                 world.setBlockAndUpdate(pos.above(), this.getBlock().defaultBlockState());
+                Player player = context.getPlayer();
+                if (player != null) {
+
+                }
                 if (context.getPlayer() != null && !context.getPlayer().getAbilities().instabuild) {
                     stack.shrink(1);
                 }

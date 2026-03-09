@@ -52,7 +52,7 @@ public class MelonStem extends StemBlock implements CropAccess<Melon> {
             Direction direction = Direction.Plane.HORIZONTAL.getRandomDirection(random);
             BlockPos melonPos = pos.relative(direction);
             BlockState melonBase = level.getBlockState(melonPos.below());
-            if (level.getBlockState(melonPos).isAir() && (melonBase.is(Blocks.FARMLAND) || melonBase.is(BlockTags.DIRT))) {
+            if (level.getBlockState(melonPos).canBeReplaced() && (melonBase.is(Blocks.FARMLAND) || melonBase.is(BlockTags.DIRT))) {
                 Registry<Block> registry = level.registryAccess().registryOrThrow(Registries.BLOCK);
                 Optional<Block> optional = registry.getOptional(this.getCrop().getMelon().adaptKey());
                 Optional<Block> optional2 = registry.getOptional(this.getCrop().getAttach().adaptKey());

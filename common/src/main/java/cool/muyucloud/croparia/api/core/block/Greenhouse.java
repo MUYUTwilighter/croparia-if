@@ -87,7 +87,6 @@ public class Greenhouse extends BaseEntityBlock {
                 player.openMenu(screenHandlerFactory);
             }
         }
-
         return ItemInteractionResult.SUCCESS;
     }
 

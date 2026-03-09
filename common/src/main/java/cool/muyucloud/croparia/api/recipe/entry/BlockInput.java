@@ -29,6 +29,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,14 +44,18 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
-public class BlockInput implements SlotDisplay {
+public class BlockInput implements SlotDisplay, LootItemCondition {
     public static final ItemStack STACK_UNKNOWN = Items.BEDROCK.getDefaultInstance();
     public static final ItemStack STACK_AIR = Items.BARRIER.getDefaultInstance();
     public static final ItemStack STACK_ANY = Items.LIGHT_GRAY_STAINED_GLASS_PANE.getDefaultInstance();
     public static final Supplier<ItemStack> STACK_PLACEHOLDER = () -> CropariaItems.PLACEHOLDER_BLOCK.get().getDefaultInstance();
     public static final BlockInput UNKNOWN = BlockInput.of(CropariaIf.of("unknown"));
     public static final BlockInput ANY = new BlockInput(null, null, BlockProperties.EMPTY);
-    public static final MapCodec<BlockInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(ResourceLocation.CODEC.optionalFieldOf("id").forGetter(BlockInput::getId), TagKey.codec(Registries.BLOCK).optionalFieldOf("tag").forGetter(BlockInput::getTag), BlockProperties.CODEC.optionalFieldOf("properties", BlockProperties.EMPTY).forGetter(BlockInput::getProperties)).apply(instance, (id, tag, properties) -> create(id.orElse(null), tag.orElse(null), properties)));
+    public static final MapCodec<BlockInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
+        ResourceLocation.CODEC.optionalFieldOf("id").forGetter(BlockInput::getId),
+        TagKey.codec(Registries.BLOCK).optionalFieldOf("tag").forGetter(BlockInput::getTag),
+        BlockProperties.CODEC.optionalFieldOf("properties", BlockProperties.EMPTY).forGetter(BlockInput::getProperties)
+    ).apply(instance, (id, tag, properties) -> create(id.orElse(null), tag.orElse(null), properties)));
     public static final Codec<BlockInput> CODEC_STR = Codec.STRING.xmap(BlockInput::create, BlockInput::getTaggable);
     public static final MultiCodec<BlockInput> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
         if (toEncode.isAny()) return TestedCodec.fail(() -> "Can be encoded as empty string");
@@ -56,6 +64,7 @@ public class BlockInput implements SlotDisplay {
         return TestedCodec.success();
     }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockInput> STREAM_CODEC = CodecUtil.toStream(CODEC);
+    public static final LootItemConditionType CONDITION_TYPE = new LootItemConditionType(CODEC_COMP);
 
     static {
         STACK_UNKNOWN.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.unknown"));
@@ -257,5 +266,16 @@ public class BlockInput implements SlotDisplay {
     @Override
     public int hashCode() {
         return Objects.hash(id, tag, properties);
+    }
+
+    @Override
+    public @NotNull LootItemConditionType getType() {
+        return CONDITION_TYPE;
+    }
+
+    @Override
+    public boolean test(LootContext lootContext) {
+        BlockState state = lootContext.getParam(LootContextParams.BLOCK_STATE);
+        return this.matches(state);
     }
 }

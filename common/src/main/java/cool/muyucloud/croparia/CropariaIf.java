@@ -42,6 +42,7 @@ public class CropariaIf {
         Crops.register();
         Melons.register();
         LOGGER.info("Croparia IF vanilla registration");
+        LootConditions.register();
         ArgumentTypes.register();
         NetworkHandlers.register();
         CropariaComponents.register();
