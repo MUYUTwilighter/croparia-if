@@ -1,0 +1,38 @@
+{
+  "parent": "croparia:croparia/ritual_stand",
+  "criteria": {
+    "melon_source": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "croparia:croparia"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.croparia.melon_source.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "id": "croparia:croparia"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.croparia.melon_source.title"
+    }
+  },
+  "requirements": [
+    [
+      "melon_source"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

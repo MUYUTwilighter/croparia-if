@@ -1,0 +1,38 @@
+{
+  "parent": "croparia:croparia/melon_seed",
+  "criteria": {
+    "melon_trait": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:melon"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.croparia.melon_trait.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "id": "minecraft:melon"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.croparia.melon_trait.title"
+    }
+  },
+  "requirements": [
+    [
+      "melon_trait"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
