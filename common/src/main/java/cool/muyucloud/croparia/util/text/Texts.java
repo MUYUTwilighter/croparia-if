@@ -2,7 +2,6 @@ package cool.muyucloud.croparia.util.text;
 
 import cool.muyucloud.croparia.api.core.component.Text;
 import cool.muyucloud.croparia.registry.CropariaComponents;
-import dev.architectury.event.events.client.ClientCommandRegistrationEvent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.component.DataComponents;
@@ -65,22 +64,6 @@ public class Texts {
 
     public static void overlay(@NotNull Player player, Component message) {
         player.displayClientMessage(message, true);
-    }
-
-    public static FailureMessenger failure(@NotNull CommandSourceStack source) {
-        return (msg) -> failure(source, msg);
-    }
-
-    public static FailureMessenger failure(@NotNull ClientCommandRegistrationEvent.ClientCommandSourceStack source) {
-        return (msg) -> failure(source, msg);
-    }
-
-    public static void failure(@NotNull CommandSourceStack source, Component message) {
-        source.sendFailure(message);
-    }
-
-    public static void failure(@NotNull ClientCommandRegistrationEvent.ClientCommandSourceStack source, Component message) {
-        source.arch$sendFailure(message);
     }
 
     public static Style suggestCommand(String... words) {
