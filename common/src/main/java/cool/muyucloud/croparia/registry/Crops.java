@@ -47,11 +47,11 @@ public class Crops {
         return crop;
     }
 
-    public static final Crop ELEMENTAL = croparia("elemental", Element.ELEMENTAL.getGem(), 0x712389, 2, Crop.CROP, "element.croparia.elemental");
-    public static final Crop EARTH = croparia("earth", Element.EARTH.getGem(), 0xE5C8BB, 3, Crop.CROP, "element.croparia.earth");
-    public static final Crop WATER = croparia("water", Element.WATER.getGem(), 0x2A5AB2, 4, Crop.CROP, "element.croparia.water");
-    public static final Crop FIRE = croparia("fire", Element.FIRE.getGem(), 0xC65957, 6, Crop.CROP, "element.croparia.fire");
-    public static final Crop AIR = croparia("air", Element.AIR.getGem(), 0xA2A9B5, 7, Crop.CROP, "element.croparia.air");
+    public static final Crop ELEMENTAL = croparia("elemental", Element.ELEMENTAL.getGem(), 0x712389, 1, Crop.CROP, "element.croparia.elemental");
+    public static final Crop EARTH = croparia("earth", Element.EARTH.getGem(), 0xE5C8BB, 2, Crop.CROP, "element.croparia.earth");
+    public static final Crop WATER = croparia("water", Element.WATER.getGem(), 0x2A5AB2, 3, Crop.CROP, "element.croparia.water");
+    public static final Crop FIRE = croparia("fire", Element.FIRE.getGem(), 0xC65957, 4, Crop.CROP, "element.croparia.fire");
+    public static final Crop AIR = croparia("air", Element.AIR.getGem(), 0xA2A9B5, 5, Crop.CROP, "element.croparia.air");
 
     /**
      * Add a crop for vanilla material with specified translation key.
@@ -73,42 +73,29 @@ public class Crops {
         return crop;
     }
 
+    /**
+     * New Tiering Principle:
+     * 1. Easy minerals, loots, plants
+     * 2. Normal Minerals
+     * 3. Gems
+     * 4. Rare items
+     * 5. Epic items
+     */
     public static final Crop COAL = vanilla("coal", Items.COAL, 0x333333, 1, Crop.CROP);
-    public static final Crop IRON = vanilla("iron", Items.IRON_INGOT, 0xd8d8d8, 2, Crop.CROP);
-    public static final Crop GOLD = vanilla("gold", Items.GOLD_INGOT, 0xffff8b, 2, Crop.CROP);
-    public static final Crop LAPIS = vanilla("lapis", Items.LAPIS_LAZULI, 0x7497ea, 3, Crop.CROP);
-    public static final Crop REDSTONE = vanilla("redstone", Items.REDSTONE, 0xff2626, 3, Crop.CROP);
-    public static final Crop DIAMOND = vanilla("diamond", Items.DIAMOND, 0x8cf4e2, 4, Crop.CROP);
-    public static final Crop EMERALD = vanilla("emerald", Items.EMERALD, 0x17dd62, 4, Crop.CROP);
     public static final Crop CLAY = vanilla("clay", Items.CLAY_BALL, 0x9aa3b3, 1, Crop.CROP);
-    public static final Crop GLOWSTONE = vanilla("glowstone", Items.GLOWSTONE, 0xffff00, 3, Crop.CROP);
-    public static final Crop QUARTZ = vanilla("quartz", Items.QUARTZ, 0xdfd8cf, 3, Crop.CROP);
-    public static final Crop SHARD = vanilla("shard", Items.PRISMARINE_SHARD, 0x73b5aa, 2, Crop.CROP);
-    public static final Crop CRYSTAL = vanilla("crystal", Items.PRISMARINE_CRYSTALS, 0xcbe7e0, 2, Crop.CROP);
-    public static final Crop ENDER = vanilla("ender", Items.ENDER_PEARL, 0x8cf4e2, 3, Crop.MONSTER);
-    public static final Crop BONE = vanilla("bone", Items.BONE, 0xeceac9, 2, Crop.MONSTER);
-    public static final Crop SPIDER = vanilla("eye", Items.SPIDER_EYE, 0x9b1e2c, 2, Crop.MONSTER);
-    public static final Crop POWDER = vanilla("powder", Items.GUNPOWDER, 0x727272, 2, Crop.MONSTER);
+    public static final Crop BONE = vanilla("bone", Items.BONE, 0xeceac9, 1, Crop.MONSTER);
+    public static final Crop SPIDER = vanilla("spider_eye", Items.SPIDER_EYE, 0x9b1e2c, 1, Crop.MONSTER);
+    public static final Crop POWDER = vanilla("gunpowder", Items.GUNPOWDER, 0x727272, 1, Crop.MONSTER);
     public static final Crop PAPER = vanilla("paper", Items.PAPER, 0xeaeaea, 1, Crop.CROP);
     public static final Crop SUGAR = vanilla("sugar", Items.SUGAR, 0xf5ffff, 1, Crop.CROP);
     public static final Crop CHARCOAL = vanilla("charcoal", Items.CHARCOAL, 0x53493a, 1, Crop.CROP);
     public static final Crop FLINT = vanilla("flint", Items.FLINT, 0x565656, 1, Crop.CROP);
     public static final Crop SNOWBALL = vanilla("snowball", Items.SNOWBALL, 0xfbffff, 1, Crop.CROP);
-    public static final Crop FIREWORK = vanilla("firework", Items.FIREWORK_STAR, 0x575757, 1, Crop.CROP);
-    public static final Crop NETHER = vanilla("nether", Items.NETHER_BRICK, 0x46262c, 3, Crop.CROP);
-    public static final Crop BOTTLE = vanilla("bottle", Items.GLASS_BOTTLE, 0xe4e4e4, 1, Crop.CROP);
-    public static final Crop FOOT = vanilla("foot", Items.RABBIT_FOOT, 0xcfa978, 1, Crop.ANIMAL);
     public static final Crop HIDE = vanilla("hide", Items.RABBIT_HIDE, 0xc79e67, 1, Crop.ANIMAL);
     public static final Crop LEATHER = vanilla("leather", Items.LEATHER, 0xc65c35, 1, Crop.ANIMAL);
     public static final Crop FEATHER = vanilla("feather", Items.FEATHER, 0xffffff, 1, Crop.ANIMAL);
-    public static final Crop BLAZE = vanilla("blaze", Items.BLAZE_ROD, 0xffcb00, 3, Crop.MONSTER);
-    public static final Crop GHAST = vanilla("ghast", Items.GHAST_TEAR, 0xe3fde8, 4, Crop.MONSTER);
-    public static final Crop MAGMA = vanilla("magma", Items.MAGMA_CREAM, 0xcea025, 3, Crop.MONSTER);
-    public static final Crop SHELL = vanilla("shell", Items.SHULKER_SHELL, 0x9e749e, 4, Crop.MONSTER);
-    public static final Crop STAR = vanilla("star", Items.NETHER_STAR, 0xf0f3f3, 6, Crop.MONSTER);
-    public static final Crop STRING = vanilla("string", Items.STRING, 0xf7f7f7, 2, Crop.MONSTER);
-    public static final Crop SLIME = vanilla("slime", Items.SLIME_BALL, 0x84c873, 2, Crop.MONSTER);
-    public static final Crop ZOMBIE = vanilla("zombie", Items.ROTTEN_FLESH, 0xbd5d37, 2, Crop.MONSTER);
+    public static final Crop STRING = vanilla("string", Items.STRING, 0xf7f7f7, 1, Crop.MONSTER);
+    public static final Crop ZOMBIE = vanilla("zombie", Items.ROTTEN_FLESH, 0xbd5d37, 1, Crop.MONSTER);
     public static final Crop VINE = vanilla("vine", Items.VINE, 0x1b4509, 1, Crop.NATURE);
     public static final Crop WEEPING_VINES = vanilla("weeping_vines", Items.WEEPING_VINES, 0x7a0000, 1, Crop.NATURE);
     public static final Crop TWISTING_VINES = vanilla("twisting_vines", Items.TWISTING_VINES, 0x14b283, 1, Crop.NATURE);
@@ -119,15 +106,10 @@ public class Crops {
     public static final Crop TALL_GRASS = vanilla("tall_grass", Items.TALL_GRASS, 0x2f4728, 1, Crop.NATURE);
     public static final Crop FERN = vanilla("fern", Items.FERN, 0x1b4509, 1, Crop.NATURE);
     public static final Crop APPLE = vanilla("apple", Items.APPLE, 0xff1c2b, 1, Crop.FOOD);
-    public static final Crop GOLDEN_APPLE = vanilla("golden_apple", Items.GOLDEN_APPLE, 0xffffb0, 3, Crop.FOOD);
-    public static final Crop BREAD = vanilla("bread", Items.BREAD, 0x9e7325, 1, Crop.FOOD);
     public static final Crop EGG = vanilla("egg", Items.EGG, 0xdfce9b, 1, Crop.FOOD);
-    public static final Crop TURTLE_EGG = vanilla("turtle_egg", Items.TURTLE_EGG, 0x58ceaf, 1, Crop.FOOD);
-    public static final Crop SNIFFER_EGG = vanilla("sniffer_egg", Items.SNIFFER_EGG, 0xb1413f, 1, Crop.FOOD);
     public static final Crop TROPICAL_FISH = vanilla("clownfish", Items.TROPICAL_FISH, 0xf29965, 1, Crop.FOOD);
     public static final Crop PUFFER_FISH = vanilla("pufferfish", Items.PUFFERFISH, 0xc5b200, 1, Crop.FOOD);
     public static final Crop COOKIE = vanilla("cookie", Items.COOKIE, 0xd9833e, 1, Crop.FOOD);
-    public static final Crop CHORUS = vanilla("chorus", Items.CHORUS_FRUIT, 0xaa85aa, 3, Crop.FOOD);
     public static final Crop BEEF = vanilla("raw_beef", Items.BEEF, 0xe24940, 1, Crop.FOOD);
     public static final Crop PORKSHOP = vanilla("raw_porc", Items.PORKCHOP, 0xff8c8c, 1, Crop.FOOD);
     public static final Crop COD = vanilla("fish", Items.COD, 0xc6a271, 1, Crop.FOOD);
@@ -153,30 +135,56 @@ public class Crops {
     public static final Crop GREEN = vanilla("green", Items.GREEN_DYE, 0x7f0e, 1, Crop.CROP);
     public static final Crop RED = vanilla("red", Items.RED_DYE, 0xff0000, 1, Crop.CROP);
     public static final Crop BLACK = vanilla("black", Items.BLACK_DYE, 0x2d2d2d, 1, Crop.CROP);
-    public static final Crop TOTEM = vanilla("totem", Items.TOTEM_OF_UNDYING, 0xf8eea5, 6, Crop.CROP);
     public static final Crop TETHER = vanilla("tether", Items.LEAD, 0xac8e79, 1, Crop.CROP);
     public static final Crop NAME_TAG = vanilla("name_tag", Items.NAME_TAG, 0x7a7162, 1, Crop.CROP);
-    public static final Crop XP = vanilla("xp", Items.EXPERIENCE_BOTTLE, 0xbaff49, 4, Crop.CROP);
-    public static final Crop SEA = vanilla("sea", Items.HEART_OF_THE_SEA, 0x1f96b1, 4, Crop.CROP);
-    public static final Crop SCUTE = vanilla("scute", Items.TURTLE_SCUTE, 0x47bf4a, 2, Crop.ANIMAL);
-    public static final Crop NAUTILUS = vanilla("nautilus", Items.NAUTILUS_SHELL, 0xd4ccc3, 3, Crop.CROP);
-    public static final Crop PHANTOM = vanilla("phantom", Items.PHANTOM_MEMBRANE, 0xdcd9c0, 2, Crop.MONSTER);
-    public static final Crop WITHER = vanilla("wither", Items.WITHER_ROSE, 0x2a1f19, 5, Crop.MONSTER);
-    public static final Crop DRAGON = vanilla("dragon", Items.DRAGON_EGG, 0x2d0133, 7, Crop.MONSTER);
+    public static final Crop SCUTE = vanilla("scute", Items.TURTLE_SCUTE, 0x47bf4a, 1, Crop.ANIMAL);
     public static final Crop BLUE = vanilla("blue", Items.BLUE_DYE, 0x26ff, 1, Crop.CROP);
     public static final Crop INK = vanilla("ink", Items.INK_SAC, 0x353451, 1, Crop.ANIMAL);
     public static final Crop WHITE = vanilla("white", Items.WHITE_DYE, 0xffffff, 1, Crop.CROP);
     public static final Crop HONEYCOMB = vanilla("honeycomb", Items.HONEYCOMB, 0xfabf29, 1, Crop.ANIMAL);
-    public static final Crop NETHERITE = vanilla("netherite", Items.NETHERITE_INGOT, 0x654740, 5, Crop.CROP);
+    public static final Crop COPPER = vanilla("copper", Items.COPPER_INGOT, 0xfbc3b6, 1, Crop.CROP);
+
+    public static final Crop IRON = vanilla("iron", Items.IRON_INGOT, 0xd8d8d8, 2, Crop.CROP);
+    public static final Crop GOLD = vanilla("gold", Items.GOLD_INGOT, 0xffff8b, 2, Crop.CROP);
+    public static final Crop LAPIS = vanilla("lapis", Items.LAPIS_LAZULI, 0x7497ea, 2, Crop.CROP);
+    public static final Crop REDSTONE = vanilla("redstone", Items.REDSTONE, 0xff2626, 2, Crop.CROP);
+    public static final Crop QUARTZ = vanilla("quartz", Items.QUARTZ, 0xdfd8cf, 2, Crop.CROP);
+    public static final Crop SHARD = vanilla("shard", Items.PRISMARINE_SHARD, 0x73b5aa, 2, Crop.CROP);
+    public static final Crop CRYSTAL = vanilla("crystal", Items.PRISMARINE_CRYSTALS, 0xcbe7e0, 2, Crop.CROP);
+    public static final Crop ENDER = vanilla("ender", Items.ENDER_PEARL, 0x8cf4e2, 2, Crop.MONSTER);
+    public static final Crop FOOT = vanilla("foot", Items.RABBIT_FOOT, 0xcfa978, 2, Crop.ANIMAL);
+    public static final Crop BLAZE = vanilla("blaze", Items.BLAZE_ROD, 0xffcb00, 2, Crop.MONSTER);
+    public static final Crop GHAST = vanilla("ghast", Items.GHAST_TEAR, 0xe3fde8, 2, Crop.MONSTER);
+    public static final Crop MAGMA = vanilla("magma", Items.MAGMA_CREAM, 0xcea025, 2, Crop.MONSTER);
+    public static final Crop SLIME = vanilla("slime", Items.SLIME_BALL, 0x84c873, 2, Crop.MONSTER);
+    public static final Crop TURTLE_EGG = vanilla("turtle_egg", Items.TURTLE_EGG, 0x58ceaf, 2, Crop.FOOD);
+    public static final Crop SNIFFER_EGG = vanilla("sniffer_egg", Items.SNIFFER_EGG, 0xb1413f, 2, Crop.FOOD);
+    public static final Crop CHORUS = vanilla("chorus", Items.CHORUS_FRUIT, 0xaa85aa, 2, Crop.FOOD);
+    public static final Crop PHANTOM = vanilla("phantom", Items.PHANTOM_MEMBRANE, 0xdcd9c0, 2, Crop.MONSTER);
     public static final Crop GLOW_INK = vanilla("glowink", Items.GLOW_INK_SAC, 0x4bdeba, 2, Crop.ANIMAL);
-    public static final Crop COPPER = vanilla("copper", Items.COPPER_INGOT, 0xfbc3b6, 2, Crop.CROP);
-    public static final Crop AMETHYST = vanilla("amethyst", Items.AMETHYST_SHARD, 0xd9cbf2, 3, Crop.CROP);
-    public static final Crop ECHO_SHARD = vanilla("echo_shard", Items.ECHO_SHARD, 0x3404f, 4, Crop.MONSTER);
     public static final Crop ARMADILLO = vanilla("armadillo", Items.ARMADILLO_SCUTE, 0xc48682, 2, Crop.ANIMAL);
+    public static final Crop FROGSPAWN = vanilla("frogspawn", Items.FROGSPAWN, 0x7980c2, 2, Crop.ANIMAL);
+
+    public static final Crop DIAMOND = vanilla("diamond", Items.DIAMOND, 0x8cf4e2, 3, Crop.CROP);
+    public static final Crop EMERALD = vanilla("emerald", Items.EMERALD, 0x17dd62, 3, Crop.CROP);
+    public static final Crop GLOWSTONE = vanilla("glowstone", Items.GLOWSTONE, 0xffff00, 3, Crop.CROP);
+    public static final Crop SHELL = vanilla("shell", Items.SHULKER_SHELL, 0x9e749e, 3, Crop.MONSTER);
+    public static final Crop GOLDEN_APPLE = vanilla("golden_apple", Items.GOLDEN_APPLE, 0xffffb0, 3, Crop.FOOD);
+    public static final Crop XP = vanilla("xp", Items.EXPERIENCE_BOTTLE, 0xbaff49, 3, Crop.CROP);
+    public static final Crop NETHERITE = vanilla("netherite", Items.NETHERITE_INGOT, 0x654740, 3, Crop.CROP);
+    public static final Crop AMETHYST = vanilla("amethyst", Items.AMETHYST_SHARD, 0xd9cbf2, 3, Crop.CROP);
+    public static final Crop ECHO_SHARD = vanilla("echo_shard", Items.ECHO_SHARD, 0x3404f, 3, Crop.MONSTER);
+    public static final Crop BREEZE = vanilla("breeze", Items.BREEZE_ROD, 0x7980c2, 3, Crop.NATURE);
+
+    public static final Crop TOTEM = vanilla("totem", Items.TOTEM_OF_UNDYING, 0xf8eea5, 4, Crop.CROP);
+    public static final Crop SEA = vanilla("sea", Items.HEART_OF_THE_SEA, 0x1f96b1, 4, Crop.CROP);
+    public static final Crop NAUTILUS = vanilla("nautilus", Items.NAUTILUS_SHELL, 0xd4ccc3, 4, Crop.CROP);
+    public static final Crop WITHER = vanilla("wither", Items.WITHER_ROSE, 0x2a1f19, 4, Crop.MONSTER);
+
+    public static final Crop STAR = vanilla("star", Items.NETHER_STAR, 0xf0f3f3, 5, Crop.MONSTER);
+    public static final Crop DRAGON = vanilla("dragon", Items.DRAGON_EGG, 0x2d0133, 5, Crop.MONSTER);
     // Resin only in 1.21.4+
     // public static final Crop RESIN = vanilla("resin", Items.RESIN_CLUMP, 0xF0781B, 1, Crop.NATURE);
-    public static final Crop BREEZE = vanilla("breeze", Items.BREEZE_ROD, 0x7980c2, 3, Crop.NATURE);
-    public static final Crop FROGSPAWN = vanilla("frogspawn", Items.FROGSPAWN, 0x7980c2, 3, Crop.ANIMAL);
 
     /**
      * Add a crop from a modded material.
@@ -214,244 +222,244 @@ public class Crops {
         return "#c:dusts/" + name;
     }
 
-    public static final Crop ADAMANTITE = compat("adamantite", forIngot("adamantite"), 0xAD0E19, 3, Crop.CROP, Map.of(
+    public static final Crop ADAMANTITE = compat("adamantite", forIngot("adamantite"), 0xAD0E19, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.adamantite_ingot"
     ));
-    public static final Crop ALUMINUM = compat("aluminum", forIngot("aluminum"), 0x9E9E9E, 3, Crop.CROP, Map.of(
+    public static final Crop ALUMINUM = compat("aluminum", forIngot("aluminum"), 0x9E9E9E, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.aluminum_ingot",
         "modern_industrialization", "item.modern_industrialization.aluminum_ingot",
         "gtceu", "material.gtceu.aluminum"
     ));
-    public static final Crop AMERICIUM = compat("americium", forIngot("americium"), 0x7F8C8D, 3, Crop.CROP, Map.of(
+    public static final Crop AMERICIUM = compat("americium", forIngot("americium"), 0x7F8C8D, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.americium"
     ));
-    public static final Crop ANTIMONY = compat("antimony", forIngot("antimony"), 0x8A8A8A, 3, Crop.CROP, Map.of(
+    public static final Crop ANTIMONY = compat("antimony", forIngot("antimony"), 0x8A8A8A, 2, Crop.CROP, Map.of(
         "modern_industrialization", "item.modern_industrialization.antimony_ingot",
         "gtceu", "material.gtceu.antimony"
     ));
-    public static final Crop AQUARIUM = compat("aquarium", forIngot("aquarium"), 0x4392DC, 3, Crop.CROP, Map.of(
+    public static final Crop AQUARIUM = compat("aquarium", forIngot("aquarium"), 0x4392DC, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.aquarium_ingot"
     ));
-    public static final Crop BARONYTE = compat("baronyte", forIngot("baronyte"), 0xE56544, 3, Crop.CROP, Map.of(
+    public static final Crop BARONYTE = compat("baronyte", forIngot("baronyte"), 0xE56544, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.baronyte"
     ));
-    public static final Crop BANGLUM = compat("banglum", forIngot("banglum"), 0x734C28, 3, Crop.CROP, Map.of(
+    public static final Crop BANGLUM = compat("banglum", forIngot("banglum"), 0x734C28, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.banglum_ingot"
     ));
-    public static final Crop BERYLLIUM = compat("beryllium", forIngot("beryllium"), 0xA4C639, 3, Crop.CROP, Map.of(
+    public static final Crop BERYLLIUM = compat("beryllium", forIngot("beryllium"), 0xA4C639, 2, Crop.CROP, Map.of(
         "modern_industrialization", "item.modern_industrialization.beryllium_ingot",
         "gtceu", "material.gtceu.beryllium"
     ));
-    public static final Crop BISMUTH = compat("bismuth", forIngot("bismuth"), 0xB87333, 3, Crop.CROP, Map.of(
+    public static final Crop BISMUTH = compat("bismuth", forIngot("bismuth"), 0xB87333, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.bismuth"
     ));
-    public static final Crop BLAZIUM = compat("blazium", forIngot("blazium"), 0xFCEB6F, 3, Crop.CROP, Map.of(
+    public static final Crop BLAZIUM = compat("blazium", forIngot("blazium"), 0xFCEB6F, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.blazium_ingot"
     ));
-    public static final Crop BLOODSTONE = compat("bloodstone", forGem("bloodstone"), 0x9B0000, 3, Crop.CROP, Map.of(
+    public static final Crop BLOODSTONE = compat("bloodstone", forGem("bloodstone"), 0x9B0000, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.bloodstone"
     ));
-    public static final Crop CADMIUM = compat("cadmium", forIngot("cadmium"), 0x8B0000, 3, Crop.CROP, Map.of(
+    public static final Crop CADMIUM = compat("cadmium", forIngot("cadmium"), 0x8B0000, 2, Crop.CROP, Map.of(
         "modern_industrialization", "item.modern_industrialization.cadmium_ingot"
     ));
-    public static final Crop CALORITE = compat("calorite", forIngot("calorite"), 0x8B0000, 3, Crop.CROP, Map.of(
+    public static final Crop CALORITE = compat("calorite", forIngot("calorite"), 0x8B0000, 2, Crop.CROP, Map.of(
         "ad_astra", "item.ad_astra.calorite_ingot"
     ));
-    public static final Crop CARMOT = compat("carmot", forIngot("carmot"), 0xC1283F, 3, Crop.CROP, Map.of(
+    public static final Crop CARMOT = compat("carmot", forIngot("carmot"), 0xC1283F, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.carmot_ingot"
     ));
-    public static final Crop CELESTIUM = compat("celestium", forIngot("celestium"), 0xF7D3B6, 3, Crop.CROP, Map.of(
+    public static final Crop CELESTIUM = compat("celestium", forIngot("celestium"), 0xF7D3B6, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.celestium_ingot"
     ));
-    public static final Crop CERTUS = compat("certus", forGem("certus_quartz"), 0xB8D8FC, 3, Crop.CROP, Map.of(
+    public static final Crop CERTUS = compat("certus", forGem("certus_quartz"), 0xB8D8FC, 2, Crop.CROP, Map.of(
         "ae2", "item.ae2.certus_quartz_crystal"
     ));
-    public static final Crop CHROMIUM = compat("chromium", forIngot("chromium"), 0xE0E0E0, 3, Crop.CROP, Map.of(
+    public static final Crop CHROMIUM = compat("chromium", forIngot("chromium"), 0xE0E0E0, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.chrome_ingot",
         "modern_industrialization", "item.modern_industrialization.chromium_ingot",
         "gtceu", "material.gtceu.chromium"
     ));
-    public static final Crop COBALT = compat("cobalt", forIngot("cobalt"), 0x1E90FF, 3, Crop.CROP, Map.of(
+    public static final Crop COBALT = compat("cobalt", forIngot("cobalt"), 0x1E90FF, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.cobalt"
     ));
-    public static final Crop CRYSTALLITE = compat("crystallite", forGem("crystallite"), 0x9EB1C8, 3, Crop.CROP, Map.of(
+    public static final Crop CRYSTALLITE = compat("crystallite", forGem("crystallite"), 0x9EB1C8, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.crystallite"
     ));
-    public static final Crop DARMSTADTIUM = compat("darmstadtium", forIngot("darmstadtium"), 0xB67A56, 3, Crop.CROP, Map.of(
+    public static final Crop DARMSTADTIUM = compat("darmstadtium", forIngot("darmstadtium"), 0xB67A56, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.darmstadtium"
     ));
-    public static final Crop DESH = compat("desh", forIngot("desh"), 0x8B0000, 3, Crop.CROP, Map.of(
+    public static final Crop DESH = compat("desh", forIngot("desh"), 0x8B0000, 2, Crop.CROP, Map.of(
         "ad_astra", "item.ad_astra.desh_ingot"
     ));
-    public static final Crop DURASTEEL = compat("durasteel", forIngot("durasteel"), 0x4B4B4B, 3, Crop.CROP, Map.of(
+    public static final Crop DURASTEEL = compat("durasteel", forIngot("durasteel"), 0x4B4B4B, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.durasteel_ingot"
     ));
-    public static final Crop ELECANIUM = compat("elecanium", forIngot("elecanium"), 0x34ACDE, 3, Crop.CROP, Map.of(
+    public static final Crop ELECANIUM = compat("elecanium", forIngot("elecanium"), 0x34ACDE, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.elecanium_ingot"
     ));
-    public static final Crop EMBERSTONE = compat("emberstone", forIngot("emberstone"), 0xF17F22, 3, Crop.CROP, Map.of(
+    public static final Crop EMBERSTONE = compat("emberstone", forIngot("emberstone"), 0xF17F22, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.emberstone_ingot"
     ));
-    public static final Crop EUROPIUM = compat("europium", forIngot("europium"), 0xFFD700, 3, Crop.CROP, Map.of(
+    public static final Crop EUROPIUM = compat("europium", forIngot("europium"), 0xFFD700, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.europium"
     ));
-    public static final Crop FLUIX = compat("fluix", forGem("fluix"), 0x8F5CCB, 3, Crop.CROP, Map.of(
+    public static final Crop FLUIX = compat("fluix", forGem("fluix"), 0x8F5CCB, 2, Crop.CROP, Map.of(
         "ae2", "item.ae2.fluix_crystal"
     ));
-    public static final Crop GALLIUM = compat("gallium", forIngot("gallium"), 0xBCD2E8, 3, Crop.CROP, Map.of(
+    public static final Crop GALLIUM = compat("gallium", forIngot("gallium"), 0xBCD2E8, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.gallium"
     ));
-    public static final Crop GEMENYTE = compat("gemenyte", forGem("gemenyte"), 0x8F5CCB, 3, Crop.CROP, Map.of(
+    public static final Crop GEMENYTE = compat("gemenyte", forGem("gemenyte"), 0x8F5CCB, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.gemenyte"
     ));
-    public static final Crop GHASTLY = compat("ghastly", forIngot("ghastly"), 0xF8FC9C, 3, Crop.CROP, Map.of(
+    public static final Crop GHASTLY = compat("ghastly", forIngot("ghastly"), 0xF8FC9C, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.ghastly_ingot"
     ));
-    public static final Crop GHOULISH = compat("ghoulish", forIngot("ghoulish"), 0x7EA8FC, 3, Crop.CROP, Map.of(
+    public static final Crop GHOULISH = compat("ghoulish", forIngot("ghoulish"), 0x7EA8FC, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.ghoulish_ingot"
     ));
-    public static final Crop HALLOWED = compat("hallowed", forIngot("hallowed"), 0xFCF899, 3, Crop.CROP, Map.of(
+    public static final Crop HALLOWED = compat("hallowed", forIngot("hallowed"), 0xFCF899, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.hallowed_ingot"
     ));
-    public static final Crop INDIUM = compat("indium", forIngot("indium"), 0x4A7190, 3, Crop.CROP, Map.of(
+    public static final Crop INDIUM = compat("indium", forIngot("indium"), 0x4A7190, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.indium"
     ));
-    public static final Crop JADE = compat("jade", forGem("jade"), 0x8F5CCB, 3, Crop.CROP, Map.of(
+    public static final Crop JADE = compat("jade", forGem("jade"), 0x8F5CCB, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.jade"
     ));
-    public static final Crop JEWELYTE = compat("jewelyte", forGem("jewelyte"), 0x8F5CCB, 3, Crop.CROP, Map.of(
+    public static final Crop JEWELYTE = compat("jewelyte", forGem("jewelyte"), 0x8F5CCB, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.jewelyte"
     ));
-    public static final Crop KYBER = compat("kyber", forIngot("kyber"), 0xB275D7, 3, Crop.CROP, Map.of(
+    public static final Crop KYBER = compat("kyber", forIngot("kyber"), 0xB275D7, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.kyber_ingot"
     ));
-    public static final Crop LEAD = compat("lead", forIngot("lead"), 0x6F6B77, 3, Crop.CROP, Map.of(
+    public static final Crop LEAD = compat("lead", forIngot("lead"), 0x6F6B77, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.lead_ingot",
         "indrev", "item.indrev.lead_ingot",
         "modern_industrialization", "item.modern_industrialization.lead_ingot",
         "thermal_foundation", "item.thermal.lead_ingot",
         "gtceu", "material.gtceu.lead"
     ));
-    public static final Crop LIMONITE = compat("limonite", forIngot("limonite"), 0xE79353, 3, Crop.CROP, Map.of(
+    public static final Crop LIMONITE = compat("limonite", forIngot("limonite"), 0xE79353, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.limonite_ingot"
     ));
-    public static final Crop LITHIUM = compat("lithium", forIngot("lithium"), 0xC0C0C0, 3, Crop.CROP, Map.of(
+    public static final Crop LITHIUM = compat("lithium", forIngot("lithium"), 0xC0C0C0, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.lithium"
     ));
-    public static final Crop LUNAR = compat("lunar", forIngot("lunar"), 0xA32F9D, 3, Crop.CROP, Map.of(
+    public static final Crop LUNAR = compat("lunar", forIngot("lunar"), 0xA32F9D, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.lunar_ingot"
     ));
-    public static final Crop MANGANESE = compat("manganese", forIngot("manganese"), 0xEBBED6, 3, Crop.CROP, Map.of(
+    public static final Crop MANGANESE = compat("manganese", forIngot("manganese"), 0xEBBED6, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.manganese_ingot",
         "gtceu", "material.gtceu.manganese"
     ));
-    public static final Crop METALLURGIUM = compat("metallurgium", forIngot("metallurgium"), 0x5417B4, 3, Crop.CROP, Map.of(
+    public static final Crop METALLURGIUM = compat("metallurgium", forIngot("metallurgium"), 0x5417B4, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.metallurgium_ingot"
     ));
-    public static final Crop MIDAS_GOLD = compat("midas_gold", forIngot("midas_gold"), 0xFCDE80, 3, Crop.CROP, Map.of(
+    public static final Crop MIDAS_GOLD = compat("midas_gold", forIngot("midas_gold"), 0xFCDE80, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.midas_gold_ingot"
     ));
-    public static final Crop MOLYBDENUM = compat("molybdenum", forIngot("molybdenum"), 0x708090, 3, Crop.CROP, Map.of(
+    public static final Crop MOLYBDENUM = compat("molybdenum", forIngot("molybdenum"), 0x708090, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.molybdenum"
     ));
-    public static final Crop MONAZITE = compat("monazite", "#c:dusts/monazite", 0xFCC4B3, 3, Crop.CROP, Map.of(
+    public static final Crop MONAZITE = compat("monazite", "#c:dusts/monazite", 0xFCC4B3, 2, Crop.CROP, Map.of(
         "modern_industrialization", "item.modern_industrialization.monazite_dust"
     ));
-    public static final Crop MYSTITE = compat("mystite", forIngot("mystite"), 0xB3FCC4, 3, Crop.CROP, Map.of(
+    public static final Crop MYSTITE = compat("mystite", forIngot("mystite"), 0xB3FCC4, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.mystite_ingot"
     ));
-    public static final Crop MYTHRIL = compat("mythril", forIngot("mythril"), 0x63E7F8, 3, Crop.CROP, Map.of(
+    public static final Crop MYTHRIL = compat("mythril", forIngot("mythril"), 0x63E7F8, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.mythril_ingot"
     ));
-    public static final Crop NAQUADAH = compat("naquadah", forIngot("naquadah"), 0x556B2F, 3, Crop.CROP, Map.of(
+    public static final Crop NAQUADAH = compat("naquadah", forIngot("naquadah"), 0x556B2F, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.naquadah"
     ));
-    public static final Crop NEODYMIUM = compat("neodymium", forIngot("neodymium"), 0x7F7F7F, 3, Crop.CROP, Map.of(
+    public static final Crop NEODYMIUM = compat("neodymium", forIngot("neodymium"), 0x7F7F7F, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.neodymium"
     ));
-    public static final Crop NICKEL = compat("nickel", forIngot("nickel"), 0xAEAC8C, 3, Crop.CROP, Map.of(
+    public static final Crop NICKEL = compat("nickel", forIngot("nickel"), 0xAEAC8C, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.nickel_ingot",
         "modern_industrialization", "item.modern_industrialization.nickel_ingot",
         "thermal_foundation", "item.thermal.nickel_ingot",
         "gtceu", "material.gtceu.nickel"
     ));
-    public static final Crop NIOBIUM = compat("niobium", forIngot("niobium"), 0x8E44AD, 3, Crop.CROP, Map.of(
+    public static final Crop NIOBIUM = compat("niobium", forIngot("niobium"), 0x8E44AD, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.niobium"
     ));
-    public static final Crop IRIDIUM = compat("iridium", forIngot("iridium"), 0x8F9E9A, 3, Crop.CROP, Map.of(
+    public static final Crop IRIDIUM = compat("iridium", forIngot("iridium"), 0x8F9E9A, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.iridium_ingot",
         "modern_industrialization", "item.modern_industrialization.iridium_ingot"
     ));
-    public static final Crop ORICHALCUM = compat("orichalcum", forIngot("orichalcum"), 0x9EF1A5, 3, Crop.CROP, Map.of(
+    public static final Crop ORICHALCUM = compat("orichalcum", forIngot("orichalcum"), 0x9EF1A5, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.orichalcum_ingot"
     ));
-    public static final Crop ORNAMYTE = compat("ornamyte", forGem("ornamyte"), 0x8F5CCB, 3, Crop.CROP, Map.of(
+    public static final Crop ORNAMYTE = compat("ornamyte", forGem("ornamyte"), 0x8F5CCB, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.ornamyte"
     ));
-    public static final Crop OSMIUM = compat("osmium", forIngot("osmium"), 0x9EB1C8, 3, Crop.CROP, Map.of(
+    public static final Crop OSMIUM = compat("osmium", forIngot("osmium"), 0x9EB1C8, 2, Crop.CROP, Map.of(
         "mekanism", "item.mekanism.ingot_osmium",
         "mythicmetals", "item.mythicmetals.osmium_ingot"
     ));
-    public static final Crop OSTRUM = compat("ostrum", forIngot("ostrum"), 0x7F7F7F, 3, Crop.CROP, Map.of(
+    public static final Crop OSTRUM = compat("ostrum", forIngot("ostrum"), 0x7F7F7F, 2, Crop.CROP, Map.of(
         "ad_astra", "item.ad_astra.ostrum_ingot"
     ));
-    public static final Crop PALLADIUM = compat("palladium", forIngot("palladium"), 0xED9926, 3, Crop.CROP, Map.of(
+    public static final Crop PALLADIUM = compat("palladium", forIngot("palladium"), 0xED9926, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.palladium_ingot",
         "gtceu", "material.gtceu.palladium"
     ));
-    public static final Crop PERIDOT = compat("peridot", forGem("peridot"), 0xAAD26F, 3, Crop.CROP, Map.of(
+    public static final Crop PERIDOT = compat("peridot", forGem("peridot"), 0xAAD26F, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.peridot_gem"
     ));
-    public static final Crop PLATINUM = compat("platinum", forIngot("platinum"), 0xAABBC7, 3, Crop.CROP, Map.of(
+    public static final Crop PLATINUM = compat("platinum", forIngot("platinum"), 0xAABBC7, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.platinum_ingot",
         "mythicmetals", "item.mythicmetals.platinum_ingot",
         "modern_industrialization", "item.modern_industrialization.platinum_ingot",
         "gtceu", "material.gtceu.platinum"
     ));
-    public static final Crop PLUTONIUM = compat("plutonium", forIngot("plutonium"), 0x4CFF00, 3, Crop.CROP, Map.of(
+    public static final Crop PLUTONIUM = compat("plutonium", forIngot("plutonium"), 0x4CFF00, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.plutonium"
     ));
-    public static final Crop PROMETHEUM = compat("prometheum", forIngot("prometheum"), 0x396955, 3, Crop.CROP, Map.of(
+    public static final Crop PROMETHEUM = compat("prometheum", forIngot("prometheum"), 0x396955, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.prometheum_ingot"
     ));
-    public static final Crop QUADRILLUM = compat("quadrillum", forIngot("quadrillum"), 0x626E6E, 3, Crop.CROP, Map.of(
+    public static final Crop QUADRILLUM = compat("quadrillum", forIngot("quadrillum"), 0x626E6E, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.quadrillum_ingot"
     ));
-    public static final Crop RED_GARNET = compat("red_garnet", forGem("red_garnet"), 0xE66C67, 3, Crop.CROP, Map.of(
+    public static final Crop RED_GARNET = compat("red_garnet", forGem("red_garnet"), 0xE66C67, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.red_garnet_gem"
     ));
-    public static final Crop RHODIUM = compat("rhodium", forIngot("rhodium"), 0xB5BFC6, 3, Crop.CROP, Map.of(
+    public static final Crop RHODIUM = compat("rhodium", forIngot("rhodium"), 0xB5BFC6, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.rhodium"
     ));
-    public static final Crop ROSITE = compat("rosite", forIngot("rosite"), 0xF16B59, 3, Crop.CROP, Map.of(
+    public static final Crop ROSITE = compat("rosite", forIngot("rosite"), 0xF16B59, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.rosite_ingot"
     ));
-    public static final Crop RUBY = compat("ruby", forGem("ruby"), 0xC45E68, 3, Crop.CROP, Map.of(
+    public static final Crop RUBY = compat("ruby", forGem("ruby"), 0xC45E68, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.ruby_gem"
     ));
-    public static final Crop RUNITE = compat("runite", forIngot("runite"), 0x00AECE, 3, Crop.CROP, Map.of(
+    public static final Crop RUNITE = compat("runite", forIngot("runite"), 0x00AECE, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.runite_ingot"
     ));
-    public static final Crop RUTHENIUM = compat("ruthenium", forIngot("ruthenium"), 0x838B8B, 3, Crop.CROP, Map.of(
+    public static final Crop RUTHENIUM = compat("ruthenium", forIngot("ruthenium"), 0x838B8B, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.ruthenium"
     ));
     // special
-    public static final Crop SALT = compat("salt", "#c:dusts/salt", 0x8F9E9A, 3, Crop.CROP, Map.of(
+    public static final Crop SALT = compat("salt", "#c:dusts/salt", 0x8F9E9A, 2, Crop.CROP, Map.of(
         "modern_industrialization", "item.modern_industrialization.salt_dust"
     ));
-    public static final Crop SAMARIUM = compat("samarium", forIngot("samarium"), 0xFF4500, 3, Crop.CROP, Map.of(
+    public static final Crop SAMARIUM = compat("samarium", forIngot("samarium"), 0xFF4500, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.samarium"
     ));
-    public static final Crop SAPPHIRE = compat("sapphire", forGem("sapphire"), 0x6D9BEC, 3, Crop.CROP, Map.of(
+    public static final Crop SAPPHIRE = compat("sapphire", forGem("sapphire"), 0x6D9BEC, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.sapphire_gem"
     ));
-    public static final Crop SHYRESTONE = compat("shyrestone", forIngot("shyrestone"), 0xA1EAFC, 3, Crop.CROP, Map.of(
+    public static final Crop SHYRESTONE = compat("shyrestone", forIngot("shyrestone"), 0xA1EAFC, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.shyrestone_ingot"
     ));
-    public static final Crop SHYREGEM = compat("shyregem", forGem("shyregem"), 0xA1EAFC, 3, Crop.CROP, Map.of(
+    public static final Crop SHYREGEM = compat("shyregem", forGem("shyregem"), 0xA1EAFC, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.shyregem"
     ));
-    public static final Crop SILVER = compat("silver", forIngot("silver"), 0xD4E1E2, 3, Crop.CROP, Map.of(
+    public static final Crop SILVER = compat("silver", forIngot("silver"), 0xD4E1E2, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.silver_ingot",
         "indrev", "item.indrev.silver_ingot",
         "modern_industrialization", "item.modern_industrialization.silver_ingot",
@@ -459,25 +467,25 @@ public class Crops {
         "mythicmetals", "item.mythicmetals.silver_ingot",
         "gtceu", "material.gtceu.silver"
     ));
-    public static final Crop SILICON = compat("silicon", "#c:silicon", 0x66546D, 3, Crop.CROP, Map.of(
+    public static final Crop SILICON = compat("silicon", "#c:silicon", 0x66546D, 2, Crop.CROP, Map.of(
         "ae2", "item.ae2.silicon"
     ));
-    public static final Crop SKELETAL = compat("skeletal", forIngot("skeletal"), 0xB3A997, 3, Crop.CROP, Map.of(
+    public static final Crop SKELETAL = compat("skeletal", forIngot("skeletal"), 0xB3A997, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.skeletal_ingot"
     ));
-    public static final Crop STAR_PLATINUM = compat("star_platinum", forIngot("star_platinum"), 0xA199D3, 3, Crop.CROP, Map.of(
+    public static final Crop STAR_PLATINUM = compat("star_platinum", forIngot("star_platinum"), 0xA199D3, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.star_platinum"
     ));
-    public static final Crop STORMYX = compat("stormyx", forIngot("stormyx"), 0xE366DC, 3, Crop.CROP, Map.of(
+    public static final Crop STORMYX = compat("stormyx", forIngot("stormyx"), 0xE366DC, 2, Crop.CROP, Map.of(
         "mythicmetals", "item.mythicmetals.stormyx_ingot"
     ));
-    public static final Crop TANTALUM = compat("tantalum", forIngot("tantalum"), 0xA9A9A9, 3, Crop.CROP, Map.of(
+    public static final Crop TANTALUM = compat("tantalum", forIngot("tantalum"), 0xA9A9A9, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.tantalum"
     ));
-    public static final Crop THORIUM = compat("thorium", forIngot("thorium"), 0x00CED1, 3, Crop.CROP, Map.of(
+    public static final Crop THORIUM = compat("thorium", forIngot("thorium"), 0x00CED1, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.thorium"
     ));
-    public static final Crop TIN = compat("tin", forIngot("tin"), 0xE3E3E0, 3, Crop.CROP, Map.of(
+    public static final Crop TIN = compat("tin", forIngot("tin"), 0xE3E3E0, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.tin_ingot",
         "indrev", "item.indrev.tin_ingot",
         "modern_industrialization", "item.modern_industrialization.tin_ingot",
@@ -486,37 +494,37 @@ public class Crops {
         "mythicmetals", "item.mythicmetals.tin_ingot",
         "gtceu", "material.gtceu.tin"
     ));
-    public static final Crop TITANIUM = compat("titanium", forIngot("titanium"), 0xDDDDE3, 3, Crop.CROP, Map.of(
+    public static final Crop TITANIUM = compat("titanium", forIngot("titanium"), 0xDDDDE3, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.titanium_ingot",
         "modern_industrialization", "item.modern_industrialization.titanium_ingot",
         "gtceu", "material.gtceu.titanium"
     ));
-    public static final Crop TRINIUM = compat("trinium", forIngot("trinium"), 0x4682B4, 3, Crop.CROP, Map.of(
+    public static final Crop TRINIUM = compat("trinium", forIngot("trinium"), 0x4682B4, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.trinium"
     ));
-    public static final Crop TUNGSTEN = compat("tungsten", forIngot("tungsten"), 0x797D80, 3, Crop.CROP, Map.of(
+    public static final Crop TUNGSTEN = compat("tungsten", forIngot("tungsten"), 0x797D80, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.tungsten_ingot",
         "indrev", "item.indrev.tungsten_ingot",
         "modern_industrialization", "item.modern_industrialization.tungsten_ingot",
         "gtceu", "material.gtceu.tungsten"
     ));
-    public static final Crop URANIUM = compat("uranium", forIngot("uranium"), 0x32CE00, 3, Crop.CROP, Map.of(
+    public static final Crop URANIUM = compat("uranium", forIngot("uranium"), 0x32CE00, 2, Crop.CROP, Map.of(
         "modern_industrialization", "item.modern_industrialization.uranium_ingot",
         "mekanism", "item.mekanism.ingot_uranium"
     ));
-    public static final Crop VANADIUM = compat("vanadium", forIngot("vanadium"), 0x228B22, 3, Crop.CROP, Map.of(
+    public static final Crop VANADIUM = compat("vanadium", forIngot("vanadium"), 0x228B22, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.vanadium"
     ));
-    public static final Crop VARSIUM = compat("varsium", forIngot("varsium"), 0xDABF59, 3, Crop.CROP, Map.of(
+    public static final Crop VARSIUM = compat("varsium", forIngot("varsium"), 0xDABF59, 2, Crop.CROP, Map.of(
         "aoa3", "item.aoa3.varsium_ingot"
     ));
-    public static final Crop YELLOW_GARNET = compat("yellow_garnet", forGem("yellow_garnet"), 0xEACB5F, 3, Crop.CROP, Map.of(
+    public static final Crop YELLOW_GARNET = compat("yellow_garnet", forGem("yellow_garnet"), 0xEACB5F, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.yellow_garnet_gem"
     ));
-    public static final Crop YTTRIUM = compat("yttrium", forIngot("yttrium"), 0xFF6347, 3, Crop.CROP, Map.of(
+    public static final Crop YTTRIUM = compat("yttrium", forIngot("yttrium"), 0xFF6347, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.yttrium"
     ));
-    public static final Crop ZINC = compat("zinc", forIngot("zinc"), 0xEDEEEC, 3, Crop.CROP, Map.of(
+    public static final Crop ZINC = compat("zinc", forIngot("zinc"), 0xEDEEEC, 2, Crop.CROP, Map.of(
         "techreborn", "item.techreborn.zinc_ingot",
         "create", "item.create.zinc_ingot"
     ));
