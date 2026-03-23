@@ -10,6 +10,11 @@ archives_name = "$archives_name-$minecraft_version"
 
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
+    runs {
+        server {
+            source sourceSets.test
+        }
+    }
 }
 
 architectury {
