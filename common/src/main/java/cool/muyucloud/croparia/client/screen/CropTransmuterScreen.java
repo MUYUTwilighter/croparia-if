@@ -1,7 +1,7 @@
 package cool.muyucloud.croparia.client.screen;
 
-import cool.muyucloud.croparia.api.core.menu.MaterialExtractorMenu;
-import cool.muyucloud.croparia.api.core.network.MaterialExtractorSelectPacket;
+import cool.muyucloud.croparia.api.core.menu.CropTransmuterMenu;
+import cool.muyucloud.croparia.api.core.network.CropTransmuter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class MaterialExtractorScreen extends AbstractContainerScreen<MaterialExtractorMenu> {
+public class MaterialExtractorScreen extends AbstractContainerScreen<CropTransmuterMenu> {
     private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace(
         "textures/gui/container/dispenser.png"
     );
@@ -28,7 +28,7 @@ public class MaterialExtractorScreen extends AbstractContainerScreen<MaterialExt
     private Button prevButton;
     private Button nextButton;
 
-    public MaterialExtractorScreen(MaterialExtractorMenu menu, Inventory inventory, Component title) {
+    public MaterialExtractorScreen(CropTransmuterMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = BASE_WIDTH + PANEL_WIDTH + 8;
         this.imageHeight = 166;
@@ -175,7 +175,7 @@ public class MaterialExtractorScreen extends AbstractContainerScreen<MaterialExt
                 ItemStack stack = candidates.get(i);
                 ResourceLocation id = stack.getItem().arch$registryName();
                 if (id != null && menu.getBlockPos() != null) {
-                    new MaterialExtractorSelectPacket(menu.getBlockPos(), id).send();
+                    new CropTransmuter(menu.getBlockPos(), id).send();
                 }
                 return true;
             }

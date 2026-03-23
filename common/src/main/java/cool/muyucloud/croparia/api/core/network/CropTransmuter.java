@@ -1,8 +1,8 @@
 package cool.muyucloud.croparia.api.core.network;
 
 import cool.muyucloud.croparia.CropariaIf;
-import cool.muyucloud.croparia.api.core.block.entity.MaterialExtractorBlockEntity;
-import cool.muyucloud.croparia.api.core.menu.MaterialExtractorMenu;
+import cool.muyucloud.croparia.api.core.block.entity.CropTransmuterBlockEntity;
+import cool.muyucloud.croparia.api.core.menu.CropTransmuterMenu;
 import cool.muyucloud.croparia.api.crop.util.Material;
 import cool.muyucloud.croparia.api.network.NetworkHandler;
 import cool.muyucloud.croparia.api.network.NetworkHandlerType;
@@ -37,15 +37,15 @@ public record MaterialExtractorSelectPacket(BlockPos pos, ResourceLocation selec
     public void handle(NetworkManager.PacketContext context) {
         context.queue(() -> {
             if (!(context.getPlayer() instanceof ServerPlayer player)) return;
-            if (!(player.containerMenu instanceof MaterialExtractorMenu menu)) return;
+            if (!(player.containerMenu instanceof CropTransmuterMenu menu)) return;
             if (menu.getBlockPos() == null || !menu.getBlockPos().equals(pos)) return;
             BlockEntity be = player.level().getBlockEntity(pos);
-            if (!(be instanceof MaterialExtractorBlockEntity extractor)) return;
-            Material<?> material = MaterialExtractorBlockEntity.materialFromInput(
-                extractor.getItem(MaterialExtractorBlockEntity.INPUT_SLOT)
+            if (!(be instanceof CropTransmuterBlockEntity extractor)) return;
+            Material<?> material = CropTransmuterBlockEntity.materialFromInput(
+                extractor.getItem(CropTransmuterBlockEntity.INPUT_SLOT)
             );
             if (material == null || !material.isTag()) return;
-            Set<ResourceLocation> candidates = MaterialExtractorBlockEntity.candidateItemIds(material);
+            Set<ResourceLocation> candidates = CropTransmuterBlockEntity.candidateItemIds(material);
             if (!candidates.contains(selectedId)) return;
             extractor.setSelectedOutput(material.getName(), selectedId);
         });
