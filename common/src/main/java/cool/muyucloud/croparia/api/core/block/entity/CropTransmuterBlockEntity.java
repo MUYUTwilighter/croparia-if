@@ -238,8 +238,8 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public void onLoad() {
-        super.onLoad();
+    public void setLevel(@NotNull Level level) {
+        super.setLevel(level);
         refreshSelection(false);
     }
 
