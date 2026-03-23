@@ -47,6 +47,10 @@ public class CropariaItems {
         "greenhouse",
         properties -> new GreenhouseItem(CropariaBlocks.GREENHOUSE.get(), properties.arch$tab(Tabs.MAIN))
     );
+    public static final RegistrySupplier<BlockItem> MATERIAL_EXTRACTOR = registerItem(
+        "material_extractor",
+        properties -> new BlockItem(CropariaBlocks.MATERIAL_EXTRACTOR.get(), properties.arch$tab(Tabs.MAIN))
+    );
     public static final RegistrySupplier<BlockItem> INFUSOR = registerItem(
         "infusor", properties -> new BlockItem(CropariaBlocks.INFUSOR.get(), properties.arch$tab(Tabs.MAIN))
     );

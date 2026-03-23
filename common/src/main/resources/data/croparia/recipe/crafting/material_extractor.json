@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "C": {
+      "item": "croparia:croparia"
+    }
+  },
+  "pattern": [
+    "IRI",
+    "GCG",
+    "IRI"
+  ],
+  "result": {
+    "id": "croparia:material_extractor"
+  }
+}

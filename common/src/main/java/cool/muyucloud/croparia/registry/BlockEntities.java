@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.registry;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.block.entity.ActivatedShriekerBlockEntity;
 import cool.muyucloud.croparia.api.core.block.entity.GreenhouseBlockEntity;
+import cool.muyucloud.croparia.api.core.block.entity.MaterialExtractorBlockEntity;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.Util;
@@ -24,6 +25,11 @@ public class BlockEntities {
         "greenhouse",
         GreenhouseBlockEntity::new,
         Set.of(CropariaBlocks.GREENHOUSE)
+    );
+    public static final RegistrySupplier<BlockEntityType<MaterialExtractorBlockEntity>> MATERIAL_EXTRACTOR = register(
+        "material_extractor",
+        MaterialExtractorBlockEntity::new,
+        Set.of(CropariaBlocks.MATERIAL_EXTRACTOR)
     );
     public static final RegistrySupplier<BlockEntityType<ActivatedShriekerBlockEntity>> ACTIVATED_SHRIEKER = register(
         "activated_shrieker",

@@ -49,6 +49,7 @@ public class CropariaIf {
         CropariaFluids.register();
         CropariaBlocks.register();
         BlockEntities.register();
+        MenuTypes.register();
         CropariaItems.register();
         Recipes.register();
         Tabs.register();

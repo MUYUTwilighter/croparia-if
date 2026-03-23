@@ -126,7 +126,7 @@
 - 支持嵌套字段、列表、映射、codec 映射、扩展占位符
 
 ### 4.7 `api.core.*`（游戏实现 API）
-- `core.block`：`Infusor`、`RitualStand`、`ElementalStone`、`Greenhouse`
+- `core.block`：`Infusor`、`RitualStand`、`ElementalStone`、`Greenhouse`、`MaterialExtractor`（作物果实 -> 材料选择输出）
 - `core.block.entity`：温室库存与自动收获逻辑
 - `core.item`：`RecipeWizard`、温室方块物品
 - `core.item.relic`：遗物道具逻辑
@@ -228,4 +228,3 @@ Croparia IF 的 `api` 层本质上是一个“可扩展的玩法 DSL 运行时�
 - 新增/调整作物与配方 JSON
 - 扩展 `RecipeWizardGenerator` 占位符
 - 复用 `Repo` 接口接入自定义机器与物流
-
