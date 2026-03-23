@@ -1,9 +1,12 @@
 package cool.muyucloud.croparia.neoforge.gametest;
 
+import cool.muyucloud.croparia.CropariaIf;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.gametest.framework.GameTestHolder;
 
 @SuppressWarnings("unused")
+@GameTestHolder(CropariaIf.MOD_ID)
 public final class CropariaNeoForgeGameTests {
     private CropariaNeoForgeGameTests() {
     }
@@ -16,7 +19,7 @@ public final class CropariaNeoForgeGameTests {
      * </p>
      */
     @GameTest(template = "minecraft:empty")
-    public static void sanity(GameTestHelper helper) {
+    public static void sanity_bootstrap(GameTestHelper helper) {
         helper.succeed();
     }
 }
