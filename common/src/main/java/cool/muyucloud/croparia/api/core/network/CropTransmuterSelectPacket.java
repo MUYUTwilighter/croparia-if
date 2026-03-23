@@ -44,7 +44,7 @@ public record CropTransmuterSelectPacket(BlockPos pos, ResourceLocation selected
             Material<?> material = CropTransmuterBlockEntity.materialFromInput(
                 extractor.getItem(CropTransmuterBlockEntity.INPUT_SLOT)
             );
-            if (material == null || !material.isTag()) return;
+            if (material == null) return;
             Set<ResourceLocation> candidates = CropTransmuterBlockEntity.candidateItemIds(material);
             if (!candidates.contains(selectedId)) return;
             extractor.setSelectedOutput(material.getName(), selectedId);

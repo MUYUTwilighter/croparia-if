@@ -58,21 +58,13 @@ public class CropTransmuterMenu extends AbstractContainerMenu {
     private record Resolved(@Nullable CropTransmuterBlockEntity blockEntity, BlockPos pos) {}
 
     private void addSlots(Inventory playerInventory) {
-        this.addSlot(new Slot(container, CropTransmuterBlockEntity.INPUT_SLOT, 26, 18));
-        int outputStart = CropTransmuterBlockEntity.OUTPUT_START;
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                int index = outputStart + col + row * 3;
-                int x = 62 + col * 18;
-                int y = 18 + row * 18;
-                this.addSlot(new Slot(container, index, x, y) {
-                    @Override
-                    public boolean mayPlace(@NotNull ItemStack stack) {
-                        return false;
-                    }
-                });
+        this.addSlot(new Slot(container, CropTransmuterBlockEntity.INPUT_SLOT, 20, 35));
+        this.addSlot(new Slot(container, CropTransmuterBlockEntity.OUTPUT_SLOT, 138, 35) {
+            @Override
+            public boolean mayPlace(@NotNull ItemStack stack) {
+                return false;
             }
-        }
+        });
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 this.addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
@@ -135,9 +127,8 @@ public class CropTransmuterMenu extends AbstractContainerMenu {
         return CropTransmuterBlockEntity.candidateItemStacks(material);
     }
 
-    public boolean isSelectionRequired() {
-        Material<?> material = getCurrentMaterial();
-        return material != null && material.isTag();
+    public boolean hasMaterial() {
+        return getCurrentMaterial() != null;
     }
 
     public @Nullable String getCurrentMaterialKey() {

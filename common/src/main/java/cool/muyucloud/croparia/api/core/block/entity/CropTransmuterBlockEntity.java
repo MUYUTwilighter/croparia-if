@@ -37,8 +37,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.WorldlyContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,11 +50,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvider, Container, ExtendedMenuProvider {
+public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvider, Container, WorldlyContainer, ExtendedMenuProvider {
     public static final int INPUT_SLOT = 0;
-    public static final int OUTPUT_START = 1;
-    public static final int OUTPUT_COUNT = 9;
-    public static final int INVENTORY_SIZE = OUTPUT_START + OUTPUT_COUNT;
+    public static final int OUTPUT_SLOT = 1;
+    public static final int INVENTORY_SIZE = 2;
 
     private static final String NBT_SELECTED_MATERIAL = "SelectedMaterial";
     private static final String NBT_SELECTED_OUTPUT = "SelectedOutput";
@@ -138,9 +139,6 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     private ItemStack resolveOutput(Material<?> material) {
-        if (!material.isTag()) {
-            return material.asItem();
-        }
         String materialKey = material.getName();
         if (!Objects.equals(materialKey, this.selectedMaterialKey) || this.selectedOutputId == null) {
             return ItemStack.EMPTY;
@@ -168,39 +166,26 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     private boolean insertIntoOutput(ItemStack stack) {
-        for (int i = OUTPUT_START; i < OUTPUT_START + OUTPUT_COUNT; i++) {
-            ItemStack stored = this.getItem(i);
-            if (stored.isEmpty()) {
-                this.setItem(i, stack.copy());
-                return true;
-            }
-            if (ItemStack.isSameItemSameComponents(stored, stack)) {
-                int max = Math.min(stored.getMaxStackSize(), this.getMaxStackSize());
-                int room = max - stored.getCount();
-                if (room <= 0) continue;
-                int toMove = Math.min(room, stack.getCount());
-                stored.grow(toMove);
-                stack.shrink(toMove);
-                this.setItem(i, stored);
-                if (stack.isEmpty()) {
-                    return true;
-                }
-            }
+        ItemStack stored = this.getItem(OUTPUT_SLOT);
+        if (stored.isEmpty()) {
+            this.setItem(OUTPUT_SLOT, stack.copy());
+            return true;
         }
+        if (!ItemStack.isSameItemSameComponents(stored, stack)) {
+            return false;
+        }
+        int max = Math.min(stored.getMaxStackSize(), this.getMaxStackSize());
+        int room = max - stored.getCount();
+        if (room <= 0) return false;
+        int toMove = Math.min(room, stack.getCount());
+        stored.grow(toMove);
+        stack.shrink(toMove);
+        this.setItem(OUTPUT_SLOT, stored);
         return stack.isEmpty();
     }
 
     public boolean setSelectedOutput(@NotNull String materialKey, @NotNull ResourceLocation outputId) {
-        if (Objects.equals(this.selectedMaterialKey, materialKey) && Objects.equals(this.selectedOutputId, outputId)) {
-            return false;
-        }
-        this.selectedMaterialKey = materialKey;
-        this.selectedOutputId = outputId;
-        this.setChanged();
-        if (this.level != null) {
-            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
-        }
-        return true;
+        return setSelectedOutputInternal(materialKey, outputId, true);
     }
 
     public @Nullable ResourceLocation getSelectedOutputIdFor(@Nullable String materialKey) {
@@ -252,6 +237,12 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        refreshSelection(false);
+    }
+
+    @Override
     public @NotNull CompoundTag getUpdateTag(HolderLookup.Provider provider) {
         return this.saveWithoutMetadata(provider);
     }
@@ -298,12 +289,34 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
         }
         this.setChanged();
         this.inventory.set(slot, stack);
+        if (slot == INPUT_SLOT) {
+            refreshSelection(true);
+        }
     }
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
         if (slot != INPUT_SLOT) return false;
         return cropFromInput(stack) != null;
+    }
+
+    @Override
+    public int @NotNull [] getSlotsForFace(@NotNull Direction side) {
+        if (side == Direction.DOWN) {
+            return new int[]{OUTPUT_SLOT};
+        }
+        return new int[]{INPUT_SLOT};
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int slot, @NotNull ItemStack stack, @Nullable Direction direction) {
+        if (direction == Direction.DOWN) return false;
+        return slot == INPUT_SLOT && cropFromInput(stack) != null;
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int slot, @NotNull ItemStack stack, @NotNull Direction direction) {
+        return direction == Direction.DOWN && slot == OUTPUT_SLOT;
     }
 
     @Override
@@ -340,6 +353,60 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
         return new CropTransmuterMenu(syncId, inv, this);
     }
 
+    private void refreshSelection(boolean notify) {
+        Material<?> material = materialFromInput(getItem(INPUT_SLOT));
+        if (material == null) {
+            if (selectedMaterialKey != null || selectedOutputId != null) {
+                selectedMaterialKey = null;
+                selectedOutputId = null;
+                if (notify) {
+                    setChanged();
+                    if (level != null) {
+                        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+                    }
+                }
+            }
+            return;
+        }
+        List<ItemStack> candidates = candidateItemStacks(material);
+        if (candidates.isEmpty()) {
+            if (selectedMaterialKey != null || selectedOutputId != null) {
+                selectedMaterialKey = null;
+                selectedOutputId = null;
+                if (notify) {
+                    setChanged();
+                    if (level != null) {
+                        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+                    }
+                }
+            }
+            return;
+        }
+        ResourceLocation first = candidates.getFirst().getItem().arch$registryName();
+        if (first == null) return;
+        boolean valid = Objects.equals(material.getName(), selectedMaterialKey)
+            && selectedOutputId != null
+            && candidateItemIds(material).contains(selectedOutputId);
+        if (!valid) {
+            setSelectedOutputInternal(material.getName(), first, notify);
+        }
+    }
+
+    private boolean setSelectedOutputInternal(@NotNull String materialKey, @NotNull ResourceLocation outputId, boolean notify) {
+        if (Objects.equals(this.selectedMaterialKey, materialKey) && Objects.equals(this.selectedOutputId, outputId)) {
+            return false;
+        }
+        this.selectedMaterialKey = materialKey;
+        this.selectedOutputId = outputId;
+        if (notify) {
+            this.setChanged();
+            if (this.level != null) {
+                this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
+            }
+        }
+        return true;
+    }
+
     private static final class ExtractorRepo implements Repo<ItemSpec> {
         private final CropTransmuterBlockEntity entity;
 
@@ -369,7 +436,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
 
         @Override
         public long simConsume(int i, ItemSpec resource, long amount) {
-            if (i == INPUT_SLOT) return 0;
+            if (i != OUTPUT_SLOT) return 0;
             ItemStack stack = entity.getItem(i);
             if (!resource.is(stack)) return 0;
             return Math.min(amount, stack.getCount());
@@ -377,7 +444,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
 
         @Override
         public long consume(int i, ItemSpec resource, long amount) {
-            if (i == INPUT_SLOT) return 0;
+            if (i != OUTPUT_SLOT) return 0;
             ItemStack stack = entity.getItem(i);
             if (!resource.is(stack)) return 0;
             int stored = stack.getCount();

@@ -138,6 +138,7 @@
   "gui.croparia.infusor.title": "Elemental Infuse",
   "gui.croparia.soak.title": "Elemental Soak",
   "gui.croparia.crop_transmuter.select": "Select Output",
+  "gui.croparia.crop_transmuter.no_input": "Insert a crop fruit",
   "gui.croparia.crop_transmuter.no_selection": "Select an output item",
   "gui.croparia.crop_transmuter.auto_output": "Output is fixed by crop material",
   "item.croparia.croparia": "Croparia",
