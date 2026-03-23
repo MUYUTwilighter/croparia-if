@@ -126,7 +126,7 @@
 - 支持嵌套字段、列表、映射、codec 映射、扩展占位符
 
 ### 4.7 `api.core.*`（游戏实现 API）
-- `core.block`：`Infusor`、`RitualStand`、`ElementalStone`、`Greenhouse`、`MaterialExtractor`（作物果实 -> 材料选择输出）
+- `core.block`：`Infusor`、`RitualStand`、`ElementalStone`、`Greenhouse`、`CropTransmuter`（作物果实 -> 材料选择输出）
 - `core.block.entity`：温室库存与自动收获逻辑
 - `core.item`：`RecipeWizard`、温室方块物品
 - `core.item.relic`：遗物道具逻辑

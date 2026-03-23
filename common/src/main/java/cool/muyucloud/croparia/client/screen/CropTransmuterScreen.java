@@ -1,7 +1,7 @@
 package cool.muyucloud.croparia.client.screen;
 
 import cool.muyucloud.croparia.api.core.menu.CropTransmuterMenu;
-import cool.muyucloud.croparia.api.core.network.CropTransmuter;
+import cool.muyucloud.croparia.api.core.network.CropTransmuterSelectPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class MaterialExtractorScreen extends AbstractContainerScreen<CropTransmuterMenu> {
+public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuterMenu> {
     private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace(
         "textures/gui/container/dispenser.png"
     );
@@ -28,7 +28,7 @@ public class MaterialExtractorScreen extends AbstractContainerScreen<CropTransmu
     private Button prevButton;
     private Button nextButton;
 
-    public MaterialExtractorScreen(CropTransmuterMenu menu, Inventory inventory, Component title) {
+    public CropTransmuterScreen(CropTransmuterMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = BASE_WIDTH + PANEL_WIDTH + 8;
         this.imageHeight = 166;
@@ -62,7 +62,7 @@ public class MaterialExtractorScreen extends AbstractContainerScreen<CropTransmu
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         graphics.drawString(this.font, this.title, 8, 6, 0x404040, false);
         graphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 94, 0x404040, false);
-        graphics.drawString(this.font, Component.translatable("gui.croparia.material_extractor.select"), panelLeft() + 4, panelTop(), 0x404040, false);
+        graphics.drawString(this.font, Component.translatable("gui.croparia.crop_transmuter.select"), panelLeft() + 4, panelTop(), 0x404040, false);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class MaterialExtractorScreen extends AbstractContainerScreen<CropTransmu
         if (!menu.isSelectionRequired()) {
             graphics.drawString(
                 this.font,
-                Component.translatable("gui.croparia.material_extractor.auto_output"),
+                Component.translatable("gui.croparia.crop_transmuter.auto_output"),
                 left + PANEL_PADDING,
                 top + PANEL_PADDING + 4,
                 0xB0B0B0,
@@ -119,7 +119,7 @@ public class MaterialExtractorScreen extends AbstractContainerScreen<CropTransmu
         if (candidates.isEmpty()) {
             graphics.drawString(
                 this.font,
-                Component.translatable("gui.croparia.material_extractor.no_selection"),
+                Component.translatable("gui.croparia.crop_transmuter.no_selection"),
                 left + PANEL_PADDING,
                 top + PANEL_PADDING + 4,
                 0xB0B0B0,
@@ -175,7 +175,7 @@ public class MaterialExtractorScreen extends AbstractContainerScreen<CropTransmu
                 ItemStack stack = candidates.get(i);
                 ResourceLocation id = stack.getItem().arch$registryName();
                 if (id != null && menu.getBlockPos() != null) {
-                    new CropTransmuter(menu.getBlockPos(), id).send();
+                    new CropTransmuterSelectPacket(menu.getBlockPos(), id).send();
                 }
                 return true;
             }

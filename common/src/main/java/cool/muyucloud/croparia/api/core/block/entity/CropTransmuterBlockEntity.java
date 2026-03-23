@@ -5,7 +5,7 @@ import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.api.crop.util.BlockMaterial;
 import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
 import cool.muyucloud.croparia.api.crop.util.Material;
-import cool.muyucloud.croparia.api.core.menu.MaterialExtractorMenu;
+import cool.muyucloud.croparia.api.core.menu.CropTransmuterMenu;
 import cool.muyucloud.croparia.api.repo.Repo;
 import cool.muyucloud.croparia.api.repo.RepoProxy;
 import cool.muyucloud.croparia.api.resource.TypeToken;
@@ -13,11 +13,13 @@ import cool.muyucloud.croparia.api.resource.type.ItemSpec;
 import cool.muyucloud.croparia.registry.BlockEntities;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.text.Texts;
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -46,7 +48,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class MaterialExtractorBlockEntity extends BlockEntity implements MenuProvider, Container {
+public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvider, Container, ExtendedMenuProvider {
     public static final int INPUT_SLOT = 0;
     public static final int OUTPUT_START = 1;
     public static final int OUTPUT_COUNT = 9;
@@ -60,12 +62,12 @@ public class MaterialExtractorBlockEntity extends BlockEntity implements MenuPro
     private @Nullable String selectedMaterialKey = null;
     private @Nullable ResourceLocation selectedOutputId = null;
 
-    public MaterialExtractorBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntities.MATERIAL_EXTRACTOR.get(), pos, state);
+    public CropTransmuterBlockEntity(BlockPos pos, BlockState state) {
+        super(BlockEntities.CROP_TRANSMUTER.get(), pos, state);
         this.inventory = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
     }
 
-    public static void serverTick(Level level, BlockPos pos, BlockState state, MaterialExtractorBlockEntity blockEntity) {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, CropTransmuterBlockEntity blockEntity) {
         if (!(level instanceof ServerLevel serverLevel)) return;
         if (!serverLevel.hasNeighborSignal(pos)) return;
         blockEntity.tryProcess(serverLevel);
@@ -325,18 +327,23 @@ public class MaterialExtractorBlockEntity extends BlockEntity implements MenuPro
 
     @Override
     public @NotNull Component getDisplayName() {
-        return Texts.translatable("container.croparia.material_extractor");
+        return Texts.translatable("container.croparia.crop_transmuter");
+    }
+
+    @Override
+    public void saveExtraData(FriendlyByteBuf buf) {
+        buf.writeBlockPos(this.worldPosition);
     }
 
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
-        return new MaterialExtractorMenu(syncId, inv, this);
+        return new CropTransmuterMenu(syncId, inv, this);
     }
 
     private static final class ExtractorRepo implements Repo<ItemSpec> {
-        private final MaterialExtractorBlockEntity entity;
+        private final CropTransmuterBlockEntity entity;
 
-        private ExtractorRepo(MaterialExtractorBlockEntity entity) {
+        private ExtractorRepo(CropTransmuterBlockEntity entity) {
             this.entity = entity;
         }
 

@@ -17,16 +17,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public record MaterialExtractorSelectPacket(BlockPos pos, ResourceLocation selectedId) implements NetworkHandler {
-    public static final StreamCodec<RegistryFriendlyByteBuf, MaterialExtractorSelectPacket> STREAM_CODEC = StreamCodec.of(
+public record CropTransmuterSelectPacket(BlockPos pos, ResourceLocation selectedId) implements NetworkHandler {
+    public static final StreamCodec<RegistryFriendlyByteBuf, CropTransmuterSelectPacket> STREAM_CODEC = StreamCodec.of(
         (buf, payload) -> {
             buf.writeBlockPos(payload.pos);
             buf.writeResourceLocation(payload.selectedId);
         },
-        buf -> new MaterialExtractorSelectPacket(buf.readBlockPos(), buf.readResourceLocation())
+        buf -> new CropTransmuterSelectPacket(buf.readBlockPos(), buf.readResourceLocation())
     );
-    public static final NetworkHandlerType<MaterialExtractorSelectPacket> TYPE =
-        NetworkHandlerType.ofC2S(CropariaIf.of("material_extractor_select"), STREAM_CODEC);
+    public static final NetworkHandlerType<CropTransmuterSelectPacket> TYPE =
+        NetworkHandlerType.ofC2S(CropariaIf.of("crop_transmuter_select"), STREAM_CODEC);
 
     @Override
     public @NotNull NetworkHandlerType<?> handlerType() {

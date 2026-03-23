@@ -1,6 +1,6 @@
 package cool.muyucloud.croparia.api.core.menu;
 
-import cool.muyucloud.croparia.api.core.block.entity.MaterialExtractorBlockEntity;
+import cool.muyucloud.croparia.api.core.block.entity.CropTransmuterBlockEntity;
 import cool.muyucloud.croparia.api.crop.util.Material;
 import cool.muyucloud.croparia.registry.MenuTypes;
 import net.minecraft.core.BlockPos;
@@ -19,29 +19,29 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MaterialExtractorMenu extends AbstractContainerMenu {
+public class CropTransmuterMenu extends AbstractContainerMenu {
     private final Container container;
-    private final @Nullable MaterialExtractorBlockEntity blockEntity;
+    private final @Nullable CropTransmuterBlockEntity blockEntity;
     private final BlockPos pos;
 
-    public MaterialExtractorMenu(int syncId, Inventory inventory, MaterialExtractorBlockEntity blockEntity) {
+    public CropTransmuterMenu(int syncId, Inventory inventory, CropTransmuterBlockEntity blockEntity) {
         this(syncId, inventory, blockEntity, blockEntity.getBlockPos());
     }
 
-    public MaterialExtractorMenu(int syncId, Inventory inventory, FriendlyByteBuf buf) {
+    public CropTransmuterMenu(int syncId, Inventory inventory, FriendlyByteBuf buf) {
         this(syncId, inventory, resolveBlockEntity(inventory, buf));
     }
 
-    private MaterialExtractorMenu(int syncId, Inventory inventory, Resolved resolved) {
+    private CropTransmuterMenu(int syncId, Inventory inventory, Resolved resolved) {
         this(syncId, inventory, resolved.blockEntity, resolved.pos);
     }
 
-    private MaterialExtractorMenu(int syncId, Inventory inventory, @Nullable MaterialExtractorBlockEntity blockEntity, BlockPos pos) {
-        super(MenuTypes.MATERIAL_EXTRACTOR.get(), syncId);
+    private CropTransmuterMenu(int syncId, Inventory inventory, @Nullable CropTransmuterBlockEntity blockEntity, BlockPos pos) {
+        super(MenuTypes.CROP_TRANSMUTER.get(), syncId);
         this.blockEntity = blockEntity;
         this.pos = pos;
-        this.container = blockEntity == null ? new SimpleContainer(MaterialExtractorBlockEntity.INVENTORY_SIZE) : blockEntity;
-        checkContainerSize(this.container, MaterialExtractorBlockEntity.INVENTORY_SIZE);
+        this.container = blockEntity == null ? new SimpleContainer(CropTransmuterBlockEntity.INVENTORY_SIZE) : blockEntity;
+        checkContainerSize(this.container, CropTransmuterBlockEntity.INVENTORY_SIZE);
         this.container.startOpen(inventory.player);
         addSlots(inventory);
     }
@@ -49,17 +49,17 @@ public class MaterialExtractorMenu extends AbstractContainerMenu {
     private static Resolved resolveBlockEntity(Inventory inventory, FriendlyByteBuf buf) {
         BlockPos pos = buf.readBlockPos();
         BlockEntity be = inventory.player.level().getBlockEntity(pos);
-        if (be instanceof MaterialExtractorBlockEntity extractor) {
+        if (be instanceof CropTransmuterBlockEntity extractor) {
             return new Resolved(extractor, pos);
         }
         return new Resolved(null, pos);
     }
 
-    private record Resolved(@Nullable MaterialExtractorBlockEntity blockEntity, BlockPos pos) {}
+    private record Resolved(@Nullable CropTransmuterBlockEntity blockEntity, BlockPos pos) {}
 
     private void addSlots(Inventory playerInventory) {
-        this.addSlot(new Slot(container, MaterialExtractorBlockEntity.INPUT_SLOT, 26, 18));
-        int outputStart = MaterialExtractorBlockEntity.OUTPUT_START;
+        this.addSlot(new Slot(container, CropTransmuterBlockEntity.INPUT_SLOT, 26, 18));
+        int outputStart = CropTransmuterBlockEntity.OUTPUT_START;
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 int index = outputStart + col + row * 3;
@@ -103,7 +103,7 @@ public class MaterialExtractorMenu extends AbstractContainerMenu {
         }
         ItemStack stack = slot.getItem();
         itemStack = stack.copy();
-        int containerSlots = MaterialExtractorBlockEntity.INVENTORY_SIZE;
+        int containerSlots = CropTransmuterBlockEntity.INVENTORY_SIZE;
         if (index < containerSlots) {
             if (!this.moveItemStackTo(stack, containerSlots, this.slots.size(), true)) {
                 return ItemStack.EMPTY;
@@ -122,17 +122,17 @@ public class MaterialExtractorMenu extends AbstractContainerMenu {
     }
 
     public @NotNull ItemStack getInputStack() {
-        return container.getItem(MaterialExtractorBlockEntity.INPUT_SLOT);
+        return container.getItem(CropTransmuterBlockEntity.INPUT_SLOT);
     }
 
     public @Nullable Material<?> getCurrentMaterial() {
-        return MaterialExtractorBlockEntity.materialFromInput(getInputStack());
+        return CropTransmuterBlockEntity.materialFromInput(getInputStack());
     }
 
     public @NotNull List<ItemStack> getCandidateStacks() {
         Material<?> material = getCurrentMaterial();
         if (material == null) return List.of();
-        return MaterialExtractorBlockEntity.candidateItemStacks(material);
+        return CropTransmuterBlockEntity.candidateItemStacks(material);
     }
 
     public boolean isSelectionRequired() {

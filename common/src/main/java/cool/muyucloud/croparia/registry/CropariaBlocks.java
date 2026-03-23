@@ -32,8 +32,8 @@ public class CropariaBlocks {
                 .isViewBlocking((state, world, pos) -> false)
         )
     );
-    public static final RegistrySupplier<MaterialExtractor> MATERIAL_EXTRACTOR = registerBlock(
-        "material_extractor", properties -> new MaterialExtractor(
+    public static final RegistrySupplier<CropTransmuter> CROP_TRANSMUTER = registerBlock(
+        "crop_transmuter", properties -> new CropTransmuter(
             properties.strength(1.5F, 1.5F).requiresCorrectToolForDrops()
         )
     );

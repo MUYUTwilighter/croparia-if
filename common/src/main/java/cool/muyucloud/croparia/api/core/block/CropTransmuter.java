@@ -1,15 +1,16 @@
 package cool.muyucloud.croparia.api.core.block;
 
 import com.mojang.serialization.MapCodec;
-import cool.muyucloud.croparia.api.core.block.entity.MaterialExtractorBlockEntity;
+import cool.muyucloud.croparia.api.core.block.entity.CropTransmuterBlockEntity;
 import cool.muyucloud.croparia.api.repo.ProxyProvider;
 import cool.muyucloud.croparia.registry.BlockEntities;
 import cool.muyucloud.croparia.registry.CropariaItems;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,14 +29,14 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class MaterialExtractor extends BaseEntityBlock {
-    public static final MapCodec<MaterialExtractor> CODEC = simpleCodec(MaterialExtractor::new);
+public class CropTransmuter extends BaseEntityBlock {
+    public static final MapCodec<CropTransmuter> CODEC = simpleCodec(CropTransmuter::new);
     protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 16.0);
 
-    public MaterialExtractor(Properties settings) {
+    public CropTransmuter(Properties settings) {
         super(settings);
         ProxyProvider.registerItem((world, pos, state, be, direction) -> {
-            if (be instanceof MaterialExtractorBlockEntity extractor) {
+            if (be instanceof CropTransmuterBlockEntity extractor) {
                 return extractor.visitItem();
             }
             return null;
@@ -53,9 +54,11 @@ public class MaterialExtractor extends BaseEntityBlock {
         BlockHitResult blockHitResult
     ) {
         if (!world.isClientSide) {
-            MenuProvider menu = state.getMenuProvider(world, pos);
-            if (menu != null) {
-                player.openMenu(menu);
+            if (player instanceof ServerPlayer serverPlayer) {
+                BlockEntity blockEntity = world.getBlockEntity(pos);
+                if (blockEntity instanceof CropTransmuterBlockEntity extractor) {
+                    MenuRegistry.openExtendedMenu(serverPlayer, extractor);
+                }
             }
         }
         return ItemInteractionResult.SUCCESS;
@@ -65,7 +68,7 @@ public class MaterialExtractor extends BaseEntityBlock {
     public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
         if (state.getBlock() != newState.getBlock()) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof MaterialExtractorBlockEntity) {
+            if (blockEntity instanceof CropTransmuterBlockEntity) {
                 Containers.dropContentsOnDestroy(state, newState, world, pos);
             }
             super.onRemove(state, world, pos, newState, moved);
@@ -94,7 +97,7 @@ public class MaterialExtractor extends BaseEntityBlock {
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new MaterialExtractorBlockEntity(pos, state);
+        return new CropTransmuterBlockEntity(pos, state);
     }
 
     @Override
@@ -104,7 +107,7 @@ public class MaterialExtractor extends BaseEntityBlock {
 
     @Override
     public @NotNull Item asItem() {
-        return CropariaItems.MATERIAL_EXTRACTOR.get();
+        return CropariaItems.CROP_TRANSMUTER.get();
     }
 
     @Override
@@ -115,8 +118,8 @@ public class MaterialExtractor extends BaseEntityBlock {
     ) {
         return level.isClientSide ? null : BaseEntityBlock.createTickerHelper(
             blockEntityType,
-            BlockEntities.MATERIAL_EXTRACTOR.get(),
-            MaterialExtractorBlockEntity::serverTick
+            BlockEntities.CROP_TRANSMUTER.get(),
+            CropTransmuterBlockEntity::serverTick
         );
     }
 }
