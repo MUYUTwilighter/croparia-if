@@ -23,6 +23,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -32,9 +35,11 @@ import org.jetbrains.annotations.Nullable;
 public class CropTransmuter extends BaseEntityBlock {
     public static final MapCodec<CropTransmuter> CODEC = simpleCodec(CropTransmuter::new);
     protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 16.0);
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     public CropTransmuter(Properties settings) {
         super(settings);
+        this.registerDefaultState(this.stateDefinition.any().setValue(POWERED, false));
         ProxyProvider.registerItem((world, pos, state, be, direction) -> {
             if (be instanceof CropTransmuterBlockEntity extractor) {
                 return extractor.visitItem();
@@ -72,6 +77,36 @@ public class CropTransmuter extends BaseEntityBlock {
                 Containers.dropContentsOnDestroy(state, newState, world, pos);
             }
             super.onRemove(state, world, pos, newState, moved);
+        }
+    }
+
+    @Override
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moved) {
+        super.onPlace(state, level, pos, oldState, moved);
+        if (!level.isClientSide) {
+            updatePowerState(level, pos, state);
+        }
+    }
+
+    @Override
+    public void neighborChanged(
+        BlockState state,
+        Level level,
+        BlockPos pos,
+        Block block,
+        BlockPos neighborPos,
+        boolean movedByPiston
+    ) {
+        super.neighborChanged(state, level, pos, block, neighborPos, movedByPiston);
+        if (!level.isClientSide) {
+            updatePowerState(level, pos, state);
+        }
+    }
+
+    private void updatePowerState(Level level, BlockPos pos, BlockState state) {
+        boolean powered = level.hasNeighborSignal(pos);
+        if (powered != state.getValue(POWERED)) {
+            level.setBlock(pos, state.setValue(POWERED, powered), 3);
         }
     }
 
@@ -121,5 +156,10 @@ public class CropTransmuter extends BaseEntityBlock {
             BlockEntities.CROP_TRANSMUTER.get(),
             CropTransmuterBlockEntity::serverTick
         );
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(POWERED);
     }
 }

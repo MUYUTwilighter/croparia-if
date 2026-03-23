@@ -5,6 +5,7 @@ import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.api.crop.util.BlockMaterial;
 import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
 import cool.muyucloud.croparia.api.crop.util.Material;
+import cool.muyucloud.croparia.api.core.block.CropTransmuter;
 import cool.muyucloud.croparia.api.core.menu.CropTransmuterMenu;
 import cool.muyucloud.croparia.api.repo.Repo;
 import cool.muyucloud.croparia.api.repo.RepoProxy;
@@ -70,7 +71,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CropTransmuterBlockEntity blockEntity) {
         if (!(level instanceof ServerLevel serverLevel)) return;
-        if (!serverLevel.hasNeighborSignal(pos)) return;
+        if (!state.getValue(CropTransmuter.POWERED)) return;
         blockEntity.tryProcess(serverLevel);
     }
 

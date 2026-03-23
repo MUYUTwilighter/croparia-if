@@ -1,6 +1,9 @@
 {
   "variants": {
-    "": {
+    "powered=false": {
+      "model": "croparia:block/crop_transmuter"
+    },
+    "powered=true": {
       "model": "croparia:block/crop_transmuter"
     }
   }
