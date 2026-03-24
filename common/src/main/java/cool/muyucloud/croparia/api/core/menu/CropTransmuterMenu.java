@@ -138,10 +138,19 @@ public class CropTransmuterMenu extends AbstractContainerMenu {
 
     public @Nullable ResourceLocation getSelectedOutputId() {
         if (blockEntity == null) return null;
-        return blockEntity.getSelectedOutputIdFor(getCurrentMaterialKey());
+        return blockEntity.getSelectedOutputIdFor(getCurrentMaterial());
     }
 
     public @Nullable BlockPos getBlockPos() {
         return pos;
+    }
+
+    public int getSelectedIndex() {
+        if (blockEntity == null) return 0;
+        return blockEntity.getSelectedIndexFor(getCurrentMaterial());
+    }
+
+    public boolean isPositiveRedstone() {
+        return blockEntity == null || blockEntity.isPositiveRedstone();
     }
 }

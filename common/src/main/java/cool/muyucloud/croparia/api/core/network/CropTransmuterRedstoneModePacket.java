@@ -3,7 +3,6 @@ package cool.muyucloud.croparia.api.core.network;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.block.entity.CropTransmuterBlockEntity;
 import cool.muyucloud.croparia.api.core.menu.CropTransmuterMenu;
-import cool.muyucloud.croparia.api.crop.util.Material;
 import cool.muyucloud.croparia.api.network.NetworkHandler;
 import cool.muyucloud.croparia.api.network.NetworkHandlerType;
 import dev.architectury.networking.NetworkManager;
@@ -14,16 +13,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 
-public record CropTransmuterSelectPacket(BlockPos pos, int selectedIndex) implements NetworkHandler {
-    public static final StreamCodec<RegistryFriendlyByteBuf, CropTransmuterSelectPacket> STREAM_CODEC = StreamCodec.of(
-        (buf, payload) -> {
-            buf.writeBlockPos(payload.pos);
-            buf.writeVarInt(payload.selectedIndex);
-        },
-        buf -> new CropTransmuterSelectPacket(buf.readBlockPos(), buf.readVarInt())
+public record CropTransmuterRedstoneModePacket(BlockPos pos) implements NetworkHandler {
+    public static final StreamCodec<RegistryFriendlyByteBuf, CropTransmuterRedstoneModePacket> STREAM_CODEC = StreamCodec.of(
+        (buf, payload) -> buf.writeBlockPos(payload.pos),
+        buf -> new CropTransmuterRedstoneModePacket(buf.readBlockPos())
     );
-    public static final NetworkHandlerType<CropTransmuterSelectPacket> TYPE =
-        NetworkHandlerType.ofC2S(CropariaIf.of("crop_transmuter_select"), STREAM_CODEC);
+    public static final NetworkHandlerType<CropTransmuterRedstoneModePacket> TYPE =
+        NetworkHandlerType.ofC2S(CropariaIf.of("crop_transmuter_redstone_mode"), STREAM_CODEC);
 
     @Override
     public @NotNull NetworkHandlerType<?> handlerType() {
@@ -38,13 +34,7 @@ public record CropTransmuterSelectPacket(BlockPos pos, int selectedIndex) implem
             if (menu.getBlockPos() == null || !menu.getBlockPos().equals(pos)) return;
             BlockEntity be = player.level().getBlockEntity(pos);
             if (!(be instanceof CropTransmuterBlockEntity extractor)) return;
-            Material<?> material = CropTransmuterBlockEntity.materialFromInput(
-                extractor.getItem(CropTransmuterBlockEntity.INPUT_SLOT)
-            );
-            if (material == null) return;
-            int size = CropTransmuterBlockEntity.candidateItemStacks(material).size();
-            if (selectedIndex < 0 || selectedIndex >= size) return;
-            extractor.setSelectedIndex(selectedIndex);
+            extractor.toggleRedstoneMode();
         });
     }
 }

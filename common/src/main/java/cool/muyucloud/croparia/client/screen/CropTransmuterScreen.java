@@ -1,6 +1,7 @@
 package cool.muyucloud.croparia.client.screen;
 
 import cool.muyucloud.croparia.api.core.menu.CropTransmuterMenu;
+import cool.muyucloud.croparia.api.core.network.CropTransmuterRedstoneModePacket;
 import cool.muyucloud.croparia.api.core.network.CropTransmuterSelectPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -40,6 +41,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     private int page = 0;
     private Button prevButton;
     private Button nextButton;
+    private Button redstoneModeButton;
 
     public CropTransmuterScreen(CropTransmuterMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -59,6 +61,10 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         nextButton = addRenderableWidget(Button.builder(Component.literal(">"), button -> changePage(1))
             .pos(panelX + PANEL_COLS * PANEL_CELL - 18, panelY)
             .size(18, 20)
+            .build());
+        redstoneModeButton = addRenderableWidget(Button.builder(getRedstoneModeLabel(), button -> toggleRedstoneMode())
+            .pos(this.leftPos + INPUT_SLOT_X - 1, this.topPos + INPUT_SLOT_Y + SLOT_SIZE + 6)
+            .size(20, 20)
             .build());
         updatePageButtons();
     }
@@ -90,6 +96,9 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     public void containerTick() {
         super.containerTick();
         updatePageButtons();
+        if (redstoneModeButton != null) {
+            redstoneModeButton.setMessage(getRedstoneModeLabel());
+        }
     }
 
     private void updatePageButtons() {
@@ -190,13 +199,25 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         int hovered = getHoveredCandidateIndex(mouseX, mouseY, candidates.size());
         if (hovered >= 0 && hovered < candidates.size()) {
             ItemStack stack = candidates.get(hovered);
-            ResourceLocation id = stack.getItem().arch$registryName();
-            if (id != null && menu.getBlockPos() != null) {
-                new CropTransmuterSelectPacket(menu.getBlockPos(), id).send();
+            if (stack.getItem().arch$registryName() != null && menu.getBlockPos() != null) {
+                new CropTransmuterSelectPacket(menu.getBlockPos(), hovered).send();
             }
             return true;
         }
         return false;
+    }
+
+    private void toggleRedstoneMode() {
+        if (menu.getBlockPos() == null) return;
+        new CropTransmuterRedstoneModePacket(menu.getBlockPos()).send();
+    }
+
+    private Component getRedstoneModeLabel() {
+        return Component.translatable(
+            menu.isPositiveRedstone()
+                ? "gui.croparia.crop_transmuter.redstone_positive"
+                : "gui.croparia.crop_transmuter.redstone_negative"
+        );
     }
 
     private void drawPanelFooter(GuiGraphics graphics) {

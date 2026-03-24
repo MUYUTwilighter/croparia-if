@@ -141,6 +141,8 @@
   "gui.croparia.crop_transmuter.no_input": "放入果实",
   "gui.croparia.crop_transmuter.no_selection": "请选择输出物品",
   "gui.croparia.crop_transmuter.auto_output": "输出由作物材料固定",
+  "gui.croparia.crop_transmuter.redstone_positive": "R+",
+  "gui.croparia.crop_transmuter.redstone_negative": "R-",
   "item.croparia.croparia": "一阶魔种",
   "item.croparia.croparia2": "二阶魔种",
   "item.croparia.croparia3": "三阶魔种",

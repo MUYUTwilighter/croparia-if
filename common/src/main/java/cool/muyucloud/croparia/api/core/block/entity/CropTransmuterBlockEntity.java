@@ -18,7 +18,6 @@ import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
@@ -48,7 +47,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvider, Container, WorldlyContainer, ExtendedMenuProvider {
@@ -56,13 +54,13 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     public static final int OUTPUT_SLOT = 1;
     public static final int INVENTORY_SIZE = 2;
 
-    private static final String NBT_SELECTED_MATERIAL = "SelectedMaterial";
-    private static final String NBT_SELECTED_OUTPUT = "SelectedOutput";
+    private static final String NBT_SELECTED_INDEX = "SelectedIndex";
+    private static final String NBT_POSITIVE_REDSTONE = "PositiveRedstone";
 
     private final NonNullList<ItemStack> inventory;
     private final RepoProxy<ItemSpec> proxy = RepoProxy.item(new ExtractorRepo(this));
-    private @Nullable String selectedMaterialKey = null;
-    private @Nullable ResourceLocation selectedOutputId = null;
+    private int selectedIndex = 0;
+    private boolean positiveRedstone = true;
 
     public CropTransmuterBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntities.CROP_TRANSMUTER.get(), pos, state);
@@ -71,7 +69,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CropTransmuterBlockEntity blockEntity) {
         if (!(level instanceof ServerLevel serverLevel)) return;
-        if (!state.getValue(CropTransmuter.POWERED)) return;
+        if (!blockEntity.shouldProcess(state)) return;
         blockEntity.tryProcess(serverLevel);
     }
 
@@ -140,18 +138,16 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     private ItemStack resolveOutput(Material<?> material) {
-        String materialKey = material.getName();
-        if (!Objects.equals(materialKey, this.selectedMaterialKey) || this.selectedOutputId == null) {
+        List<ItemStack> candidates = candidateItemStacks(material);
+        if (candidates.isEmpty()) {
             return ItemStack.EMPTY;
         }
-        Set<ResourceLocation> candidates = candidateItemIds(material);
-        if (!candidates.contains(this.selectedOutputId)) {
+        int clampedIndex = getSelectedIndexFor(material);
+        if (clampedIndex < 0 || clampedIndex >= candidates.size()) {
             return ItemStack.EMPTY;
         }
-        Item selected = BuiltInRegistries.ITEM.get(this.selectedOutputId);
-        if (selected == Items.AIR) {
-            return ItemStack.EMPTY;
-        }
+        ItemStack candidate = candidates.get(clampedIndex);
+        Item selected = candidate.getItem();
         if (material instanceof ItemMaterial itemMaterial) {
             ItemStack stack = selected.getDefaultInstance();
             stack.applyComponents(itemMaterial.getComponents());
@@ -186,22 +182,52 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
         return true;
     }
 
-    public boolean setSelectedOutput(@NotNull String materialKey, @NotNull ResourceLocation outputId) {
-        return setSelectedOutputInternal(materialKey, outputId, true);
+    public boolean setSelectedIndex(int selectedIndex) {
+        if (selectedIndex < 0 || this.selectedIndex == selectedIndex) {
+            return false;
+        }
+        this.selectedIndex = selectedIndex;
+        this.setChanged();
+        if (this.level != null) {
+            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
+        }
+        return true;
     }
 
-    public @Nullable ResourceLocation getSelectedOutputIdFor(@Nullable String materialKey) {
-        if (materialKey == null) return null;
-        if (!Objects.equals(materialKey, this.selectedMaterialKey)) return null;
-        return this.selectedOutputId;
+    public int getSelectedIndex() {
+        return selectedIndex;
     }
 
-    public @Nullable String getSelectedMaterialKey() {
-        return selectedMaterialKey;
+    public int getSelectedIndexFor(@Nullable Material<?> material) {
+        if (material == null) {
+            return selectedIndex;
+        }
+        int size = candidateItemStacks(material).size();
+        if (size <= 0) {
+            return 0;
+        }
+        return Math.min(selectedIndex, size - 1);
     }
 
-    public @Nullable ResourceLocation getSelectedOutputId() {
-        return selectedOutputId;
+    public @Nullable ResourceLocation getSelectedOutputIdFor(@Nullable Material<?> material) {
+        if (material == null) return null;
+        List<ItemStack> candidates = candidateItemStacks(material);
+        if (candidates.isEmpty()) return null;
+        ResourceLocation id = candidates.get(getSelectedIndexFor(material)).getItem().arch$registryName();
+        return id;
+    }
+
+    public boolean isPositiveRedstone() {
+        return positiveRedstone;
+    }
+
+    public boolean toggleRedstoneMode() {
+        this.positiveRedstone = !this.positiveRedstone;
+        this.setChanged();
+        if (this.level != null) {
+            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
+        }
+        return this.positiveRedstone;
     }
 
     public @Nullable RepoProxy<ItemSpec> visitItem() {
@@ -212,29 +238,15 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
         super.loadAdditional(nbt, provider);
         ContainerHelper.loadAllItems(nbt, this.inventory, provider);
-        if (nbt.contains(NBT_SELECTED_MATERIAL)) {
-            String key = nbt.getString(NBT_SELECTED_MATERIAL);
-            this.selectedMaterialKey = key.isEmpty() ? null : key;
-        } else {
-            this.selectedMaterialKey = null;
-        }
-        if (nbt.contains(NBT_SELECTED_OUTPUT)) {
-            String id = nbt.getString(NBT_SELECTED_OUTPUT);
-            this.selectedOutputId = id.isEmpty() ? null : ResourceLocation.tryParse(id);
-        } else {
-            this.selectedOutputId = null;
-        }
+        this.selectedIndex = Math.max(0, nbt.getInt(NBT_SELECTED_INDEX));
+        this.positiveRedstone = !nbt.contains(NBT_POSITIVE_REDSTONE) || nbt.getBoolean(NBT_POSITIVE_REDSTONE);
     }
 
     @Override
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
         ContainerHelper.saveAllItems(nbt, this.inventory, provider);
-        if (this.selectedMaterialKey != null) {
-            nbt.putString(NBT_SELECTED_MATERIAL, this.selectedMaterialKey);
-        }
-        if (this.selectedOutputId != null) {
-            nbt.putString(NBT_SELECTED_OUTPUT, this.selectedOutputId.toString());
-        }
+        nbt.putInt(NBT_SELECTED_INDEX, this.selectedIndex);
+        nbt.putBoolean(NBT_POSITIVE_REDSTONE, this.positiveRedstone);
         super.saveAdditional(nbt, provider);
     }
 
@@ -357,56 +369,24 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
 
     private void refreshSelection(boolean notify) {
         Material<?> material = materialFromInput(getItem(INPUT_SLOT));
-        if (material == null) {
-            if (selectedMaterialKey != null || selectedOutputId != null) {
-                selectedMaterialKey = null;
-                selectedOutputId = null;
-                if (notify) {
-                    setChanged();
-                    if (level != null) {
-                        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-                    }
-                }
-            }
+        if (material == null || candidateItemStacks(material).isEmpty()) {
             return;
         }
-        List<ItemStack> candidates = candidateItemStacks(material);
-        if (candidates.isEmpty()) {
-            if (selectedMaterialKey != null || selectedOutputId != null) {
-                selectedMaterialKey = null;
-                selectedOutputId = null;
-                if (notify) {
-                    setChanged();
-                    if (level != null) {
-                        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-                    }
+        int clamped = getSelectedIndexFor(material);
+        if (clamped != this.selectedIndex) {
+            this.selectedIndex = clamped;
+            if (notify) {
+                this.setChanged();
+                if (this.level != null) {
+                    this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
                 }
             }
-            return;
-        }
-        ResourceLocation first = candidates.getFirst().getItem().arch$registryName();
-        if (first == null) return;
-        boolean valid = Objects.equals(material.getName(), selectedMaterialKey)
-            && selectedOutputId != null
-            && candidateItemIds(material).contains(selectedOutputId);
-        if (!valid) {
-            setSelectedOutputInternal(material.getName(), first, notify);
         }
     }
 
-    private boolean setSelectedOutputInternal(@NotNull String materialKey, @NotNull ResourceLocation outputId, boolean notify) {
-        if (Objects.equals(this.selectedMaterialKey, materialKey) && Objects.equals(this.selectedOutputId, outputId)) {
-            return false;
-        }
-        this.selectedMaterialKey = materialKey;
-        this.selectedOutputId = outputId;
-        if (notify) {
-            this.setChanged();
-            if (this.level != null) {
-                this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
-            }
-        }
-        return true;
+    private boolean shouldProcess(BlockState state) {
+        boolean powered = state.getValue(CropTransmuter.POWERED);
+        return positiveRedstone ? powered : !powered;
     }
 
     private static final class ExtractorRepo implements Repo<ItemSpec> {

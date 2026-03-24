@@ -141,6 +141,8 @@
   "gui.croparia.crop_transmuter.no_input": "Insert fruit",
   "gui.croparia.crop_transmuter.no_selection": "Select an output item",
   "gui.croparia.crop_transmuter.auto_output": "Output is fixed by crop material",
+  "gui.croparia.crop_transmuter.redstone_positive": "R+",
+  "gui.croparia.crop_transmuter.redstone_negative": "R-",
   "item.croparia.croparia": "Croparia",
   "item.croparia.croparia2": "Croparia T2",
   "item.croparia.croparia3": "Croparia T3",
