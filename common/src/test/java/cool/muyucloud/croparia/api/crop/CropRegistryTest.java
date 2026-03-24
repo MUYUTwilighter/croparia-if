@@ -154,6 +154,11 @@ class CropRegistryTest {
             public ItemStack asItem() {
                 return null;
             }
+
+            @Override
+            public List<ItemStack> asItems() {
+                return List.of();
+            }
         };
 
         private final ResourceLocation id;

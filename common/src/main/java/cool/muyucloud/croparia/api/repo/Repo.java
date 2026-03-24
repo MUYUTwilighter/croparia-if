@@ -4,7 +4,12 @@ import com.mojang.logging.LogUtils;
 import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.TypeTokenAccess;
 import cool.muyucloud.croparia.api.resource.TypedResource;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Abstraction of resource storage.<br>
@@ -12,7 +17,6 @@ import org.slf4j.Logger;
 @SuppressWarnings("unused")
 public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
     Logger LOGGER = LogUtils.getLogger();
-    
 
     /**
      * The amount of resource storage units
@@ -118,6 +122,10 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
         return required - amount;
     }
 
+    default long simAccept(int i, long amount) {
+        return this.simAccept(i, this.resourceFor(i), amount);
+    }
+
     /**
      * Simulates accepting the specified amount of resource into the specified resource storage.
      *
@@ -141,6 +149,10 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
             amount -= accept(i, resource, amount);
         }
         return required - amount;
+    }
+
+    default long accept(int i, long amount) {
+        return this.accept(i, this.resourceFor(i), amount);
     }
 
     /**
@@ -213,5 +225,150 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
      */
     default long amountFor(int i) {
         return this.amountFor(i, this.resourceFor(i));
+    }
+
+    default @NotNull AcceptOnlyRepo<T> asAcceptOnly() {
+        return new AcceptOnlyRepo<>(this);
+    }
+
+    default @NotNull ConsumeOnlyRepo<T> asConsumeOnly() {
+        return new ConsumeOnlyRepo<>(this);
+    }
+
+    default @NotNull LockedRepo<T> asLocked(Integer @NotNull ... idx) {
+        return new LockedRepo<>(this, Arrays.stream(idx).collect(Collectors.toUnmodifiableSet()));
+    }
+
+    class AcceptOnlyRepo<T extends TypedResource<?>> extends DelegateRepo<T> {
+        public AcceptOnlyRepo(@NotNull Repo<T> repo) {
+            super(repo);
+        }
+
+        @Override
+        public long simConsume(int i, T resource, long amount) {
+            return 0;
+        }
+
+        @Override
+        public long simConsume(T resource, long amount) {
+            return 0;
+        }
+
+        @Override
+        public long simConsume(int i, long amount) {
+            return 0;
+        }
+
+        @Override
+        public long consume(int i, T resource, long amount) {
+            return 0;
+        }
+
+        @Override
+        public long consume(T resource, long amount) {
+            return 0;
+        }
+
+        @Override
+        public long consume(int i, long amount) {
+            return 0;
+        }
+    }
+
+    class ConsumeOnlyRepo<T extends TypedResource<?>> extends DelegateRepo<T> {
+        public ConsumeOnlyRepo(@NotNull Repo<T> repo) {
+            super(repo);
+        }
+
+        @Override
+        public long simAccept(int i, T resource, long amount) {
+            return 0;
+        }
+
+        @Override
+        public long simAccept(int i, long amount) {
+            return 0;
+        }
+
+        @Override
+        public long simAccept(T resource, long amount) {
+            return 0;
+        }
+
+        @Override
+        public long accept(int i, T resource, long amount) {
+            return 0;
+        }
+
+        @Override
+        public long accept(int i, long amount) {
+            return 0;
+        }
+
+        @Override
+        public long accept(T resource, long amount) {
+            return 0;
+        }
+    }
+
+    class LockedRepo<T extends TypedResource<?>> extends DelegateRepo<T> {
+        private final @NotNull Set<Integer> locked;
+
+        public LockedRepo(@NotNull Repo<T> repo, @NotNull Set<Integer> locked) {
+            super(repo);
+            this.locked = locked;
+        }
+
+        public boolean isLocked(int i) {
+            return this.locked.contains(i);
+        }
+
+        @Override
+        public long simConsume(int i, T resource, long amount) {
+            if (this.isLocked(i)) return 0;
+            return super.simConsume(i, resource, amount);
+        }
+
+        @Override
+        public long simConsume(int i, long amount) {
+            if (this.isLocked(i)) return 0;
+            return super.simConsume(i, amount);
+        }
+
+        @Override
+        public long consume(int i, T resource, long amount) {
+            if (this.isLocked(i)) return 0;
+            return super.consume(i, resource, amount);
+        }
+
+        @Override
+        public long consume(int i, long amount) {
+            if (this.isLocked(i)) return 0;
+            return super.consume(i, amount);
+        }
+
+        @Override
+        public long simAccept(int i, T resource, long amount) {
+            if (this.isLocked(i)) return 0;
+            return super.simAccept(i, resource, amount);
+        }
+
+        @Override
+        public long simAccept(int i, long amount) {
+            if (this.isLocked(i)) return 0;
+            return super.simAccept(i, amount);
+        }
+
+        @Override
+        public long accept(int i, T resource, long amount) {
+            if (this.isLocked(i)) return 0;
+            return super.accept(i, resource, amount);
+        }
+
+        @Override
+        public long accept(int i, long amount) {
+            if (this.isLocked(i)) return 0;
+            return super.accept(i, amount);
+        }
     }
 }
