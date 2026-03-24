@@ -60,6 +60,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     @Override
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
+        this.renderTooltip(graphics, mouseX, mouseY);
         renderSelectionTooltip(graphics, mouseX, mouseY);
     }
 
