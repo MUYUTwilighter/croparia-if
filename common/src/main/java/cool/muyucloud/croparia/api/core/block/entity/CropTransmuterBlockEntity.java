@@ -178,11 +178,12 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
         int max = Math.min(stored.getMaxStackSize(), this.getMaxStackSize());
         int room = max - stored.getCount();
         if (room <= 0) return false;
-        int toMove = Math.min(room, stack.getCount());
-        stored.grow(toMove);
-        stack.shrink(toMove);
+        if (room < stack.getCount()) {
+            return false;
+        }
+        stored.grow(stack.getCount());
         this.setItem(OUTPUT_SLOT, stored);
-        return stack.isEmpty();
+        return true;
     }
 
     public boolean setSelectedOutput(@NotNull String materialKey, @NotNull ResourceLocation outputId) {
