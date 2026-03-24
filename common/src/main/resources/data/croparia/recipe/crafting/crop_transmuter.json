@@ -2,23 +2,22 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "item": "minecraft:iron_ingot"
+    "E": {
+      "item": "croparia:elemental_stone"
     },
-    "R": {
-      "item": "minecraft:redstone"
+    "S": {
+      "tag": "minecraft:stone_bricks"
     },
-    "G": {
-      "item": "minecraft:glass"
+    "W": {
+      "item": "minecraft:crafting_table"
     },
     "C": {
-      "item": "croparia:croparia"
+      "item": "minecraft:comparator"
     }
   },
   "pattern": [
-    "IRI",
-    "GCG",
-    "IRI"
+    "SWS",
+    "CEC"
   ],
   "result": {
     "id": "croparia:crop_transmuter"

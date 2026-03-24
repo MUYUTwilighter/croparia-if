@@ -4,7 +4,7 @@
       "model": "croparia:block/crop_transmuter"
     },
     "powered=true": {
-      "model": "croparia:block/crop_transmuter"
+      "model": "croparia:block/crop_transmuter_powered"
     }
   }
 }

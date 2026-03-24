@@ -1,10 +1,9 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "particle": "croparia:block/crop_transmuter_top",
     "top": "croparia:block/crop_transmuter_top",
     "end": "croparia:block/crop_transmuter_bottom",
-    "side": "croparia:block/crop_transmuter_side"
+    "side": "croparia:block/crop_transmuter_side_powered"
   },
   "elements": [
     {   "from": [ 0, 0, 0 ],
