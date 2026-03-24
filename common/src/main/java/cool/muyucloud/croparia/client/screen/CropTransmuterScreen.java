@@ -22,6 +22,13 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     private static final int PANEL_ROWS = 3;
     private static final int SELECTION_X = 62;
     private static final int SELECTION_Y = 17;
+    private static final int PANEL_OUTER_BORDER = 0xFF5B4A36;
+    private static final int PANEL_BACKGROUND = 0xFF221A12;
+    private static final int PANEL_CELL_BACKGROUND = 0xFF382B1E;
+    private static final int PANEL_CELL_HOVER = 0x66FFF2CC;
+    private static final int PANEL_CELL_SELECTED = 0xCCFFD54F;
+    private static final int PANEL_TEXT = 0xE8D9C2;
+    private static final int PANEL_TEXT_MUTED = 0xBFAF96;
 
     private int page = 0;
     private Button prevButton;
@@ -40,11 +47,11 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         int panelY = this.topPos + SELECTION_Y + PANEL_ROWS * PANEL_CELL + 4;
         prevButton = addRenderableWidget(Button.builder(Component.literal("<"), button -> changePage(-1))
             .pos(panelX, panelY)
-            .size(20, 20)
+            .size(18, 20)
             .build());
         nextButton = addRenderableWidget(Button.builder(Component.literal(">"), button -> changePage(1))
-            .pos(panelX + 24, panelY)
-            .size(20, 20)
+            .pos(panelX + PANEL_COLS * PANEL_CELL - 18, panelY)
+            .size(18, 20)
             .build());
         updatePageButtons();
     }
@@ -69,6 +76,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         graphics.drawString(this.font, this.title, 8, 6, 0x404040, false);
         graphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 94, 0x404040, false);
         graphics.drawString(this.font, Component.translatable("gui.croparia.crop_transmuter.select"), SELECTION_X, 6, 0x404040, false);
+        drawPanelFooter(graphics);
     }
 
     @Override
@@ -80,8 +88,15 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     private void updatePageButtons() {
         int pages = getPageCount();
         if (page >= pages) page = Math.max(0, pages - 1);
-        if (prevButton != null) prevButton.active = page > 0;
-        if (nextButton != null) nextButton.active = page + 1 < pages;
+        boolean showPaging = pages > 1;
+        if (prevButton != null) {
+            prevButton.visible = showPaging;
+            prevButton.active = page > 0;
+        }
+        if (nextButton != null) {
+            nextButton.visible = showPaging;
+            nextButton.active = page + 1 < pages;
+        }
     }
 
     private int getPageCount() {
@@ -101,33 +116,28 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         int top = this.topPos + SELECTION_Y;
         int width = PANEL_COLS * PANEL_CELL;
         int height = PANEL_ROWS * PANEL_CELL;
-        graphics.fill(left - 1, top - 1, left + width + 1, top + height + 1, 0xAA1E1E1E);
+        graphics.fill(left - 2, top - 2, left + width + 2, top + height + 2, PANEL_OUTER_BORDER);
+        graphics.fill(left - 1, top - 1, left + width + 1, top + height + 1, PANEL_BACKGROUND);
         List<ItemStack> candidates = getCandidates();
         if (!menu.hasMaterial()) {
-            graphics.drawString(
-                this.font,
-                Component.translatable("gui.croparia.crop_transmuter.no_input"),
-                left + 2,
-                top + 2,
-                0xB0B0B0,
-                false
-            );
+            drawPanelMessage(graphics, Component.translatable("gui.croparia.crop_transmuter.no_input"), left, top, width, height);
             return;
         }
         if (candidates.isEmpty()) {
-            graphics.drawString(
-                this.font,
-                Component.translatable("gui.croparia.crop_transmuter.no_selection"),
-                left + 2,
-                top + 2,
-                0xB0B0B0,
-                false
-            );
+            drawPanelMessage(graphics, Component.translatable("gui.croparia.crop_transmuter.no_selection"), left, top, width, height);
             return;
         }
-        int start = page * PANEL_COLS * PANEL_ROWS;
+        int hovered = getHoveredCandidateIndex(mouseX, mouseY, candidates.size());
+        int start = getVisibleStart();
         int end = Math.min(start + PANEL_COLS * PANEL_ROWS, candidates.size());
         ResourceLocation selected = menu.getSelectedOutputId();
+        for (int local = 0; local < PANEL_COLS * PANEL_ROWS; local++) {
+            int col = local % PANEL_COLS;
+            int row = local / PANEL_COLS;
+            int x = left + col * PANEL_CELL;
+            int y = top + row * PANEL_CELL;
+            graphics.fill(x, y, x + PANEL_CELL - 1, y + PANEL_CELL - 1, PANEL_CELL_BACKGROUND);
+        }
         for (int i = start; i < end; i++) {
             int local = i - start;
             int col = local % PANEL_COLS;
@@ -135,10 +145,14 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
             int x = left + col * PANEL_CELL;
             int y = top + row * PANEL_CELL;
             ItemStack stack = candidates.get(i);
+            if (hovered == i) {
+                graphics.fill(x, y, x + PANEL_CELL - 1, y + PANEL_CELL - 1, PANEL_CELL_HOVER);
+            }
             graphics.renderItem(stack, x + 1, y + 1);
+            graphics.renderItemDecorations(this.font, stack, x + 1, y + 1);
             ResourceLocation id = stack.getItem().arch$registryName();
             if (selected != null && selected.equals(id)) {
-                graphics.fill(x, y, x + PANEL_CELL, y + PANEL_CELL, 0x66FFD54F);
+                graphics.renderOutline(x, y, PANEL_CELL, PANEL_CELL, PANEL_CELL_SELECTED);
             }
         }
     }
@@ -147,20 +161,9 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         if (!menu.hasMaterial()) return;
         List<ItemStack> candidates = getCandidates();
         if (candidates.isEmpty()) return;
-        int left = this.leftPos + SELECTION_X;
-        int top = this.topPos + SELECTION_Y;
-        int start = page * PANEL_COLS * PANEL_ROWS;
-        int end = Math.min(start + PANEL_COLS * PANEL_ROWS, candidates.size());
-        for (int i = start; i < end; i++) {
-            int local = i - start;
-            int col = local % PANEL_COLS;
-            int row = local / PANEL_COLS;
-            int x = left + col * PANEL_CELL;
-            int y = top + row * PANEL_CELL;
-            if (mouseX >= x && mouseX < x + PANEL_CELL && mouseY >= y && mouseY < y + PANEL_CELL) {
-                graphics.renderTooltip(this.font, candidates.get(i), mouseX, mouseY);
-                return;
-            }
+        int hovered = getHoveredCandidateIndex(mouseX, mouseY, candidates.size());
+        if (hovered >= 0 && hovered < candidates.size()) {
+            graphics.renderTooltip(this.font, candidates.get(hovered), mouseX, mouseY);
         }
     }
 
@@ -177,26 +180,48 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         if (!menu.hasMaterial()) return false;
         List<ItemStack> candidates = getCandidates();
         if (candidates.isEmpty()) return false;
-        int left = this.leftPos + SELECTION_X;
-        int top = this.topPos + SELECTION_Y;
-        int start = page * PANEL_COLS * PANEL_ROWS;
-        int end = Math.min(start + PANEL_COLS * PANEL_ROWS, candidates.size());
-        for (int i = start; i < end; i++) {
-            int local = i - start;
-            int col = local % PANEL_COLS;
-            int row = local / PANEL_COLS;
-            int x = left + col * PANEL_CELL;
-            int y = top + row * PANEL_CELL;
-            if (mouseX >= x && mouseX < x + PANEL_CELL && mouseY >= y && mouseY < y + PANEL_CELL) {
-                ItemStack stack = candidates.get(i);
-                ResourceLocation id = stack.getItem().arch$registryName();
-                if (id != null && menu.getBlockPos() != null) {
-                    new CropTransmuterSelectPacket(menu.getBlockPos(), id).send();
-                }
-                return true;
+        int hovered = getHoveredCandidateIndex(mouseX, mouseY, candidates.size());
+        if (hovered >= 0 && hovered < candidates.size()) {
+            ItemStack stack = candidates.get(hovered);
+            ResourceLocation id = stack.getItem().arch$registryName();
+            if (id != null && menu.getBlockPos() != null) {
+                new CropTransmuterSelectPacket(menu.getBlockPos(), id).send();
             }
+            return true;
         }
         return false;
+    }
+
+    private void drawPanelFooter(GuiGraphics graphics) {
+        List<ItemStack> candidates = getCandidates();
+        Component footer = candidates.size() <= 1
+            ? Component.translatable("gui.croparia.crop_transmuter.auto_output")
+            : Component.literal((page + 1) + "/" + getPageCount());
+        int x = SELECTION_X + (PANEL_COLS * PANEL_CELL - this.font.width(footer)) / 2;
+        int y = SELECTION_Y + PANEL_ROWS * PANEL_CELL + 10;
+        graphics.drawString(this.font, footer, x, y, candidates.size() <= 1 ? PANEL_TEXT_MUTED : PANEL_TEXT, false);
+    }
+
+    private void drawPanelMessage(GuiGraphics graphics, Component message, int left, int top, int width, int height) {
+        int textX = left + (width - this.font.width(message)) / 2;
+        int textY = top + height / 2 - 4;
+        graphics.drawString(this.font, message, textX, textY, PANEL_TEXT_MUTED, false);
+    }
+
+    private int getVisibleStart() {
+        return page * PANEL_COLS * PANEL_ROWS;
+    }
+
+    private int getHoveredCandidateIndex(double mouseX, double mouseY, int candidateCount) {
+        int left = this.leftPos + SELECTION_X;
+        int top = this.topPos + SELECTION_Y;
+        if (mouseX < left || mouseX >= left + PANEL_COLS * PANEL_CELL || mouseY < top || mouseY >= top + PANEL_ROWS * PANEL_CELL) {
+            return -1;
+        }
+        int col = (int) ((mouseX - left) / PANEL_CELL);
+        int row = (int) ((mouseY - top) / PANEL_CELL);
+        int index = getVisibleStart() + row * PANEL_COLS + col;
+        return index < candidateCount ? index : -1;
     }
 
     private List<ItemStack> getCandidates() {
