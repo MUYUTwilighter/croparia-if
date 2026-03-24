@@ -13,15 +13,11 @@ public interface NetworkHandler extends CustomPacketPayload {
     }
 
     default void send() {
-        CropariaIf.ifServerOrElse(server -> {
-            if (this.handlerType().side() == NetworkManager.Side.S2C) {
-                NetworkManager.sendToPlayers(server.getPlayerList().getPlayers(), this);
-            }
-        }, () -> {
-            if (this.handlerType().side() == NetworkManager.Side.C2S) {
-                NetworkManager.sendToServer(this);
-            }
-        });
+        if (this.handlerType().side() == NetworkManager.Side.C2S) {
+            NetworkManager.sendToServer(this);
+            return;
+        }
+        CropariaIf.ifServer(server -> NetworkManager.sendToPlayers(server.getPlayerList().getPlayers(), this));
     }
 
     default void send(ServerPlayer player) {
