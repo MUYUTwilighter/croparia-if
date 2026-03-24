@@ -34,7 +34,7 @@ public class CropariaBlocks {
     );
     public static final RegistrySupplier<CropTransmuter> CROP_TRANSMUTER = registerBlock(
         "crop_transmuter", properties -> new CropTransmuter(
-            properties.strength(1.5F, 1.5F).requiresCorrectToolForDrops()
+            properties.strength(1.0F, 1.0F).requiresCorrectToolForDrops()
         )
     );
     public static final RegistrySupplier<Infusor> INFUSOR = registerBlock("infusor", properties -> new Infusor(

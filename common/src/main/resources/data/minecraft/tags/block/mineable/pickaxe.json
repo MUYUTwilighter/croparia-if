@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
+    "croparia:crop_transmuter",
     "croparia:elematilius_ore",
     "croparia:deepslate_elematilius_ore",
     "croparia:elemental_stone",
