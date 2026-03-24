@@ -83,7 +83,6 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         graphics.drawString(this.font, this.title, 8, 6, 0x404040, false);
         graphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 94, 0x404040, false);
-        graphics.drawString(this.font, Component.translatable("gui.croparia.crop_transmuter.select"), SELECTION_X, 6, 0x404040, false);
         drawPanelFooter(graphics);
     }
 

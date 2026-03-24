@@ -138,7 +138,7 @@
   "gui.croparia.infusor.title": "元素灌注",
   "gui.croparia.soak.title": "元素浸润",
   "gui.croparia.crop_transmuter.select": "选择输出",
-  "gui.croparia.crop_transmuter.no_input": "请放入作物果实",
+  "gui.croparia.crop_transmuter.no_input": "放入果实",
   "gui.croparia.crop_transmuter.no_selection": "请选择输出物品",
   "gui.croparia.crop_transmuter.auto_output": "输出由作物材料固定",
   "item.croparia.croparia": "一阶魔种",
