@@ -99,11 +99,11 @@ public class CropariaItems {
     );
     @PostReg
     public static final RegistrySupplier<Croparia> CROPARIA6 = registerItem(
-        "croparia6", properties -> new Croparia(6, properties.arch$tab(Tabs.MAIN))
+        "croparia6", properties -> new Croparia(6, properties)
     );
     @PostReg
     public static final RegistrySupplier<Croparia> CROPARIA7 = registerItem(
-        "croparia7", properties -> new Croparia(7, properties.arch$tab(Tabs.MAIN))
+        "croparia7", properties -> new Croparia(7, properties)
     );
     public static final RegistrySupplier<HornPlenty> HORN = registerItem(
         "horn_plenty",
