@@ -22,11 +22,18 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     private static final int PANEL_ROWS = 3;
     private static final int SELECTION_X = 62;
     private static final int SELECTION_Y = 17;
+    private static final int INPUT_SLOT_X = 19;
+    private static final int INPUT_SLOT_Y = 34;
+    private static final int OUTPUT_SLOT_X = 137;
+    private static final int OUTPUT_SLOT_Y = 34;
+    private static final int SLOT_SIZE = 18;
     private static final int PANEL_OUTER_BORDER = 0xFF5B4A36;
     private static final int PANEL_BACKGROUND = 0xFF221A12;
     private static final int PANEL_CELL_BACKGROUND = 0xFF382B1E;
     private static final int PANEL_CELL_HOVER = 0x66FFF2CC;
     private static final int PANEL_CELL_SELECTED = 0xCCFFD54F;
+    private static final int SLOT_BORDER = 0xFF8B6B43;
+    private static final int SLOT_BACKGROUND = 0xFF2A2017;
     private static final int PANEL_TEXT = 0xE8D9C2;
     private static final int PANEL_TEXT_MUTED = 0xBFAF96;
 
@@ -61,6 +68,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         int left = this.leftPos;
         int top = this.topPos;
         graphics.blit(TEXTURE, left, top, 0, 0, this.imageWidth, this.imageHeight);
+        renderMachineSlots(graphics);
         renderSelectionPanel(graphics, mouseX, mouseY);
     }
 
@@ -194,18 +202,30 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
 
     private void drawPanelFooter(GuiGraphics graphics) {
         List<ItemStack> candidates = getCandidates();
-        Component footer = candidates.size() <= 1
-            ? Component.translatable("gui.croparia.crop_transmuter.auto_output")
-            : Component.literal((page + 1) + "/" + getPageCount());
+        if (candidates.size() <= 1) {
+            return;
+        }
+        Component footer = Component.literal((page + 1) + "/" + getPageCount());
         int x = SELECTION_X + (PANEL_COLS * PANEL_CELL - this.font.width(footer)) / 2;
         int y = SELECTION_Y + PANEL_ROWS * PANEL_CELL + 10;
-        graphics.drawString(this.font, footer, x, y, candidates.size() <= 1 ? PANEL_TEXT_MUTED : PANEL_TEXT, false);
+        graphics.drawString(this.font, footer, x, y, PANEL_TEXT, false);
     }
 
     private void drawPanelMessage(GuiGraphics graphics, Component message, int left, int top, int width, int height) {
         int textX = left + (width - this.font.width(message)) / 2;
         int textY = top + height / 2 - 4;
         graphics.drawString(this.font, message, textX, textY, PANEL_TEXT_MUTED, false);
+    }
+
+    private void renderMachineSlots(GuiGraphics graphics) {
+        drawSlotFrame(graphics, this.leftPos + INPUT_SLOT_X, this.topPos + INPUT_SLOT_Y);
+        drawSlotFrame(graphics, this.leftPos + OUTPUT_SLOT_X, this.topPos + OUTPUT_SLOT_Y);
+    }
+
+    private void drawSlotFrame(GuiGraphics graphics, int x, int y) {
+        graphics.fill(x - 1, y - 1, x + SLOT_SIZE + 1, y + SLOT_SIZE + 1, SLOT_BORDER);
+        graphics.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, SLOT_BACKGROUND);
+        graphics.renderOutline(x - 1, y - 1, SLOT_SIZE + 2, SLOT_SIZE + 2, SLOT_BORDER);
     }
 
     private int getVisibleStart() {
