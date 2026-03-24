@@ -42,7 +42,7 @@ public class CropTransmuter extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(POWERED, false));
         ProxyProvider.registerItem((world, pos, state, be, direction) -> {
             if (be instanceof CropTransmuterBlockEntity extractor) {
-                return extractor.visitItem();
+                return extractor.visitItem(direction);
             }
             return null;
         }, this);

@@ -31,10 +31,11 @@ public record CropTransmuterRedstoneModePacket(BlockPos pos) implements NetworkH
         context.queue(() -> {
             if (!(context.getPlayer() instanceof ServerPlayer player)) return;
             if (!(player.containerMenu instanceof CropTransmuterMenu menu)) return;
-            if (menu.getBlockPos() == null || !menu.getBlockPos().equals(pos)) return;
+            if (!menu.getBlockPos().equals(pos)) return;
             BlockEntity be = player.level().getBlockEntity(pos);
-            if (!(be instanceof CropTransmuterBlockEntity extractor)) return;
-            extractor.toggleRedstoneMode();
+            if (!(be instanceof CropTransmuterBlockEntity transmuter)) return;
+            transmuter.toggleRedstoneMode();
+            menu.broadcastChanges();
         });
     }
 }

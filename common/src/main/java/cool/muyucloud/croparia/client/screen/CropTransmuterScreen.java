@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.client.screen;
 import cool.muyucloud.croparia.api.core.menu.CropTransmuterMenu;
 import cool.muyucloud.croparia.api.core.network.CropTransmuterRedstoneModePacket;
 import cool.muyucloud.croparia.api.core.network.CropTransmuterSelectPacket;
+import cool.muyucloud.croparia.api.crop.util.Material;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -13,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Optional;
 
 public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuterMenu> {
     private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace(
@@ -42,11 +44,13 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     private Button prevButton;
     private Button nextButton;
     private Button redstoneModeButton;
+    private boolean localPositiveRedstone;
 
     public CropTransmuterScreen(CropTransmuterMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
         this.imageHeight = 166;
+        this.localPositiveRedstone = menu.isPositiveRedstone();
     }
 
     @Override
@@ -63,7 +67,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
             .size(18, 20)
             .build());
         redstoneModeButton = addRenderableWidget(Button.builder(getRedstoneModeLabel(), button -> toggleRedstoneMode())
-            .pos(this.leftPos + INPUT_SLOT_X - 1, this.topPos + INPUT_SLOT_Y + SLOT_SIZE + 6)
+            .pos(this.leftPos + this.imageWidth - 24, this.topPos + 4)
             .size(20, 20)
             .build());
         updatePageButtons();
@@ -96,6 +100,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     public void containerTick() {
         super.containerTick();
         updatePageButtons();
+        this.localPositiveRedstone = this.menu.isPositiveRedstone();
         if (redstoneModeButton != null) {
             redstoneModeButton.setMessage(getRedstoneModeLabel());
         }
@@ -135,7 +140,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         graphics.fill(left - 2, top - 2, left + width + 2, top + height + 2, PANEL_OUTER_BORDER);
         graphics.fill(left - 1, top - 1, left + width + 1, top + height + 1, PANEL_BACKGROUND);
         List<ItemStack> candidates = getCandidates();
-        if (!menu.hasMaterial()) {
+        if (menu.getBlockEntity().readInputMaterial().isEmpty()) {
             drawPanelMessage(graphics, Component.translatable("gui.croparia.crop_transmuter.no_input"), left, top, width, height);
             return;
         }
@@ -146,7 +151,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         int hovered = getHoveredCandidateIndex(mouseX, mouseY, candidates.size());
         int start = getVisibleStart();
         int end = Math.min(start + PANEL_COLS * PANEL_ROWS, candidates.size());
-        ResourceLocation selected = menu.getSelectedOutputId();
+        ResourceLocation selected = this.getSelectedStack().getItem().arch$registryName();
         for (int local = 0; local < PANEL_COLS * PANEL_ROWS; local++) {
             int col = local % PANEL_COLS;
             int row = local / PANEL_COLS;
@@ -174,7 +179,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     }
 
     private void renderSelectionTooltip(GuiGraphics graphics, int mouseX, int mouseY) {
-        if (!menu.hasMaterial()) return;
+        if (this.getMenu().getBlockEntity().readInputMaterial().isEmpty()) return;
         List<ItemStack> candidates = getCandidates();
         if (candidates.isEmpty()) return;
         int hovered = getHoveredCandidateIndex(mouseX, mouseY, candidates.size());
@@ -193,14 +198,14 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
 
     private boolean handleSelectionClick(double mouseX, double mouseY, int button) {
         if (button != 0) return false;
-        if (!menu.hasMaterial()) return false;
+        if (this.getMenu().getBlockEntity().readInputMaterial().isEmpty()) return false;
         List<ItemStack> candidates = getCandidates();
         if (candidates.isEmpty()) return false;
         int hovered = getHoveredCandidateIndex(mouseX, mouseY, candidates.size());
         if (hovered >= 0 && hovered < candidates.size()) {
             ItemStack stack = candidates.get(hovered);
-            if (stack.getItem().arch$registryName() != null && menu.getBlockPos() != null) {
-                new CropTransmuterSelectPacket(menu.getBlockPos(), hovered).send();
+            if (stack.getItem().arch$registryName() != null) {
+                new CropTransmuterSelectPacket(this.getMenu().getBlockEntity().getBlockPos(), hovered).send();
             }
             return true;
         }
@@ -208,13 +213,16 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     }
 
     private void toggleRedstoneMode() {
-        if (menu.getBlockPos() == null) return;
-        new CropTransmuterRedstoneModePacket(menu.getBlockPos()).send();
+        this.localPositiveRedstone = !this.localPositiveRedstone;
+        if (redstoneModeButton != null) {
+            redstoneModeButton.setMessage(getRedstoneModeLabel());
+        }
+        new CropTransmuterRedstoneModePacket(this.getMenu().getBlockPos()).send();
     }
 
     private Component getRedstoneModeLabel() {
         return Component.translatable(
-            menu.isPositiveRedstone()
+            this.localPositiveRedstone
                 ? "gui.croparia.crop_transmuter.redstone_positive"
                 : "gui.croparia.crop_transmuter.redstone_negative"
         );
@@ -265,6 +273,13 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     }
 
     private List<ItemStack> getCandidates() {
-        return menu.getCandidateStacks();
+        return menu.getBlockEntity().readInputMaterial().map(Material::asItems).orElse(List.of());
+    }
+
+    private ItemStack getSelectedStack() {
+        Optional<Material<?>> mayMaterial = this.getMenu().getBlockEntity().readInputMaterial();
+        if (mayMaterial.isEmpty()) return ItemStack.EMPTY;
+        List<ItemStack> stacks = mayMaterial.get().asItems();
+        return stacks.get(Math.min(stacks.size() - 1, this.getMenu().getBlockEntity().getSelectedIndex()));
     }
 }

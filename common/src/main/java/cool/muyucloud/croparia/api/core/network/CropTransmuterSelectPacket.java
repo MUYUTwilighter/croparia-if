@@ -14,6 +14,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+
 public record CropTransmuterSelectPacket(BlockPos pos, int selectedIndex) implements NetworkHandler {
     public static final StreamCodec<RegistryFriendlyByteBuf, CropTransmuterSelectPacket> STREAM_CODEC = StreamCodec.of(
         (buf, payload) -> {
@@ -35,16 +37,14 @@ public record CropTransmuterSelectPacket(BlockPos pos, int selectedIndex) implem
         context.queue(() -> {
             if (!(context.getPlayer() instanceof ServerPlayer player)) return;
             if (!(player.containerMenu instanceof CropTransmuterMenu menu)) return;
-            if (menu.getBlockPos() == null || !menu.getBlockPos().equals(pos)) return;
+            if (!menu.getBlockEntity().getBlockPos().equals(pos)) return;
             BlockEntity be = player.level().getBlockEntity(pos);
-            if (!(be instanceof CropTransmuterBlockEntity extractor)) return;
-            Material<?> material = CropTransmuterBlockEntity.materialFromInput(
-                extractor.getItem(CropTransmuterBlockEntity.INPUT_SLOT)
-            );
-            if (material == null) return;
-            int size = CropTransmuterBlockEntity.candidateItemStacks(material).size();
+            if (!(be instanceof CropTransmuterBlockEntity transmuter)) return;
+            Optional<Material<?>> mayMaterial = transmuter.readInputMaterial();
+            if (mayMaterial.isEmpty()) return;
+            int size = mayMaterial.get().asItems().size();
             if (selectedIndex < 0 || selectedIndex >= size) return;
-            extractor.setSelectedIndex(selectedIndex);
+            transmuter.setSelectedIndex(selectedIndex);
         });
     }
 }
