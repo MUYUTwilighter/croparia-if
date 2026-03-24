@@ -43,9 +43,16 @@ public class ItemMaterial extends Material<Item> {
     @NotNull
     private final DataComponentPatch components;
     private transient final OnLoadSupplier<List<Item>> items = OnLoadSupplier.of(
-        () -> this.candidates(BuiltInRegistries.ITEM.key().location()).stream().filter(
+        () -> this.rawCandidates(BuiltInRegistries.ITEM.key().location()).stream().filter(
             item -> CropariaIf.CONFIG.isModValid(Objects.requireNonNull(item.arch$registryName()).getNamespace())
         ).toList()
+    );
+    private transient final OnLoadSupplier<List<ItemStack>> stacks = OnLoadSupplier.of(() ->
+        this.candidates().stream().map(item -> {
+            ItemStack stack = item.getDefaultInstance();
+            stack.applyComponents(this.getComponents());
+            return stack;
+        }).toList()
     );
 
     public ItemMaterial(ItemStack stack) {
@@ -66,19 +73,17 @@ public class ItemMaterial extends Material<Item> {
     }
 
     @Override
-    public @NotNull ItemStack asItem() {
-        List<Item> stacks = this.candidates();
-        if (stacks.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-        ItemStack stack = this.candidates().getFirst().getDefaultInstance();
-        stack.applyComponents(this.getComponents());
-        stack.setCount(Math.min(stack.getMaxStackSize(), this.getCount()));
-        return stack;
+    public @NotNull List<ItemStack> asItems() {
+        return this.stacks.get();
     }
 
     @Override
-    public List<Item> candidates() {
+    public @NotNull ItemStack asItem() {
+        return this.asItems().isEmpty() ? ItemStack.EMPTY : this.asItems().getFirst();
+    }
+
+    @Override
+    public @NotNull List<Item> candidates() {
         return this.items.get();
     }
 }

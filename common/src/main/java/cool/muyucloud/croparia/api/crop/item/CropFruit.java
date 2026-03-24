@@ -1,14 +1,12 @@
 package cool.muyucloud.croparia.api.crop.item;
 
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.crop.AbstractFruit;
 import cool.muyucloud.croparia.api.crop.Crop;
-import cool.muyucloud.croparia.api.crop.CropAccess;
-import cool.muyucloud.croparia.registry.DgRegistries;
 import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -17,12 +15,12 @@ import net.minecraft.world.item.context.UseOnContext;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("UnstableApiUsage")
-public class CropFruit extends Item implements CropAccess<Crop> {
-    private final ResourceLocation cropId;
+public class CropFruit extends Item implements AbstractFruit<Crop> {
+    private final Crop crop;
 
     public CropFruit(Crop crop) {
         super(new Properties().arch$tab(Tabs.CROPS));
-        this.cropId = crop.getKey();
+        this.crop = crop;
     }
 
     public @NotNull InteractionResult useOn(@NotNull UseOnContext context) {
@@ -50,9 +48,8 @@ public class CropFruit extends Item implements CropAccess<Crop> {
         return Texts.translatable("item." + CropariaIf.MOD_ID + ".crop.fruit", cropName);
     }
 
-
     @Override
     public Crop getCrop() {
-        return DgRegistries.CROPS.forName(this.cropId).orElseThrow();
+        return crop;
     }
 }

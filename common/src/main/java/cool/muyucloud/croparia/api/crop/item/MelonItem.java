@@ -1,6 +1,7 @@
 package cool.muyucloud.croparia.api.crop.item;
 
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.crop.AbstractFruit;
 import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.api.crop.Melon;
 import cool.muyucloud.croparia.registry.Tabs;
@@ -11,7 +12,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class MelonItem extends BlockItem implements CropAccess<Melon> {
+public class MelonItem extends BlockItem implements AbstractFruit<Melon> {
     private final Melon melon;
 
     @SuppressWarnings("UnstableApiUsage")

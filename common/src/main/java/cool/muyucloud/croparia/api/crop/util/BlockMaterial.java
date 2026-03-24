@@ -41,11 +41,14 @@ public class BlockMaterial extends Material<Block> {
         .concat(Material.PLACEHOLDER, TypeMapper.of(material -> material)));
 
     private transient final OnLoadSupplier<List<Block>> blocks = OnLoadSupplier.of(
-        () -> this.candidates(BuiltInRegistries.BLOCK.key().location()).stream().filter(block -> {
+        () -> this.rawCandidates(BuiltInRegistries.BLOCK.key().location()).stream().filter(block -> {
             boolean blacklist = CropariaIf.CONFIG.isModValid(Objects.requireNonNull(block.arch$registryName()).getNamespace());
             boolean hasItem = block.asItem() instanceof BlockItem;
             return blacklist & hasItem;
         }).toList()
+    );
+    private transient final OnLoadSupplier<List<ItemStack>> stacks = OnLoadSupplier.of(() ->
+        this.candidates().stream().map(block -> block.asItem().getDefaultInstance()).toList()
     );
 
     public static ResourceLocation parse(ItemStack stack) {
@@ -70,17 +73,22 @@ public class BlockMaterial extends Material<Block> {
     }
 
     @Override
-    public List<Block> candidates() {
+    public @NotNull List<Block> candidates() {
         return blocks.get();
     }
 
     @Override
-    public ItemStack asItem() {
+    public @NotNull List<ItemStack> asItems() {
+        return stacks.get();
+    }
+
+    @Override
+    public @NotNull ItemStack asItem() {
         List<Block> candidates = this.candidates();
         if (candidates.isEmpty()) {
             return ItemStack.EMPTY;
         }
-        ItemStack stack =  this.candidates().getFirst().asItem().getDefaultInstance();
+        ItemStack stack = this.candidates().getFirst().asItem().getDefaultInstance();
         stack.setCount(this.getCount());
         return stack;
     }

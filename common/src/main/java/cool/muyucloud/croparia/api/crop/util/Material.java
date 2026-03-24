@@ -57,7 +57,13 @@ public abstract class Material<T> {
         return count;
     }
 
-    protected Collection<T> candidates(ResourceLocation registryName) {
+    /**
+     * Get raw candidate entries from registry.
+     * No filters are applied.
+     *
+     * @see #candidates()
+     */
+    protected Collection<T> rawCandidates(ResourceLocation registryName) {
         @Nullable
         Registry<T> registry = CifUtil.castUnsafe(BuiltInRegistries.REGISTRY.get(registryName));
         if (registry == null) {
@@ -85,7 +91,14 @@ public abstract class Material<T> {
         return this.asItem().isEmpty();
     }
 
-    public abstract List<T> candidates();
+    /**
+     * Get filtered candidate entries
+     *
+     * @see #rawCandidates(ResourceLocation)
+     */
+    public abstract @NotNull List<T> candidates();
 
-    public abstract ItemStack asItem();
+    public abstract @NotNull List<ItemStack> asItems();
+
+    public abstract @NotNull ItemStack asItem();
 }
