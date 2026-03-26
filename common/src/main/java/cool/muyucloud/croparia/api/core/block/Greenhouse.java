@@ -27,10 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -56,6 +53,12 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        super.onPlace(state, level, pos, oldState, movedByPiston);
+        this.updateShape(state, Direction.DOWN, state, level, pos, pos);
+    }
+
+    @Override
     protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         super.updateShape(state, direction, neighborState, level, pos, neighborPos);
         // Filter client level
@@ -63,7 +66,6 @@ public class Greenhouse extends BaseEntityBlock {
         // Filter unharvestable blocks
         BlockPos belowPos = pos.below();
         BlockState belowState = level.getBlockState(belowPos);
-        if (TagUtil.isIn(UNHARVESTABLE, belowState.getBlock())) return state;
         // Filter block entity
         BlockEntity be = level.getBlockEntity(pos);
         if (!(be instanceof GreenhouseBlockEntity gbe)) return state;

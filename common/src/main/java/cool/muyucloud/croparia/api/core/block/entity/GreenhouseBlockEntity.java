@@ -40,7 +40,7 @@ import java.util.List;
 
 public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, Container {
     private final NonNullList<ItemStack> inventory;
-    private final RepoProxy<ItemSpec> proxy = RepoProxy.item(new ContainerRepo(this));
+    private final RepoProxy<ItemSpec> proxy = RepoProxy.item(new ContainerRepo<>(this));
 
     public GreenhouseBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntities.GREENHOUSE_BE.get(), pos, state);
