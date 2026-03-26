@@ -15,11 +15,6 @@ architectury {
 
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
-    runs {
-        server {
-            source sourceSets.test
-        }
-    }
 }
 
 configurations {
