@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "croparia:seeds/melons"
+            "items": "#croparia:seeds/melons"
           }
         ]
       },
