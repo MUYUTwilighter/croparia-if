@@ -95,10 +95,10 @@ public class CropariaIf {
         else orElse.run();
     }
 
-    public static void ifServerOrClient(Consumer<MinecraftServer> serverConsumer, Consumer<Ref<Minecraft>> clientConsumer) {
+    public static void ifServerOrClient(Consumer<MinecraftServer> serverConsumer, Consumer<Minecraft> clientConsumer) {
         if (SERVER != null) serverConsumer.accept(SERVER);
         else if (Platform.getEnvironment() == Env.CLIENT) {
-            clientConsumer.accept(Ref.of(Minecraft.getInstance()));
+            clientConsumer.accept(Minecraft.getInstance());
         }
     }
 
@@ -106,17 +106,17 @@ public class CropariaIf {
         if (SERVER != null) consumer.accept(SERVER);
     }
 
-    public static void ifClientOrElse(Consumer<Ref<Minecraft>> consumer, Consumer<Optional<MinecraftServer>> orElse) {
+    public static void ifClientOrElse(Consumer<Minecraft> consumer, Consumer<Optional<MinecraftServer>> orElse) {
         if (Platform.getEnvironment() == Env.CLIENT) {
-            consumer.accept(Ref.of(Minecraft.getInstance()));
+            consumer.accept(Minecraft.getInstance());
         } else {
             orElse.accept(Optional.ofNullable(SERVER));
         }
     }
 
-    public static void ifClient(Consumer<Ref<Minecraft>> consumer) {
+    public static void ifClient(Consumer<Minecraft> consumer) {
         if (Platform.getEnvironment() == Env.CLIENT) {
-            consumer.accept(Ref.of(Minecraft.getInstance()));
+            consumer.accept(Minecraft.getInstance());
         }
     }
 
@@ -135,8 +135,8 @@ public class CropariaIf {
 
     public static Optional<RegistryAccess> getRegistryAccess() {
         Ref<RegistryAccess> accessRef = new Ref<>();
-        CropariaIf.ifServerOrClient(server -> accessRef.set(server.registryAccess()), ref -> {
-            ClientLevel level = ref.get().level;
+        CropariaIf.ifServerOrClient(server -> accessRef.set(server.registryAccess()), client -> {
+            ClientLevel level = client.level;
             if (level != null) {
                 accessRef.set(level.registryAccess());
             }

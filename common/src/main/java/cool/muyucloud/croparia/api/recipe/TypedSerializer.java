@@ -7,6 +7,7 @@ import cool.muyucloud.croparia.access.RecipeManagerAccess;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.registry.Recipes;
 import cool.muyucloud.croparia.util.supplier.Mappable;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -16,9 +17,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,14 +64,16 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
     @SuppressWarnings("unchecked")
     public List<R> find() {
         List<R> recipes = new ArrayList<>();
-        CropariaIf.ifServerOrElse(server -> recipes.addAll(
+        CropariaIf.ifServer(server -> recipes.addAll(
             ((RecipeManagerAccess) server.getRecipeManager()).cif$byType(this.adapt())
                 .stream().map(holder -> (R) holder.value()).toList()
-        ), () -> {
-            Level level = getClientLevel();
+        ));
+        CropariaIf.ifClient(client -> {
+            ClientLevel level = client.level;
             if (level == null) return;
-            RecipeManagerAccess access = (RecipeManagerAccess) level.getRecipeManager();
-            access.cif$byType(this.adapt()).forEach(holder -> recipes.add((R) holder.value()));
+            recipes.addAll(
+                ((RecipeManagerAccess) level.getRecipeManager()).cif$byType(this.adapt())
+                    .stream().map(holder -> (R) holder.value()).toList());
         });
         return recipes;
     }
@@ -110,18 +111,5 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
 
     public ResourceLocation getId() {
         return id;
-    }
-
-    @Nullable
-    private static Level getClientLevel() {
-        try {
-            Class<?> minecraftClass = Class.forName("net.minecraft.client.Minecraft");
-            Object minecraft = minecraftClass.getMethod("getInstance").invoke(null);
-            Field levelField = minecraftClass.getField("level");
-            Object level = levelField.get(minecraft);
-            return level instanceof Level typedLevel ? typedLevel : null;
-        } catch (ReflectiveOperationException ignored) {
-            return null;
-        }
     }
 }
