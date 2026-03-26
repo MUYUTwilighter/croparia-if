@@ -20,7 +20,7 @@ public interface ItemPlaceable {
     default void placeItem(Level world, BlockPos pos, ItemStack stack, Entity owner) {
         if (world.isClientSide()) return;
         ItemStack newStack;
-        if (owner instanceof Player player && player.isCrouching()) {   // Place the entire stack if the player is crouching
+        if (world.hasNeighborSignal(pos)) { // Place the entire stack if the block is charged by redstone
             newStack = stack.copyAndClear();
         } else {    // Otherwise, place only one item
             newStack = stack.split(1);
