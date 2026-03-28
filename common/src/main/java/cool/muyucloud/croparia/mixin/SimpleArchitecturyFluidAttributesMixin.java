@@ -1,19 +1,14 @@
 package cool.muyucloud.croparia.mixin;
 
 import cool.muyucloud.croparia.access.SimpleArchitecturyFluidAttributesAccess;
+import cool.muyucloud.croparia.api.crop.util.Color;
 import dev.architectury.core.fluid.ArchitecturyFluidAttributes;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.function.Supplier;
 
 @Mixin(value = SimpleArchitecturyFluidAttributes.class, remap = false)
 public abstract class SimpleArchitecturyFluidAttributesMixin implements ArchitecturyFluidAttributes, SimpleArchitecturyFluidAttributesAccess {
@@ -23,11 +18,7 @@ public abstract class SimpleArchitecturyFluidAttributesMixin implements Architec
     @Unique
     @Nullable
     private ResourceLocation cif$renderOverlayTexture;
-
-    @Inject(method = "<init>", at = @At("HEAD"))
-    private static void test(Supplier<? extends Fluid> flowingFluid, Supplier<? extends Fluid> sourceFluid, CallbackInfo ci) {
-        System.out.println("SimpleArchitecturyFluidAttributes Injected");
-    }
+    private Color cif$FogColor;
 
     @Override
     public Component cif$getName() {
@@ -35,9 +26,8 @@ public abstract class SimpleArchitecturyFluidAttributesMixin implements Architec
     }
 
     @Override
-    public SimpleArchitecturyFluidAttributesAccess cif$setName(Component name) {
+    public void cif$setName(Component name) {
         this.cif$name = name;
-        return this;
     }
 
     @Override
@@ -46,8 +36,17 @@ public abstract class SimpleArchitecturyFluidAttributesMixin implements Architec
     }
 
     @Override
-    public SimpleArchitecturyFluidAttributesAccess cif$setRenderOverlayTexture(ResourceLocation texture) {
+    public void cif$setRenderOverlayTexture(ResourceLocation texture) {
         this.cif$renderOverlayTexture = texture;
-        return this;
+    }
+
+    @Override
+    public Color cif$getFogColor() {
+        return this.cif$FogColor;
+    }
+
+    @Override
+    public void cif$setFogColor(Color color) {
+        this.cif$FogColor = color;
     }
 }

@@ -7,6 +7,7 @@ import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.TypeMapper;
 import net.minecraft.network.chat.Style;
+import org.joml.Vector3f;
 
 import java.util.Locale;
 
@@ -29,6 +30,11 @@ public class Color {
     }
 
     private final int value;
+    private final transient Vector3f vector3f = new Vector3f(
+        ((this.getValue() >> 16) & 0xFF) / 255F,
+        ((this.getValue() >> 8) & 0xFF) / 255F,
+        (this.getValue() & 0xFF) / 255F
+    );
 
     public Color(int value) {
         this.value = value;
@@ -58,5 +64,9 @@ public class Color {
 
     public String toDecString() {
         return String.format("%d", this.getValue());
+    }
+
+    public Vector3f toVector3f() {
+        return vector3f;
     }
 }

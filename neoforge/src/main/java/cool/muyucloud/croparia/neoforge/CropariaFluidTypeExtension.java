@@ -1,10 +1,13 @@
 package cool.muyucloud.croparia.neoforge;
 
 import cool.muyucloud.croparia.access.SimpleArchitecturyFluidAttributesAccess;
+import cool.muyucloud.croparia.api.crop.util.Color;
 import dev.architectury.core.fluid.ArchitecturyFluidAttributes;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -13,6 +16,7 @@ import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtension
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 public class CropariaFluidTypeExtension implements IClientFluidTypeExtensions {
     private ArchitecturyFluidAttributes attr;
@@ -20,7 +24,7 @@ public class CropariaFluidTypeExtension implements IClientFluidTypeExtensions {
     public CropariaFluidTypeExtension(ArchitecturyFluidAttributes attr) {
         this.attr = attr;
     }
-    
+
     public int getTintColor() {
         return this.attr.getColor();
     }
@@ -66,16 +70,26 @@ public class CropariaFluidTypeExtension implements IClientFluidTypeExtensions {
     }
 
     public @NotNull ResourceLocation getOverlayTexture(@NotNull FluidStack stack) {
-        return this.attr.getOverlayTexture(this.convertSafe(stack)) ;
+        return this.attr.getOverlayTexture(this.convertSafe(stack));
     }
 
     @Override
     public @Nullable ResourceLocation getRenderOverlayTexture(@NotNull Minecraft mc) {
         if (this.attr instanceof SimpleArchitecturyFluidAttributes simpleAttr) {
             ResourceLocation renderOverlay = SimpleArchitecturyFluidAttributesAccess.getRenderOverlayTexture(simpleAttr);
+            if (renderOverlay == null) return null;
             return ResourceLocation.tryBuild(renderOverlay.getNamespace(), "textures/" + renderOverlay.getPath() + ".png");
         }
         return null;
+    }
+
+    @Override
+    public @NotNull Vector3f modifyFogColor(@NotNull Camera camera, float partialTick, @NotNull ClientLevel level, int renderDistance, float darkenWorldAmount, @NotNull Vector3f fluidFogColor) {
+        if (this.attr instanceof SimpleArchitecturyFluidAttributes simpleAttr) {
+            Color color = SimpleArchitecturyFluidAttributesAccess.getFogColor(simpleAttr);
+            return color == null ? fluidFogColor : color.toVector3f();
+        }
+        return fluidFogColor;
     }
 
     public dev.architectury.fluid.@Nullable FluidStack convertSafe(@Nullable FluidStack stack) {

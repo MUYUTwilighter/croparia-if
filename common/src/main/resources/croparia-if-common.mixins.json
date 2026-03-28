@@ -13,7 +13,6 @@
     "DropperBlockMixin",
     "ItemStackMixin",
     "MinecraftServerMixin",
-    "ArchitecturyFlowingFluidMixin",
     "PackRepositoryMixin",
     "RecipeManagerMixin",
     "ReloadableResourceManagerImplMixin",

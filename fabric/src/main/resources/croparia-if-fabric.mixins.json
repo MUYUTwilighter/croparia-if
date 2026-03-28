@@ -4,10 +4,11 @@
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
   "client": [
+    "FogRendererMixin",
+    "ScreenEffectRendererMixin"
   ],
   "mixins": [
-    "ArchitecturyFluidAttributesFabricMixin",
-    "ScreenEffectRendererMixin"
+    "ArchitecturyFluidAttributesFabricMixin"
   ],
   "injectors": {
     "defaultRequire": 1
