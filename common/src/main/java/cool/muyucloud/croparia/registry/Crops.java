@@ -10,6 +10,7 @@ import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
 import cool.muyucloud.croparia.api.element.Element;
 import dev.architectury.injectables.targets.ArchitecturyTarget;
 import dev.architectury.registry.registries.RegistrySupplier;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +43,7 @@ public class Crops {
         @NotNull String name, @NotNull RegistrySupplier<? extends Item> material, int color, int tier, @NotNull String type,
         @NotNull String translationKey
     ) {
-        Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material.getId().toString()), new Color(color), tier, type, null, new CropDependencies("croparia", translationKey));
+        Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material.getId().toString(), DataComponentPatch.EMPTY, CropariaIf.CONFIG.getCropYield()), new Color(color), tier, type, null, new CropDependencies("croparia", translationKey));
         DgRegistries.CROPS.register(crop);
         return crop;
     }
@@ -66,7 +67,7 @@ public class Crops {
         @NotNull String name, Item material, int color, int tier, @NotNull String type
     ) {
         Crop crop = new Crop(
-            CropariaIf.of(name), new ItemMaterial(Objects.requireNonNull(material.arch$registryName()).toString()),
+            CropariaIf.of(name), new ItemMaterial(Objects.requireNonNull(material.arch$registryName()).toString(), DataComponentPatch.EMPTY, CropariaIf.CONFIG.getCropYield()),
             new Color(color), tier, type, null, new CropDependencies("minecraft", material.getDescriptionId())
         );
         DgRegistries.CROPS.register(crop);
@@ -202,7 +203,7 @@ public class Crops {
     public static @NotNull Crop compat(
         String name, String material, int color, int tier, String type, @NotNull Map<String, String> translationKeys
     ) {
-        Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material), new Color(color), tier, type, null, new CropDependencies(translationKeys));
+        Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material, DataComponentPatch.EMPTY, CropariaIf.CONFIG.getCropYield()), new Color(color), tier, type, null, new CropDependencies(translationKeys));
         DgRegistries.CROPS.register(crop);
         return crop;
     }

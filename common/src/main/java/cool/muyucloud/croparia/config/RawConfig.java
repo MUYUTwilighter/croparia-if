@@ -3,6 +3,6 @@ package cool.muyucloud.croparia.config;
 import java.util.List;
 
 public record RawConfig(String filePath, String recipeWizard, Boolean override, Boolean infusor, Boolean ritual,
-                        Boolean fruitUse, Integer autoReload, Integer soakAttempts,
+                        Boolean fruitUse, Integer autoReload, Integer soakAttempts, Integer cropYield, Integer melonYield,
                         List<String> blacklist) {
 }

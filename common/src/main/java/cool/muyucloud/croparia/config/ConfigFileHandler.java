@@ -37,7 +37,7 @@ public class ConfigFileHandler {
         return new Config(new RawConfig(
             gameFolder.resolve("croparia").toString(),
             gameFolder.resolve("croparia/recipe_wizard/dump").toString(),
-            true, true, true, true, 20, 1, List.of()
+            true, true, true, true, 20, 1, 2, 2, List.of()
         ));
     }
 

@@ -23,6 +23,8 @@ class ConfigTest {
             true,
             42,
             3,
+            2,
+            2,
             List.of("minecraft:wheat", "@fabric.*", "not a resource location")
         );
 
@@ -55,6 +57,8 @@ class ConfigTest {
             true,
             20,
             1,
+            2,
+            2,
             List.of()
         ));
 

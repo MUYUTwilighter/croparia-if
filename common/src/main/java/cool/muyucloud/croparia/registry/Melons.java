@@ -25,7 +25,7 @@ public class Melons {
         @NotNull String name, Block material, int color, int tier
     ) {
         Melon melon = new Melon(
-            CropariaIf.of(name), new BlockMaterial(Objects.requireNonNull(material.arch$registryName()).toString()),
+            CropariaIf.of(name), new BlockMaterial(Objects.requireNonNull(material.arch$registryName()).toString(), CropariaIf.CONFIG.getMelonYield()),
             new Color(color), tier, null, new CropDependencies("minecraft", material.getDescriptionId())
         );
         DgRegistries.MELONS.register(melon);

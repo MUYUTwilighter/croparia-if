@@ -56,6 +56,10 @@ public class Config {
     @NotNull
     private Integer soakAttempts;
     @NotNull
+    private Integer cropYield;
+    @NotNull
+    private Integer melonYield;
+    @NotNull
     private final List<ResourceLocation> cropBlackList;
     private final List<String> modBlackList;
 
@@ -71,6 +75,8 @@ public class Config {
         this.infusor = true;
         this.ritual = true;
         this.soakAttempts = 1;
+        this.cropYield = 2;
+        this.melonYield = 2;
         this.cropBlackList = new ArrayList<>();
         this.modBlackList = new ArrayList<>();
     }
@@ -87,13 +93,32 @@ public class Config {
         this.infusor = raw.infusor() != null ? raw.infusor() : true;
         this.ritual = raw.ritual() != null ? raw.ritual() : true;
         this.soakAttempts = raw.soakAttempts() != null ? raw.soakAttempts() : 1;
+        this.cropYield = raw.cropYield() != null && raw.cropYield() > 0 ? raw.cropYield() : 2;
+        this.melonYield = raw.melonYield() != null && raw.melonYield() > 0 ? raw.melonYield() : 2;
+        this.melonYield = 2;
         this.cropBlackList = new ArrayList<>();
         this.modBlackList = new ArrayList<>();
         this.setBlackList(raw.blacklist());
     }
 
     public RawConfig toRaw() {
-        return new RawConfig(resolvePath(filePath), resolvePath(recipeWizard), override, infusor, ritual, fruitUse, autoReload, soakAttempts, this.getBlacklist());
+        return new RawConfig(resolvePath(filePath), resolvePath(recipeWizard), override, infusor, ritual, fruitUse, autoReload, soakAttempts, cropYield, melonYield, this.getBlacklist());
+    }
+
+    public @NotNull Integer getCropYield() {
+        return cropYield;
+    }
+
+    public void setCropYield(@NotNull Integer cropYield) {
+        this.cropYield = cropYield;
+    }
+
+    public @NotNull Integer getMelonYield() {
+        return melonYield;
+    }
+
+    public void setMelonYield(@NotNull Integer melonYield) {
+        this.melonYield = melonYield;
     }
 
     public @NotNull Path getFilePath() {
