@@ -33,7 +33,8 @@
     ]
   },
   "mixins": [
-    "croparia-if-common.mixins.json"
+    "croparia-if-common.mixins.json",
+    "croparia-if-fabric.mixins.json"
   ],
   "depends": {
     "fabric": "*",

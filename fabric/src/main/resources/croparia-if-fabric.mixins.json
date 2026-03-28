@@ -6,7 +6,8 @@
   "client": [
   ],
   "mixins": [
-    "ArchitecturyFluidAttributesFabricMixin"
+    "ArchitecturyFluidAttributesFabricMixin",
+    "ScreenEffectRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

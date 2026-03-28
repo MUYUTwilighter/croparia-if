@@ -4,6 +4,7 @@ import cool.muyucloud.croparia.access.SimpleArchitecturyFluidAttributesAccess;
 import dev.architectury.core.fluid.ArchitecturyFluidAttributes;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +20,9 @@ public abstract class SimpleArchitecturyFluidAttributesMixin implements Architec
     @Unique
     @Nullable
     private Component cif$name;
+    @Unique
+    @Nullable
+    private ResourceLocation cif$renderOverlayTexture;
 
     @Inject(method = "<init>", at = @At("HEAD"))
     private static void test(Supplier<? extends Fluid> flowingFluid, Supplier<? extends Fluid> sourceFluid, CallbackInfo ci) {
@@ -33,6 +37,17 @@ public abstract class SimpleArchitecturyFluidAttributesMixin implements Architec
     @Override
     public SimpleArchitecturyFluidAttributesAccess cif$setName(Component name) {
         this.cif$name = name;
+        return this;
+    }
+
+    @Override
+    public ResourceLocation cif$getRenderOverlayTexture() {
+        return this.cif$renderOverlayTexture;
+    }
+
+    @Override
+    public SimpleArchitecturyFluidAttributesAccess cif$setRenderOverlayTexture(ResourceLocation texture) {
+        this.cif$renderOverlayTexture = texture;
         return this;
     }
 }

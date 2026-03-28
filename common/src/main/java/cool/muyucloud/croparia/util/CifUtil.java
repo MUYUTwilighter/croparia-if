@@ -1,5 +1,6 @@
 package cool.muyucloud.croparia.util;
 
+import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
@@ -23,6 +24,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -154,5 +157,38 @@ public class CifUtil {
     @SuppressWarnings("unchecked")
     public static <T> T castUnsafe(Object o) {
         return (T) o;
+    }
+
+    public static <T> LazySupplier<Field> forField(Class<T> clz, String name) {
+        return LazySupplier.of(() -> {
+            try {
+                Field field = clz.getDeclaredField(name);
+                field.setAccessible(true);
+                return field;
+            } catch (NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public static <T> LazySupplier<Constructor<T>> forConstructor(Class<T> clz, Class<?>... paramTypes) {
+        return LazySupplier.of(() -> {
+            try {
+                Constructor<T> constructor = clz.getConstructor(paramTypes);
+                constructor.setAccessible(true);
+                return constructor;
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> LazySupplier<Constructor<T>> forConstructor(String name, Class<?>... paramTypes) {
+        try {
+            return forConstructor((Class<T>) Class.forName(name), paramTypes);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

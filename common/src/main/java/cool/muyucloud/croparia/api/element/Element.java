@@ -1,5 +1,6 @@
 package cool.muyucloud.croparia.api.element;
 
+import com.google.common.collect.ImmutableMap;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.access.SimpleArchitecturyFluidAttributesAccess;
 import cool.muyucloud.croparia.api.crop.util.Color;
@@ -18,15 +19,24 @@ import cool.muyucloud.croparia.registry.CropariaFluids;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.CifUtil;
+import cool.muyucloud.croparia.util.TagUtil;
+import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import dev.architectury.registry.registries.RegistrySupplier;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -69,6 +79,7 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
     private final RegistrySupplier<ElementalBucket> bucket;
     private final RegistrySupplier<ElementalPotion> potion;
     private final RegistrySupplier<ElementalGem> gem;
+    private final TagKey<Fluid> tag;
 
     Element() {
         this.id = CropariaIf.of("empty");
@@ -81,6 +92,7 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
         this.bucket = null;
         this.potion = null;
         this.gem = null;
+        this.tag = null;
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -96,8 +108,9 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
             () -> Element.this.getFluidSource().get()
         ).block(() -> Optional.ofNullable(Element.this.getFluidBlock().get())).bucketItem(
             () -> Optional.ofNullable(Element.this.getBucket().get())
-        ).sourceTexture(parseId("block/%s_still")).flowingTexture(parseId("block/%s_flow")).overlayTexture(parseId("block/%s_still"));
+        ).color(color.getValue()).sourceTexture(parseId("block/%s_still")).flowingTexture(parseId("block/%s_flow"));
         SimpleArchitecturyFluidAttributesAccess.setName(this.fluidAttr, Texts.translatable("fluid.croparia.elemental_fluid", Texts.translatable("element.croparia.%s".formatted(name))));
+        SimpleArchitecturyFluidAttributesAccess.setRenderOverlayTexture(this.fluidAttr, parseId("misc/%s_overlay"));
         appendix.accept(fluidAttr);
         this.fluidSource = CropariaFluids.registerFluid(parseId("fluid_%s"), () -> new ElementalSource(this, fluidAttr));
         this.fluidFlowing = CropariaFluids.registerFluid(parseId("fluid_%s_flow"), () -> new ElementalFlowing(this, fluidAttr));
@@ -115,10 +128,15 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
         this.gem = CropariaItems.registerItem(parseId("gem_%s"), properties -> new ElementalGem(
             this, properties.arch$tab(Tabs.MAIN)
         ));
+        this.tag = TagKey.create(Registries.FLUID, parseId("fluid/%s"));
     }
 
     public ResourceLocation parseId(String pattern) {
         return CifUtil.formatId(pattern, this.getKey());
+    }
+
+    public TagKey<Fluid> getTag() {
+        return tag;
     }
 
     public Color getColor() {

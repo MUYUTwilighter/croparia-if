@@ -1,21 +1,35 @@
 package cool.muyucloud.croparia.access;
 
-import dev.architectury.core.fluid.ArchitecturyFluidAttributes;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 public interface SimpleArchitecturyFluidAttributesAccess {
     Component cif$getName();
 
     SimpleArchitecturyFluidAttributesAccess cif$setName(Component name);
 
-    static SimpleArchitecturyFluidAttributes setName(SimpleArchitecturyFluidAttributes instance, Component name) {
-        SimpleArchitecturyFluidAttributesAccess access = (SimpleArchitecturyFluidAttributesAccess) instance;
-        return (SimpleArchitecturyFluidAttributes) access.cif$setName(name);
+    ResourceLocation cif$getRenderOverlayTexture();
+
+    SimpleArchitecturyFluidAttributesAccess cif$setRenderOverlayTexture(ResourceLocation texture);
+
+    static void setName(SimpleArchitecturyFluidAttributes instance, Component name) {
+        cast(instance).cif$setName(name);
     }
 
     static Component getName(SimpleArchitecturyFluidAttributes instance) {
-        SimpleArchitecturyFluidAttributesAccess access = (SimpleArchitecturyFluidAttributesAccess) instance;
-        return access.cif$getName();
+        return cast(instance).cif$getName();
+    }
+
+    static void setRenderOverlayTexture(SimpleArchitecturyFluidAttributes instance, ResourceLocation texture) {
+        cast(instance).cif$setRenderOverlayTexture(texture);
+    }
+
+    static ResourceLocation getRenderOverlayTexture(SimpleArchitecturyFluidAttributes instance) {
+        return cast(instance).cif$getRenderOverlayTexture();
+    }
+
+    static SimpleArchitecturyFluidAttributesAccess cast(SimpleArchitecturyFluidAttributes instance) {
+        return (SimpleArchitecturyFluidAttributesAccess) instance;
     }
 }
