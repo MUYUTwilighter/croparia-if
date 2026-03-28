@@ -1,6 +1,7 @@
 package cool.muyucloud.croparia.api.element;
 
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.access.SimpleArchitecturyFluidAttributesAccess;
 import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.element.block.ElementalLiquidBlock;
 import cool.muyucloud.croparia.api.element.fluid.ElementalFlowing;
@@ -17,6 +18,7 @@ import cool.muyucloud.croparia.registry.CropariaFluids;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.CifUtil;
+import cool.muyucloud.croparia.util.text.Texts;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.resources.ResourceLocation;
@@ -94,7 +96,8 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
             () -> Element.this.getFluidSource().get()
         ).block(() -> Optional.ofNullable(Element.this.getFluidBlock().get())).bucketItem(
             () -> Optional.ofNullable(Element.this.getBucket().get())
-        ).sourceTexture(parseId("block/%s_still")).flowingTexture(parseId("block/%s_flow"));
+        ).sourceTexture(parseId("block/%s_still")).flowingTexture(parseId("block/%s_flow")).overlayTexture(parseId("block/%s_still"));
+        SimpleArchitecturyFluidAttributesAccess.setName(this.fluidAttr, Texts.translatable("fluid.croparia.elemental_fluid", Texts.translatable("element.croparia.%s".formatted(name))));
         appendix.accept(fluidAttr);
         this.fluidSource = CropariaFluids.registerFluid(parseId("fluid_%s"), () -> new ElementalSource(this, fluidAttr));
         this.fluidFlowing = CropariaFluids.registerFluid(parseId("fluid_%s_flow"), () -> new ElementalFlowing(this, fluidAttr));

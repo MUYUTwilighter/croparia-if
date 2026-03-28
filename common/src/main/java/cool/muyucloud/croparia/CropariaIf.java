@@ -2,6 +2,7 @@ package cool.muyucloud.croparia;
 
 import com.mojang.logging.LogUtils;
 import cool.muyucloud.croparia.api.core.command.CommonCommandRoot;
+import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
 import cool.muyucloud.croparia.config.Config;
 import cool.muyucloud.croparia.config.ConfigFileHandler;
@@ -39,6 +40,7 @@ public class CropariaIf {
         DgRegistries.register();
         DataGenerators.register();
         PackHandlers.register();
+        Element.EMPTY.name();
         Crops.register();
         Melons.register();
         LOGGER.info("Croparia IF vanilla registration");

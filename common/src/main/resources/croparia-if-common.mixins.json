@@ -16,6 +16,7 @@
     "PackRepositoryMixin",
     "RecipeManagerMixin",
     "ReloadableResourceManagerImplMixin",
+    "SimpleArchitecturyFluidAttributesMixin",
     "StateHolderMixin"
   ],
   "injectors": {
