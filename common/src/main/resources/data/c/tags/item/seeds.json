@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "#croparia:seeds"
+    "#croparia:seeds",
+    "#minecraft:seeds"
   ]
 }
