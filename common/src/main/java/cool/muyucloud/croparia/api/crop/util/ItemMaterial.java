@@ -50,6 +50,7 @@ public class ItemMaterial extends Material<Item> {
     private transient final OnLoadSupplier<List<ItemStack>> stacks = OnLoadSupplier.of(() ->
         this.candidates().stream().map(item -> {
             ItemStack stack = item.getDefaultInstance();
+            stack.setCount(Math.min(this.getCount(), stack.getMaxStackSize()));
             stack.applyComponents(this.getComponents());
             return stack;
         }).toList()
