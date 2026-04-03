@@ -201,7 +201,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
     public <S> int reportSingular(ResourceLocation id, DelegateSource<S> source) {
         Optional<C> mayCrop = registry.forName(id);
         if (mayCrop.isEmpty()) {
-            source.failure(Texts.translatable("commands.croparia.crop.query.absent", id));
+            source.failure(Texts.translatable("commands.croparia.crop.query.absent", id.toString()));
             return 0;
         }
         C crop = mayCrop.get();
