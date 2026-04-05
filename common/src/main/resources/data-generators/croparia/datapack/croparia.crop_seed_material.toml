@@ -2,16 +2,13 @@ registry = "croparia:crops"
 path = "croparia/recipe/crafting/melon/material_seed/${id.namespace}/${id.path}.json"
 template = """
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    {
-      "item": "${seed}"
-    }
-  ],
+  "type": "croparia:infusor",
+  "element": "elemental",
+  "ingredient": "${seed}",
   "result": {
     "id": "${material.result.id}",
     "components": ${material.result.components},
-    "count": 4
+    "amount": 4
   }
 }
 """
