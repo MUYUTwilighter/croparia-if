@@ -1,6 +1,5 @@
 package cool.muyucloud.croparia.api.repo;
 
-import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.TypedResource;
 import cool.muyucloud.croparia.api.resource.type.FluidSpec;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;

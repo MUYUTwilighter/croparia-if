@@ -9,6 +9,7 @@ import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
+import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -26,8 +27,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import cool.muyucloud.croparia.util.supplier.LazySupplier;
 
 /**
  * A placeholder parser that can parse placeholders in the format of "field.sublist.[].subfield".<br/>

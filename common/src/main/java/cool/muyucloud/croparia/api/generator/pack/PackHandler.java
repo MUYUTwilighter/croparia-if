@@ -21,7 +21,6 @@ import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;

@@ -2,7 +2,6 @@ package cool.muyucloud.croparia.api.crop.item;
 
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.crop.AbstractFruit;
-import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.api.crop.Melon;
 import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.text.Texts;

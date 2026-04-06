@@ -1,6 +1,5 @@
 package cool.muyucloud.croparia.api.element;
 
-import com.google.common.collect.ImmutableMap;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.access.SimpleArchitecturyFluidAttributesAccess;
 import cool.muyucloud.croparia.api.crop.util.Color;
@@ -19,8 +18,6 @@ import cool.muyucloud.croparia.registry.CropariaFluids;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.CifUtil;
-import cool.muyucloud.croparia.util.TagUtil;
-import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -28,15 +25,11 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 

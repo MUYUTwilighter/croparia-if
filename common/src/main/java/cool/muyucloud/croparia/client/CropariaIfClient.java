@@ -13,7 +13,6 @@ import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.level.block.StemBlock;
 
 public class CropariaIfClient {
