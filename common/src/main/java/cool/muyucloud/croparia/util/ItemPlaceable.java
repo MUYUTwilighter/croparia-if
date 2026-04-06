@@ -6,6 +6,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 public interface ItemPlaceable {
     /**
@@ -17,7 +18,7 @@ public interface ItemPlaceable {
      * @param owner the entity that owns the item (can be null)
      * @apiNote The amount of the stack will be modified
      */
-    default void placeItem(Level world, BlockPos pos, ItemStack stack, Entity owner) {
+    default void placeItem(Level world, BlockPos pos, ItemStack stack, @Nullable Entity owner) {
         if (world.isClientSide()) return;
         ItemStack newStack;
         if (world.hasNeighborSignal(pos)) { // Place the entire stack if the block is charged by redstone
@@ -26,7 +27,7 @@ public interface ItemPlaceable {
             newStack = stack.split(1);
         }
         ItemEntity entity = CifUtil.createItemEntity(world, pos, newStack);
-        entity.setThrower(owner);
+        if (owner != null) entity.setThrower(owner);
         world.addFreshEntity(entity);
     }
 }
