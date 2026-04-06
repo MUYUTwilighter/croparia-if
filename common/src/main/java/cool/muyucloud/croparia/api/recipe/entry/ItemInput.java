@@ -14,13 +14,10 @@ import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.TagUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -35,7 +32,7 @@ import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class ItemInput implements SlotDisplay {
-    public static final ItemInput EMPTY = new ItemInput(null, null, DataComponentPredicate.EMPTY, 0);
+    public static final ItemInput EMPTY = new ItemInput(null, null, null, 0);
     public static final Codec<ItemInput> CODEC_STR = Codec.STRING.xmap(
         s -> s.isEmpty() ? EMPTY : new ItemInput(s, 1),
         ItemInput::getTaggable
@@ -43,72 +40,65 @@ public class ItemInput implements SlotDisplay {
     public static final MapCodec<ItemInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
         ResourceLocation.CODEC.optionalFieldOf("id").forGetter(ItemInput::getId),
         TagKey.codec(Registries.ITEM).optionalFieldOf("tag").forGetter(ItemInput::getTag),
-        DataComponentPredicate.CODEC.optionalFieldOf("components", DataComponentPredicate.EMPTY).forGetter(ItemInput::getComponentsPredicate),
+        CodecUtil.optionalFieldsOf(CompoundTag.CODEC, "nbt", "components").forGetter(ItemInput::optionalComponents),
         Codec.LONG.optionalFieldOf("amount", 1L).forGetter(ItemInput::getAmount)
     ).apply(instance, (id, tag, components, amount) ->
-        id.isEmpty() && tag.isEmpty() && components.equals(DataComponentPredicate.EMPTY) || amount <= 0 ? EMPTY :
-            new ItemInput(id.orElse(null), tag.orElse(null), components, amount)));
+        id.isEmpty() && tag.isEmpty() && components.isEmpty() || amount <= 0 ? EMPTY :
+            new ItemInput(id.orElse(null), tag.orElse(null), components.orElse(null), amount)));
     public static final MultiCodec<ItemInput> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
-        if (toEncode.getComponentsPredicate().equals(DataComponentPredicate.EMPTY) && toEncode.getAmount() == 1 || toEncode.equals(EMPTY)) {
+        if (toEncode.optionalComponents().isEmpty() && toEncode.getAmount() == 1L || toEncode.equals(EMPTY)) {
             return TestedCodec.fail(() -> "Can be encoded as string");
-        } else {
-            return TestedCodec.success();
         }
+        return TestedCodec.success();
     }), CODEC_STR);
-    public static final StreamCodec<RegistryFriendlyByteBuf, ItemInput> STREAM_CODEC = CodecUtil.toStream(CODEC);
 
     public static ItemInput of(ResourceLocation id) {
-        return new ItemInput(id, null, DataComponentPredicate.EMPTY, 1L);
+        return new ItemInput(id, null, null, 1L);
     }
 
     public static ItemInput ofTag(ResourceLocation id) {
-        return new ItemInput(null, TagKey.create(Registries.ITEM, id), DataComponentPredicate.EMPTY, 1L);
+        return new ItemInput(null, TagKey.create(Registries.ITEM, id), null, 1L);
     }
 
     public static ItemInput of(final ItemStack stack) {
-        return new ItemInput(
-            stack.getItem().arch$registryName(),
-            null,
-            CifUtil.extractPredicate(stack.getComponentsPatch()),
-            stack.getCount()
-        );
+        return new ItemInput(stack.getItem().arch$registryName(), null, stack.getTag(), stack.getCount());
     }
 
     @Nullable
     private final ResourceLocation id;
     @Nullable
     private final TagKey<Item> tag;
-    @NotNull
-    private final DataComponentPredicate componentPredicate;
+    @Nullable
+    private final CompoundTag componentTag;
     private final long amount;
     private transient OnLoadSupplier<ImmutableList<ItemStack>> displayStacks;
 
     public ItemInput(String s, int amount) {
-        this(s.startsWith("#") ? null : ResourceLocation.parse(s),
-            s.startsWith("#") ? TagKey.create(Registries.ITEM, ResourceLocation.parse(s.substring(1))) : null,
-            DataComponentPredicate.EMPTY, amount);
+        this(s.startsWith("#") ? null : new ResourceLocation(s),
+            s.startsWith("#") ? TagKey.create(Registries.ITEM, new ResourceLocation(s.substring(1))) : null,
+            null, amount);
     }
 
     public ItemInput(@NotNull ResourceLocation id, int amount) {
-        this(id, null, DataComponentPredicate.EMPTY, amount);
+        this(id, null, null, amount);
     }
 
     public ItemInput(@NotNull ItemStack stack) {
-        this(stack.getItem().arch$registryName(), null, CifUtil.extractPredicate(stack.getComponentsPatch()), stack.getCount());
+        this(stack.getItem().arch$registryName(), null, stack.getTag(), stack.getCount());
     }
 
-    public ItemInput(@Nullable ResourceLocation id, @Nullable TagKey<Item> tag,
-                     @NotNull DataComponentPredicate componentPredicate, long amount) {
+    public ItemInput(@Nullable ResourceLocation id, @Nullable TagKey<Item> tag, @Nullable CompoundTag componentTag, long amount) {
         this.id = id;
         this.tag = tag;
-        if (this.id != null && this.tag != null)
-            throw new IllegalArgumentException("id and tag cannot be set at the same time");
-        this.componentPredicate = componentPredicate;
+        if (this.id != null && this.tag != null) {
+            throw new IllegalArgumentException("id and tag cannot be both set");
+        }
+        this.componentTag = componentTag == null ? null : componentTag.copy();
         this.amount = amount;
         this.displayStacks = OnLoadSupplier.of(() -> {
             if (this.getId().isPresent()) {
-                ItemStack stack = new ItemStack(Holder.direct(BuiltInRegistries.ITEM.get(this.getId().get())),
-                    CifUtil.toIntSafe(this.getAmount()), this.getComponentsPredicate().asPatch());
+                ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.get(this.getId().get()), (int) Math.min(Integer.MAX_VALUE, this.getAmount()));
+                stack.setTag(this.componentTag == null ? null : this.componentTag.copy());
                 if (stack.isEmpty()) {
                     DisplayableRecipe.LOGGER.error("Item with id '{}' not found, using placeholder", this.getId().get());
                     return ImmutableList.of(Texts.tooltip(BlockInput.STACK_UNKNOWN.copy(), Texts.literal(this.getTaggable())));
@@ -117,8 +107,8 @@ public class ItemInput implements SlotDisplay {
             } else if (this.getTag().isPresent()) {
                 LinkedList<ItemStack> stacks = new LinkedList<>();
                 TagUtil.forEntries(this.getTag().get()).forEach(entry -> {
-                    ItemStack stack = new ItemStack(entry, CifUtil.toIntSafe(this.getAmount()),
-                        this.getComponentsPredicate().asPatch());
+                    ItemStack stack = new ItemStack(entry, (int) Math.min(Integer.MAX_VALUE, this.getAmount()));
+                    stack.setTag(this.componentTag == null ? null : this.componentTag.copy());
                     stacks.addLast(stack);
                 });
                 if (stacks.isEmpty()) {
@@ -127,9 +117,8 @@ public class ItemInput implements SlotDisplay {
                 }
                 return ImmutableList.copyOf(stacks);
             } else {
-                ItemStack stack = new ItemStack(Holder.direct(CropariaItems.PLACEHOLDER.get()),
-                    CifUtil.toIntSafe(this.getAmount()),
-                    this.getComponentsPredicate().asPatch());
+                ItemStack stack = new ItemStack(CropariaItems.PLACEHOLDER.get(), (int) Math.min(Integer.MAX_VALUE, this.getAmount()));
+                stack.setTag(this.componentTag == null ? null : this.componentTag.copy());
                 return ImmutableList.of(stack);
             }
         });
@@ -146,21 +135,20 @@ public class ItemInput implements SlotDisplay {
     }
 
     public ResourceLocation getDisplayId() {
-        return this.getTag().map(TagKey::location).orElse(this.getDisplayStacks().getFirst().getItem().arch$registryName());
+        return this.getTag().map(TagKey::location).orElse(this.getDisplayStacks().get(0).getItem().arch$registryName());
     }
 
     public Optional<TagKey<Item>> getTag() {
         return Optional.ofNullable(tag);
     }
 
-    @NotNull
-    public DataComponentPredicate getComponentsPredicate() {
-        return this.componentPredicate;
+    @Nullable
+    public CompoundTag getComponentsPredicate() {
+        return this.componentTag == null ? null : this.componentTag.copy();
     }
 
-    public Optional<DataComponentPredicate> optionalComponents() {
-        if (this.componentPredicate == DataComponentPredicate.EMPTY) return Optional.empty();
-        return Optional.of(this.componentPredicate);
+    public Optional<CompoundTag> optionalComponents() {
+        return Optional.ofNullable(this.componentTag == null ? null : this.componentTag.copy());
     }
 
     public long getAmount() {
@@ -199,9 +187,8 @@ public class ItemInput implements SlotDisplay {
                 long count = stack.getCount();
                 if (count >= remaining) {
                     return true;
-                } else {
-                    remaining -= count;
                 }
+                remaining -= count;
             }
         }
         return false;
@@ -216,33 +203,21 @@ public class ItemInput implements SlotDisplay {
         return true;
     }
 
-    public boolean matches(@NotNull DataComponentMap components) {
-        return this.getComponentsPredicate().test(components);
+    public boolean matches(@Nullable CompoundTag components) {
+        if (this.componentTag == null || this.componentTag.isEmpty()) return true;
+        return NbtUtils.compareNbt(this.componentTag, components, true);
     }
 
-    /**
-     * Whether the specified item matches the input, considering only the type of the item & components
-     *
-     * @param item The item to match
-     * @return {@code true} if the specified and components item matches
-     */
     public boolean matches(@NotNull ItemSpec item) {
-        return this.matches(item.getResource()) && this.matches(item.getComponents());
+        return this.matches(item.getResource()) && this.matches(item.getNbt().orElse(null));
     }
 
-    /**
-     * Whether the specified item stack matches the input, considering the type of the item, components and amount
-     */
     public boolean matches(@NotNull ItemStack stack) {
         return this.matchType(stack) && this.getAmount() <= stack.getCount();
     }
 
-    /**
-     * Whether the specified item stack matches the input, considering the type of the item, components
-     *
-     */
     public boolean matchType(@NotNull ItemStack stack) {
-        return this.matches(stack.getItem()) && this.matches(stack.getComponents());
+        return this.matches(stack.getItem()) && this.matches(stack.getTag());
     }
 
     public boolean matches(@NotNull ItemSpec item, long amount) {
@@ -253,11 +228,11 @@ public class ItemInput implements SlotDisplay {
     public boolean equals(Object o) {
         if (!(o instanceof ItemInput itemInput)) return false;
         return amount == itemInput.amount && Objects.equals(id, itemInput.id) && Objects.equals(tag, itemInput.tag)
-            && Objects.equals(componentPredicate, itemInput.componentPredicate);
+            && Objects.equals(componentTag, itemInput.componentTag);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, tag, componentPredicate, amount);
+        return Objects.hash(id, tag, componentTag, amount);
     }
 }

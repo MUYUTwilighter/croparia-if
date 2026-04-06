@@ -88,9 +88,9 @@ public class PatchedTranslatable extends DelegateWidget {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amountX, double amountY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double amountY) {
         Vector4f mouse = transformMouse(mouseX, mouseY);
-        return super.mouseScrolled(mouse.x(), mouse.y(), amountX, amountY);
+        return super.mouseScrolled(mouse.x(), mouse.y(), amountY);
     }
 
     @Override

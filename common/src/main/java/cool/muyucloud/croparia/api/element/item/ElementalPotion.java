@@ -35,9 +35,9 @@ public class ElementalPotion extends Item implements ElementAccess {
         this.element = element;
         POTIONS.put(element, this);
         DispenserBlock.registerBehavior(this, (blockSource, itemStack) -> {
-            Level world = blockSource.level();
-            BlockPos sourcePos = blockSource.pos();
-            BlockState sourceState = blockSource.state();
+            Level world = blockSource.getLevel();
+            BlockPos sourcePos = blockSource.getPos();
+            BlockState sourceState = blockSource.getBlockState();
             Direction direction = sourceState.getValue(DispenserBlock.FACING);
             BlockPos targetPos = sourcePos.offset(direction.getNormal());
             BlockState targetState = world.getBlockState(targetPos);

@@ -17,14 +17,7 @@ public class NetworkHandlers {
     );
 
     public static <T extends NetworkHandler> NetworkHandlerType<T> register(NetworkHandlerType<T> type) {
-        if (type.side() == NetworkManager.Side.S2C) {
-            CropariaIf.ifClientOrElse(
-                client -> NetworkManager.registerReceiver(type.side(), type.type(), type.codec(), NetworkHandler::handle),
-                mayServer -> NetworkManager.registerS2CPayloadType(type.type(), type.codec())
-            );
-        } else {
-            NetworkManager.registerReceiver(type.side(), type.type(), type.codec(), NetworkHandler::handle);
-        }
+        NetworkManager.registerReceiver(type.side(), type.id(), (buf, context) -> type.decode(buf).handle(context));
         return type;
     }
 

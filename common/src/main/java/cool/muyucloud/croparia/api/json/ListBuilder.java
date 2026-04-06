@@ -23,12 +23,11 @@ public class ListBuilder implements JsonBuilder {
 
     @SafeVarargs
     public final <T> ListBuilder add(Codec<T> codec, T... elements) throws IllegalStateException {
-        for (T e : elements) CodecUtil.encodeJson(e, codec).mapOrElse(json -> {
+        for (T e : elements) CodecUtil.mapOrElse(CodecUtil.encodeJson(e, codec), json -> {
             this.json.add(json);
             return null;
         }, err -> {
-            err.getOrThrow();
-            return null;
+            throw new IllegalStateException(err.message());
         });
         return this;
     }

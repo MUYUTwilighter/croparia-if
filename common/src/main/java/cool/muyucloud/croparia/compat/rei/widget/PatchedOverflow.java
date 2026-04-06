@@ -86,13 +86,13 @@ public class PatchedOverflow extends PatchedTranslatable {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amountX, double amountY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double amountY) {
         if (containsMouse(mouseX, mouseY) && amountY != 0) {
             this.scale.setTo(this.scale.target() + amountY * -0.2f, ConfigObject.getInstance().isReducedMotion() ? 0 : 300);
             return true;
         }
 
-        return super.mouseScrolled(mouseX, mouseY, amountX, amountY);
+        return super.mouseScrolled(mouseX, mouseY, amountY);
     }
 
     @Override

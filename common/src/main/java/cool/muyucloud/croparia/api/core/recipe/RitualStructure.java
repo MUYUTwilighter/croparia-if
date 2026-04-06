@@ -19,9 +19,8 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Vec3i;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -43,7 +42,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     );
     public static final LazySupplier<ItemStack> STACK_INPUT = LazySupplier.of(() -> {
         ItemStack stack = CropariaItems.PLACEHOLDER.get().getDefaultInstance();
-        stack.set(DataComponents.CUSTOM_NAME, Constants.INPUT_BLOCK);
+        stack.setHoverName(Constants.INPUT_BLOCK);
         return stack;
     });
 
@@ -214,7 +213,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
 
     @Override
     @Deprecated
-    public @NotNull ItemStack assemble(RitualStructureContainer recipeInput, HolderLookup.Provider provider) {
+    public @NotNull ItemStack assemble(RitualStructureContainer recipeInput, RegistryAccess registryAccess) {
         return ItemStack.EMPTY;
     }
 

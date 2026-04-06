@@ -1,12 +1,13 @@
 package cool.muyucloud.croparia.api.core.recipe.container;
 
 import cool.muyucloud.croparia.api.element.Element;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-public class SoakContainer implements RecipeInput {
+public class SoakContainer implements Container {
     private final BlockState state;
     private final Element element;
     private final float random;
@@ -30,6 +31,11 @@ public class SoakContainer implements RecipeInput {
     }
 
     @Override
+    public int getContainerSize() {
+        return 0;
+    }
+
+    @Override
     public @NotNull ItemStack getItem(int i) {
         return ItemStack.EMPTY;
     }
@@ -40,7 +46,34 @@ public class SoakContainer implements RecipeInput {
     }
 
     @Override
-    public int size() {
+    public @NotNull ItemStack removeItem(int i, int count) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public @NotNull ItemStack removeItemNoUpdate(int i) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void setItem(int i, @NotNull ItemStack stack) {
+    }
+
+    @Override
+    public void setChanged() {
+    }
+
+    @Override
+    public boolean stillValid(@NotNull Player player) {
+        return true;
+    }
+
+    @Override
+    public void clearContent() {
+    }
+
+    @Override
+    public int getMaxStackSize() {
         return 0;
     }
 }

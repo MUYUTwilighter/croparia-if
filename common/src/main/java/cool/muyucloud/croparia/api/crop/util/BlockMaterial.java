@@ -88,7 +88,7 @@ public class BlockMaterial extends Material<Block> {
         if (candidates.isEmpty()) {
             return ItemStack.EMPTY;
         }
-        ItemStack stack = this.candidates().getFirst().asItem().getDefaultInstance();
+        ItemStack stack = this.candidates().get(0).asItem().getDefaultInstance();
         stack.setCount(this.getCount());
         return stack;
     }

@@ -13,7 +13,6 @@ import cool.muyucloud.croparia.registry.BlockEntities;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -113,15 +112,15 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
-        ContainerHelper.loadAllItems(nbt, this.inventory, provider);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
+        ContainerHelper.loadAllItems(nbt, this.inventory);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        ContainerHelper.saveAllItems(nbt, this.inventory, provider);
-        super.saveAdditional(nbt, provider);
+    protected void saveAdditional(CompoundTag nbt) {
+        ContainerHelper.saveAllItems(nbt, this.inventory);
+        super.saveAdditional(nbt);
     }
 
     public int getContainerSize() {
@@ -152,7 +151,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     @Override
     public void setItem(int slot, ItemStack stack) {
         ItemStack stored = this.getItem(slot);
-        if (ItemStack.isSameItemSameComponents(stored, stack) && stored.getCount() == stack.getCount()) {
+        if (ItemStack.isSameItemSameTags(stored, stack) && stored.getCount() == stack.getCount()) {
             return;
         }
         this.setChanged();

@@ -1,38 +1,55 @@
 package cool.muyucloud.croparia.api.network;
 
 import dev.architectury.networking.NetworkManager;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+
 @SuppressWarnings("unused")
 public class NetworkHandlerType<H extends NetworkHandler> {
-    public static <T extends NetworkHandler> NetworkHandlerType<T> ofS2C(@NotNull ResourceLocation id, @NotNull StreamCodec<RegistryFriendlyByteBuf, T> codec) {
-        return new NetworkHandlerType<>(id, NetworkManager.Side.S2C, codec);
+    public static <T extends NetworkHandler> NetworkHandlerType<T> ofS2C(
+        @NotNull ResourceLocation id,
+        @NotNull BiConsumer<FriendlyByteBuf, T> encoder,
+        @NotNull Function<FriendlyByteBuf, T> decoder
+    ) {
+        return new NetworkHandlerType<>(id, NetworkManager.Side.S2C, encoder, decoder);
     }
 
-    public static <T extends NetworkHandler> NetworkHandlerType<T> ofC2S(@NotNull ResourceLocation id, @NotNull StreamCodec<RegistryFriendlyByteBuf, T> codec) {
-        return new NetworkHandlerType<>(id, NetworkManager.Side.C2S, codec);
+    public static <T extends NetworkHandler> NetworkHandlerType<T> ofC2S(
+        @NotNull ResourceLocation id,
+        @NotNull BiConsumer<FriendlyByteBuf, T> encoder,
+        @NotNull Function<FriendlyByteBuf, T> decoder
+    ) {
+        return new NetworkHandlerType<>(id, NetworkManager.Side.C2S, encoder, decoder);
     }
 
     @NotNull
-    private final CustomPacketPayload.Type<H> type;
+    private final ResourceLocation id;
     @NotNull
-    private final StreamCodec<RegistryFriendlyByteBuf, H> codec;
+    private final BiConsumer<FriendlyByteBuf, H> encoder;
+    @NotNull
+    private final Function<FriendlyByteBuf, H> decoder;
     @NotNull
     private final NetworkManager.Side side;
 
-    public NetworkHandlerType(@NotNull ResourceLocation id, @NotNull NetworkManager.Side side, @NotNull StreamCodec<RegistryFriendlyByteBuf, H> codec) {
-        this.type = new CustomPacketPayload.Type<>(id);
+    public NetworkHandlerType(
+        @NotNull ResourceLocation id,
+        @NotNull NetworkManager.Side side,
+        @NotNull BiConsumer<FriendlyByteBuf, H> encoder,
+        @NotNull Function<FriendlyByteBuf, H> decoder
+    ) {
+        this.id = id;
         this.side = side;
-        this.codec = codec;
+        this.encoder = encoder;
+        this.decoder = decoder;
     }
 
     @NotNull
-    public CustomPacketPayload.Type<H> type() {
-        return this.type;
+    public ResourceLocation id() {
+        return this.id;
     }
 
     @NotNull
@@ -40,9 +57,13 @@ public class NetworkHandlerType<H extends NetworkHandler> {
         return side;
     }
 
+    public void encode(FriendlyByteBuf buf, H handler) {
+        this.encoder.accept(buf, handler);
+    }
+
     @NotNull
-    public StreamCodec<RegistryFriendlyByteBuf, H> codec() {
-        return codec;
+    public H decode(FriendlyByteBuf buf) {
+        return this.decoder.apply(buf);
     }
 
     @SuppressWarnings("unchecked")

@@ -3,10 +3,6 @@ package cool.muyucloud.croparia.util;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.core.component.DataComponentPredicate;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -41,13 +37,13 @@ public class CifUtil {
     }
 
     public static boolean isEdible(ItemStack item) {
-        return item.has(DataComponents.FOOD);
+        return item.getItem().isEdible();
     }
 
     @Nullable
     public static FoodProperties getFoodProperties(ItemStack item) {
         if (isEdible(item)) {
-            return item.get(DataComponents.FOOD);
+            return item.getItem().getFoodProperties();
         }
         return null;
     }
@@ -90,8 +86,8 @@ public class CifUtil {
                         continue;
                     }
                     ItemStack stored = container.getItem(i);
-                    if (ItemStack.isSameItemSameComponents(stored, stack) || stored.isEmpty()) {
-                        int capacity = container.getMaxStackSize(stack);
+                    if (ItemStack.isSameItemSameTags(stored, stack) || stored.isEmpty()) {
+                        int capacity = Math.min(container.getMaxStackSize(), stack.getMaxStackSize());
                         int room = capacity - stored.getCount();
                         if (room == 0) continue;
                         int toMove = Math.min(room, stack.getCount());
@@ -131,13 +127,6 @@ public class CifUtil {
 
     public static ItemEntity createItemEntity(Level world, BlockPos pos, ItemStack stack) {
         return new ItemEntity(world, (double) pos.getX() + 0.5, (double) pos.getY() + 0.6, (double) pos.getZ() + 0.5, stack, 0, 0, 0);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static DataComponentPredicate extractPredicate(DataComponentPatch patch) {
-        DataComponentPredicate.Builder builder = DataComponentPredicate.builder();
-        patch.entrySet().forEach(entry -> builder.expect((DataComponentType<Object>) entry.getKey(), (Object) entry.getValue()));
-        return builder.build();
     }
 
     public static int toIntSafe(long value) {

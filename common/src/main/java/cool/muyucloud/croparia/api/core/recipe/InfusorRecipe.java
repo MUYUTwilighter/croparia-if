@@ -16,7 +16,7 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -110,7 +110,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     }
 
     @Override
-    public @NotNull ItemStack assemble(InfusorContainer recipeInput, HolderLookup.Provider provider) {
+    public @NotNull ItemStack assemble(InfusorContainer recipeInput, RegistryAccess registryAccess) {
         return assemble(recipeInput);
     }
 

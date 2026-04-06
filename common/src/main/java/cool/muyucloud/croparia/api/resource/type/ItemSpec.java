@@ -11,30 +11,31 @@ import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.TypedResource;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.TagUtil;
-import net.minecraft.core.Holder;
-import net.minecraft.core.component.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @SuppressWarnings("unused")
-public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
+public class ItemSpec implements TypedResource<Item> {
     public static final MapCodec<ItemSpec> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
         ResourceLocation.CODEC.fieldOf("id").forGetter(itemSpec -> itemSpec.getResource().arch$registryName()),
-        CodecUtil.optionalFieldsOf(DataComponentPatch.CODEC, DataComponentPatch.EMPTY, "components", "nbt").forGetter(ItemSpec::getComponentsPatch)
-    ).apply(instance, (id, components) -> new ItemSpec(BuiltInRegistries.ITEM.get(id), components)));
+        CodecUtil.optionalFieldsOf(CompoundTag.CODEC, new CompoundTag(), "components", "nbt").forGetter(ItemSpec::getTagOrEmpty)
+    ).apply(instance, (id, tag) -> new ItemSpec(BuiltInRegistries.ITEM.get(id), tag.isEmpty() ? null : tag)));
     public static final Codec<ItemSpec> CODEC_STR = ResourceLocation.CODEC.xmap(
-        id -> new ItemSpec(BuiltInRegistries.ITEM.get(id), DataComponentPatch.EMPTY),
+        id -> new ItemSpec(BuiltInRegistries.ITEM.get(id), null),
         itemSpec -> itemSpec.getResource().arch$registryName()
     );
     public static final MultiCodec<ItemSpec> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
-        if (toEncode.getComponents().isEmpty()) return TestedCodec.fail(() -> "Can be encoded as string");
+        if (toEncode.getTagOrEmpty().isEmpty()) return TestedCodec.fail(() -> "Can be encoded as string");
         return TestedCodec.success();
     }), CODEC_STR);
     public static final ItemSpec EMPTY = ItemSpec.of(Items.AIR);
@@ -42,89 +43,59 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
 
     @NotNull
     private final Item resource;
-    @NotNull
-    private final PatchedDataComponentMap components;
+    @Nullable
+    private final CompoundTag tag;
 
     @NotNull
     public static ItemSpec of(@NotNull ItemStack stack) {
-        return new ItemSpec(stack.getItem(), stack.getComponentsPatch());
+        return new ItemSpec(stack.getItem(), stack.getTag());
     }
 
     @NotNull
     public static ItemSpec of(@NotNull Item item) {
-        return new ItemSpec(item, DataComponentPatch.EMPTY);
+        return new ItemSpec(item, null);
     }
 
     public ItemSpec(@NotNull Item item) {
-        this(item, DataComponentPatch.EMPTY);
+        this(item, null);
     }
 
-    public ItemSpec(@NotNull Item item, @NotNull DataComponentPatch components) {
+    public ItemSpec(@NotNull Item item, @Nullable CompoundTag tag) {
         this.resource = item;
-        this.components = PatchedDataComponentMap.fromPatch(item.components(), components);
-    }
-
-    public ItemSpec(@NotNull Item item, @NotNull DataComponentMap components) {
-        this.resource = item;
-        this.components = new PatchedDataComponentMap(item.components());
-        components.forEach(typed -> typed.applyTo(this.components));
+        this.tag = tag == null ? null : tag.copy();
     }
 
     @NotNull
     public ItemSpec copy() {
-        return new ItemSpec(this.getResource(), this.getComponentsPatch());
+        return new ItemSpec(this.getResource(), this.tag);
     }
 
     @NotNull
     public ItemSpec with(@NotNull Item item) {
-        return new ItemSpec(item, this.getComponents());
+        return new ItemSpec(item, this.tag);
     }
 
     @NotNull
-    public ItemSpec with(@NotNull DataComponentPatch components) {
-        PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
-        patched.applyPatch(components);
-        return new ItemSpec(this.getResource(), patched);
-    }
-
-    @NotNull
-    public ItemSpec with(@NotNull DataComponentMap components) {
-        PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
-        patched.setAll(components);
-        return new ItemSpec(this.getResource(), patched);
-    }
-
-    @NotNull
-    public ItemSpec with(@NotNull TypedDataComponent<?> component) {
-        PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
-        component.applyTo(patched);
-        return new ItemSpec(this.getResource(), patched);
-    }
-
-    @NotNull
-    public <T> ItemSpec with(@NotNull DataComponentType<T> type, @NotNull T value) {
-        return this.with(new TypedDataComponent<>(type, value));
-    }
-
-    @NotNull
-    public ItemSpec replaceComponents(@NotNull DataComponentMap nbt) {
-        return new ItemSpec(this.getResource(), nbt);
+    public ItemSpec replaceNbt(@Nullable CompoundTag tag) {
+        return new ItemSpec(this.getResource(), tag);
     }
 
     @NotNull
     public ItemStack createStack(long amount) {
-        return new ItemStack(Holder.direct(this.getResource()), CifUtil.toIntSafe(amount), this.getComponentsPatch());
+        ItemStack stack = new ItemStack(this.getResource(), CifUtil.toIntSafe(amount));
+        stack.setTag(this.tag == null ? null : this.tag.copy());
+        return stack;
     }
 
     @NotNull
     public ItemStack createStack() {
         ItemStack stack = this.getResource().getDefaultInstance();
-        stack.applyComponents(this.getComponents());
+        stack.setTag(this.tag == null ? null : this.tag.copy());
         return stack;
     }
 
     public boolean is(@NotNull ItemStack stack) {
-        return ItemStack.isSameItemSameComponents(stack, this.createStack());
+        return ItemStack.isSameItemSameTags(stack, this.createStack());
     }
 
     public boolean is(@NotNull ResourceLocation tag) {
@@ -147,27 +118,25 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
         return this.resource;
     }
 
-    @Override
-    @NotNull
-    public DataComponentMap getComponents() {
-        return this.components;
+    public Optional<CompoundTag> getNbt() {
+        return Optional.ofNullable(this.tag == null ? null : this.tag.copy());
     }
 
     @NotNull
-    public DataComponentPatch getComponentsPatch() {
-        return this.components.asPatch();
+    public CompoundTag getTagOrEmpty() {
+        return this.tag == null ? new CompoundTag() : this.tag.copy();
     }
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ItemSpec itemSpec)) return false;
         if (this.isEmpty()) return itemSpec.isEmpty();
-        return Objects.equals(resource, itemSpec.resource) && Objects.equals(components, itemSpec.components);
+        return Objects.equals(resource, itemSpec.resource) && Objects.equals(tag, itemSpec.tag);
     }
 
     @Override
     public int hashCode() {
         if (this.isEmpty()) return 0;
-        return Objects.hash(resource, components);
+        return Objects.hash(resource, tag);
     }
 }

@@ -16,10 +16,9 @@ public class MelonAttach extends AttachedStemBlock implements CropAccess<Melon> 
 
     public MelonAttach(Melon melon) {
         super(
-            CifUtil.castUnsafe(melon.getStem().getKey()),
-            CifUtil.castUnsafe(melon.getMelon().getKey()),
-            CifUtil.castUnsafe(melon.getSeed().getKey()),
-            Properties.ofFullCopy(Blocks.ATTACHED_PUMPKIN_STEM)
+            melon.getMelon().get(),
+            () -> melon.getSeed().get(),
+            Properties.copy(Blocks.ATTACHED_PUMPKIN_STEM)
         );
         this.melon = melon;
     }

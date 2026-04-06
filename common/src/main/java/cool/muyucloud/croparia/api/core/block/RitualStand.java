@@ -16,7 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -42,15 +42,16 @@ public class RitualStand extends Block implements ItemPlaceable {
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(ItemStack itemStack, BlockState blockState, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult blockHitResult) {
+    public @NotNull InteractionResult use(BlockState blockState, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult blockHitResult) {
+        ItemStack itemStack = player.getItemInHand(hand);
         if (hand == InteractionHand.MAIN_HAND) {
             if (itemStack.getItem() == CropariaItems.RECIPE_WIZARD.get()) {
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                return InteractionResult.PASS;
             }
             this.placeItem(world, pos, itemStack, player);
-            return ItemInteractionResult.CONSUME;
+            return InteractionResult.CONSUME;
         }
-        return super.useItemOn(itemStack, blockState, world, pos, player, hand, blockHitResult);
+        return super.use(blockState, world, pos, player, hand, blockHitResult);
     }
 
     @Override
@@ -83,7 +84,7 @@ public class RitualStand extends Block implements ItemPlaceable {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         super.onRemove(state, level, pos, newState, movedByPiston);
         DropsCache.remove(level, pos);
     }

@@ -40,7 +40,7 @@ public class ActivatedShrieker extends SculkShriekerBlock {
         super.stepOn(level, blockPos, blockState, entity);
     }
 
-    protected void onRemove(BlockState blockState, Level level, BlockPos blockPos, BlockState blockState2, boolean bl) {
+    public void onRemove(BlockState blockState, Level level, BlockPos blockPos, BlockState blockState2, boolean bl) {
         if (level instanceof ServerLevel serverLevel) {
             if (blockState.getValue(SHRIEKING) && !blockState.is(blockState2.getBlock())) {
                 serverLevel.getBlockEntity(blockPos, BlockEntities.ACTIVATED_SHRIEKER.get()).ifPresent(
@@ -57,7 +57,7 @@ public class ActivatedShrieker extends SculkShriekerBlock {
         return new ActivatedShriekerBlockEntity(blockPos, blockState);
     }
 
-    protected void tick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
+    public void tick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
         if (blockState.getValue(SHRIEKING)) {
             serverLevel.setBlock(blockPos, blockState.setValue(SHRIEKING, false), 3);
             serverLevel.getBlockEntity(blockPos, BlockEntities.ACTIVATED_SHRIEKER.get()).ifPresent(

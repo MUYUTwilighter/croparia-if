@@ -20,7 +20,7 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.supplier.HolderSupplier;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
-import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -128,7 +128,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return material;
     }
 
-    public DataComponentPatch getPatch() {
+    public CompoundTag getPatch() {
         return this.getMaterial().getComponents();
     }
 

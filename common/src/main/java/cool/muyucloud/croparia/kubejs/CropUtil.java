@@ -29,7 +29,7 @@ public class CropUtil {
         @Nullable Map<String, String> rawDependencies, @Nullable Map<String, String> translations
     ) {
         type = type == null ? Crop.DEFAULT_TYPE : type;
-        ResourceLocation id = ResourceLocation.parse(rawId);
+        ResourceLocation id = ResourceLocation.tryParse(rawId);
         CropDependencies dependencies = rawDependencies == null ? CropDependencies.EMPTY : new CropDependencies(rawDependencies);
         Crop crop = new Crop(id, new ItemMaterial(material), new Color(color), tier, type, translations, dependencies);
         DgRegistries.CROPS.register(crop);

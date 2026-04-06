@@ -19,7 +19,6 @@ import mezz.jei.library.render.ItemStackRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeInput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 @SuppressWarnings("unused")
-public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeInput>> implements IRecipeCategory<R> {
+public abstract class JeiCategory<R extends DisplayableRecipe<?>> implements IRecipeCategory<R> {
     private final RecipeType<R> recipeType = RecipeType.create(
         this.getTypedSerializer().getId().getNamespace(),
         this.getTypedSerializer().getId().getPath(),
@@ -35,7 +34,7 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
     );
 
     @SuppressWarnings("unchecked")
-    public <I extends RecipeInput, T extends DisplayableRecipe<I>> JeiCategory<T> adapt() {
+    public <T extends DisplayableRecipe<?>> JeiCategory<T> adapt() {
         return (JeiCategory<T>) this;
     }
 
@@ -55,7 +54,7 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
     public @Nullable IDrawable getIcon() {
         List<Mappable<ItemStack>> stations = this.getTypedSerializer().getStations();
         if (stations.isEmpty()) throw new RuntimeException("Override is required if no stations are provided for " + this.getTypedSerializer().getId());
-        else return toDrawable(stations.getFirst().get());
+        else return toDrawable(stations.get(0).get());
     }
 
     public @NotNull ResourceLocation getUid() {
@@ -94,9 +93,9 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
     public static final DrawableResource DOWN_WHITE = new DrawableResource(Constants.DOWN_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
 
     public static DrawableIngredient<ItemStack> toDrawable(ItemStack stack) {
-        return new DrawableIngredient<>(Objects.requireNonNull(TypedIngredient.createAndFilterInvalid(
+        return new DrawableIngredient<>(TypedIngredient.createAndFilterInvalid(
             Internal.getJeiRuntime().getIngredientManager(), VanillaTypes.ITEM_STACK, stack, true
-        )), new ItemStackRenderer());
+        ).orElseThrow(), new ItemStackRenderer());
     }
 
     public static <T extends AbstractInputManager<T>> T add(IRecipeExtrasBuilder builder, T manager) {

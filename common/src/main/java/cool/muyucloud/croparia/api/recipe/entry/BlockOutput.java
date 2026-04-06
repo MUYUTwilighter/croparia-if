@@ -10,10 +10,7 @@ import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.api.core.component.BlockProperties;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -39,12 +36,11 @@ public class BlockOutput implements SlotDisplay {
         if (toEncode.getProperties().isEmpty()) return TestedCodec.fail(() -> "Can be encoded as string");
         return TestedCodec.success();
     }), CODEC_STR);
-    public static final StreamCodec<RegistryFriendlyByteBuf, BlockOutput> STREAM_CODEC = CodecUtil.toStream(CODEC);
     public static final ItemStack STACK_UNKNOWN = Items.BEDROCK.getDefaultInstance();
     public static final ItemStack STACK_AIR = Items.BARRIER.getDefaultInstance();
 
     static {
-        STACK_AIR.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.air"));
+        STACK_AIR.setHoverName(Texts.translatable("tooltip.croparia.air"));
     }
 
     @NotNull
@@ -70,7 +66,7 @@ public class BlockOutput implements SlotDisplay {
         this.properties = properties;
         this.displayStack = BuiltInRegistries.BLOCK.getOptional(this.getId()).map(block -> {
             ItemStack stack = block.asItem().getDefaultInstance();
-            stack.set(BlockProperties.TYPE, this.getProperties());
+            this.getProperties().addToTooltip(stack);
             return stack;
         }).orElseThrow(() -> new IllegalArgumentException("Unknown block: " + id));
     }

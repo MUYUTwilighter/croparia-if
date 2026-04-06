@@ -1,7 +1,10 @@
 package cool.muyucloud.croparia.mixin;
 
 import cool.muyucloud.croparia.access.RecipeManagerAccess;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -11,11 +14,11 @@ import java.util.Collection;
 @Mixin(RecipeManager.class)
 public abstract class RecipeManagerMixin implements RecipeManagerAccess {
     @Shadow
-    protected abstract <I extends RecipeInput, T extends Recipe<I>> Collection<RecipeHolder<T>> byType(RecipeType<T> type);
+    public abstract <C extends Container, T extends Recipe<C>> Collection<T> getAllRecipesFor(RecipeType<T> recipeType);
 
     @Unique
     @Override
-    public <I extends RecipeInput, R extends Recipe<I>> Collection<RecipeHolder<R>> cif$byType(RecipeType<R> type) {
-        return this.byType(type);
+    public <C extends Container, R extends Recipe<C>> Collection<R> cif$byType(RecipeType<R> type) {
+        return this.getAllRecipesFor(type);
     }
 }

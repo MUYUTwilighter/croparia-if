@@ -60,7 +60,7 @@ public class DataGenerator implements DgListener {
     public static Optional<DataGenerator> read(JsonObject json) throws JsonParseException, IllegalStateException {
         JsonElement rawDependency = json.get("dependencies");
         if (rawDependency != null) {
-            Dependencies dependencies = CodecUtil.decodeJson(rawDependency, Dependencies.CODEC).getOrThrow();
+            Dependencies dependencies = CodecUtil.getOrThrow(CodecUtil.decodeJson(rawDependency, Dependencies.CODEC));
             if (!dependencies.available()) return Optional.empty();
         }
         JsonElement rawType = json.get("type");
@@ -69,7 +69,7 @@ public class DataGenerator implements DgListener {
         if (codec == null) {
             throw new JsonParseException("Unknown data generator type: " + type);
         }
-        return Optional.of(CodecUtil.decodeJson(json, codec.codec()).getOrThrow());
+        return Optional.of(CodecUtil.getOrThrow(CodecUtil.decodeJson(json, codec.codec())));
     }
 
     public static final MapCodec<DataGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(

@@ -1,6 +1,9 @@
 package cool.muyucloud.croparia.api.recipe.entry;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -17,11 +20,8 @@ import cool.muyucloud.croparia.util.TagUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.Serializer;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
@@ -63,24 +64,23 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
             return TestedCodec.fail(() -> "Can be encoded as simple id or tag");
         return TestedCodec.success();
     }), CODEC_STR);
-    public static final StreamCodec<RegistryFriendlyByteBuf, BlockInput> STREAM_CODEC = CodecUtil.toStream(CODEC);
-    public static final LootItemConditionType CONDITION_TYPE = new LootItemConditionType(CODEC_COMP);
+    public static final LootItemConditionType CONDITION_TYPE = new LootItemConditionType(new ConditionSerializer());
 
     static {
-        STACK_UNKNOWN.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.unknown"));
-        STACK_AIR.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.air"));
-        STACK_ANY.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.any"));
+        STACK_UNKNOWN.setHoverName(Texts.translatable("tooltip.croparia.unknown"));
+        STACK_AIR.setHoverName(Texts.translatable("tooltip.croparia.air"));
+        STACK_ANY.setHoverName(Texts.translatable("tooltip.croparia.any"));
     }
 
     public static BlockInput create(String s) {
         if (s.startsWith("#")) {
             s = s.substring(1);
-            TagKey<Block> tag = TagKey.create(Registries.BLOCK, ResourceLocation.parse(s));
+            TagKey<Block> tag = TagKey.create(Registries.BLOCK, new ResourceLocation(s));
             return ofTag(tag);
         } else if (s.isEmpty()) {
             return ANY;
         } else {
-            return of(ResourceLocation.parse(s));
+            return of(new ResourceLocation(s));
         }
     }
 
@@ -146,7 +146,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
                         stack = Texts.rename(STACK_PLACEHOLDER.get(), Texts.translatable(block.getDescriptionId()));
                         this.virtualRender = true;
                     }
-                    stack.set(BlockProperties.TYPE, this.getProperties());
+                    this.getProperties().addToTooltip(stack);
                     return stack;
                 }).orElseGet(() -> {
                     DisplayableRecipe.LOGGER.error("Block with id '{}' not found, using placeholder", this.getId().get());
@@ -163,7 +163,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
                         stack = Texts.rename(STACK_PLACEHOLDER.get(), Texts.translatable(block.getDescriptionId()));
                         this.virtualRender = true;
                     }
-                    stack.set(BlockProperties.TYPE, this.getProperties());
+                    this.getProperties().addToTooltip(stack);
                     stacks.add(stack);
                 }
                 if (stacks.isEmpty()) {
@@ -177,7 +177,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
             } else {
                 this.virtualRender = true;
                 ItemStack stack = STACK_PLACEHOLDER.get();
-                stack.set(BlockProperties.TYPE, this.getProperties());
+                this.getProperties().addToTooltip(stack);
                 return ImmutableList.of(stack);
             }
         });
@@ -188,7 +188,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     }
 
     public ResourceLocation getDisplayId() {
-        return this.getTag().map(TagKey::location).orElse(this.getDisplayStacks().getFirst().getItem().arch$registryName());
+        return this.getTag().map(TagKey::location).orElse(this.getDisplayStacks().get(0).getItem().arch$registryName());
     }
 
     public Optional<TagKey<Block>> getTag() {
@@ -244,7 +244,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     public boolean isUnknown() {
         List<ItemStack> stacks = this.getDisplayStacks();
         if (stacks.size() != 1) return false;
-        return Objects.equals(stacks.getFirst().getItem(), Items.BEDROCK) && this.isVirtualRender();
+        return Objects.equals(stacks.get(0).getItem(), Items.BEDROCK) && this.isVirtualRender();
     }
 
     public boolean matches(@NotNull Block block) {
@@ -277,5 +277,18 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     public boolean test(LootContext lootContext) {
         BlockState state = lootContext.getParam(LootContextParams.BLOCK_STATE);
         return this.matches(state);
+    }
+
+    public static class ConditionSerializer implements Serializer<BlockInput> {
+        @Override
+        public void serialize(JsonObject jsonObject, BlockInput condition, JsonSerializationContext jsonSerializationContext) {
+            JsonObject encoded = CodecUtil.getOrThrow(CodecUtil.encodeJson(condition, CODEC_COMP.codec()), IllegalStateException::new).getAsJsonObject();
+            encoded.entrySet().forEach(entry -> jsonObject.add(entry.getKey(), entry.getValue()));
+        }
+
+        @Override
+        public BlockInput deserialize(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+            return CodecUtil.getOrThrow(CodecUtil.decodeJson(jsonObject, CODEC_COMP.codec()), IllegalArgumentException::new);
+        }
     }
 }

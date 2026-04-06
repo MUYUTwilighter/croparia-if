@@ -11,8 +11,6 @@ import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.json.JsonTransformer;
 import cool.muyucloud.croparia.reflection.RecordCodecBuilderReflection;
 import cool.muyucloud.croparia.util.FileUtil;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryOps;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -21,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -56,7 +55,10 @@ public class CodecUtil {
      */
     @ApiStatus.Experimental
     public static <T> MapCodec<T> toMap(Codec<T> codec) {
-        return codec instanceof MapCodec.MapCodecCodec<T>(MapCodec<T> map) ? map : MapCodec.assumeMapUnsafe(codec);
+        if (codec instanceof MapCodec.MapCodecCodec<T> mapCodec) {
+            return mapCodec.codec();
+        }
+        return CodecUtil.fieldsOf(codec, "value").xmap(Function.identity(), Function.identity());
     }
 
     /**
@@ -70,8 +72,38 @@ public class CodecUtil {
      */
     public static <E> MultiCodec<List<E>> listOf(Codec<E> codec) {
         TestedCodec<List<E>> listCodec = of(Codec.list(codec), list -> list.size() == 1 ? TestedCodec.fail(() -> "Can be applied by singular codec") : TestedCodec.success());
-        Codec<List<E>> singularCodec = codec.xmap(Collections::singletonList, List::getFirst);
+        Codec<List<E>> singularCodec = codec.xmap(Collections::singletonList, list -> list.get(0));
         return of(listCodec, singularCodec);
+    }
+
+    public static <T> boolean isSuccess(DataResult<T> result) {
+        return result.result().isPresent();
+    }
+
+    public static <T> boolean isError(DataResult<T> result) {
+        return result.error().isPresent();
+    }
+
+    public static String errorMessage(DataResult<?> result) {
+        return result.error().map(DataResult.PartialResult::message).orElse("Unknown codec error");
+    }
+
+    public static <T> T getOrThrow(DataResult<T> result) {
+        return result.result().orElseThrow(() -> new IllegalStateException(errorMessage(result)));
+    }
+
+    public static <T, E extends RuntimeException> T getOrThrow(DataResult<T> result, Function<String, E> exceptionFactory) {
+        return result.result().orElseThrow(() -> exceptionFactory.apply(errorMessage(result)));
+    }
+
+    public static <T> void ifSuccess(DataResult<T> result, Consumer<T> consumer) {
+        result.result().ifPresent(consumer);
+    }
+
+    public static <T, O> O mapOrElse(DataResult<T> result, Function<T, O> onSuccess, Function<DataResult.PartialResult<T>, O> onError) {
+        Optional<T> mayResult = result.result();
+        if (mayResult.isPresent()) return onSuccess.apply(mayResult.get());
+        return onError.apply(result.error().orElseGet(() -> new DataResult.PartialResult<>(() -> "Unknown codec error", Optional.empty())));
     }
 
     /**
@@ -259,30 +291,6 @@ public class CodecUtil {
         );
     }
 
-    /**
-     * Map a codec into stream codec of target type.
-     *
-     * @param codec  original codec
-     * @param parser transform original type into target type
-     * @param getter get original type from target type
-     * @return stream codec of target type.
-     *
-     */
-    public static <B extends FriendlyByteBuf, T, I> StreamCodec<B, T> mapStream(Codec<I> codec, Function<? super I, ? extends T> parser, Function<? super T, ? extends I> getter) {
-        StreamCodec<B, I> stream = toStream(codec);
-        return stream.map(parser, getter);
-    }
-
-    /**
-     * Covert codec into stream codec
-     *
-     * @param codec the codec
-     *
-     */
-    public static <B extends FriendlyByteBuf, T> StreamCodec<B, T> toStream(Codec<T> codec) {
-        return StreamCodec.of((buf, inst) -> buf.writeJsonWithCodec(codec, inst), buf -> buf.readJsonWithCodec(codec));
-    }
-
     public static <T> Optional<RegistryOps<T>> getRegistryOps(DynamicOps<T> ops) {
         try {
             return CropariaIf.getRegistryAccess().map(access -> RegistryOps.create(ops, access));
@@ -304,8 +312,8 @@ public class CodecUtil {
 
     public static <T> DataResult<JsonElement> dumpJson(T object, Codec<T> codec, Path path, boolean override) throws IOException {
         DataResult<JsonElement> result = encodeJson(object, codec);
-        if (result.isSuccess()) {
-            FileUtil.write(path.toFile(), result.getOrThrow().toString(), override);
+        if (isSuccess(result)) {
+            FileUtil.write(path.toFile(), getOrThrow(result).toString(), override);
         }
         return result;
     }
@@ -356,42 +364,42 @@ public class CodecUtil {
      */
     @SuppressWarnings("unchecked")
     public static <S, F1, T extends S> MapCodec<T> extend(MapCodec<S> superCodec, RecordCodecBuilder<T, F1> field1, BiFunction<S, F1, T> mapper) {
-        return extend(superCodec, List.of(field1), (base, fields) -> mapper.apply(base, (F1) fields.getFirst()));
+        return extend(superCodec, List.of(field1), (base, fields) -> mapper.apply(base, (F1) fields.get(0)));
     }
 
     @SuppressWarnings("unchecked")
     public static <S, F1, F2, T extends S> MapCodec<T> extend(MapCodec<S> superCodec, RecordCodecBuilder<T, F1> field1, RecordCodecBuilder<T, F2> field2, Function3<S, F1, F2, T> mapper) {
-        return extend(superCodec, List.of(field1, field2), (base, fields) -> mapper.apply(base, (F1) fields.getFirst(), (F2) fields.get(1)));
+        return extend(superCodec, List.of(field1, field2), (base, fields) -> mapper.apply(base, (F1) fields.get(0), (F2) fields.get(1)));
     }
 
     @SuppressWarnings("unchecked")
     public static <S, F1, F2, F3, T extends S> MapCodec<T> extend(MapCodec<S> superCodec, RecordCodecBuilder<T, F1> field1, RecordCodecBuilder<T, F2> field2, RecordCodecBuilder<T, F3> field3, Function4<S, F1, F2, F3, T> mapper) {
-        return extend(superCodec, List.of(field1, field2, field3), (base, fields) -> mapper.apply(base, (F1) fields.getFirst(), (F2) fields.get(1), (F3) fields.get(2)));
+        return extend(superCodec, List.of(field1, field2, field3), (base, fields) -> mapper.apply(base, (F1) fields.get(0), (F2) fields.get(1), (F3) fields.get(2)));
     }
 
     @SuppressWarnings("unchecked")
     public static <S, F1, F2, F3, F4, T extends S> MapCodec<T> extend(MapCodec<S> superCodec, RecordCodecBuilder<T, F1> field1, RecordCodecBuilder<T, F2> field2, RecordCodecBuilder<T, F3> field3, RecordCodecBuilder<T, F4> field4, Function5<S, F1, F2, F3, F4, T> mapper) {
-        return extend(superCodec, List.of(field1, field2, field3, field4), (base, fields) -> mapper.apply(base, (F1) fields.getFirst(), (F2) fields.get(1), (F3) fields.get(2), (F4) fields.get(3)));
+        return extend(superCodec, List.of(field1, field2, field3, field4), (base, fields) -> mapper.apply(base, (F1) fields.get(0), (F2) fields.get(1), (F3) fields.get(2), (F4) fields.get(3)));
     }
 
     @SuppressWarnings("unchecked")
     public static <S, F1, F2, F3, F4, F5, T extends S> MapCodec<T> extend(MapCodec<S> superCodec, RecordCodecBuilder<T, F1> field1, RecordCodecBuilder<T, F2> field2, RecordCodecBuilder<T, F3> field3, RecordCodecBuilder<T, F4> field4, RecordCodecBuilder<T, F5> field5, Function6<S, F1, F2, F3, F4, F5, T> mapper) {
-        return extend(superCodec, List.of(field1, field2, field3, field4, field5), (base, fields) -> mapper.apply(base, (F1) fields.getFirst(), (F2) fields.get(1), (F3) fields.get(2), (F4) fields.get(3), (F5) fields.get(4)));
+        return extend(superCodec, List.of(field1, field2, field3, field4, field5), (base, fields) -> mapper.apply(base, (F1) fields.get(0), (F2) fields.get(1), (F3) fields.get(2), (F4) fields.get(3), (F5) fields.get(4)));
     }
 
     @SuppressWarnings("unchecked")
     public static <S, F1, F2, F3, F4, F5, F6, T extends S> MapCodec<T> extend(MapCodec<S> superCodec, RecordCodecBuilder<T, F1> field1, RecordCodecBuilder<T, F2> field2, RecordCodecBuilder<T, F3> field3, RecordCodecBuilder<T, F4> field4, RecordCodecBuilder<T, F5> field5, RecordCodecBuilder<T, F6> field6, Function7<S, F1, F2, F3, F4, F5, F6, T> mapper) {
-        return extend(superCodec, List.of(field1, field2, field3, field4, field5, field6), (base, fields) -> mapper.apply(base, (F1) fields.getFirst(), (F2) fields.get(1), (F3) fields.get(2), (F4) fields.get(3), (F5) fields.get(4), (F6) fields.get(5)));
+        return extend(superCodec, List.of(field1, field2, field3, field4, field5, field6), (base, fields) -> mapper.apply(base, (F1) fields.get(0), (F2) fields.get(1), (F3) fields.get(2), (F4) fields.get(3), (F5) fields.get(4), (F6) fields.get(5)));
     }
 
     @SuppressWarnings("unchecked")
     public static <S, F1, F2, F3, F4, F5, F6, F7, T extends S> MapCodec<T> extend(MapCodec<S> superCodec, RecordCodecBuilder<T, F1> field1, RecordCodecBuilder<T, F2> field2, RecordCodecBuilder<T, F3> field3, RecordCodecBuilder<T, F4> field4, RecordCodecBuilder<T, F5> field5, RecordCodecBuilder<T, F6> field6, RecordCodecBuilder<T, F7> field7, Function8<S, F1, F2, F3, F4, F5, F6, F7, T> mapper) {
-        return extend(superCodec, List.of(field1, field2, field3, field4, field5, field6, field7), (base, fields) -> mapper.apply(base, (F1) fields.getFirst(), (F2) fields.get(1), (F3) fields.get(2), (F4) fields.get(3), (F5) fields.get(4), (F6) fields.get(5), (F7) fields.get(6)));
+        return extend(superCodec, List.of(field1, field2, field3, field4, field5, field6, field7), (base, fields) -> mapper.apply(base, (F1) fields.get(0), (F2) fields.get(1), (F3) fields.get(2), (F4) fields.get(3), (F5) fields.get(4), (F6) fields.get(5), (F7) fields.get(6)));
     }
 
     @SuppressWarnings("unchecked")
     public static <S, F1, F2, F3, F4, F5, F6, F7, F8, T extends S> MapCodec<T> extend(MapCodec<S> superCodec, RecordCodecBuilder<T, F1> field1, RecordCodecBuilder<T, F2> field2, RecordCodecBuilder<T, F3> field3, RecordCodecBuilder<T, F4> field4, RecordCodecBuilder<T, F5> field5, RecordCodecBuilder<T, F6> field6, RecordCodecBuilder<T, F7> field7, RecordCodecBuilder<T, F8> field8, Function9<S, F1, F2, F3, F4, F5, F6, F7, F8, T> mapper) {
-        return extend(superCodec, List.of(field1, field2, field3, field4, field5, field6, field7, field8), (base, fields) -> mapper.apply(base, (F1) fields.getFirst(), (F2) fields.get(1), (F3) fields.get(2), (F4) fields.get(3), (F5) fields.get(4), (F6) fields.get(5), (F7) fields.get(6), (F8) fields.get(7)));
+        return extend(superCodec, List.of(field1, field2, field3, field4, field5, field6, field7, field8), (base, fields) -> mapper.apply(base, (F1) fields.get(0), (F2) fields.get(1), (F3) fields.get(2), (F4) fields.get(3), (F5) fields.get(4), (F6) fields.get(5), (F7) fields.get(6), (F8) fields.get(7)));
     }
 
     /**
@@ -448,17 +456,17 @@ public class CodecUtil {
             @Override
             public <I> DataResult<T> decode(DynamicOps<I> ops, MapLike<I> input) {
                 DataResult<S> superResult = superCodec.decode(ops, input);
-                if (superResult.isError())
+                if (isError(superResult))
                     return superResult.flatMap(s -> DataResult.error(() -> "Failed to decode super: " + s));
                 ArrayList<Object> fields = new ArrayList<>();
                 for (RecordCodecBuilder<T, ?> fieldCodec : fieldCodecs) {
                     MapDecoder<?> decoder = RecordCodecBuilderReflection.getDecoder(fieldCodec);
                     DataResult<?> result = decoder.decode(ops, input);
-                    if (result.isError())
+                    if (isError(result))
                         return result.flatMap(f -> DataResult.error(() -> "Failed to decode field: " + f));
-                    fields.add(result.getOrThrow());
+                    fields.add(getOrThrow(result));
                 }
-                return DataResult.success(resultMapper.apply(superResult.getOrThrow(), fields));
+                return DataResult.success(resultMapper.apply(getOrThrow(superResult), fields));
             }
 
             @Override

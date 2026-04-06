@@ -22,10 +22,10 @@ public class MultiCodec<T> extends ArrayList<TestedCodec<? extends T>> implement
         for (TestedCodec<? extends T> codec : this) {
             TestedCodec<T> adapted = codec.adapt();
             DataResult<Pair<T, I>> result = adapted.decode(ops, toDecode);
-            if (result.isSuccess()) {
+            if (CodecUtil.isSuccess(result)) {
                 return result;
             } else {
-                result.error().ifPresent(error -> logs.add(error.messageSupplier()));
+                result.error().ifPresent(error -> logs.add(error::message));
             }
         }
         return DataResult.error(() -> buildMsg(logs));
@@ -36,10 +36,10 @@ public class MultiCodec<T> extends ArrayList<TestedCodec<? extends T>> implement
         ArrayList<Supplier<String>> logs = new ArrayList<>(this.size());
         for (TestedCodec<? extends T> codec : this) {
             DataResult<O> result = codec.adapt().encode(toEncode, ops, prefix);
-            if (result.isSuccess()) {
+            if (CodecUtil.isSuccess(result)) {
                 return result;
             } else {
-                result.error().ifPresent(error -> logs.add(error.messageSupplier()));
+                result.error().ifPresent(error -> logs.add(error::message));
             }
         }
         return DataResult.error(() -> buildMsg(logs));

@@ -16,7 +16,7 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -96,7 +96,7 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
 
     @Override
     @Deprecated
-    public @NotNull ItemStack assemble(SoakContainer recipeInput, HolderLookup.Provider provider) {
+    public @NotNull ItemStack assemble(SoakContainer recipeInput, RegistryAccess registryAccess) {
         return ItemStack.EMPTY;
     }
 

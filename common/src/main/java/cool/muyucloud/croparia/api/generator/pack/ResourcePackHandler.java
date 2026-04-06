@@ -1,20 +1,19 @@
 package cool.muyucloud.croparia.api.generator.pack;
 
 import com.google.gson.JsonObject;
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.mixin.ReloadableResourceManagerImplMixin;
+import cool.muyucloud.croparia.util.FileUtil;
 import cool.muyucloud.croparia.util.Ref;
-import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PathPackResources;
-import net.minecraft.server.packs.repository.PackSource;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -45,18 +44,13 @@ public class ResourcePackHandler extends PackHandler {
         return register(new ResourcePackHandler(id, path, meta, override));
     }
 
-    private final PathPackResources resourcePack = new PathPackResources(
-        new PackLocationInfo(
-            this.getId().toString(),
-            Texts.literal(this.getId().toString()),
-            PackSource.BUILT_IN,
-            Optional.empty()
-        ), getRoot()
-    );
-
     public ResourcePackHandler(ResourceLocation id, Path path, JsonObject meta, Supplier<Boolean> override) {
         super(id, path, meta, override);
     }
+
+    private final PathPackResources resourcePack = new PathPackResources(
+        this.getId().toString(), this.getRoot(), true
+    );
 
     @Override
     public void onClientStopping(Ref<Minecraft> client) {
@@ -66,6 +60,19 @@ public class ResourcePackHandler extends PackHandler {
 
     public PackResources getResourcePack() {
         return this.resourcePack;
+    }
+
+    @Override
+    public void clear() {
+        File file = this.getRoot().resolve("assets").toFile();
+        if (file.isDirectory()) {
+            CropariaIf.LOGGER.info("Clearing resource pack directory");
+            try {
+                FileUtil.deleteDir(file);
+            } catch (Throwable e) {
+                CropariaIf.LOGGER.error("Failed to clear resource pack directory", e);
+            }
+        }
     }
 
     @Override

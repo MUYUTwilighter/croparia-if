@@ -1,6 +1,5 @@
 package cool.muyucloud.croparia.api.core.block;
 
-import com.mojang.serialization.MapCodec;
 import cool.muyucloud.croparia.api.core.block.entity.CropTransmuterBlockEntity;
 import cool.muyucloud.croparia.api.repo.ProxyProvider;
 import cool.muyucloud.croparia.registry.BlockEntities;
@@ -10,10 +9,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -33,7 +31,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CropTransmuter extends BaseEntityBlock {
-    public static final MapCodec<CropTransmuter> CODEC = simpleCodec(CropTransmuter::new);
     protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 16.0);
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
@@ -49,13 +46,12 @@ public class CropTransmuter extends BaseEntityBlock {
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(
-        ItemStack itemStack,
+    public @NotNull InteractionResult use(
         BlockState state,
         Level world,
         BlockPos pos,
         Player player,
-        InteractionHand interactionHand,
+        InteractionHand hand,
         BlockHitResult blockHitResult
     ) {
         if (!world.isClientSide) {
@@ -66,15 +62,15 @@ public class CropTransmuter extends BaseEntityBlock {
                 }
             }
         }
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
     public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
         if (state.getBlock() != newState.getBlock()) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof CropTransmuterBlockEntity) {
-                Containers.dropContentsOnDestroy(state, newState, world, pos);
+            if (blockEntity instanceof CropTransmuterBlockEntity cropTransmuter) {
+                Containers.dropContents(world, pos, cropTransmuter);
             }
             super.onRemove(state, world, pos, newState, moved);
         }
@@ -108,11 +104,6 @@ public class CropTransmuter extends BaseEntityBlock {
         if (powered != state.getValue(POWERED)) {
             level.setBlock(pos, state.setValue(POWERED, powered), 3);
         }
-    }
-
-    @Override
-    protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
     }
 
     @Override

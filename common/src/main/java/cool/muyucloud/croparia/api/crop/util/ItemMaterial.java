@@ -12,8 +12,8 @@ import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.TypeMapper;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -26,51 +26,51 @@ public class ItemMaterial extends Material<Item> {
     public static final MapCodec<ItemMaterial> CODEC_COMP = RecordCodecBuilder.mapCodec(
         instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(ItemMaterial::getName),
-            DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY).forGetter(ItemMaterial::getComponents),
+            CompoundTag.CODEC.optionalFieldOf("components", new CompoundTag()).forGetter(ItemMaterial::getComponents),
             Codec.INT.optionalFieldOf("count", 2).forGetter(ItemMaterial::getCount)
         ).apply(instance, ItemMaterial::new)
     );
     public static final MultiCodec<ItemMaterial> CODEC = CodecUtil.of(
-        CodecUtil.of(CODEC_COMP.codec(), toDecode -> toDecode.components.equals(DataComponentPatch.EMPTY) && toDecode.getCount() == 2
+        CodecUtil.of(CODEC_COMP.codec(), toDecode -> toDecode.components.isEmpty() && toDecode.getCount() == 2
             ? TestedCodec.fail(() -> "Count is 2 and no components, proceed to string codec") : TestedCodec.success()), CODEC_STR
     );
     public static final Placeholder<ItemMaterial> PLACEHOLDER = Placeholder.build(node -> node
         .self(TypeMapper.identity(), ItemMaterial.CODEC)
         .then(PatternKey.literal("result"), TypeMapper.of(material -> ItemOutput.of(material.asItem())), Placeholder.ITEM_OUTPUT)
-        .then(PatternKey.literal("components"), TypeMapper.of(ItemMaterial::getComponents), Placeholder.DATA_COMPONENTS)
         .concat(Material.PLACEHOLDER, TypeMapper.of(material -> material)));
 
     @NotNull
-    private final DataComponentPatch components;
+    private final CompoundTag components;
     private transient final OnLoadSupplier<List<Item>> items = OnLoadSupplier.of(
         () -> this.rawCandidates(BuiltInRegistries.ITEM.key().location()).stream().filter(
             item -> CropariaIf.CONFIG.isModValid(Objects.requireNonNull(item.arch$registryName()).getNamespace())
         ).toList()
     );
-    private transient final OnLoadSupplier<List<ItemStack>> stacks = OnLoadSupplier.of(() ->
-        this.candidates().stream().map(item -> {
-            ItemStack stack = item.getDefaultInstance();
-            stack.setCount(Math.min(this.getCount(), stack.getMaxStackSize()));
-            stack.applyComponents(this.getComponents());
-            return stack;
-        }).toList()
-    );
+    private transient final OnLoadSupplier<List<ItemStack>> stacks;
 
     public ItemMaterial(ItemStack stack) {
-        this(String.valueOf(stack.getItem().arch$registryName()), stack.getComponentsPatch(), stack.getCount());
+        this(String.valueOf(stack.getItem().arch$registryName()), stack.getTag(), stack.getCount());
     }
 
     public ItemMaterial(@NotNull String name) {
-        this(name, DataComponentPatch.EMPTY, 2);
+        this(name, new CompoundTag(), 2);
     }
 
-    public ItemMaterial(@NotNull String name, @NotNull DataComponentPatch components, int count) {
+    public ItemMaterial(@NotNull String name, @NotNull CompoundTag components, int count) {
         super(name, count);
-        this.components = components;
+        this.components = components.copy();
+        this.stacks = OnLoadSupplier.of(() ->
+            this.candidates().stream().map(item -> {
+                ItemStack stack = item.getDefaultInstance();
+                stack.setCount(Math.min(this.getCount(), stack.getMaxStackSize()));
+                stack.setTag(this.components.isEmpty() ? null : this.components.copy());
+                return stack;
+            }).toList()
+        );
     }
 
-    public @NotNull DataComponentPatch getComponents() {
-        return components;
+    public @NotNull CompoundTag getComponents() {
+        return components.copy();
     }
 
     @Override
@@ -80,7 +80,7 @@ public class ItemMaterial extends Material<Item> {
 
     @Override
     public @NotNull ItemStack asItem() {
-        return this.asItems().isEmpty() ? ItemStack.EMPTY : this.asItems().getFirst();
+        return this.asItems().isEmpty() ? ItemStack.EMPTY : this.asItems().get(0);
     }
 
     @Override

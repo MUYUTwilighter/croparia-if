@@ -18,7 +18,6 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.core.Vec3i;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ReiRitualStructure extends ReiCategory<RitualStructure> {
     private static final LazySupplier<ItemStack> INPUT = LazySupplier.of(() -> {
         ItemStack stack = CropariaItems.PLACEHOLDER.get().getDefaultInstance();
-        stack.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.input"));
+        stack.setHoverName(Texts.translatable("tooltip.croparia.input"));
         return stack;
     });
 

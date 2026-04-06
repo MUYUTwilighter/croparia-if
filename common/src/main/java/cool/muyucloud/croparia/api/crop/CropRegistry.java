@@ -70,7 +70,7 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
     protected void readCrop(File file) {
         if (!file.getName().endsWith(".json")) return;
         try {
-            CodecUtil.readJson(file, this.getCodec()).ifSuccess(this::register);
+            CodecUtil.ifSuccess(CodecUtil.readJson(file, this.getCodec()), this::register);
         } catch (IOException | RuntimeException e) {
             CropariaIf.LOGGER.error("Failed to read crop from file \"%s\"".formatted(file), e);
         }
@@ -83,7 +83,7 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
     public Path dumpCrop(@NotNull C crop) {
         Path cropPath = this.getPath().resolve(crop.getKey().toString().replace(":", "/") + ".json");
         StringWriter result = new StringWriter();
-        CodecUtil.encodeJson(crop, this.getCodec()).mapOrElse(json -> {
+        CodecUtil.mapOrElse(CodecUtil.encodeJson(crop, this.getCodec()), json -> {
             try (JsonWriter writer = new JsonWriter(result)) {
                 writer.setIndent("  ");
                 GSON.toJson(json, writer);

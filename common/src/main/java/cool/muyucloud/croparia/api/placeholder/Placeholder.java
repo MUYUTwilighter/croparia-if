@@ -10,7 +10,7 @@ import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
-import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,14 +28,6 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * A placeholder parser that can parse placeholders in the format of "field.sublist.[].subfield".<br/>
- * The parser is built using a {@link PlaceholderBuilder}, which provides a fluent API to define how to parse each part of the placeholder.
- *
- * @apiNote This can be seen as an immutable version of {@link PlaceholderBuilder}, which can be reused and shared.<br/>
- * To create a new parser, use {@code #build(...)}.
- * @see PlaceholderBuilder
- */
 public class Placeholder<T> implements RegexParser<T> {
     public static final Logger LOGGER = LogUtils.getLogger();
 
@@ -67,7 +59,7 @@ public class Placeholder<T> implements RegexParser<T> {
         .then(PatternKey.literal("namespace"), RegexParser.of(ResourceLocation::getNamespace))
         .then(PatternKey.literal("path"), RegexParser.of(ResourceLocation::getPath))
     );
-    public static final Placeholder<DataComponentPatch> DATA_COMPONENTS = lazy(Builtins::dataComponents);
+    public static final Placeholder<CompoundTag> DATA_COMPONENTS = lazy(Builtins::dataComponents);
     public static final Placeholder<BlockOutput> BLOCK_OUTPUT = lazy(Builtins::blockOutput);
     public static final Placeholder<ItemOutput> ITEM_OUTPUT = lazy(Builtins::itemOutput);
     public static final Placeholder<Item> ITEM = lazy(Builtins::item);
@@ -81,7 +73,7 @@ public class Placeholder<T> implements RegexParser<T> {
     }
 
     public static <T> Placeholder<T> build(Codec<T> codec, PlaceholderFactory<T> factory) {
-        Placeholder<T> json = JSON.map((entry, placeholder, matcher) -> Optional.ofNullable(CodecUtil.encodeJson(entry, codec).getOrThrow(PlaceholderException::new)));
+        Placeholder<T> json = JSON.map((entry, placeholder, matcher) -> Optional.ofNullable(CodecUtil.getOrThrow(CodecUtil.encodeJson(entry, codec), PlaceholderException::new)));
         return factory.apply(PlaceholderBuilder.of()).concat(json, TypeMapper.identity()).build();
     }
 
@@ -97,7 +89,7 @@ public class Placeholder<T> implements RegexParser<T> {
     private final Map<PatternKey, RegexParser<T>> subNodes;
 
     public Placeholder(Codec<T> codec, Function<PlaceholderBuilder<T>, PlaceholderBuilder<T>> factory) {
-        Placeholder<T> json = JSON.map((entry, placeholder, matcher) -> Optional.ofNullable(CodecUtil.encodeJson(entry, codec).getOrThrow(PlaceholderException::new)));
+        Placeholder<T> json = JSON.map((entry, placeholder, matcher) -> Optional.ofNullable(CodecUtil.getOrThrow(CodecUtil.encodeJson(entry, codec), PlaceholderException::new)));
         this.subNodes = Collections.unmodifiableMap(factory.apply(PlaceholderBuilder.of()).concat(json, TypeMapper.identity()).getSubNodes());
     }
 
@@ -110,13 +102,6 @@ public class Placeholder<T> implements RegexParser<T> {
         return this.subNodes;
     }
 
-    /**
-     * Create a new parser that maps the entry type using the given mapper function.
-     *
-     * @param mapper The function to map the entry type.
-     * @param <O>    The new entry type.
-     * @return A new parser that maps the entry type.
-     */
     public <O> Placeholder<O> map(TypeMapper<O, T> mapper) {
         PlaceholderBuilder<T> builder = PlaceholderBuilder.of();
         builder.overwrite(this, TypeMapper.identity());
@@ -129,19 +114,6 @@ public class Placeholder<T> implements RegexParser<T> {
         return builder;
     }
 
-    /**
-     * Analyze the placeholder and delegate to the appropriate sub-node parser.
-     *
-     * @param entry       The entry that provides the values.
-     * @param placeholder The placeholder to be processed.
-     * @param matcher     The matcher of the pattern that matched the placeholder.
-     * @return The processed JsonElement, or Optional.empty() if the placeholder is not recognized.
-     * @throws PlaceholderException If any error occurs during processing.
-     * @apiNote This method checks if the placeholder is empty, in which case it calls the self parser.<br/>
-     * If not empty, it extracts the next key segment and looks for a matching sub-node parser.<br/>
-     * If a matching sub-node is found, it forwards the remaining placeholder to that parser.<br/>
-     * If no matching sub-node is found, it throws a PlaceholderException.
-     */
     @Override
     public Optional<JsonElement> parse(@NotNull T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws PlaceholderException {
         String forwarded = RegexParser.forward(placeholder);
@@ -213,8 +185,8 @@ public class Placeholder<T> implements RegexParser<T> {
     }
 
     private static final class Builtins {
-        private static final LazySupplier<Placeholder<DataComponentPatch>> DATA_COMPONENTS_IMPL =
-            LazySupplier.of(() -> Placeholder.build(DataComponentPatch.CODEC, PlaceholderFactory.identity()));
+        private static final LazySupplier<Placeholder<CompoundTag>> DATA_COMPONENTS_IMPL =
+            LazySupplier.of(() -> Placeholder.build(CompoundTag.CODEC, PlaceholderFactory.identity()));
         private static final LazySupplier<Placeholder<BlockOutput>> BLOCK_OUTPUT_IMPL = LazySupplier.of(() -> build(BlockOutput.CODEC, builder -> builder
             .then(PatternKey.literal("id"), TypeMapper.of(BlockOutput::getId), ID)
             .thenMap(PatternKey.literal("properties"), TypeMapper.of(block -> MapReader.map(block.getProperties().getProperties())), Placeholder.STRING)
@@ -223,6 +195,7 @@ public class Placeholder<T> implements RegexParser<T> {
             ItemOutput.CODEC, builder -> builder
                 .then(PatternKey.literal("id"), TypeMapper.of(ItemOutput::getId), ID)
                 .then(PatternKey.literal("amount"), TypeMapper.of(ItemOutput::getAmount), NUMBER)
+                .then(PatternKey.literal("nbt"), TypeMapper.of(ItemOutput::getComponentsPatch), Placeholder.DATA_COMPONENTS)
                 .then(PatternKey.literal("components"), TypeMapper.of(ItemOutput::getComponentsPatch), Placeholder.DATA_COMPONENTS)
                 .then(PatternKey.literal("stack"), TypeMapper.of(ItemOutput::createStack), ItemStack.CODEC)
         ));
@@ -231,7 +204,7 @@ public class Placeholder<T> implements RegexParser<T> {
         private static final LazySupplier<Placeholder<Block>> BLOCK_IMPL = LazySupplier.of(() -> ID.map(TypeMapper.of(Block::arch$registryName)));
         private static final LazySupplier<Placeholder<BlockState>> BLOCK_STATE_IMPL = LazySupplier.of(() -> BLOCK_OUTPUT.map(TypeMapper.of(BlockOutput::of)));
 
-        private static Placeholder<DataComponentPatch> dataComponents() {
+        private static Placeholder<CompoundTag> dataComponents() {
             return DATA_COMPONENTS_IMPL.get();
         }
 

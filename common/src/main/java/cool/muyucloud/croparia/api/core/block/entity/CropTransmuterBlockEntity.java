@@ -12,7 +12,6 @@ import cool.muyucloud.croparia.util.text.Texts;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -83,7 +82,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
         ItemStack slot = this.getItem(OUTPUT_SLOT);
         if (slot.isEmpty()) {
             this.setItem(OUTPUT_SLOT, output.copy());
-        } else if (ItemStack.isSameItemSameComponents(slot, output) && (slot.getMaxStackSize() - slot.getCount()) >= output.getCount()) {
+        } else if (ItemStack.isSameItemSameTags(slot, output) && (slot.getMaxStackSize() - slot.getCount()) >= output.getCount()) {
             this.setItem(OUTPUT_SLOT, slot.copyWithCount(slot.getCount() + output.getCount()));
         } else {
             return;
@@ -133,24 +132,24 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
-        ContainerHelper.loadAllItems(nbt, this.inventory, provider);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
+        ContainerHelper.loadAllItems(nbt, this.inventory);
         this.selectedIndex = Math.max(0, nbt.getInt(NBT_SELECTED_INDEX));
         this.positiveRedstone = !nbt.contains(NBT_POSITIVE_REDSTONE) || nbt.getBoolean(NBT_POSITIVE_REDSTONE);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        ContainerHelper.saveAllItems(nbt, this.inventory, provider);
+    protected void saveAdditional(CompoundTag nbt) {
+        ContainerHelper.saveAllItems(nbt, this.inventory);
         nbt.putInt(NBT_SELECTED_INDEX, this.selectedIndex);
         nbt.putBoolean(NBT_POSITIVE_REDSTONE, this.positiveRedstone);
-        super.saveAdditional(nbt, provider);
+        super.saveAdditional(nbt);
     }
 
     @Override
-    public @NotNull CompoundTag getUpdateTag(HolderLookup.Provider provider) {
-        return this.saveWithoutMetadata(provider);
+    public @NotNull CompoundTag getUpdateTag() {
+        return this.saveWithoutMetadata();
     }
 
     @Override
@@ -190,7 +189,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     @Override
     public void setItem(int slot, ItemStack stack) {
         ItemStack stored = this.getItem(slot);
-        if (ItemStack.isSameItemSameComponents(stored, stack) && stored.getCount() == stack.getCount()) {
+        if (ItemStack.isSameItemSameTags(stored, stack) && stored.getCount() == stack.getCount()) {
             return;
         }
         this.setChanged();

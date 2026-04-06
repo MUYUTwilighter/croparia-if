@@ -39,7 +39,7 @@ public class ReiClient implements REIClientPlugin {
         TypedSerializer<R> type = category.getRecipeType();
         registry.registerRecipeFiller(
             type.getRecipeClass(), type,
-            holder -> new ReiDisplay<>(holder, category)
+            recipe -> new ReiDisplay<>(recipe, type.getId(), category)
         );
     }
 }

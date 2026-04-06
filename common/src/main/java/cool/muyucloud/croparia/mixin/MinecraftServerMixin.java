@@ -1,6 +1,5 @@
 package cool.muyucloud.croparia.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -23,7 +22,7 @@ public abstract class MinecraftServerMixin {
     public abstract ServerLevel getLevel(ResourceKey<Level> dimension);
 
     @Inject(method = "reloadResources", at = @At("RETURN"))
-    public void onReloaded(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir, @Local CompletableFuture<Void> completableFuture) {
-        completableFuture.whenComplete((v, t) -> OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis());
+    public void onReloaded(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+        cir.getReturnValue().whenComplete((v, t) -> OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis());
     }
 }

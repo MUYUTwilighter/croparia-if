@@ -89,9 +89,9 @@ public abstract class AbstractInputManager<T extends AbstractInputManager<T>> im
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scrollDeltaX, double scrollDeltaY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollDeltaY) {
         return this.onMouseScroll.values().stream().anyMatch(handler ->
-            handler.handle(this.getSelf(), mouseX, mouseY, scrollDeltaX, scrollDeltaY)
+            handler.handle(this.getSelf(), mouseX, mouseY, 0, scrollDeltaY)
         );
     }
 

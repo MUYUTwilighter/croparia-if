@@ -2,10 +2,11 @@ package cool.muyucloud.croparia.api.recipe;
 
 import com.mojang.logging.LogUtils;
 import cool.muyucloud.croparia.api.recipe.entry.SlotDisplay;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeInput;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -15,7 +16,7 @@ import java.util.List;
  * A generic interface for recipes that can be displayed in the recipe book, can be polymorphic to many types required
  *
  */
-public interface DisplayableRecipe<C extends RecipeInput> extends Recipe<C> {
+public interface DisplayableRecipe<C extends Container> extends Recipe<C> {
     Logger LOGGER = LogUtils.getLogger();
 
     /**
@@ -44,26 +45,26 @@ public interface DisplayableRecipe<C extends RecipeInput> extends Recipe<C> {
     }
 
     @Override
-    default boolean isSpecial() {
-        return false;
+    default @NotNull ResourceLocation getId() {
+        return this.getTypedSerializer().getId();
     }
 
-    @SuppressWarnings("unchecked")
-    default <T extends RecipeInput, R extends Recipe<T>> R adapt() {
-        return (R) this;
+    @Override
+    default @NotNull ItemStack getResultItem(@NotNull RegistryAccess registryAccess) {
+        return this.getOutputs().stream()
+            .flatMap(List::stream)
+            .findFirst()
+            .map(ItemStack::copy)
+            .orElse(ItemStack.EMPTY);
+    }
+
+    @Override
+    default boolean isSpecial() {
+        return false;
     }
 
     @Override
     default boolean canCraftInDimensions(int width, int height) {
         return true;
-    }
-
-    @Override
-    default @NotNull ItemStack getResultItem(HolderLookup.Provider registries) {
-        List<List<ItemStack>> outputs = getOutputs();
-        if (outputs.isEmpty() || outputs.getFirst().isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-        return outputs.getFirst().getFirst();
     }
 }

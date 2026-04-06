@@ -10,7 +10,7 @@
   },
   "result": {
     "id": "minecraft:enchanted_book",
-    "components": {
+    "nbt": {
       "minecraft:stored_enchantments": {
         "levels": {
           "minecraft:density": 5

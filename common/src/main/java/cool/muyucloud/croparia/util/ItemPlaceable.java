@@ -26,7 +26,7 @@ public interface ItemPlaceable {
             newStack = stack.split(1);
         }
         ItemEntity entity = CifUtil.createItemEntity(world, pos, newStack);
-        if (owner != null) entity.setThrower(owner);
+        if (owner != null) entity.setThrower(owner.getUUID());
         world.addFreshEntity(entity);
     }
 }

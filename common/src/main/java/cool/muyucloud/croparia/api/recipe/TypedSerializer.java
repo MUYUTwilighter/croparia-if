@@ -1,17 +1,20 @@
 package cool.muyucloud.croparia.api.recipe;
 
+import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.access.RecipeManagerAccess;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.registry.Recipes;
+import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.supplier.Mappable;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
@@ -32,24 +35,15 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
     private final List<Mappable<ItemStack>> stations;
     private final Class<? extends R> recipeClass;
     private final MapCodec<R> codec;
-    private final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec;
 
     @SafeVarargs
     public TypedSerializer(ResourceLocation id, Class<? extends R> recipeClass, final MapCodec<R> codec,
-                           Mappable<ItemStack>... stations) {
-        this(id, recipeClass, codec, CodecUtil.toStream(codec.codec()), stations);
-    }
-
-    @SafeVarargs
-    public TypedSerializer(ResourceLocation id, Class<? extends R> recipeClass, final MapCodec<R> codec,
-                           final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec,
                            Mappable<ItemStack>... stations) {
         this.id = id;
         this.stations = new ArrayList<>();
         this.stations.addAll(Arrays.asList(stations));
         this.recipeClass = recipeClass;
         this.codec = codec;
-        this.streamCodec = streamCodec;
     }
 
     /**
@@ -58,30 +52,28 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
      * @apiNote CHECK TYPE SAFETY BEFORE USE!
      */
     @SuppressWarnings("unchecked")
-    public <I extends RecipeInput, T extends DisplayableRecipe<I>> TypedSerializer<T> adapt() {
+    public <C extends Container, T extends DisplayableRecipe<C>> TypedSerializer<T> adapt() {
         return (TypedSerializer<T>) this;
     }
 
     @SuppressWarnings("unchecked")
     public List<R> find() {
         List<R> recipes = new ArrayList<>();
-        CropariaIf.ifServerOrElse(server -> recipes.addAll(
-            ((RecipeManagerAccess) server.getRecipeManager()).cif$byType(this.adapt())
-                .stream().map(holder -> (R) holder.value()).toList()
-        ), () -> {
+        CropariaIf.ifServerOrElse(server -> {
+            List<?> found = new ArrayList<>(((RecipeManagerAccess) server.getRecipeManager()).cif$byType(this.adapt()));
+            found.forEach(recipe -> recipes.add((R) recipe));
+        }, () -> {
             Level level = getClientLevel();
             if (level == null) return;
             RecipeManagerAccess access = (RecipeManagerAccess) level.getRecipeManager();
-            access.cif$byType(this.adapt()).forEach(holder -> recipes.add((R) holder.value()));
+            access.cif$byType(this.adapt()).forEach(recipe -> recipes.add((R) recipe));
         });
         return recipes;
     }
 
     @SuppressWarnings("unchecked")
-    public <I extends RecipeInput> Optional<R> find(I input, Level level) {
-        return level.getRecipeManager().getRecipeFor(this.adapt(), input, level).map(
-            holder -> (R) holder.value()
-        );
+    public <C extends Container> Optional<R> find(C input, Level level) {
+        return level.getRecipeManager().getRecipeFor(this.adapt(), input, level).map(recipe -> (R) recipe);
     }
 
     public List<Mappable<ItemStack>> getStations() {
@@ -96,20 +88,33 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
         return recipeClass;
     }
 
-    @Override
-    public @NotNull MapCodec<R> codec() {
+    public ResourceLocation getId() {
+        return id;
+    }
+
+    public @NotNull MapCodec<R> getCodec() {
         return codec;
     }
 
     @Override
-    @NotNull
-    @SuppressWarnings("deprecation")
-    public StreamCodec<RegistryFriendlyByteBuf, R> streamCodec() {
-        return streamCodec;
+    public @NotNull R fromJson(@NotNull ResourceLocation recipeId, @NotNull JsonObject json) {
+        return CodecUtil.getOrThrow(CodecUtil.decodeJson(json, this.codec.codec()), IllegalArgumentException::new);
     }
 
-    public ResourceLocation getId() {
-        return id;
+    @Override
+    public R fromNetwork(@NotNull ResourceLocation recipeId, @NotNull FriendlyByteBuf buffer) {
+        CompoundTag tag = buffer.readNbt();
+        if (tag == null) {
+            throw new IllegalArgumentException("Missing recipe payload for " + recipeId);
+        }
+        return CodecUtil.getOrThrow(this.codec.codec().parse(NbtOps.INSTANCE, tag), IllegalArgumentException::new);
+    }
+
+    @Override
+    public void toNetwork(@NotNull FriendlyByteBuf buffer, @NotNull R recipe) {
+        CompoundTag tag = CodecUtil.getOrThrow(this.codec.codec().encodeStart(NbtOps.INSTANCE, recipe), IllegalArgumentException::new)
+            instanceof CompoundTag compoundTag ? compoundTag : new CompoundTag();
+        buffer.writeNbt(tag);
     }
 
     @Nullable

@@ -5,7 +5,7 @@
   "block": "minecraft:sculk_catalyst",
   "result": {
     "id": "minecraft:enchanted_book",
-    "components": {
+    "nbt": {
       "minecraft:stored_enchantments": {
         "levels": {
           "minecraft:mending": 1

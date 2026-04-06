@@ -367,7 +367,7 @@ public class PlaceholderBuilder<T> {
             var mayO = mapper.map(entry, placeholder, matcher);
             if (mayO.isEmpty()) return Optional.empty();
             O o = mayO.get();
-            return CodecUtil.encodeJson(o, codec).map(Optional::of).getOrThrow(PlaceholderException::new);
+            return Optional.of(CodecUtil.getOrThrow(CodecUtil.encodeJson(o, codec), PlaceholderException::new));
         }, Placeholder.JSON);
     }
 

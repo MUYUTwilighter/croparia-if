@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuterMenu> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace(
-        "textures/gui/container/dispenser.png"
-    );
+    private static final ResourceLocation TEXTURE = ResourceLocation.tryParse("minecraft:textures/gui/container/dispenser.png");
     private static final int PANEL_CELL = 18;
     private static final int PANEL_COLS = 3;
     private static final int PANEL_ROWS = 3;

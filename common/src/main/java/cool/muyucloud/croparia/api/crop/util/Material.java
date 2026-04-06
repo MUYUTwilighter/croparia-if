@@ -34,10 +34,10 @@ public abstract class Material<T> {
         this.count = count;
         if (name.startsWith("#")) {
             this.tag = true;
-            this.id = ResourceLocation.parse(name.substring(1));
+            this.id = ResourceLocation.tryParse(name.substring(1));
         } else {
             this.tag = false;
-            this.id = ResourceLocation.parse(name);
+            this.id = ResourceLocation.tryParse(name);
         }
     }
 

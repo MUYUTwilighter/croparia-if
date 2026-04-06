@@ -113,7 +113,7 @@ public class CropariaItems {
     );
     public static final RegistrySupplier<InfiniteApple> INFINITE_APPLE = registerItem(
         "infinite_apple", properties -> new InfiniteApple(properties.food(
-            new FoodProperties.Builder().alwaysEdible().nutrition(5).saturationModifier(4.0F)
+            new FoodProperties.Builder().alwaysEat().nutrition(5).saturationMod(4.0F)
                 .effect(new MobEffectInstance(MobEffects.REGENERATION, 100, 1), 1F)
                 .effect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 0), 1F)
                 .effect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 100, 0), 1F)

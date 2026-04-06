@@ -5,7 +5,6 @@
 
 package cool.muyucloud.croparia.api.core.block;
 
-import com.mojang.serialization.MapCodec;
 import cool.muyucloud.croparia.api.core.block.entity.GreenhouseBlockEntity;
 import cool.muyucloud.croparia.api.repo.ProxyProvider;
 import cool.muyucloud.croparia.registry.CropariaItems;
@@ -18,11 +17,10 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -39,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Greenhouse extends BaseEntityBlock {
-    public static final MapCodec<Greenhouse> CODEC = simpleCodec(Greenhouse::new);
     public static TagKey<Block> UNHARVESTABLE = TagKey.create(BuiltInRegistries.BLOCK.key(), ResourceLocation.tryParse("croparia:greenhouse_unharvestable"));
     protected final VoxelShape SHAPE = Block.box(1.0, 1.0, 0.0, 15.0, 3.0, 15.0);
 
@@ -55,13 +52,13 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
-    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
         this.updateShape(state, Direction.DOWN, state, level, pos, pos);
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         super.updateShape(state, direction, neighborState, level, pos, neighborPos);
         // Filter client level
         if (!(level instanceof ServerLevel serverLevel)) return state;
@@ -84,14 +81,14 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(ItemStack itemStack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+    public @NotNull InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
         if (!world.isClientSide) {
             MenuProvider screenHandlerFactory = state.getMenuProvider(world, pos);
             if (screenHandlerFactory != null) {
                 player.openMenu(screenHandlerFactory);
             }
         }
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -99,15 +96,10 @@ public class Greenhouse extends BaseEntityBlock {
         if (state.getBlock() != newState.getBlock()) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof GreenhouseBlockEntity) {
-                Containers.dropContentsOnDestroy(state, newState, world, pos);
+                Containers.dropContents(world, pos, (GreenhouseBlockEntity) blockEntity);
             }
             super.onRemove(state, world, pos, newState, moved);
         }
-    }
-
-    @Override
-    protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
     }
 
     @Override

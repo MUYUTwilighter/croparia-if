@@ -3,7 +3,6 @@ package cool.muyucloud.croparia.compat.rei.util;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
-import net.minecraft.world.item.crafting.RecipeInput;
 
 public class ReiType<R extends DisplayableRecipe<?>> {
     public static <R extends DisplayableRecipe<?>> ReiType<R> of(TypedSerializer<R> type) {
@@ -19,7 +18,7 @@ public class ReiType<R extends DisplayableRecipe<?>> {
     }
 
     @SuppressWarnings("unchecked")
-    public <I extends RecipeInput, T extends DisplayableRecipe<I>> ReiType<T> adapt() {
+    public <T extends DisplayableRecipe<?>> ReiType<T> adapt() {
         return (ReiType<T>) this;
     }
 

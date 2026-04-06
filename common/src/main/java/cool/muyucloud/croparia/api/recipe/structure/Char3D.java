@@ -25,8 +25,8 @@ public class Char3D extends AbstractChar3D<Char3D> implements Iterable<Char2D> {
 
     public Char3D(List<Char2D> structure) {
         int height = structure.size();
-        int maxZ = structure.getFirst().zSize();
-        int maxX = structure.getFirst().xSize();
+        int maxZ = structure.get(0).zSize();
+        int maxX = structure.get(0).xSize();
         List<Char2D> pattern = new ArrayList<>(height);
         Map<Character, Integer> counts = new HashMap<>();
         for (Char2D layer : structure) {
@@ -71,12 +71,12 @@ public class Char3D extends AbstractChar3D<Char3D> implements Iterable<Char2D> {
 
     @Override
     public int zSize() {
-        return pattern.isEmpty() ? 0 : pattern.getFirst().zSize();
+        return pattern.isEmpty() ? 0 : pattern.get(0).zSize();
     }
 
     @Override
     public int xSize() {
-        return pattern.isEmpty() ? 0 : pattern.getFirst().xSize();
+        return pattern.isEmpty() ? 0 : pattern.get(0).xSize();
     }
 
     @Override

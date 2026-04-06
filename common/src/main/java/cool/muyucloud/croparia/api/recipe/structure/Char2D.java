@@ -20,7 +20,7 @@ public class Char2D implements Iterable<char[]> {
         if (layer.isEmpty()) {
             throw new IllegalArgumentException("Empty surface");
         } else {
-            int cols = layer.getFirst().length();
+            int cols = layer.get(0).length();
             int rows = layer.size();
             this.chars = new char[rows][cols];
             for (int z = 0; z < rows; z++) {

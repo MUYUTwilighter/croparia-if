@@ -7,7 +7,6 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,16 +18,12 @@ public class ReiDisplay<R extends DisplayableRecipe<?>> implements Display {
     private final List<EntryIngredient> inputs;
     private final List<EntryIngredient> outputs;
 
-    public ReiDisplay(RecipeHolder<? extends R> holder, ReiCategory<R> category) {
-        this.recipe = holder.value();
-        this.id = holder.id();
+    public ReiDisplay(R recipe, ResourceLocation id, ReiCategory<R> category) {
+        this.recipe = recipe;
+        this.id = id;
         this.category = category;
         this.inputs = this.recipe.getInputs().stream().map(EntryIngredients::ofItemStacks).toList();
         this.outputs = this.recipe.getOutputs().stream().map(EntryIngredients::ofItemStacks).toList();
-    }
-
-    public ReiDisplay(R recipe, ResourceLocation id, ReiCategory<R> category) {
-        this(new RecipeHolder<>(id, recipe), category);
     }
 
     public R getRecipe() {

@@ -1,12 +1,16 @@
 package cool.muyucloud.croparia.util.text;
 
-import cool.muyucloud.croparia.api.core.component.Text;
-import cool.muyucloud.croparia.registry.CropariaComponents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -15,12 +19,15 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 public class Texts {
+    private static final String DISPLAY_TAG = "display";
+    private static final String LORE_TAG = "Lore";
+
     public static ItemStack rename(Item item, Component name) {
         return rename(item.getDefaultInstance(), name);
     }
 
     public static ItemStack rename(ItemStack stack, Component name) {
-        stack.set(DataComponents.CUSTOM_NAME, name);
+        stack.setHoverName(name);
         return stack;
     }
 
@@ -29,9 +36,10 @@ public class Texts {
     }
 
     public static ItemStack tooltip(ItemStack stack, MutableComponent component) {
-        Text text = stack.getOrDefault(CropariaComponents.TEXT.get(), new Text());
-        text.append(component);
-        stack.set(CropariaComponents.TEXT.get(), text);
+        CompoundTag display = stack.getOrCreateTagElement(DISPLAY_TAG);
+        ListTag lore = display.contains(LORE_TAG, 9) ? display.getList(LORE_TAG, 8) : new ListTag();
+        lore.add(StringTag.valueOf(Component.Serializer.toJson(component)));
+        display.put(LORE_TAG, lore);
         return stack;
     }
 

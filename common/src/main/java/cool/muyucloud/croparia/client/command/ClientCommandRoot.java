@@ -2,19 +2,11 @@ package cool.muyucloud.croparia.client.command;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import cool.muyucloud.croparia.CropariaIf;
-import cool.muyucloud.croparia.api.core.command.CropCommand;
-import cool.muyucloud.croparia.api.core.command.GeneratorCommand;
-import dev.architectury.event.events.client.ClientCommandRegistrationEvent;
 
 public class ClientCommandRoot {
-    public static final LiteralArgumentBuilder<ClientCommandRegistrationEvent.ClientCommandSourceStack> ROOT =
-        LiteralArgumentBuilder.literal("croparia");
+    public static final LiteralArgumentBuilder<Object> ROOT = LiteralArgumentBuilder.literal("croparia");
 
     public static void register() {
-        CropariaIf.LOGGER.debug("Registering client commands");
-        ROOT.then(CropCommand.buildCrop(true))
-            .then(CropCommand.buildMelon(true))
-            .then(GeneratorCommand.buildGenerator(true));
-        ClientCommandRegistrationEvent.EVENT.register((dispatcher, context) -> dispatcher.register(ROOT));
+        CropariaIf.LOGGER.debug("Client commands are disabled on 1.20.1 until platform hooks are restored");
     }
 }

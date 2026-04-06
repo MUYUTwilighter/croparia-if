@@ -101,7 +101,7 @@ public class ContainerRepo<C extends Container> implements Repo<ItemSpec> {
     public long capacityFor(int i, ItemSpec resource) {
         ItemStack stored = this.getContainer().getItem(i);
         ItemStack toPlace = resource.createStack();
-        int containerSize = this.getContainer().getMaxStackSize(toPlace);
+        int containerSize = Math.min(this.getContainer().getMaxStackSize(), toPlace.getMaxStackSize());
         if (stored.isEmpty() || resource.is(stored)) {
             return containerSize;
         } else {

@@ -39,7 +39,8 @@ public record PatternKey(Pattern pattern) {
         if (this == o) return true;
         if (o instanceof Pattern oPattern) {
             return Objects.equals(this.pattern().pattern(), oPattern.pattern()) && Objects.equals(this.pattern().flags(), oPattern.flags());
-        } else if (o instanceof PatternKey(Pattern oPattern)) {
+        } else if (o instanceof PatternKey other) {
+            Pattern oPattern = other.pattern();
             return Objects.equals(this.pattern().pattern(), oPattern.pattern()) && Objects.equals(this.pattern().flags(), oPattern.flags());
         } else {
             return false;

@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.repo;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.TypedResource;
 import net.minecraft.nbt.CompoundTag;
@@ -31,9 +32,10 @@ public class RepoUnit<T extends TypedResource<?>> implements Repo<T> {
     }
 
     public void load(JsonObject json) {
-        this.resource = this.getType().codec().codec().decode(JsonOps.INSTANCE, json.get("resource")).getOrThrow(msg -> {
-            throw new IllegalArgumentException(msg);
-        }).getFirst();
+        this.resource = CodecUtil.getOrThrow(
+            this.getType().codec().codec().decode(JsonOps.INSTANCE, json.get("resource")).map(com.mojang.datafixers.util.Pair::getFirst),
+            IllegalArgumentException::new
+        );
         this.amount = GsonHelper.getAsLong(json, "amount", 0L);
         this.capacity = GsonHelper.getAsLong(json, "capacity", 0L);
         this.consumable = GsonHelper.getAsBoolean(json, "consumable", false);
@@ -42,9 +44,10 @@ public class RepoUnit<T extends TypedResource<?>> implements Repo<T> {
     }
 
     public void load(CompoundTag nbt) {
-        this.setResource(this.getType().codec().codec().decode(NbtOps.INSTANCE, nbt.get("resource")).getOrThrow(msg -> {
-            throw new IllegalArgumentException(msg);
-        }).getFirst());
+        this.setResource(CodecUtil.getOrThrow(
+            this.getType().codec().codec().decode(NbtOps.INSTANCE, nbt.get("resource")).map(com.mojang.datafixers.util.Pair::getFirst),
+            IllegalArgumentException::new
+        ));
         this.setAmount(nbt.getLong("amount"));
         this.setCapacity(nbt.getLong("capacity"));
         this.setConsumable(nbt.getBoolean("consumable"));
@@ -53,9 +56,10 @@ public class RepoUnit<T extends TypedResource<?>> implements Repo<T> {
     }
 
     public void save(JsonObject json) {
-        json.add("resource", this.getType().codec().codec().encodeStart(JsonOps.INSTANCE, this.getResource()).getOrThrow(msg -> {
-            throw new IllegalArgumentException(msg);
-        }));
+        json.add("resource", CodecUtil.getOrThrow(
+            this.getType().codec().codec().encodeStart(JsonOps.INSTANCE, this.getResource()),
+            IllegalArgumentException::new
+        ));
         json.addProperty("amount", this.getAmount());
         json.addProperty("capacity", this.getCapacity());
         json.addProperty("consumable", this.isConsumable());
@@ -64,9 +68,10 @@ public class RepoUnit<T extends TypedResource<?>> implements Repo<T> {
     }
 
     public void save(CompoundTag nbt) {
-        nbt.put("resource", this.getType().codec().codec().encodeStart(NbtOps.INSTANCE, this.getResource()).getOrThrow(msg -> {
-            throw new IllegalArgumentException(msg);
-        }));
+        nbt.put("resource", CodecUtil.getOrThrow(
+            this.getType().codec().codec().encodeStart(NbtOps.INSTANCE, this.getResource()),
+            IllegalArgumentException::new
+        ));
         nbt.putLong("amount", this.getAmount());
         nbt.putLong("capacity", this.getCapacity());
         nbt.putBoolean("consumable", this.isConsumable());

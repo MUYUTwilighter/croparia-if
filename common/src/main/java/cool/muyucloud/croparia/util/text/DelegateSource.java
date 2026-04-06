@@ -2,7 +2,6 @@ package cool.muyucloud.croparia.util.text;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.architectury.event.events.client.ClientCommandRegistrationEvent;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -17,8 +16,6 @@ public abstract class DelegateSource<S> implements FailureMessenger, SuccessMess
         S source = context.getSource();
         if (source instanceof CommandSourceStack commonSource) {
             return (DelegateSource<S>) new CommonDelegateSource<>(commonSource);
-        } else if (source instanceof ClientCommandRegistrationEvent.ClientCommandSourceStack clientSource) {
-            return (DelegateSource<S>) new ClientDelegateSource<>(clientSource);
         } else {
             throw new UnsupportedOperationException("Unsupported command source type: " + source.getClass());
         }
@@ -69,29 +66,4 @@ public abstract class DelegateSource<S> implements FailureMessenger, SuccessMess
         }
     }
 
-    public static class ClientDelegateSource<S extends ClientCommandRegistrationEvent.ClientCommandSourceStack> extends DelegateSource<S> {
-        public ClientDelegateSource(S source) {
-            super(source);
-        }
-
-        @Override
-        public void failure(Component msg) {
-            this.getSource().arch$sendFailure(msg);
-        }
-
-        @Override
-        public void success(Component msg, boolean broadcast) {
-            this.getSource().arch$sendSuccess(() -> msg, broadcast);
-        }
-
-        @Override
-        public Optional<Player> getPlayer() {
-            return Optional.ofNullable(this.getSource().arch$getPlayer());
-        }
-
-        @Override
-        public Level getLevel() {
-            return this.getSource().arch$getLevel();
-        }
-    }
 }

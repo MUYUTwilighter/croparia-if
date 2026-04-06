@@ -3,7 +3,7 @@
   "element": "air",
   "ingredient": {
     "id": "minecraft:potion",
-    "components": {
+    "nbt": {
       "minecraft:potion_contents": {
         "potion": "minecraft:awkward"
       }

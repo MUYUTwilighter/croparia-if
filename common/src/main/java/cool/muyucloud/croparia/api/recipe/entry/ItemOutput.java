@@ -8,10 +8,8 @@ import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -28,15 +26,15 @@ public class ItemOutput implements SlotDisplay {
     );
     public static final MapCodec<ItemOutput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
         ResourceLocation.CODEC.fieldOf("id").forGetter(ItemOutput::getId),
-        DataComponentPatch.CODEC.optionalFieldOf("components").forGetter(itemOutput -> Optional.of(itemOutput.getComponentsPatch())),
+        CodecUtil.optionalFieldsOf(CompoundTag.CODEC, "nbt", "components").forGetter(itemOutput -> Optional.of(itemOutput.getComponentsPatch())),
         Codec.LONG.optionalFieldOf("amount").forGetter(result -> Optional.of(result.getAmount()))
-    ).apply(instance, (id, components, amount) -> new ItemOutput(id, components.orElse(DataComponentPatch.EMPTY), amount.orElse(1L))));
+    ).apply(instance, (id, components, amount) -> new ItemOutput(id, components.orElse(new CompoundTag()), amount.orElse(1L))));
     public static final MultiCodec<ItemOutput> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
-        if (toEncode.getComponentsPatch().isEmpty() && toEncode.getAmount() == 1L)
+        if (toEncode.getComponentsPatch().isEmpty() && toEncode.getAmount() == 1L) {
             return TestedCodec.fail(() -> "Can be encoded as string");
+        }
         return TestedCodec.success();
     }), CODEC_STR);
-    public static final StreamCodec<RegistryFriendlyByteBuf, ItemOutput> STREAM_CODEC = CodecUtil.toStream(CODEC);
     public static final ItemOutput EMPTY = new ItemOutput();
 
     public static ItemOutput of(@NotNull ItemStack stack) {
@@ -47,7 +45,7 @@ public class ItemOutput implements SlotDisplay {
     @NotNull
     private final ResourceLocation id;
     @NotNull
-    private final DataComponentPatch components;
+    private final CompoundTag components;
     private final long amount;
     @NotNull
     private final transient ItemSpec itemSpec;
@@ -56,26 +54,26 @@ public class ItemOutput implements SlotDisplay {
 
     private ItemOutput() {
         this.id = BuiltInRegistries.ITEM.getKey(Items.AIR);
-        this.components = DataComponentPatch.EMPTY;
+        this.components = new CompoundTag();
         this.amount = 0;
         this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.get(this.id), this.components);
         this.displayStack = this.toSpec().createStack(this.getAmount());
     }
 
     public ItemOutput(@NotNull ItemStack stack) {
-        this(Objects.requireNonNull(stack.getItem().arch$registryName()), stack.getComponentsPatch(), stack.getCount());
+        this(Objects.requireNonNull(stack.getItem().arch$registryName()), stack.getTag(), stack.getCount());
     }
 
     public ItemOutput(@NotNull ResourceLocation id, int amount) {
-        this(id, DataComponentPatch.EMPTY, amount);
+        this(id, new CompoundTag(), amount);
     }
 
-    public ItemOutput(@NotNull ResourceLocation id, @NotNull DataComponentPatch components, long amount) {
+    public ItemOutput(@NotNull ResourceLocation id, @NotNull CompoundTag components, long amount) {
         this.id = id;
-        this.components = components;
+        this.components = components.copy();
         this.amount = amount;
         if (this.amount <= 0) CropariaIf.LOGGER.warn("Creating ItemOutput with non-positive amount: {}", this.amount);
-        this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.get(id), components);
+        this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.get(id), this.components);
         if (this.itemSpec.isEmpty()) throw new IllegalArgumentException("Unknown or invalid item: " + id);
         this.displayStack = this.toSpec().createStack(this.getAmount());
     }
@@ -90,8 +88,8 @@ public class ItemOutput implements SlotDisplay {
     }
 
     @NotNull
-    public DataComponentPatch getComponentsPatch() {
-        return this.components;
+    public CompoundTag getComponentsPatch() {
+        return this.components.copy();
     }
 
     public long getAmount() {

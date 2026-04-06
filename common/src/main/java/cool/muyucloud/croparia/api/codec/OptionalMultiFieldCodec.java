@@ -32,10 +32,10 @@ public class OptionalMultiFieldCodec<T> extends MapCodec<Optional<T>> implements
             }
             TestedCodec<T> adapted = entry.getValue().adapt();
             DataResult<Pair<T, I>> result = adapted.decode(ops, input.get(key));
-            if (result.isSuccess()) {
+            if (CodecUtil.isSuccess(result)) {
                 return result.map(pair -> Optional.ofNullable(pair.getFirst()));
             } else {
-                result.ifError(error -> logs.add(error.messageSupplier()));
+                result.error().ifPresent(error -> logs.add(error::message));
             }
         }
         return skipped == this.codecs.size() ? DataResult.success(Optional.empty()) : DataResult.error(() -> MultiCodec.buildMsg(logs));
@@ -49,10 +49,10 @@ public class OptionalMultiFieldCodec<T> extends MapCodec<Optional<T>> implements
             String key = entry.getKey();
             TestedCodec<T> adapted = entry.getValue().adapt();
             DataResult<O> result = adapted.encodeStart(ops, input.get());
-            if (result.isSuccess()) {
+            if (CodecUtil.isSuccess(result)) {
                 return prefix.add(key, result);
             } else {
-                result.ifError(error -> logs.add(error.messageSupplier()));
+                result.error().ifPresent(error -> logs.add(error::message));
             }
         }
         return prefix.withErrorsFrom(DataResult.error(() -> MultiCodec.buildMsg(logs)));

@@ -38,7 +38,6 @@ import net.minecraft.world.level.block.entity.SculkShriekerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.BlockPositionSource;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.gameevent.GameEventListener;
 import net.minecraft.world.level.gameevent.PositionSource;
 import net.minecraft.world.level.gameevent.vibrations.VibrationSystem;
 import net.minecraft.world.phys.Vec3;
@@ -51,7 +50,7 @@ import java.util.OptionalInt;
 /**
  * Copy from {@link SculkShriekerBlockEntity}
  */
-public class ActivatedShriekerBlockEntity extends BlockEntity implements GameEventListener.Provider<VibrationSystem.Listener>, VibrationSystem {
+public class ActivatedShriekerBlockEntity extends BlockEntity implements VibrationSystem {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Int2ObjectMap<SoundEvent> SOUND_BY_LEVEL = Util.make(new Int2ObjectOpenHashMap<>(), map -> {
         map.put(1, SoundEvents.WARDEN_NEARBY_CLOSE);
@@ -75,10 +74,12 @@ public class ActivatedShriekerBlockEntity extends BlockEntity implements GameEve
         return this.vibrationUser;
     }
 
-    protected void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-        super.loadAdditional(compoundTag, provider);
+    @Override
+    public void load(CompoundTag compoundTag) {
+        super.load(compoundTag);
 
-        RegistryOps<Tag> registryOps = provider.createSerializationContext(NbtOps.INSTANCE);
+        if (this.level == null) return;
+        RegistryOps<Tag> registryOps = RegistryOps.create(NbtOps.INSTANCE, this.level.registryAccess());
         if (compoundTag.contains("listener", 10)) {
             Data.CODEC.parse(registryOps, compoundTag.getCompound("listener")).resultOrPartial(
                 string -> LOGGER.error("Failed to parse vibration listener for Sculk Shrieker: '{}'", string)
@@ -87,9 +88,11 @@ public class ActivatedShriekerBlockEntity extends BlockEntity implements GameEve
 
     }
 
-    protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-        super.saveAdditional(compoundTag, provider);
-        RegistryOps<Tag> registryOps = provider.createSerializationContext(NbtOps.INSTANCE);
+    @Override
+    protected void saveAdditional(CompoundTag compoundTag) {
+        super.saveAdditional(compoundTag);
+        if (this.level == null) return;
+        RegistryOps<Tag> registryOps = RegistryOps.create(NbtOps.INSTANCE, this.level.registryAccess());
         Data.CODEC.encodeStart(registryOps, this.vibrationData).resultOrPartial(
             string -> LOGGER.error("Failed to encode vibration listener for Sculk Shrieker: '{}'", string)
         ).ifPresent((tag) -> compoundTag.put("listener", tag));
@@ -203,11 +206,12 @@ public class ActivatedShriekerBlockEntity extends BlockEntity implements GameEve
             return GameEventTags.SHRIEKER_CAN_LISTEN;
         }
 
-        public boolean canReceiveVibration(ServerLevel serverLevel, BlockPos blockPos, Holder<GameEvent> holder, GameEvent.Context context) {
-            return !(Boolean) ActivatedShriekerBlockEntity.this.getBlockState().getValue(ActivatedShrieker.SHRIEKING) && ActivatedShriekerBlockEntity.tryGetPlayer(context.sourceEntity()) != null;
+        public boolean canReceiveVibration(ServerLevel serverLevel, BlockPos blockPos, GameEvent event, GameEvent.Context context) {
+            return !(Boolean) ActivatedShriekerBlockEntity.this.getBlockState().getValue(ActivatedShrieker.SHRIEKING)
+                && ActivatedShriekerBlockEntity.tryGetPlayer(context.sourceEntity()) != null;
         }
 
-        public void onReceiveVibration(ServerLevel serverLevel, BlockPos blockPos, Holder<GameEvent> holder, @Nullable Entity entity, @Nullable Entity entity2, float f) {
+        public void onReceiveVibration(ServerLevel serverLevel, BlockPos blockPos, GameEvent event, @Nullable Entity entity, @Nullable Entity entity2, float f) {
             ActivatedShriekerBlockEntity.this.tryShriek(serverLevel, ActivatedShriekerBlockEntity.tryGetPlayer(entity2 != null ? entity2 : entity));
         }
 

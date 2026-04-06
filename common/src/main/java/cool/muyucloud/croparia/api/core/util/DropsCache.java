@@ -30,7 +30,7 @@ public class DropsCache {
      * Checks if the item entities at the specified position have been queried within the current tick.
      */
     public static boolean isTickQueried(Level level, BlockPos pos) {
-        int tickTime = CifUtil.toIntSafe(level.tickRateManager().millisecondsPerTick());
+        int tickTime = 50;
         TargetPos targetPos = new TargetPos(level, pos);
         long lastQuery = CACHE.getOrDefault(targetPos, 0L);
         long currentTime = System.currentTimeMillis();

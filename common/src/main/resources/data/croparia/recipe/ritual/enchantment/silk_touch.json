@@ -5,7 +5,7 @@
   "block": "minecraft:honeycomb_block",
   "result": {
     "id": "minecraft:enchanted_book",
-    "components": {
+    "nbt": {
       "minecraft:stored_enchantments": {
         "levels": {
           "minecraft:silk_touch": 1

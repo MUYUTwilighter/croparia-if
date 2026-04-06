@@ -52,7 +52,7 @@ public class MidasHand extends Item {
             LightningBolt bolt = new LightningBolt(EntityType.LIGHTNING_BOLT, world);
             bolt.setPos(player.position());
             world.addFreshEntity(bolt);
-            return InteractionResult.SUCCESS_NO_ITEM_USED;
+            return InteractionResult.SUCCESS;
         }
     }
 

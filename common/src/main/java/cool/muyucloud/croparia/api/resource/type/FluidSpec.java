@@ -7,9 +7,9 @@ import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.TypedResource;
 import cool.muyucloud.croparia.util.TagUtil;
 import dev.architectury.fluid.FluidStack;
-import net.minecraft.core.component.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -17,88 +17,54 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @SuppressWarnings("unused")
-public class FluidSpec implements TypedResource<Fluid>, DataComponentHolder {
+public class FluidSpec implements TypedResource<Fluid> {
     public static final MapCodec<FluidSpec> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.fieldOf("id").forGetter(fluidSpec -> fluidSpec.getResource().arch$registryName()),
-        DataComponentMap.CODEC.fieldOf("components").forGetter(FluidSpec::getComponents)
-    ).apply(instance, (id, nbt) -> new FluidSpec(BuiltInRegistries.FLUID.get(id), nbt)));
-    public static final FluidSpec EMPTY = FluidSpec.of(Fluids.EMPTY);
+        ResourceLocation.CODEC.fieldOf("id").forGetter(fluid -> fluid.getResource().arch$registryName()),
+        CompoundTag.CODEC.optionalFieldOf("nbt").forGetter(FluidSpec::getNbt)
+    ).apply(instance, (id, nbt) -> new FluidSpec(BuiltInRegistries.FLUID.get(id), nbt.orElse(null))));
+    public static final FluidSpec EMPTY = new FluidSpec(Fluids.EMPTY, null);
     public static final TypeToken<FluidSpec> TYPE = TypeToken.register(CropariaIf.of("fluid_spec"), EMPTY, CODEC).orElseThrow();
 
     @NotNull
-    public static FluidSpec of(@NotNull Fluid fluid) {
-        return new FluidSpec(fluid, DataComponentMap.EMPTY);
-    }
-
-    @NotNull
-    public static FluidSpec of(@NotNull Fluid fluid, @Nullable DataComponentMap nbt) {
-        return new FluidSpec(fluid, nbt == null ? DataComponentMap.EMPTY : nbt);
-    }
-
-    @NotNull
     private final Fluid resource;
+    @Nullable
+    private final CompoundTag tag;
+
     @NotNull
-    private final PatchedDataComponentMap components;
-
-    public FluidSpec(@NotNull Fluid fluid) {
-        this(fluid, DataComponentPatch.EMPTY);
+    public static FluidSpec of(@NotNull Fluid fluid) {
+        return new FluidSpec(fluid, null);
     }
 
-    public FluidSpec(@NotNull Fluid fluid, @NotNull DataComponentPatch components) {
-        this.resource = fluid;
-        this.components = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, components);
+    @NotNull
+    public static FluidSpec of(@NotNull Fluid fluid, @Nullable CompoundTag nbt) {
+        return new FluidSpec(fluid, nbt);
     }
 
-    public FluidSpec(@NotNull Fluid fluid, @NotNull DataComponentMap components) {
+    public FluidSpec(@NotNull Fluid fluid, @Nullable CompoundTag nbt) {
         this.resource = fluid;
-        this.components = new PatchedDataComponentMap(components);
+        this.tag = nbt == null ? null : nbt.copy();
     }
 
     @NotNull
     public FluidSpec copy() {
-        return new FluidSpec(this.getResource(), this.getComponentsPatch());
+        return new FluidSpec(this.getResource(), this.tag);
     }
 
     @NotNull
     public FluidSpec with(@NotNull Fluid fluid) {
-        return new FluidSpec(fluid, this.getComponents());
+        return new FluidSpec(fluid, this.tag);
     }
 
     @NotNull
-    public FluidSpec with(@NotNull DataComponentPatch components) {
-        PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
-        patched.applyPatch(components);
-        return new FluidSpec(this.getResource(), patched);
-    }
-
-    @NotNull
-    public FluidSpec with(@NotNull DataComponentMap components) {
-        PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
-        patched.setAll(components);
-        return new FluidSpec(this.getResource(), patched);
-    }
-
-    @NotNull
-    public FluidSpec with(@NotNull TypedDataComponent<?> component) {
-        PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
-        component.applyTo(patched);
-        return new FluidSpec(this.getResource(), patched);
-    }
-
-    @NotNull
-    public <T> FluidSpec with(@NotNull DataComponentType<T> type, @NotNull T value) {
-        return this.with(new TypedDataComponent<>(type, value));
-    }
-
-    @NotNull
-    public FluidSpec replaceComponents(@NotNull DataComponentMap components) {
-        return new FluidSpec(this.getResource(), components);
+    public FluidSpec replaceNbt(@Nullable CompoundTag nbt) {
+        return new FluidSpec(this.getResource(), nbt);
     }
 
     public boolean is(@NotNull FluidSpec spec) {
-        return this.getResource() == spec.getResource() && this.getComponents().equals(spec.getComponents());
+        return this.getResource() == spec.getResource() && Objects.equals(this.tag, spec.tag);
     }
 
     public boolean is(@NotNull ResourceLocation tag) {
@@ -106,7 +72,7 @@ public class FluidSpec implements TypedResource<Fluid>, DataComponentHolder {
     }
 
     public FluidStack toStack(long amount) {
-        return FluidStack.create(this.getResource(), amount, this.getComponentsPatch());
+        return FluidStack.create(this.getResource(), amount, this.tag == null ? null : this.tag.copy());
     }
 
     @Override
@@ -125,27 +91,25 @@ public class FluidSpec implements TypedResource<Fluid>, DataComponentHolder {
         return this.resource;
     }
 
-    @Override
-    @NotNull
-    public DataComponentMap getComponents() {
-        return this.components;
+    public Optional<CompoundTag> getNbt() {
+        return Optional.ofNullable(this.tag == null ? null : this.tag.copy());
     }
 
     @NotNull
-    public DataComponentPatch getComponentsPatch() {
-        return this.components.asPatch();
+    public CompoundTag getTagOrEmpty() {
+        return this.tag == null ? new CompoundTag() : this.tag.copy();
     }
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof FluidSpec fluidSpec)) return false;
         if (this.isEmpty()) return fluidSpec.isEmpty();
-        return Objects.equals(resource, fluidSpec.resource) && Objects.equals(components, fluidSpec.components);
+        return Objects.equals(resource, fluidSpec.resource) && Objects.equals(tag, fluidSpec.tag);
     }
 
     @Override
     public int hashCode() {
         if (this.isEmpty()) return 0;
-        return Objects.hash(resource, components);
+        return Objects.hash(resource, tag);
     }
 }

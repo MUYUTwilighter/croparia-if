@@ -64,7 +64,7 @@ public class RecipeWizard extends Item {
     static {
         OPERATIONS.put(
             // Build Ritual Structure
-            BlockInput.ofTag(TagKey.create(Registries.BLOCK, ResourceLocation.parse("croparia:ritual_stands"))),
+            BlockInput.ofTag(TagKey.create(Registries.BLOCK, ResourceLocation.tryParse("croparia:ritual_stands"))),
             context -> {
                 BlockState state = context.getLevel().getBlockState(context.getClickedPos());
                 return RitualStructure.TYPED_SERIALIZER.find(new RitualStructureContainer(state), context.getLevel()).map(structure -> {

@@ -29,7 +29,7 @@ public abstract class ReiCategory<R extends DisplayableRecipe<?>> implements Dis
     @Override
     public Renderer getIcon() {
         EntryIngredient[] stations = this.stations();
-        if (stations.length > 0) return stations[0].getFirst();
+        if (stations.length > 0) return stations[0].get(0);
         else throw new RuntimeException("Override is required if no stations are provided for " + this.getRecipeType().getId());
     }
 

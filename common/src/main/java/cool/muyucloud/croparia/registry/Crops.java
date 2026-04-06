@@ -10,7 +10,7 @@ import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
 import cool.muyucloud.croparia.api.element.Element;
 import dev.architectury.injectables.targets.ArchitecturyTarget;
 import dev.architectury.registry.registries.RegistrySupplier;
-import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +43,7 @@ public class Crops {
         @NotNull String name, @NotNull RegistrySupplier<? extends Item> material, int color, int tier, @NotNull String type,
         @NotNull String translationKey
     ) {
-        Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material.getId().toString(), DataComponentPatch.EMPTY, CropariaIf.CONFIG.getCropYield()), new Color(color), tier, type, null, new CropDependencies("croparia", translationKey));
+        Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material.getId().toString(), new CompoundTag(), CropariaIf.CONFIG.getCropYield()), new Color(color), tier, type, null, new CropDependencies("croparia", translationKey));
         DgRegistries.CROPS.register(crop);
         return crop;
     }
@@ -67,7 +67,7 @@ public class Crops {
         @NotNull String name, Item material, int color, int tier, @NotNull String type
     ) {
         Crop crop = new Crop(
-            CropariaIf.of(name), new ItemMaterial(Objects.requireNonNull(material.arch$registryName()).toString(), DataComponentPatch.EMPTY, CropariaIf.CONFIG.getCropYield()),
+            CropariaIf.of(name), new ItemMaterial(Objects.requireNonNull(material.arch$registryName()).toString(), new CompoundTag(), CropariaIf.CONFIG.getCropYield()),
             new Color(color), tier, type, null, new CropDependencies("minecraft", material.getDescriptionId())
         );
         DgRegistries.CROPS.register(crop);
@@ -102,7 +102,7 @@ public class Crops {
     public static final Crop TWISTING_VINES = vanilla("twisting_vines", Items.TWISTING_VINES, 0x14b283, 1, Crop.NATURE);
     public static final Crop LILY_PAD = vanilla("lilypad", Items.LILY_PAD, 0xc5f14, 1, Crop.NATURE);
     public static final Crop BUSH = vanilla("bush", Items.DEAD_BUSH, 0x946428, 1, Crop.NATURE);
-    public static final Crop GRASS = vanilla("grass", Items.SHORT_GRASS, 0x820510b, 1, Crop.NATURE);
+    public static final Crop GRASS = vanilla("grass", Items.GRASS, 0x820510b, 1, Crop.NATURE);
     public static final Crop LARGE_FERN = vanilla("large_fern", Items.LARGE_FERN, 0x4a7240, 1, Crop.NATURE);
     public static final Crop TALL_GRASS = vanilla("tall_grass", Items.TALL_GRASS, 0x2f4728, 1, Crop.NATURE);
     public static final Crop FERN = vanilla("fern", Items.FERN, 0x1b4509, 1, Crop.NATURE);
@@ -138,7 +138,7 @@ public class Crops {
     public static final Crop BLACK = vanilla("black", Items.BLACK_DYE, 0x2d2d2d, 1, Crop.CROP);
     public static final Crop TETHER = vanilla("tether", Items.LEAD, 0xac8e79, 1, Crop.CROP);
     public static final Crop NAME_TAG = vanilla("name_tag", Items.NAME_TAG, 0x7a7162, 1, Crop.CROP);
-    public static final Crop SCUTE = vanilla("scute", Items.TURTLE_SCUTE, 0x47bf4a, 1, Crop.ANIMAL);
+    public static final Crop SCUTE = vanilla("scute", Items.SCUTE, 0x47bf4a, 1, Crop.ANIMAL);
     public static final Crop BLUE = vanilla("blue", Items.BLUE_DYE, 0x26ff, 1, Crop.CROP);
     public static final Crop INK = vanilla("ink", Items.INK_SAC, 0x353451, 1, Crop.ANIMAL);
     public static final Crop WHITE = vanilla("white", Items.WHITE_DYE, 0xffffff, 1, Crop.CROP);
@@ -163,7 +163,8 @@ public class Crops {
     public static final Crop CHORUS = vanilla("chorus", Items.CHORUS_FRUIT, 0xaa85aa, 2, Crop.FOOD);
     public static final Crop PHANTOM = vanilla("phantom", Items.PHANTOM_MEMBRANE, 0xdcd9c0, 2, Crop.MONSTER);
     public static final Crop GLOW_INK = vanilla("glowink", Items.GLOW_INK_SAC, 0x4bdeba, 2, Crop.ANIMAL);
-    public static final Crop ARMADILLO = vanilla("armadillo", Items.ARMADILLO_SCUTE, 0xc48682, 2, Crop.ANIMAL);
+    // Armadillo scute is unavailable before 1.20.5, keep the crop key but fall back to the closest vanilla scute item.
+    public static final Crop ARMADILLO = vanilla("armadillo", Items.SCUTE, 0xc48682, 2, Crop.ANIMAL);
     public static final Crop FROGSPAWN = vanilla("frogspawn", Items.FROGSPAWN, 0x7980c2, 2, Crop.ANIMAL);
 
     public static final Crop DIAMOND = vanilla("diamond", Items.DIAMOND, 0x8cf4e2, 3, Crop.CROP);
@@ -175,7 +176,8 @@ public class Crops {
     public static final Crop NETHERITE = vanilla("netherite", Items.NETHERITE_INGOT, 0x654740, 3, Crop.CROP);
     public static final Crop AMETHYST = vanilla("amethyst", Items.AMETHYST_SHARD, 0xd9cbf2, 3, Crop.CROP);
     public static final Crop ECHO_SHARD = vanilla("echo_shard", Items.ECHO_SHARD, 0x3404f, 3, Crop.MONSTER);
-    public static final Crop BREEZE = vanilla("breeze", Items.BREEZE_ROD, 0x7980c2, 3, Crop.NATURE);
+    // Breeze rod is unavailable before 1.21, so 1.20.1 keeps the crop entry but uses blaze rod as a temporary stand-in.
+    public static final Crop BREEZE = vanilla("breeze", Items.BLAZE_ROD, 0x7980c2, 3, Crop.NATURE);
 
     public static final Crop TOTEM = vanilla("totem", Items.TOTEM_OF_UNDYING, 0xf8eea5, 4, Crop.CROP);
     public static final Crop SEA = vanilla("sea", Items.HEART_OF_THE_SEA, 0x1f96b1, 4, Crop.CROP);
@@ -203,7 +205,7 @@ public class Crops {
     public static @NotNull Crop compat(
         String name, String material, int color, int tier, String type, @NotNull Map<String, String> translationKeys
     ) {
-        Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material, DataComponentPatch.EMPTY, CropariaIf.CONFIG.getCropYield()), new Color(color), tier, type, null, new CropDependencies(translationKeys));
+        Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material, new CompoundTag(), CropariaIf.CONFIG.getCropYield()), new Color(color), tier, type, null, new CropDependencies(translationKeys));
         DgRegistries.CROPS.register(crop);
         return crop;
     }

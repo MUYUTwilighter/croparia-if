@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Objects;
 
 public record Vec2i(int x, int z)  implements Comparable<Vec2i> {
-    public static final Codec<Vec2i> CODEC = Codec.INT.listOf(2, 2).xmap(ints -> new Vec2i(ints.getFirst(), ints.get(1)), Vec2i::toList);
+    public static final Codec<Vec2i> CODEC = Codec.INT.listOf().comapFlatMap(
+        ints -> ints.size() == 2 ? com.mojang.serialization.DataResult.success(new Vec2i(ints.get(0), ints.get(1))) : com.mojang.serialization.DataResult.error(() -> "Expected 2 integers"),
+        Vec2i::toList
+    );
 
     public Vec3i toVec3i(int y) {
         return new Vec3i(x, y, z);
@@ -34,8 +37,8 @@ public record Vec2i(int x, int z)  implements Comparable<Vec2i> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Vec2i(int x1, int z1))) return false;
-        return x == x1 && z == z1;
+        if (!(o instanceof Vec2i other)) return false;
+        return x == other.x() && z == other.z();
     }
 
     @Override

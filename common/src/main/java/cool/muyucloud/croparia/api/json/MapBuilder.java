@@ -64,9 +64,9 @@ public class MapBuilder implements JsonBuilder {
     }
 
     public <T> DataResult<Pair<JsonElement, MapBuilder>> with(String key, T value, Codec<T> codec) {
-        return CodecUtil.encodeJson(value, codec).mapOrElse(
+        return CodecUtil.mapOrElse(CodecUtil.encodeJson(value, codec),
             json -> DataResult.success(Pair.of(json, this)),
-            err -> DataResult.error(err.messageSupplier())
+            err -> DataResult.error(err::message)
         );
     }
 }

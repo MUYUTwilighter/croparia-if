@@ -12,16 +12,17 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
@@ -94,7 +95,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     @Override
     public @NotNull List<List<ItemStack>> getOutputs() {
         List<ItemStack> results = this.getResult().getDisplayStacks();
-        ItemStack stack = results.isEmpty() ? ItemStack.EMPTY : results.getFirst().copy();
+        ItemStack stack = results.isEmpty() ? ItemStack.EMPTY : results.get(0).copy();
         if (stack.getItem() instanceof SpawnEggItem) {
             Texts.tooltip(stack, Texts.translatable("tooltip.croparia.spawn_egg"));
         } else if (stack.getItem() == Items.ENCHANTED_BOOK && this.getIngredient().getAmount() == 1L) {
@@ -106,17 +107,19 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     public ItemStack assemble(RitualContainer matcher) {
         ItemStack result = this.getResult().createStack();
         // Handle enchanted book special case
-        ItemEnchantments enchantments = result.get(DataComponents.STORED_ENCHANTMENTS);
+        Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(result);
         if (this.getIngredient().getAmount() == 1L && result.getItem() == Items.ENCHANTED_BOOK && enchantments != null) {
             for (ItemStack stack : matcher.stacks()) {
                 if (this.getIngredient().matchType(stack)) {
                     matcher.matched().destroy();
                     ItemStack toEnchant = stack.copyWithCount(1);
                     stack.shrink(1);
-                    for (var entry : enchantments.entrySet()) {
-                        int level = toEnchant.getEnchantments().getLevel(entry.getKey());
-                        toEnchant.enchant(entry.getKey(), Math.min(level + result.getCount(), entry.getIntValue()));
+                    Map<Enchantment, Integer> applied = EnchantmentHelper.getEnchantments(toEnchant);
+                    for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
+                        int level = applied.getOrDefault(entry.getKey(), 0);
+                        applied.put(entry.getKey(), Math.min(level + result.getCount(), entry.getValue()));
                     }
+                    EnchantmentHelper.setEnchantments(applied, toEnchant);
                     return toEnchant;
                 }
             }
@@ -144,11 +147,11 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
             return false;
         }
         // Handle enchanted book special case
-        ItemEnchantments enchantments = result.get(DataComponents.STORED_ENCHANTMENTS);
-        if (this.getIngredient().getAmount() == 1L && result.getItem() == Items.ENCHANTED_BOOK && enchantments != null) {
+        Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(result);
+        if (this.getIngredient().getAmount() == 1L && result.getItem() == Items.ENCHANTED_BOOK && !enchantments.isEmpty()) {
             return matcher.stacks().stream().anyMatch(stack -> {
-                ItemEnchantments toCheck = stack.getEnchantments();
-                return enchantments.entrySet().stream().anyMatch(entry -> toCheck.getLevel(entry.getKey()) < entry.getIntValue())
+                Map<Enchantment, Integer> toCheck = EnchantmentHelper.getEnchantments(stack);
+                return enchantments.entrySet().stream().anyMatch(entry -> toCheck.getOrDefault(entry.getKey(), 0) < entry.getValue())
                     && this.getIngredient().matches(stack);
             }) && matcher.matched().getStates().stream().allMatch(state -> this.getBlock().matches(state));
         }
@@ -162,7 +165,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     }
 
     @Override
-    public @NotNull ItemStack assemble(RitualContainer recipeInput, HolderLookup.Provider provider) {
+    public @NotNull ItemStack assemble(RitualContainer recipeInput, RegistryAccess registryAccess) {
         return assemble(recipeInput);
     }
 

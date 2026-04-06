@@ -62,16 +62,16 @@ public class CropariaBlocks {
     public static final RegistrySupplier<DropExperienceBlock> ELEMATILIUS_ORE = registerBlock(
         "elematilius_ore",
         properties -> new DropExperienceBlock(
-            UniformInt.of(0, 2),
-            properties.strength(1.0F, 1.0F).requiresCorrectToolForDrops()
+            properties.strength(1.0F, 1.0F).requiresCorrectToolForDrops(),
+            UniformInt.of(0, 2)
         )
     );
     public static final RegistrySupplier<DropExperienceBlock> DEEPSLATE_ELEMATILIUS_ORE = registerBlock(
         "deepslate_elematilius_ore",
         properties -> new DropExperienceBlock(
-            UniformInt.of(0, 2),
             properties.strength(1.0F, 1.0F).requiresCorrectToolForDrops().mapColor(MapColor.DEEPSLATE)
-                .sound(SoundType.DEEPSLATE)
+                .sound(SoundType.DEEPSLATE),
+            UniformInt.of(0, 2)
         )
     );
 

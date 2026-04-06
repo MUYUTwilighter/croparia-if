@@ -214,7 +214,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         Player player = source.getPlayerOrException();
         Level world = source.getLevel();
         C crop = null;
-        if (player.getWeaponItem().getItem() instanceof CropAccess<?> access) {
+        if (player.getMainHandItem().getItem() instanceof CropAccess<?> access) {
             crop = CropAccess.tryGet(access);
         } else if (world.getBlockState(CifUtil.lookingAt(player)).getBlock() instanceof CropAccess<?> access) {
             crop = CropAccess.tryGet(access);
@@ -243,7 +243,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
     private static @NotNull MutableComponent reportColor(Color color) {
         return Texts.translatable(
             "commands.croparia.crop.query.color",
-            Texts.literal(color.toString(), Texts.copyText(color.toString())).withColor(color.getValue())
+            Texts.literal(color.toString(), Texts.copyText(color.toString())).withStyle(style -> style.withColor(color.getValue()))
         );
     }
 

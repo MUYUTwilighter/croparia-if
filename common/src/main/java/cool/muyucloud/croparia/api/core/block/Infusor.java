@@ -17,7 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -46,26 +46,27 @@ public class Infusor extends Block implements ItemPlaceable {
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(
-        ItemStack itemStack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
+    public @NotNull InteractionResult use(
+        BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
         BlockHitResult blockHitResult
     ) {
+        ItemStack itemStack = player.getItemInHand(hand);
         Item item = itemStack.getItem();
         // Infuse if elemental potion
         if (item instanceof ElementalPotion potion && this.tryInfuse(world, pos, potion, itemStack, player)) {
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.sidedSuccess(world.isClientSide);
         }
         Element element = state.getValue(ELEMENT);
         // Defuse if using the corresponding empty bottle
         if (element != Element.EMPTY && element.getPotion().get().getCraftingRemainingItem() == item) {
-            return this.tryDefuse(world, pos, itemStack, player) ? ItemInteractionResult.SUCCESS : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return this.tryDefuse(world, pos, itemStack, player) ? InteractionResult.sidedSuccess(world.isClientSide) : InteractionResult.PASS;
         }
         // Place item if main hand and not using recipe wizard
         if (!(item instanceof RecipeWizard) && hand == InteractionHand.MAIN_HAND) {
             this.placeItem(world, pos, itemStack, player);
-            return ItemInteractionResult.CONSUME;
+            return InteractionResult.CONSUME;
         }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.PASS;
     }
 
     public boolean tryInfuse(Level world, BlockPos pos, ElementalPotion potion, @NotNull ItemStack stack, @Nullable Player player) {
@@ -131,7 +132,7 @@ public class Infusor extends Block implements ItemPlaceable {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         super.onRemove(state, level, pos, newState, movedByPiston);
         DropsCache.remove(level, pos);
     }

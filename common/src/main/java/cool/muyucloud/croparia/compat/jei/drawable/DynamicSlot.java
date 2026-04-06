@@ -59,7 +59,7 @@ public class DynamicSlot extends AbstractInputManager<DynamicSlot> {
     public ItemStack getCurrentStack() {
         List<ItemStack> items = this.stacks.apply(this);
         if (items.isEmpty()) return ItemStack.EMPTY;
-        else if (items.size() == 1) return items.getFirst();
+        else if (items.size() == 1) return items.get(0);
         else return items.get(CifUtil.toIntSafe((System.currentTimeMillis() / 1000) % items.size()));
     }
 
