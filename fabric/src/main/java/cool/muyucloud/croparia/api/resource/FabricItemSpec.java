@@ -10,14 +10,14 @@ public class FabricItemSpec {
     }
 
     public static ItemSpec from(ItemVariant variant) {
-        return new ItemSpec(variant.getItem(), variant.getComponents());
+        return new ItemSpec(variant.getItem(), variant.copyNbt());
     }
 
     public static boolean matches(ItemSpec a, ItemVariant b) {
-        return a.getResource() == b.getItem() && a.getComponentsPatch().equals(b.getComponents());
+        return a.getResource() == b.getItem() && a.getTagOrEmpty().equals(b.copyOrCreateNbt());
     }
 
     public static boolean matches(ItemVariant a, ItemSpec b) {
-        return b.getResource() == a.getItem() && b.getComponentsPatch().equals(a.getComponents());
+        return b.getResource() == a.getItem() && b.getTagOrEmpty().equals(a.copyOrCreateNbt());
     }
 }

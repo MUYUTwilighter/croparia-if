@@ -40,12 +40,14 @@ public class ScreenEffectRendererMixin {
         float yawOffset = -minecraft.player.getYRot() / 64.0F;
         float pitchOffset = minecraft.player.getXRot() / 64.0F;
         Matrix4f matrix4f = poseStack.last().pose();
-        BufferBuilder bufferBuilder = Tesselator.getInstance().begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferBuilder.addVertex(matrix4f, -1.0F, -1.0F, -0.5F).setUv(4.0F + yawOffset, 4.0F + pitchOffset);
-        bufferBuilder.addVertex(matrix4f, 1.0F, -1.0F, -0.5F).setUv(yawOffset, 4.0F + pitchOffset);
-        bufferBuilder.addVertex(matrix4f, 1.0F, 1.0F, -0.5F).setUv(yawOffset, pitchOffset);
-        bufferBuilder.addVertex(matrix4f, -1.0F, 1.0F, -0.5F).setUv(4.0F + yawOffset, pitchOffset);
-        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder bufferBuilder = tesselator.getBuilder();
+        bufferBuilder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        bufferBuilder.vertex(matrix4f, -1.0F, -1.0F, -0.5F).uv(4.0F + yawOffset, 4.0F + pitchOffset).endVertex();
+        bufferBuilder.vertex(matrix4f, 1.0F, -1.0F, -0.5F).uv(yawOffset, 4.0F + pitchOffset).endVertex();
+        bufferBuilder.vertex(matrix4f, 1.0F, 1.0F, -0.5F).uv(yawOffset, pitchOffset).endVertex();
+        bufferBuilder.vertex(matrix4f, -1.0F, 1.0F, -0.5F).uv(4.0F + yawOffset, pitchOffset).endVertex();
+        BufferUploader.drawWithShader(bufferBuilder.end());
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.disableBlend();
     }
