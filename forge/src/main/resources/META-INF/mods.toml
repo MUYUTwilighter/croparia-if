@@ -1,0 +1,62 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+issueTrackerURL = "https://github.com/MUYUTwilighter/croparia-if/issues"
+license = "MIT with Additional Terms"
+
+[[mods]]
+modId = "croparia"
+version = "${version}"
+displayName = "Croparia-If"
+authors = "MUYU_Twilighter, xwjcool, Dalarion"
+description = '''
+Farm minerals, loots and even more!
+'''
+logoFile = "icon.png"
+
+[[dependencies.croparia]]
+modId = "forge"
+mandatory = true
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.croparia]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1,1.21)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.croparia]]
+modId = "architectury"
+mandatory = true
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.croparia]]
+modId = "jei"
+mandatory = false
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.croparia]]
+modId = "rei"
+mandatory = false
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.croparia]]
+modId = "emi"
+mandatory = false
+versionRange = "*"
+ordering = "AFTER"
+side = "BOTH"
+
+[[mixins]]
+config = "croparia-if-common.mixins.json"
+
+[[mixins]]
+config = "croparia-if-forge.mixins.json"

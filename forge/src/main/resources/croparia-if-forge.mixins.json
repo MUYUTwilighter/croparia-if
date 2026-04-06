@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "cool.muyucloud.croparia.neoforge.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "client": [
+  ],
+  "mixins": [
+    "ArchitecturyFluidAttributesForgeMixin",
+    "BlockCapabilityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
