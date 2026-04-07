@@ -16,6 +16,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static cool.muyucloud.croparia.TestSupport.getOrThrow;
+import static cool.muyucloud.croparia.TestSupport.isError;
+import static cool.muyucloud.croparia.TestSupport.isSuccess;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CodecUtilTest {
@@ -26,13 +29,13 @@ class CodecUtilTest {
         jsonList.add(1);
         jsonList.add(2);
 
-        List<Integer> fromSingle = codec.parse(JsonOps.INSTANCE, new JsonPrimitive(5)).getOrThrow();
-        List<Integer> fromList = codec.parse(JsonOps.INSTANCE, jsonList).getOrThrow();
+        List<Integer> fromSingle = getOrThrow(codec.parse(JsonOps.INSTANCE, new JsonPrimitive(5)));
+        List<Integer> fromList = getOrThrow(codec.parse(JsonOps.INSTANCE, jsonList));
 
         assertEquals(List.of(5), fromSingle);
         assertEquals(List.of(1, 2), fromList);
-        assertEquals("7", codec.encodeStart(JsonOps.INSTANCE, List.of(7)).getOrThrow().toString());
-        assertEquals("[7,8]", codec.encodeStart(JsonOps.INSTANCE, List.of(7, 8)).getOrThrow().toString());
+        assertEquals("7", getOrThrow(codec.encodeStart(JsonOps.INSTANCE, List.of(7))).toString());
+        assertEquals("[7,8]", getOrThrow(codec.encodeStart(JsonOps.INSTANCE, List.of(7, 8))).toString());
     }
 
     @Test
@@ -41,8 +44,8 @@ class CodecUtilTest {
         JsonObject byAlias = new JsonObject();
         byAlias.addProperty("index", 12);
 
-        int decoded = mapCodec.parse(JsonOps.INSTANCE, byAlias).getOrThrow();
-        JsonObject encoded = mapCodec.encodeStart(JsonOps.INSTANCE, 12).getOrThrow().getAsJsonObject();
+        int decoded = getOrThrow(mapCodec.parse(JsonOps.INSTANCE, byAlias));
+        JsonObject encoded = getOrThrow(mapCodec.encodeStart(JsonOps.INSTANCE, 12)).getAsJsonObject();
 
         assertEquals(12, decoded);
         assertTrue(encoded.has("id"));
@@ -54,9 +57,9 @@ class CodecUtilTest {
         var mapCodec = CodecUtil.optionalFieldsOf(Codec.INT, 99, "id", "index").codec();
         JsonObject empty = new JsonObject();
 
-        int decoded = mapCodec.parse(JsonOps.INSTANCE, empty).getOrThrow();
-        JsonObject encodedDefault = mapCodec.encodeStart(JsonOps.INSTANCE, 99).getOrThrow().getAsJsonObject();
-        JsonObject encodedCustom = mapCodec.encodeStart(JsonOps.INSTANCE, 5).getOrThrow().getAsJsonObject();
+        int decoded = getOrThrow(mapCodec.parse(JsonOps.INSTANCE, empty));
+        JsonObject encodedDefault = getOrThrow(mapCodec.encodeStart(JsonOps.INSTANCE, 99)).getAsJsonObject();
+        JsonObject encodedCustom = getOrThrow(mapCodec.encodeStart(JsonOps.INSTANCE, 5)).getAsJsonObject();
 
         assertEquals(99, decoded);
         assertEquals(0, encodedDefault.size());
@@ -70,16 +73,16 @@ class CodecUtilTest {
             value -> value >= 0 ? TestedCodec.success() : TestedCodec.fail(() -> "neg"),
             (ops, input) -> {
                 DataResult<Number> number = ops.getNumberValue(input);
-                return number.isSuccess() && number.getOrThrow().intValue() >= 0
+                return isSuccess(number) && getOrThrow(number).intValue() >= 0
                     ? TestedCodec.success()
                     : TestedCodec.fail(() -> "bad");
             }
         );
 
-        assertTrue(codec.encodeStart(JsonOps.INSTANCE, 3).isSuccess());
-        assertTrue(codec.parse(JsonOps.INSTANCE, new JsonPrimitive(3)).isSuccess());
-        assertTrue(codec.encodeStart(JsonOps.INSTANCE, -1).isError());
-        assertTrue(codec.parse(JsonOps.INSTANCE, new JsonPrimitive(-1)).isError());
+        assertTrue(isSuccess(codec.encodeStart(JsonOps.INSTANCE, 3)));
+        assertTrue(isSuccess(codec.parse(JsonOps.INSTANCE, new JsonPrimitive(3))));
+        assertTrue(isError(codec.encodeStart(JsonOps.INSTANCE, -1)));
+        assertTrue(isError(codec.parse(JsonOps.INSTANCE, new JsonPrimitive(-1))));
     }
 
     @Test
@@ -87,13 +90,13 @@ class CodecUtilTest {
         MultiCodec<Integer> encodeOnly = CodecUtil.of(value -> value > 0 ? TestedCodec.success() : TestedCodec.fail(), Codec.INT);
         MultiCodec<Integer> decodeOnly = CodecUtil.of((ops, input) -> {
             DataResult<Number> num = ops.getNumberValue(input);
-            return num.isSuccess() && num.getOrThrow().intValue() > 0 ? TestedCodec.success() : TestedCodec.fail();
+            return isSuccess(num) && getOrThrow(num).intValue() > 0 ? TestedCodec.success() : TestedCodec.fail();
         }, Codec.INT);
 
-        assertTrue(encodeOnly.encodeStart(JsonOps.INSTANCE, 2).isSuccess());
-        assertTrue(encodeOnly.encodeStart(JsonOps.INSTANCE, 0).isError());
+        assertTrue(isSuccess(encodeOnly.encodeStart(JsonOps.INSTANCE, 2)));
+        assertTrue(isError(encodeOnly.encodeStart(JsonOps.INSTANCE, 0)));
         assertNotNull(decodeOnly);
-        assertTrue(decodeOnly.encodeStart(JsonOps.INSTANCE, 2).isSuccess());
+        assertTrue(isSuccess(decodeOnly.encodeStart(JsonOps.INSTANCE, 2)));
     }
 
     @Test
@@ -105,23 +108,23 @@ class CodecUtilTest {
         var fieldsCodec = CodecUtil.fieldsOf(aliases).codec();
         JsonObject byAlias = new JsonObject();
         byAlias.addProperty("index", 23);
-        assertEquals(23, fieldsCodec.parse(JsonOps.INSTANCE, byAlias).getOrThrow());
+        assertEquals(23, getOrThrow(fieldsCodec.parse(JsonOps.INSTANCE, byAlias)));
 
         var optionalCodec = CodecUtil.optionalFieldsOf(Codec.INT, "id", "index").codec();
-        assertTrue(optionalCodec.parse(JsonOps.INSTANCE, new JsonObject()).getOrThrow().isEmpty());
+        assertTrue(getOrThrow(optionalCodec.parse(JsonOps.INSTANCE, new JsonObject())).isEmpty());
 
         var optionalMapCodec = CodecUtil.optionalFieldsOf(aliases).codec();
-        assertEquals(23, optionalMapCodec.parse(JsonOps.INSTANCE, byAlias).getOrThrow().orElseThrow());
+        assertEquals(23, getOrThrow(optionalMapCodec.parse(JsonOps.INSTANCE, byAlias)).orElseThrow());
     }
 
     @Test
     void dumpAndReadJsonFileHandleSuccessAndErrorBranches(@TempDir Path tempDir) throws IOException {
         Path output = tempDir.resolve("value.json");
         DataResult<?> dumped = CodecUtil.dumpJson(6, Codec.INT, output, true);
-        assertTrue(dumped.isSuccess());
+        assertTrue(isSuccess(dumped));
         assertEquals("6", Files.readString(output));
 
-        assertEquals(6, CodecUtil.readJson(output.toFile(), Codec.INT).getOrThrow());
+        assertEquals(6, getOrThrow(CodecUtil.readJson(output.toFile(), Codec.INT)));
 
         Path noExt = tempDir.resolve("value");
         Files.writeString(noExt, "6");
@@ -142,14 +145,14 @@ class CodecUtilTest {
 
     @Test
     void charCodecRoundTripAndValidation() {
-        assertEquals("a", CodecUtil.CHAR.encodeStart(JsonOps.INSTANCE, 'a').getOrThrow().getAsString());
-        assertEquals('b', CodecUtil.CHAR.parse(JsonOps.INSTANCE, new JsonPrimitive("b")).getOrThrow());
+        assertEquals("a", getOrThrow(CodecUtil.CHAR.encodeStart(JsonOps.INSTANCE, 'a')).getAsString());
+        assertEquals('b', getOrThrow(CodecUtil.CHAR.parse(JsonOps.INSTANCE, new JsonPrimitive("b"))));
         assertThrows(IllegalArgumentException.class, () -> CodecUtil.CHAR.parse(JsonOps.INSTANCE, new JsonPrimitive("xx")));
     }
 
     @Test
     void readJsonStringWorksWithoutGameRegistryContext() {
-        assertEquals(5, CodecUtil.readJson("5", Codec.INT).getOrThrow());
+        assertEquals(5, getOrThrow(CodecUtil.readJson("5", Codec.INT)));
         assertThrows(RuntimeException.class, () -> CodecUtil.readJson("{", Codec.INT));
     }
 }

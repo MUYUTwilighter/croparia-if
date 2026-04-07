@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static cool.muyucloud.croparia.TestSupport.rl;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PackHandlerFlowTest {
@@ -50,7 +51,7 @@ class PackHandlerFlowTest {
 
         private ProbePackHandler(Path root, boolean override) {
             super(
-                ResourceLocation.fromNamespaceAndPath("croparia_test", "pack_" + UUID.randomUUID()),
+                rl("croparia_test", "pack_" + UUID.randomUUID()),
                 root,
                 new JsonObject(),
                 () -> override

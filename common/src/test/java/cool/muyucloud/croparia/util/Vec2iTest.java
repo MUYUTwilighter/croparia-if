@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static cool.muyucloud.croparia.TestSupport.getOrThrow;
 import static org.junit.jupiter.api.Assertions.*;
 
 class Vec2iTest {
@@ -38,8 +39,8 @@ class Vec2iTest {
     @Test
     void codecRoundTrip() {
         Vec2i input = Vec2i.of(8, -6);
-        var encoded = Vec2i.CODEC.encodeStart(JsonOps.INSTANCE, input).getOrThrow();
-        Vec2i decoded = Vec2i.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+        var encoded = getOrThrow(Vec2i.CODEC.encodeStart(JsonOps.INSTANCE, input));
+        Vec2i decoded = getOrThrow(Vec2i.CODEC.parse(JsonOps.INSTANCE, encoded));
         assertEquals(input, decoded);
     }
 

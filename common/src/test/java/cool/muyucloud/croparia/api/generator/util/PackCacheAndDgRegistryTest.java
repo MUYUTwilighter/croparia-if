@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static cool.muyucloud.croparia.TestSupport.getOrThrow;
+import static cool.muyucloud.croparia.TestSupport.rl;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PackCacheAndDgRegistryTest {
@@ -18,7 +20,7 @@ class PackCacheAndDgRegistryTest {
         DgRegistry<DummyEntry> mapRegistry = DgRegistry.ofMap(Map.of(one.getKey(), one, two.getKey(), two));
 
         assertEquals(Optional.of(one), mapRegistry.forName(one.getKey()));
-        assertFalse(mapRegistry.forName(ResourceLocation.fromNamespaceAndPath("croparia_test", "none")).isPresent());
+        assertFalse(mapRegistry.forName(rl("croparia_test", "none")).isPresent());
 
         DgRegistry<DummyEnumEntry> enumRegistry = DgRegistry.ofEnum(DummyEnumEntry.class);
         assertTrue(enumRegistry.forName(DummyEnumEntry.A.getKey()).isPresent());
@@ -27,18 +29,18 @@ class PackCacheAndDgRegistryTest {
 
     @Test
     void registryCodecRoundTripUsesRegisteredInstance() {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("croparia_test", "registry_" + UUID.randomUUID());
+        ResourceLocation id = rl("croparia_test", "registry_" + UUID.randomUUID());
         DgRegistry<DummyEntry> registry = DgRegistry.ofMap(Map.of());
         DgRegistry.register(id, registry);
 
-        var encoded = DgRegistry.CODEC.encodeStart(JsonOps.INSTANCE, registry).getOrThrow();
-        DgRegistry<? extends DgEntry> decoded = DgRegistry.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+        var encoded = getOrThrow(DgRegistry.CODEC.encodeStart(JsonOps.INSTANCE, registry));
+        DgRegistry<? extends DgEntry> decoded = getOrThrow(DgRegistry.CODEC.parse(JsonOps.INSTANCE, encoded));
         assertSame(registry, decoded);
     }
 
     @Test
     void getIdReturnsRegisteredId() {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("croparia_test", "registry_" + UUID.randomUUID());
+        ResourceLocation id = rl("croparia_test", "registry_" + UUID.randomUUID());
         DgRegistry<DummyEntry> registry = DgRegistry.ofMap(Map.of());
         DgRegistry.register(id, registry);
         assertEquals(id, registry.getId());
@@ -46,7 +48,7 @@ class PackCacheAndDgRegistryTest {
 
     private record DummyEntry(ResourceLocation key) implements DgEntry {
         DummyEntry(String path) {
-            this(ResourceLocation.fromNamespaceAndPath("croparia_test", path));
+            this(rl("croparia_test", path));
         }
 
         @Override
@@ -66,7 +68,7 @@ class PackCacheAndDgRegistryTest {
         private final ResourceLocation key;
 
         DummyEnumEntry(String path) {
-            this.key = ResourceLocation.fromNamespaceAndPath("croparia_test", "enum_" + path);
+            this.key = rl("croparia_test", "enum_" + path);
         }
 
         @Override

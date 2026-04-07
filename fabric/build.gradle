@@ -37,11 +37,12 @@ configurations {
 dependencies {
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:$mixin_extras_version"))
 
     // Tomlj
     include("org.tomlj:tomlj:$tomlj_version")
     include("org.antlr:antlr4-runtime:$antlr_version")
-    localRuntime("org.tomlj:tomlj:$tomlj_version")
+    implementation("org.tomlj:tomlj:$tomlj_version")
 
     modImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"
     // Fabric API. This is technically optional, but you probably want it anyway.

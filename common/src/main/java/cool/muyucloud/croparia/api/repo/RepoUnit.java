@@ -1,6 +1,7 @@
 package cool.muyucloud.croparia.api.repo;
 
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.resource.TypeToken;
@@ -33,7 +34,7 @@ public class RepoUnit<T extends TypedResource<?>> implements Repo<T> {
 
     public void load(JsonObject json) {
         this.resource = CodecUtil.getOrThrow(
-            this.getType().codec().codec().decode(JsonOps.INSTANCE, json.get("resource")).map(com.mojang.datafixers.util.Pair::getFirst),
+            this.getType().codec().codec().decode(JsonOps.INSTANCE, json.get("resource")).map(Pair::getFirst),
             IllegalArgumentException::new
         );
         this.amount = GsonHelper.getAsLong(json, "amount", 0L);
@@ -45,7 +46,7 @@ public class RepoUnit<T extends TypedResource<?>> implements Repo<T> {
 
     public void load(CompoundTag nbt) {
         this.setResource(CodecUtil.getOrThrow(
-            this.getType().codec().codec().decode(NbtOps.INSTANCE, nbt.get("resource")).map(com.mojang.datafixers.util.Pair::getFirst),
+            this.getType().codec().codec().decode(NbtOps.INSTANCE, nbt.get("resource")).map(Pair::getFirst),
             IllegalArgumentException::new
         ));
         this.setAmount(nbt.getLong("amount"));

@@ -6,6 +6,7 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.junit.jupiter.api.Test;
 
+import static cool.muyucloud.croparia.TestSupport.getOrThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -26,6 +27,6 @@ class RecordCodecBuilderReflectionTest {
 
         JsonObject json = new JsonObject();
         json.addProperty("value", 11);
-        assertEquals(11, decoder.decode(JsonOps.INSTANCE, JsonOps.INSTANCE.getMap(json).getOrThrow()).getOrThrow());
+        assertEquals(11, getOrThrow(decoder.decode(JsonOps.INSTANCE, getOrThrow(JsonOps.INSTANCE.getMap(json)))));
     }
 }

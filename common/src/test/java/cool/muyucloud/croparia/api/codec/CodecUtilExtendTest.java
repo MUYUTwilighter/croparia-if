@@ -7,6 +7,9 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.junit.jupiter.api.Test;
 
+import static cool.muyucloud.croparia.TestSupport.first;
+import static cool.muyucloud.croparia.TestSupport.getOrThrow;
+import static cool.muyucloud.croparia.TestSupport.isError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -115,11 +118,11 @@ class CodecUtilExtendTest {
         JsonObject json = new JsonObject();
         json.addProperty("a", 7);
         json.addProperty("b", "ok");
-        Child decoded = childCodec.codec().parse(JsonOps.INSTANCE, json).getOrThrow();
+        Child decoded = getOrThrow(childCodec.codec().parse(JsonOps.INSTANCE, json));
         assertEquals(7, decoded.getA());
         assertEquals("ok", decoded.getB());
 
-        JsonObject encoded = childCodec.codec().encodeStart(JsonOps.INSTANCE, new Child(9, "x")).getOrThrow().getAsJsonObject();
+        JsonObject encoded = getOrThrow(childCodec.codec().encodeStart(JsonOps.INSTANCE, new Child(9, "x"))).getAsJsonObject();
         assertEquals(9, encoded.get("a").getAsInt());
         assertEquals("x", encoded.get("b").getAsString());
     }
@@ -129,20 +132,20 @@ class CodecUtilExtendTest {
         var bField = Codec.STRING.fieldOf("b").forGetter(Child::getB);
         MapCodec<Child> childCodec = CodecUtil.extend(
             BASE_CODEC,
-            (base, fields) -> new Child(base.getA(), (String) fields.getFirst()),
+            (base, fields) -> new Child(base.getA(), (String) first(fields)),
             bField
         );
 
         JsonObject ok = new JsonObject();
         ok.addProperty("a", 1);
         ok.addProperty("b", "v");
-        Child decoded = childCodec.codec().parse(JsonOps.INSTANCE, ok).getOrThrow();
+        Child decoded = getOrThrow(childCodec.codec().parse(JsonOps.INSTANCE, ok));
         assertEquals(1, decoded.getA());
         assertEquals("v", decoded.getB());
 
         JsonObject missing = new JsonObject();
         missing.addProperty("a", 1);
-        assertTrue(childCodec.codec().parse(JsonOps.INSTANCE, missing).isError());
+        assertTrue(isError(childCodec.codec().parse(JsonOps.INSTANCE, missing)));
     }
 
     @Test
@@ -160,30 +163,30 @@ class CodecUtilExtendTest {
 
         MapCodec<Octo> two = CodecUtil.extend(BASE_CODEC, B_FIELD, C_FIELD,
             (base, b, c) -> new Octo(base.getA(), b, c, 0, 0, 0, 0, 0, 0));
-        assertEquals(2, two.codec().parse(JsonOps.INSTANCE, json).getOrThrow().getC());
+        assertEquals(2, getOrThrow(two.codec().parse(JsonOps.INSTANCE, json)).getC());
 
         MapCodec<Octo> three = CodecUtil.extend(BASE_CODEC, B_FIELD, C_FIELD, D_FIELD,
             (base, b, c, d) -> new Octo(base.getA(), b, c, d, 0, 0, 0, 0, 0));
-        assertEquals(3, three.codec().parse(JsonOps.INSTANCE, json).getOrThrow().getD());
+        assertEquals(3, getOrThrow(three.codec().parse(JsonOps.INSTANCE, json)).getD());
 
         MapCodec<Octo> four = CodecUtil.extend(BASE_CODEC, B_FIELD, C_FIELD, D_FIELD, E_FIELD,
             (base, b, c, d, e) -> new Octo(base.getA(), b, c, d, e, 0, 0, 0, 0));
-        assertEquals(4, four.codec().parse(JsonOps.INSTANCE, json).getOrThrow().getE());
+        assertEquals(4, getOrThrow(four.codec().parse(JsonOps.INSTANCE, json)).getE());
 
         MapCodec<Octo> five = CodecUtil.extend(BASE_CODEC, B_FIELD, C_FIELD, D_FIELD, E_FIELD, F_FIELD,
             (base, b, c, d, e, f) -> new Octo(base.getA(), b, c, d, e, f, 0, 0, 0));
-        assertEquals(5, five.codec().parse(JsonOps.INSTANCE, json).getOrThrow().getF());
+        assertEquals(5, getOrThrow(five.codec().parse(JsonOps.INSTANCE, json)).getF());
 
         MapCodec<Octo> six = CodecUtil.extend(BASE_CODEC, B_FIELD, C_FIELD, D_FIELD, E_FIELD, F_FIELD, G_FIELD,
             (base, b, c, d, e, f, g) -> new Octo(base.getA(), b, c, d, e, f, g, 0, 0));
-        assertEquals(6, six.codec().parse(JsonOps.INSTANCE, json).getOrThrow().getG());
+        assertEquals(6, getOrThrow(six.codec().parse(JsonOps.INSTANCE, json)).getG());
 
         MapCodec<Octo> seven = CodecUtil.extend(BASE_CODEC, B_FIELD, C_FIELD, D_FIELD, E_FIELD, F_FIELD, G_FIELD, H_FIELD,
             (base, b, c, d, e, f, g, h) -> new Octo(base.getA(), b, c, d, e, f, g, h, 0));
-        assertEquals(7, seven.codec().parse(JsonOps.INSTANCE, json).getOrThrow().getH());
+        assertEquals(7, getOrThrow(seven.codec().parse(JsonOps.INSTANCE, json)).getH());
 
         MapCodec<Octo> eight = CodecUtil.extend(BASE_CODEC, B_FIELD, C_FIELD, D_FIELD, E_FIELD, F_FIELD, G_FIELD, H_FIELD, I_FIELD,
             (base, b, c, d, e, f, g, h, i) -> new Octo(base.getA(), b, c, d, e, f, g, h, i));
-        assertEquals(8, eight.codec().parse(JsonOps.INSTANCE, json).getOrThrow().getI());
+        assertEquals(8, getOrThrow(eight.codec().parse(JsonOps.INSTANCE, json)).getI());
     }
 }

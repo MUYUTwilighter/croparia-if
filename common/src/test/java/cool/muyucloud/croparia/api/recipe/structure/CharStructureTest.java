@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static cool.muyucloud.croparia.TestSupport.first;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CharStructureTest {
@@ -89,7 +90,7 @@ class CharStructureTest {
         transformed.iterator().forEachRemaining(all::add);
 
         assertTrue(all.size() >= 4);
-        assertEquals(all.getFirst(), transformed.getOriginal());
+        assertEquals(first(all), transformed.getOriginal());
         assertEquals(transformed, new MarkedTransformableChar3D(base, new Vec3i(0, 0, 0)));
     }
 }

@@ -7,6 +7,8 @@ import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.TestedCodec;
 import org.junit.jupiter.api.Test;
 
+import static cool.muyucloud.croparia.TestSupport.getOrThrow;
+import static cool.muyucloud.croparia.TestSupport.isError;
 import static org.junit.jupiter.api.Assertions.*;
 
 class JsonCodecBuilderTest {
@@ -31,7 +33,7 @@ class JsonCodecBuilderTest {
     @Test
     void mapBuilderWithCodecReturnsEncodedPairOnSuccess() {
         MapBuilder builder = new MapBuilder();
-        var result = builder.with("n", 7, Codec.INT).getOrThrow();
+        var result = getOrThrow(builder.with("n", 7, Codec.INT));
 
         assertEquals(7, result.getFirst().getAsInt());
         assertSame(builder, result.getSecond());
@@ -47,7 +49,7 @@ class JsonCodecBuilderTest {
             value -> TestedCodec.fail(() -> "always fail")
         );
         var result = new MapBuilder().with("n", 7, failCodec);
-        assertTrue(result.isError());
+        assertTrue(isError(result));
         assertTrue(result.error().orElseThrow().message().contains("always fail"));
     }
 }

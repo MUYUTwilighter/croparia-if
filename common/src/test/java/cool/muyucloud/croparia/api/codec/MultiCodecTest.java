@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
+import static cool.muyucloud.croparia.TestSupport.getOrThrow;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MultiCodecTest {
@@ -24,8 +25,8 @@ class MultiCodecTest {
         ));
         codec.add(CodecUtil.of(Codec.STRING));
 
-        assertEquals("ok", codec.parse(JsonOps.INSTANCE, new JsonPrimitive("ok")).getOrThrow());
-        assertEquals("\"ok\"", codec.encodeStart(JsonOps.INSTANCE, "ok").getOrThrow().toString());
+        assertEquals("ok", getOrThrow(codec.parse(JsonOps.INSTANCE, new JsonPrimitive("ok"))));
+        assertEquals("\"ok\"", getOrThrow(codec.encodeStart(JsonOps.INSTANCE, "ok")).toString());
     }
 
     @Test
@@ -65,8 +66,8 @@ class MultiCodecTest {
 
         JsonObject json = new JsonObject();
         json.addProperty("b", "value");
-        String decoded = codec.codec().parse(JsonOps.INSTANCE, json).getOrThrow();
-        JsonObject encoded = codec.codec().encodeStart(JsonOps.INSTANCE, "value").getOrThrow().getAsJsonObject();
+        String decoded = getOrThrow(codec.codec().parse(JsonOps.INSTANCE, json));
+        JsonObject encoded = getOrThrow(codec.codec().encodeStart(JsonOps.INSTANCE, "value")).getAsJsonObject();
 
         assertEquals("value", decoded);
         assertTrue(encoded.has("b"));
@@ -79,13 +80,13 @@ class MultiCodecTest {
         codecs.put("id", CodecUtil.of(Codec.INT));
         OptionalMultiFieldCodec<Integer> codec = new OptionalMultiFieldCodec<>(codecs);
 
-        Optional<Integer> emptyDecoded = codec.codec().parse(JsonOps.INSTANCE, new JsonObject()).getOrThrow();
-        JsonObject encodedEmpty = codec.codec().encodeStart(JsonOps.INSTANCE, Optional.empty()).getOrThrow().getAsJsonObject();
+        Optional<Integer> emptyDecoded = getOrThrow(codec.codec().parse(JsonOps.INSTANCE, new JsonObject()));
+        JsonObject encodedEmpty = getOrThrow(codec.codec().encodeStart(JsonOps.INSTANCE, Optional.empty())).getAsJsonObject();
 
         JsonObject withValue = new JsonObject();
         withValue.addProperty("id", 5);
-        Optional<Integer> valueDecoded = codec.codec().parse(JsonOps.INSTANCE, withValue).getOrThrow();
-        JsonObject encodedValue = codec.codec().encodeStart(JsonOps.INSTANCE, Optional.of(5)).getOrThrow().getAsJsonObject();
+        Optional<Integer> valueDecoded = getOrThrow(codec.codec().parse(JsonOps.INSTANCE, withValue));
+        JsonObject encodedValue = getOrThrow(codec.codec().encodeStart(JsonOps.INSTANCE, Optional.of(5))).getAsJsonObject();
 
         assertTrue(emptyDecoded.isEmpty());
         assertEquals(0, encodedEmpty.size());

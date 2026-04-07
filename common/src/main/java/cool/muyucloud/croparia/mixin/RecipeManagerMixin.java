@@ -10,11 +10,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.Collection;
+import java.util.List;
 
 @Mixin(RecipeManager.class)
 public abstract class RecipeManagerMixin implements RecipeManagerAccess {
     @Shadow
-    public abstract <C extends Container, T extends Recipe<C>> Collection<T> getAllRecipesFor(RecipeType<T> recipeType);
+    public abstract <C extends Container, T extends Recipe<C>> List<T> getAllRecipesFor(RecipeType<T> recipeType);
 
     @Unique
     @Override

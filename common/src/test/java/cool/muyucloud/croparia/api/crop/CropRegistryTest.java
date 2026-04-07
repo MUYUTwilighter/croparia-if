@@ -21,13 +21,14 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static cool.muyucloud.croparia.TestSupport.rl;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CropRegistryTest {
     @Test
     void registerTriggersOnRegisterOnlyWhenTransitioningToLoaded(@TempDir Path tempDir) {
         CropRegistry<DummyCrop> registry = new CropRegistry<>(tempDir, DummyCrop.CODEC);
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("croparia_test", "alpha");
+        ResourceLocation id = rl("croparia_test", "alpha");
 
         DummyCrop firstLoaded = new DummyCrop(id, true, "k", Map.of("en_us", "A"));
         DummyCrop secondLoaded = new DummyCrop(id, true, "k", Map.of("en_us", "B"));
@@ -64,9 +65,9 @@ class CropRegistryTest {
         registry.readCrops();
 
         assertEquals(2, registry.size());
-        assertTrue(registry.exists(ResourceLocation.fromNamespaceAndPath("croparia_test", "a")));
-        assertTrue(registry.exists(ResourceLocation.fromNamespaceAndPath("croparia_test", "b")));
-        assertFalse(registry.exists(ResourceLocation.fromNamespaceAndPath("croparia_test", "x")));
+        assertTrue(registry.exists(rl("croparia_test", "a")));
+        assertTrue(registry.exists(rl("croparia_test", "b")));
+        assertFalse(registry.exists(rl("croparia_test", "x")));
 
         List<String> loadedIds = registryLoaded(registry).stream()
             .map(c -> c.getKey().toString())
@@ -91,14 +92,14 @@ class CropRegistryTest {
         registry.readCrops();
 
         assertEquals(1, registry.size());
-        assertTrue(registry.exists(ResourceLocation.fromNamespaceAndPath("croparia_test", "ok")));
+        assertTrue(registry.exists(rl("croparia_test", "ok")));
     }
 
     @Test
     void dumpCropWritesNamespacedPath(@TempDir Path tempDir) throws IOException {
         CropRegistry<DummyCrop> registry = new CropRegistry<>(tempDir, DummyCrop.CODEC);
         DummyCrop crop = new DummyCrop(
-            ResourceLocation.fromNamespaceAndPath("croparia_test", "dump_target"),
+            rl("croparia_test", "dump_target"),
             true,
             "key.dump",
             Map.of("en_us", "Dump Target")
@@ -116,8 +117,8 @@ class CropRegistryTest {
     @Test
     void dumpCropsWritesAllRegisteredCrops(@TempDir Path tempDir) throws IOException {
         CropRegistry<DummyCrop> registry = new CropRegistry<>(tempDir, DummyCrop.CODEC);
-        DummyCrop a = new DummyCrop(ResourceLocation.fromNamespaceAndPath("croparia_test", "a"), true, "k.a", Map.of("en_us", "A"));
-        DummyCrop b = new DummyCrop(ResourceLocation.fromNamespaceAndPath("croparia_test", "b"), false, "k.b", Map.of("en_us", "B"));
+        DummyCrop a = new DummyCrop(rl("croparia_test", "a"), true, "k.a", Map.of("en_us", "A"));
+        DummyCrop b = new DummyCrop(rl("croparia_test", "b"), false, "k.b", Map.of("en_us", "B"));
         registry.register(a);
         registry.register(b);
 

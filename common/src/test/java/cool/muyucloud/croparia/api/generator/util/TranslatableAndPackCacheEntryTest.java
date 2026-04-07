@@ -7,13 +7,14 @@ import org.junit.jupiter.api.Test;
 import java.util.Collection;
 import java.util.Map;
 
+import static cool.muyucloud.croparia.TestSupport.rl;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TranslatableAndPackCacheEntryTest {
     @Test
     void translatableEntryPlaceholderExposesIdAndTranslations() {
         TranslatableEntry entry = new DummyTranslatableEntry(
-            ResourceLocation.fromNamespaceAndPath("croparia_test", "sample"),
+            rl("croparia_test", "sample"),
             Map.of("en_us", "Apple", "zh_cn", "PingGuo")
         );
 

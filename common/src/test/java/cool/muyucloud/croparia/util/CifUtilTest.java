@@ -3,12 +3,13 @@ package cool.muyucloud.croparia.util;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 
+import static cool.muyucloud.croparia.TestSupport.rl;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CifUtilTest {
     @Test
     void formatIdAllNullAndCastUnsafeWork() {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("croparia", "seed");
+        ResourceLocation id = rl("croparia", "seed");
         ResourceLocation formatted = CifUtil.formatId("x_%s", id);
         assertEquals("croparia:x_seed", formatted.toString());
 

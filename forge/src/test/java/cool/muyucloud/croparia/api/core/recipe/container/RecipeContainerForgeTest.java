@@ -15,7 +15,7 @@ class RecipeContainerForgeTest {
         Assumptions.assumeTrue(runtimeReady(), "Requires initialized Forge runtime");
         InfusorContainer container = new InfusorContainer(null, List.of(ItemStack.EMPTY, ItemStack.EMPTY));
 
-        assertEquals(2, container.size());
+        assertEquals(2, container.getContainerSize());
         assertTrue(container.isEmpty());
         assertSame(ItemStack.EMPTY, container.getItem(10));
     }
@@ -25,7 +25,7 @@ class RecipeContainerForgeTest {
         Assumptions.assumeTrue(runtimeReady(), "Requires initialized Forge runtime");
         SoakContainer air = new SoakContainer(Blocks.AIR.defaultBlockState(), null, 1.0f);
         assertTrue(air.isEmpty());
-        assertEquals(0, air.size());
+        assertEquals(0, air.getContainerSize());
         assertSame(ItemStack.EMPTY, air.getItem(0));
     }
 

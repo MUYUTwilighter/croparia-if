@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Path;
 import java.util.List;
 
+import static cool.muyucloud.croparia.TestSupport.rl;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ConfigTest {
@@ -38,7 +39,7 @@ class ConfigTest {
         assertTrue(config.getFruitUse());
         assertEquals(1, config.getCropBlackList().size());
         assertEquals(1, config.getModBlackList().size());
-        assertFalse(config.isCropValid(ResourceLocation.fromNamespaceAndPath("minecraft", "wheat")));
+        assertFalse(config.isCropValid(rl("minecraft", "wheat")));
         assertFalse(config.isModValid("fabricloader"));
         assertTrue(config.isModValid("minecraft"));
     }
@@ -62,7 +63,7 @@ class ConfigTest {
 
         config.setBlackList(List.of("minecraft:carrot", "@forg.*"));
         assertEquals(List.of("minecraft:carrot", "@forg.*"), config.getBlacklist());
-        assertFalse(config.isCropValid(ResourceLocation.fromNamespaceAndPath("minecraft", "carrot")));
+        assertFalse(config.isCropValid(rl("minecraft", "carrot")));
         assertFalse(config.isModValid("forge"));
     }
 }

@@ -32,7 +32,7 @@ class ConfigAndDependenciesFabricTest {
         assertEquals(1, config.getModBlackList().size());
         assertFalse(config.isModValid("fabricloader"));
         assertTrue(config.isModValid("minecraft"));
-        assertFalse(config.isCropValid(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("minecraft", "wheat")));
+        assertFalse(config.isCropValid(new net.minecraft.resources.ResourceLocation("minecraft", "wheat")));
     }
 
     @Test
@@ -53,4 +53,3 @@ class ConfigAndDependenciesFabricTest {
         assertTrue(empty.isEmpty());
     }
 }
-

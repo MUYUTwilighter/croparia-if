@@ -25,7 +25,7 @@ class RecipeContainerFabricTest {
     void infusorContainerHandlesBoundsAndEmptyState() {
         InfusorContainer container = new InfusorContainer(Element.AIR, List.of(ItemStack.EMPTY, new ItemStack(Items.APPLE)));
 
-        assertEquals(2, container.size());
+        assertEquals(2, container.getContainerSize());
         assertFalse(container.isEmpty());
         assertSame(ItemStack.EMPTY, container.getItem(10));
         int count = 0;
@@ -51,7 +51,7 @@ class RecipeContainerFabricTest {
 
         SoakContainer valid = new SoakContainer(Blocks.STONE.defaultBlockState(), Element.AIR, 0.5f);
         assertFalse(valid.isEmpty());
-        assertEquals(0, valid.size());
+        assertEquals(0, valid.getContainerSize());
         assertSame(ItemStack.EMPTY, valid.getItem(0));
     }
 
@@ -65,7 +65,7 @@ class RecipeContainerFabricTest {
             success
         );
         assertFalse(successContainer.isEmpty());
-        assertEquals(1, successContainer.size());
+        assertEquals(1, successContainer.getContainerSize());
         assertSame(ItemStack.EMPTY, successContainer.getItem(5));
 
         RitualContainer failed = RitualContainer.of(

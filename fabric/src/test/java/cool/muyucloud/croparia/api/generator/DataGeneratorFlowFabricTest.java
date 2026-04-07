@@ -65,7 +65,7 @@ class DataGeneratorFlowFabricTest {
         DataGenerator generator = new DataGenerator(
             true,
             true,
-            List.of(second.getKey(), ResourceLocation.fromNamespaceAndPath("croparia_test", "missing")),
+            List.of(second.getKey(), new ResourceLocation("croparia_test", "missing")),
             new Template("${id}.json"),
             DgRegistry.ofMap(linkedMap(first, second)),
             new Template("selected=${id}")
@@ -159,7 +159,7 @@ class DataGeneratorFlowFabricTest {
     private static final class TestPackHandler extends PackHandler {
         private TestPackHandler(Path root) {
             super(
-                ResourceLocation.fromNamespaceAndPath("croparia_test", "pack_" + UUID.randomUUID()),
+                new ResourceLocation("croparia_test", "pack_" + UUID.randomUUID()),
                 root,
                 new JsonObject(),
                 () -> false
@@ -176,7 +176,7 @@ class DataGeneratorFlowFabricTest {
 
     private record TestEntry(ResourceLocation key, boolean load) implements DgEntry {
         private TestEntry(String path, boolean load) {
-            this(ResourceLocation.fromNamespaceAndPath("croparia_test", path), load);
+            this(new ResourceLocation("croparia_test", path), load);
         }
 
         @Override
@@ -196,7 +196,7 @@ class DataGeneratorFlowFabricTest {
         private final Map<String, String> translations;
 
         private TestTranslatableEntry(String path, String translationKey, Map<String, String> translations) {
-            this.key = ResourceLocation.fromNamespaceAndPath("croparia_test", path);
+            this.key = new ResourceLocation("croparia_test", path);
             this.translationKey = translationKey;
             this.translations = translations;
         }
