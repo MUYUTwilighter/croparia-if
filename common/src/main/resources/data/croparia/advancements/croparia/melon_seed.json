@@ -1,0 +1,37 @@
+{
+  "parent": "croparia:croparia/ritual_stand",
+  "criteria": {
+    "melon_seed": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "croparia:seeds/melons"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.croparia.melon_seed.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "croparia:melon_seed_dirt"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.croparia.melon_seed.title"
+    }
+  },
+  "requirements": [
+    [
+      "melon_seed"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
+

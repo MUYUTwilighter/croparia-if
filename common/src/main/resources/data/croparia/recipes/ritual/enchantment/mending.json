@@ -1,0 +1,17 @@
+{
+  "type": "croparia:ritual",
+  "ritual": "croparia:ritual_stand_2",
+  "ingredient": "#c:enchantable/mending",
+  "block": "minecraft:sculk_catalyst",
+  "result": {
+    "id": "minecraft:enchanted_book",
+    "nbt": {
+      "minecraft:stored_enchantments": {
+        "levels": {
+          "minecraft:mending": 1
+        }
+      }
+    },
+    "amount": 1
+  }
+}

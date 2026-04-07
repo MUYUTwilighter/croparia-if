@@ -1,5 +1,5 @@
 registry = "croparia:melons"
-path = "croparia/tags/block/stem.json"
+path = "croparia/tags/blocks/stem.json"
 type = "croparia:aggregated"
 startup = true
 content = '    "${stem}"'

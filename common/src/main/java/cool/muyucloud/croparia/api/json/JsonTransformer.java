@@ -3,11 +3,8 @@ package cool.muyucloud.croparia.api.json;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import cool.muyucloud.croparia.api.generator.util.DgReader;
 import cool.muyucloud.croparia.util.FileUtil;
-import org.tomlj.Toml;
-import org.tomlj.TomlParseResult;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,16 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public interface JsonTransformer {
+
     Map<String, JsonTransformer> TRANSFORMERS = new HashMap<>(Map.of(
         "json", JsonParser::parseString,
-        "cdg", DgReader::read,
-        "toml", raw -> {
-            TomlParseResult toml = Toml.parse(raw);
-            if (toml.hasErrors()) {
-                throw new JsonSyntaxException("Failed to parse TOML: " + toml.errors());
-            }
-            return JsonParser.parseString(toml.toJson());
-        }
+        "cdg", DgReader::read
     ));
 
     static JsonElement transform(File file) throws IOException, JsonParseException {
@@ -35,6 +26,9 @@ public interface JsonTransformer {
     }
 
     static JsonElement transform(String content, String filename) {
+        if (!content.isEmpty() && content.charAt(0) == '\uFEFF') {
+            content = content.substring(1);
+        }
         String ext = FileUtil.extension(filename);
         JsonTransformer transformer = TRANSFORMERS.getOrDefault(ext, JsonParser::parseString);
         if (transformer == null) {

@@ -1,0 +1,17 @@
+{
+  "type": "croparia:ritual",
+  "ritual": "croparia:ritual_stand_2",
+  "ingredient": "#c:enchantable/silk_touch",
+  "block": "minecraft:honeycomb_block",
+  "result": {
+    "id": "minecraft:enchanted_book",
+    "nbt": {
+      "minecraft:stored_enchantments": {
+        "levels": {
+          "minecraft:silk_touch": 1
+        }
+      }
+    },
+    "amount": 1
+  }
+}

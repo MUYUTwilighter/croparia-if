@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "croparia:croparia4"
+    }
+  ],
+  "result": {
+    "item": "croparia:croparia3",
+    "count": 2
+  }
+}
+

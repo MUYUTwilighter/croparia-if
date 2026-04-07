@@ -1,0 +1,24 @@
+﻿{
+  "type": "croparia:ritual",
+  "ritual": "croparia:ritual_stand_2",
+  "ingredient": "#c:armors/helmets",
+  "block": {
+    "id": "croparia:fluid_water",
+    "properties": {
+      "level": "0"
+    }
+  },
+  "result": {
+    "id": "minecraft:enchanted_book",
+    "nbt": {
+      "minecraft:stored_enchantments": {
+        "levels": {
+          "minecraft:aqua_affinity": 1,
+          "minecraft:respiration": 3
+        }
+      },
+      "minecraft:repair_cost": 1
+    },
+    "amount": 1
+  }
+}

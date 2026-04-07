@@ -195,8 +195,8 @@ public class Placeholder<T> implements RegexParser<T> {
             ItemOutput.CODEC, builder -> builder
                 .then(PatternKey.literal("id"), TypeMapper.of(ItemOutput::getId), ID)
                 .then(PatternKey.literal("amount"), TypeMapper.of(ItemOutput::getAmount), NUMBER)
-                .then(PatternKey.literal("nbt"), TypeMapper.of(ItemOutput::getComponentsPatch), Placeholder.DATA_COMPONENTS)
-                .then(PatternKey.literal("components"), TypeMapper.of(ItemOutput::getComponentsPatch), Placeholder.DATA_COMPONENTS)
+                .then(PatternKey.literal("nbt"), TypeMapper.of(ItemOutput::getNbt), Placeholder.DATA_COMPONENTS)
+                .then(PatternKey.literal("components"), TypeMapper.of(ItemOutput::getNbt), Placeholder.DATA_COMPONENTS)
                 .then(PatternKey.literal("stack"), TypeMapper.of(ItemOutput::createStack), ItemStack.CODEC)
         ));
         private static final LazySupplier<Placeholder<Item>> ITEM_IMPL = LazySupplier.of(() -> ID.map(TypeMapper.of(Item::arch$registryName)));

@@ -1,5 +1,5 @@
 registry = "croparia:crops"
-path = "croparia/recipe/crafting/material/${id.namespace}/${id.path}.json"
+path = "croparia/recipes/crafting/material/crop/${id.path}.json"
 template = """
 {
   "type": "minecraft:crafting_shapeless",
@@ -8,6 +8,9 @@ template = """
       "item": "${fruit}"
     }
   ],
-  "result": ${material.result.stack}
+  "result": {
+    "item": "${material.result.id}",
+    "count": ${material.result.amount}
+  }
 }
 """

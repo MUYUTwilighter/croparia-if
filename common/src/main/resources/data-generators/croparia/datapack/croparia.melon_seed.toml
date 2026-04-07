@@ -1,5 +1,5 @@
 registry = "croparia:melons"
-path = "croparia/recipe/ritual/melon/seeds/${id.namespace}/${id.path}.json"
+path = "croparia/recipes/ritual/melon/seeds/${id.namespace}/${id.path}.json"
 template = """
 {
   "type": "croparia:ritual",

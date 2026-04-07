@@ -1,5 +1,5 @@
 registry = "croparia:melons"
-path = "minecraft/tags/block/bee_growables.json"
+path = "minecraft/tags/blocks/bee_growables.json"
 type = "croparia:aggregated"
 startup = true
 content = '    "${stem}"'

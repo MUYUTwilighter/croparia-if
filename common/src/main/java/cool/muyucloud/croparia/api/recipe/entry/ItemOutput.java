@@ -26,11 +26,11 @@ public class ItemOutput implements SlotDisplay {
     );
     public static final MapCodec<ItemOutput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
         ResourceLocation.CODEC.fieldOf("id").forGetter(ItemOutput::getId),
-        CodecUtil.optionalFieldsOf(CompoundTag.CODEC, "nbt", "components").forGetter(itemOutput -> Optional.of(itemOutput.getComponentsPatch())),
+        CodecUtil.optionalFieldsOf(CompoundTag.CODEC, "nbt", "components").forGetter(itemOutput -> Optional.of(itemOutput.getNbt())),
         Codec.LONG.optionalFieldOf("amount").forGetter(result -> Optional.of(result.getAmount()))
     ).apply(instance, (id, components, amount) -> new ItemOutput(id, components.orElse(new CompoundTag()), amount.orElse(1L))));
     public static final MultiCodec<ItemOutput> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
-        if (toEncode.getComponentsPatch().isEmpty() && toEncode.getAmount() == 1L) {
+        if (toEncode.getNbt().isEmpty() && toEncode.getAmount() == 1L) {
             return TestedCodec.fail(() -> "Can be encoded as string");
         }
         return TestedCodec.success();
@@ -68,9 +68,9 @@ public class ItemOutput implements SlotDisplay {
         this(id, new CompoundTag(), amount);
     }
 
-    public ItemOutput(@NotNull ResourceLocation id, @NotNull CompoundTag components, long amount) {
+    public ItemOutput(@NotNull ResourceLocation id, CompoundTag components, long amount) {
         this.id = id;
-        this.components = components.copy();
+        this.components = components == null ? new CompoundTag() : components.copy();
         this.amount = amount;
         if (this.amount <= 0) CropariaIf.LOGGER.warn("Creating ItemOutput with non-positive amount: {}", this.amount);
         this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.get(id), this.components);
@@ -88,7 +88,7 @@ public class ItemOutput implements SlotDisplay {
     }
 
     @NotNull
-    public CompoundTag getComponentsPatch() {
+    public CompoundTag getNbt() {
         return this.components.copy();
     }
 

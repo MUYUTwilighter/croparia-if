@@ -1,5 +1,5 @@
 registry = "croparia:elements"
-path = "${id.namespace}/tags/item/fluid/${id.path}.json"
+path = "${id.namespace}/tags/items/fluid/${id.path}.json"
 startup = true
 template = """
 {

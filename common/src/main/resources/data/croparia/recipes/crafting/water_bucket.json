@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:bucket"
+    },
+    {
+      "item": "croparia:gem_water"
+    }
+  ],
+  "result": {
+    "item": "minecraft:water_bucket"
+  }
+}

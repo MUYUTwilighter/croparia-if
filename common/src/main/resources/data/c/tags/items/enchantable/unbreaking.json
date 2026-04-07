@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:tools",
+    "#c:armors",
+    "minecraft:flint_and_steel",
+    "minecraft:fishing_rod"
+  ]
+}

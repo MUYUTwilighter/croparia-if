@@ -1,5 +1,5 @@
 registry = "croparia:elements"
-path = "gtceu/recipe/croparia/extractor/fluid/${name}.json"
+path = "gtceu/recipes/croparia/extractor/fluid/${name}.json"
 dependencies = "gtceu"
 template = """
 {

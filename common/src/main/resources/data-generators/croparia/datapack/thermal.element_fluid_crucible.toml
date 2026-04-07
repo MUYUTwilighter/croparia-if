@@ -1,5 +1,5 @@
 registry = "croparia:elements"
-path = "thermal/recipe/croparia/crucible/fluid/${name}.json"
+path = "thermal/recipes/croparia/crucible/fluid/${name}.json"
 dependencies = "thermal_expansion"
 template = """
 {

@@ -1,0 +1,49 @@
+{
+  "parent": "croparia:croparia/melon_seed",
+  "criteria": {
+    "melon_bonemeal": {
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": [
+                "minecraft:bone_meal"
+              ]
+            }
+          },
+          {
+            "condition": "croparia:block_input",
+            "tag": "croparia:stem",
+            "properties": {
+              "age": "7"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:item_used_on_block"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.croparia.melon_bonemeal.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "minecraft:bone_meal"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.croparia.melon_bonemeal.title"
+    }
+  },
+  "requirements": [
+    [
+      "melon_bonemeal"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
+

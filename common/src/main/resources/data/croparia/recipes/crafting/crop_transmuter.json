@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "E": {
+      "item": "croparia:elemental_stone"
+    },
+    "S": {
+      "tag": "minecraft:stone_bricks"
+    },
+    "W": {
+      "item": "minecraft:crafting_table"
+    },
+    "C": {
+      "item": "minecraft:comparator"
+    }
+  },
+  "pattern": [
+    "SWS",
+    "CEC"
+  ],
+  "result": {
+    "item": "croparia:crop_transmuter"
+  }
+}
+

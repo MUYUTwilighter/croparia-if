@@ -1,5 +1,5 @@
 registry = "croparia:elements"
-path = "modern_industrialization/recipe/croparia/blast_furnace/fluid/${name}.json"
+path = "modern_industrialization/recipes/croparia/blast_furnace/fluid/${name}.json"
 dependencies = "modern_industrialization"
 template = """
 {

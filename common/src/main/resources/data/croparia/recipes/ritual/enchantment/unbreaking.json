@@ -1,0 +1,17 @@
+{
+  "type": "croparia:ritual",
+  "ritual": "croparia:ritual_stand_2",
+  "ingredient": "#c:enchantable/unbreaking",
+  "block": "minecraft:obsidian",
+  "result": {
+    "id": "minecraft:enchanted_book",
+    "nbt": {
+      "minecraft:stored_enchantments": {
+        "levels": {
+          "minecraft:unbreaking": 3
+        }
+      }
+    },
+    "amount": 1
+  }
+}

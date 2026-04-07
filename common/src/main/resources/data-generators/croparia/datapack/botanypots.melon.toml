@@ -1,5 +1,5 @@
 registry = "croparia:melons"
-path = "botanypots/recipe/${id.namespace}/melon/${id.path}.json"
+path = "botanypots/recipes/${id.namespace}/melon/${id.path}.json"
 dependencies = "botanypots"
 template = """
 {

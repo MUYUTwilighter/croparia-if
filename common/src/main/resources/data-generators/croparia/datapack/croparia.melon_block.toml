@@ -1,5 +1,5 @@
 registry = "croparia:melons"
-path = "${melon.namespace}/loot_table/blocks/${melon.path}.json"
+path = "${melon.namespace}/loot_tables/blocks/${melon.path}.json"
 template = """
 {
   "type": "minecraft:block",

@@ -1,5 +1,5 @@
 registry = "croparia:elements"
-path = "croparia/recipe/crafting/bucket/${name}.json"
+path = "croparia/recipes/crafting/bucket/${name}.json"
 template = """
 {
   "type": "minecraft:crafting_shapeless",
@@ -22,7 +22,7 @@ template = """
     }
   ],
   "result": {
-    "id": "${bucket}"
+    "item": "${bucket}"
   }
 }
 """

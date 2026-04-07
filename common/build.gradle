@@ -10,8 +10,6 @@ loom {
 }
 
 dependencies {
-    // Tomlj
-    modApi("org.tomlj:tomlj:$tomlj_version")
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:$mixin_extras_version"))
 
     // We depend on Fabric Loader here to use the Fabric @Environment annotations,
@@ -31,9 +29,6 @@ dependencies {
     modCompileOnly("mezz.jei:jei-${minecraft_version}-common:${jei_version}")
     modCompileOnly("mezz.jei:jei-${minecraft_version}-lib:${jei_version}")
     modCompileOnly("mezz.jei:jei-${minecraft_version}-gui:${jei_version}")
-
-    // EMI: waiting for update to 1.21.3
-//    modCompileOnly "dev.emi:emi-xplat-intermediary:${emi_version}:api"
 
     testImplementation platform("org.junit:junit-bom:5.10.2")
     testImplementation "org.junit.jupiter:junit-jupiter"

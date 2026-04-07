@@ -1,5 +1,5 @@
 registry = "croparia:crops"
-path = "thermal/recipe/croparia/insolator_crop/${id.namespace}/${id.path}.json"
+path = "thermal/recipes/croparia/insolator_crop/${id.namespace}/${id.path}.json"
 dependencies = "thermal_expansion"
 template = """
 {

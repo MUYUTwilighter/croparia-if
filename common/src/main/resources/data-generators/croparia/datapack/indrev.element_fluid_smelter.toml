@@ -1,5 +1,5 @@
 registry = "croparia:elements"
-path = "indrev/recipe/croparia/smelter/fluid/${name}.json"
+path = "indrev/recipes/croparia/smelter/fluid/${name}.json"
 dependencies = "indrev"
 template = """
 {

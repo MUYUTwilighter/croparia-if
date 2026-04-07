@@ -1,5 +1,5 @@
 registry = "croparia:crops"
-path = "croparia/recipe/crafting/melon/material_seed/${id.namespace}/${id.path}.json"
+path = "croparia/recipes/infusor/crop/material_seed/${id.namespace}/${id.path}.json"
 template = """
 {
   "type": "croparia:infusor",
@@ -7,7 +7,7 @@ template = """
   "ingredient": "${seed}",
   "result": {
     "id": "${material.result.id}",
-    "components": ${material.result.components},
+    "nbt": ${material.result.nbt},
     "amount": 4
   }
 }

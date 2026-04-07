@@ -10,7 +10,10 @@ import net.minecraft.world.item.crafting.Recipe;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * A generic interface for recipes that can be displayed in the recipe book, can be polymorphic to many types required
@@ -18,6 +21,7 @@ import java.util.List;
  */
 public interface DisplayableRecipe<C extends Container> extends Recipe<C> {
     Logger LOGGER = LogUtils.getLogger();
+    Map<DisplayableRecipe<?>, ResourceLocation> IDS = Collections.synchronizedMap(new WeakHashMap<>());
 
     /**
      * Get the crafting station apply to this recipe
@@ -46,7 +50,11 @@ public interface DisplayableRecipe<C extends Container> extends Recipe<C> {
 
     @Override
     default @NotNull ResourceLocation getId() {
-        return this.getTypedSerializer().getId();
+        return IDS.getOrDefault(this, this.getTypedSerializer().getId());
+    }
+
+    default void setId(@NotNull ResourceLocation id) {
+        IDS.put(this, id);
     }
 
     @Override

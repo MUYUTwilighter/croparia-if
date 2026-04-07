@@ -13,8 +13,6 @@ loom {
     forge {
         convertAccessWideners = true
         extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
-
-        mixinConfig "croparia-if-common.mixins.json", "croparia-if-forge.mixins.json"
     }
 }
 
@@ -59,13 +57,6 @@ dependencies {
     modCompileOnly("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
     modLocalRuntime("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
 
-    // Tomlj
-    implementation(include("org.tomlj:tomlj:$tomlj_version"))
-    forgeRuntimeLibrary("org.tomlj:tomlj:$tomlj_version")
-
-    // EMI
-    modCompileOnly "dev.emi:emi-forge:${emi_version}:api"
-    modRuntimeOnly "dev.emi:emi-forge:${emi_version}"
     // KubeJs
 //    modApi "dev.latvian.mods:kubejs-forge:${kubejs_version}"
 
@@ -89,6 +80,7 @@ processResources {
 shadowJar {
     configurations = [project.configurations.shadowBundle]
     archiveClassifier = 'dev-shadow'
+    relocate 'io.github.wasabithumb.jtoml', 'cool.muyucloud.shadow.jtoml'
 }
 
 remapJar {

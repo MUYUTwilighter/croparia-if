@@ -1,5 +1,5 @@
 registry = "croparia:elements"
-path = "modern_industrialization/recipe/croparia/mixer/gem/${name}.json"
+path = "modern_industrialization/recipes/croparia/mixer/gem/${name}.json"
 dependencies = "modern_industrialization"
 template = """
 {

@@ -98,7 +98,9 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
 
     @Override
     public @NotNull R fromJson(@NotNull ResourceLocation recipeId, @NotNull JsonObject json) {
-        return CodecUtil.getOrThrow(CodecUtil.decodeJson(json, this.codec.codec()), IllegalArgumentException::new);
+        R recipe = CodecUtil.getOrThrow(CodecUtil.decodeJson(json, this.codec.codec()), IllegalArgumentException::new);
+        recipe.setId(recipeId);
+        return recipe;
     }
 
     @Override
@@ -107,7 +109,9 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
         if (tag == null) {
             throw new IllegalArgumentException("Missing recipe payload for " + recipeId);
         }
-        return CodecUtil.getOrThrow(this.codec.codec().parse(NbtOps.INSTANCE, tag), IllegalArgumentException::new);
+        R recipe = CodecUtil.getOrThrow(this.codec.codec().parse(NbtOps.INSTANCE, tag), IllegalArgumentException::new);
+        recipe.setId(recipeId);
+        return recipe;
     }
 
     @Override

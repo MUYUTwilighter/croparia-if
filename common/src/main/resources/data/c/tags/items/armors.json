@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "#c:armors/leggings",
+    "#c:armors/chestplates",
+    "#c:armors/helmets",
+    "#c:armors/boots"
+  ]
+}

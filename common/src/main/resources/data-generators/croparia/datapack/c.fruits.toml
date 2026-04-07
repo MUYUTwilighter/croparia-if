@@ -1,5 +1,5 @@
 registry = "croparia:crops"
-path = "c/tags/item/fruits.json"
+path = "c/tags/items/fruits.json"
 type = "croparia:aggregated"
 startup = true
 content = '    "${fruit}"'
