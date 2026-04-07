@@ -12,9 +12,9 @@
 ## 2. 项目整体架构
 
 ### 2.1 多端工程结构（Architectury）
-- 根工程：`common` + `fabric` + `neoforge`
+- 根工程：`common` + `fabric` + `forge`
 - `common`：主要游戏逻辑与 API 抽象（本文件关注）
-- `fabric` / `neoforge`：平台实现（如 `@ExpectPlatform` 对应实现）
+- `fabric` / `forge`：平台实现（如 `@ExpectPlatform` 对应实现）
 
 ### 2.2 运行分层（从底到上）
 1. 基础序列化层  
@@ -83,7 +83,7 @@
 - `RepoUnit<T>`：单槽实现
 - `RepoBatch<T>`：多槽组合
 - `ContainerRepo`：将 Minecraft `Container` 适配为 `Repo<ItemSpec>`
-- `RepoProxy` / `ProxyProvider`：桥接 Fabric/NeoForge 平台存储 API
+- `RepoProxy` / `ProxyProvider`：桥接 Fabric/Forge 平台存储 API
 
 资源规格：
 - `ItemSpec`：`Item + DataComponentPatch`

@@ -4,7 +4,7 @@ This project currently supports three testing layers:
 
 1. JVM unit tests in `common`
 2. Fabric loader-backed tests in `fabric` (dependency scaffold only)
-3. NeoForge GameTest samples in `neoforge`
+3. Forge GameTest samples in `forge`
 
 ## 1) JVM Unit Tests (common)
 
@@ -35,11 +35,11 @@ Note:
 - Fabric loader JUnit will bootstrap Fabric/Mixin. If test runtime classpath is incomplete (for example missing mixin config resources), tests can fail before any assertion runs.
 - This project reuses the real `common` mixin config and adds `:common` runtime artifacts to `fabric:test` classpath.
 
-## 3) NeoForge GameTest (integration)
+## 3) Forge GameTest (integration)
 
 Sample class:
 
-- `neoforge/src/main/java/cool/muyucloud/croparia/neoforge/gametest/CropariaNeoForgeGameTests.java`
+- `forge/src/main/java/cool/muyucloud/croparia/forge/gametest/CropariaForgeGameTests.java`
 
 Current sample:
 
@@ -49,18 +49,18 @@ To expand:
 
 1. Add more `@GameTest` methods
 2. Add/choose proper structure templates if required by your scenarios
-3. Launch dev server (for example `:neoforge:runServer`) and run tests with `/test runall croparia`
+3. Launch dev server (for example `:forge:runServer`) and run tests with `/test runall croparia`
 
-## 4) NeoForge JUnit (module smoke tests)
+## 4) Forge JUnit (module smoke tests)
 
-This project also enables regular JUnit tests in `neoforge`:
+This project also enables regular JUnit tests in `forge`:
 
-- `neoforge/src/test/java`
-- sample: `neoforge/src/test/java/cool/muyucloud/croparia/neoforge/NeoForgeSmokeTest.java`
+- `forge/src/test/java`
+- sample: `forge/src/test/java/cool/muyucloud/croparia/forge/ForgeSmokeTest.java`
 
 Runtime note:
 
-- `neoforge:test` adds `:common` runtime artifacts (`namedElements` + `transformProductionNeoForge`) to ensure common classes are available during test execution.
+- `forge:test` adds `:common` runtime artifacts (`namedElements` + `transformProductionForge`) to ensure common classes are available during test execution.
 
 ## Full Validation
 

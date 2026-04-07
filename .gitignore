@@ -28,5 +28,5 @@ common/logs/
 fabric/logs/
 fabric/config/
 forge/logs/
-neoforge/logs/
+
 /.lib/

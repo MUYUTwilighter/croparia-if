@@ -60,9 +60,9 @@ class ConfigTest {
             List.of()
         ));
 
-        config.setBlackList(List.of("minecraft:carrot", "@neo.*"));
-        assertEquals(List.of("minecraft:carrot", "@neo.*"), config.getBlacklist());
+        config.setBlackList(List.of("minecraft:carrot", "@forg.*"));
+        assertEquals(List.of("minecraft:carrot", "@forg.*"), config.getBlacklist());
         assertFalse(config.isCropValid(ResourceLocation.fromNamespaceAndPath("minecraft", "carrot")));
-        assertFalse(config.isModValid("neoforge"));
+        assertFalse(config.isModValid("forge"));
     }
 }

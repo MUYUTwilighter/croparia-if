@@ -11,7 +11,7 @@
 
 1. 可直接写 JUnit（无需改造）
 2. 需要小程度解耦后可写 JUnit
-3. 更适合集成测试（Fabric Loader / NeoForge GameTest）
+3. 更适合集成测试（Fabric Loader / Forge GameTest）
 
 ## 当前测试现状（快速统计）
 
@@ -31,11 +31,11 @@
 - 将运行时依赖较强的新增测试迁移到 Fabric loader-backed 层：
   - `fabric/src/test/java/cool/muyucloud/croparia/api/generator/DataGeneratorFlowFabricTest.java`
   - `fabric/src/test/java/cool/muyucloud/croparia/api/core/recipe/container/RecipeContainerFabricTest.java`
-- 在 NeoForge JUnit 层新增镜像测试（以运行时可用性为前置）：
-  - `neoforge/src/test/java/cool/muyucloud/croparia/api/generator/DataGeneratorFlowNeoForgeTest.java`
-  - `neoforge/src/test/java/cool/muyucloud/croparia/api/core/recipe/container/RecipeContainerNeoForgeTest.java`
-- 为了让 NeoForge 测试可编译，补充了 `neoforge` 对 `:common` 的测试编译依赖：
-  - `neoforge/build.gradle` 增加 `testImplementation(project(path: ':common', configuration: 'namedElements'))`
+- 在 Forge JUnit 层新增镜像测试（以运行时可用性为前置）：
+  - `forge/src/test/java/cool/muyucloud/croparia/api/generator/DataGeneratorFlowForgeTest.java`
+  - `forge/src/test/java/cool/muyucloud/croparia/api/core/recipe/container/RecipeContainerForgeTest.java`
+- 为了让 Forge 测试可编译，补充了 `forge` 对 `:common` 的测试编译依赖：
+  - `forge/build.gradle` 增加 `testImplementation(project(path: ':common', configuration: 'namedElements'))`
 - 在迁移过程中修复生成器并发修改缺陷：
   - `LangGenerator.onGenerated` 改为对缓存条目快照遍历
   - `AggregatedGenerator.onGenerated` 改为对缓存条目快照遍历
@@ -110,14 +110,14 @@
 
 ## C. 更适合集成测试（不建议先用纯 JUnit）
 
-这类文件强依赖 Minecraft 世界状态、注册表、Block/Entity Tick 或 Mixin 注入点。优先用 Fabric Loader 测试或 NeoForge GameTest。
+这类文件强依赖 Minecraft 世界状态、注册表、Block/Entity Tick 或 Mixin 注入点。优先用 Fabric Loader 测试或 Forge GameTest。
 
 1. `common/src/main/java/cool/muyucloud/croparia/api/core/block/**`
 2. `common/src/main/java/cool/muyucloud/croparia/api/core/block/entity/**`
 3. `common/src/main/java/cool/muyucloud/croparia/api/core/item/**`
 4. `common/src/main/java/cool/muyucloud/croparia/mixin/**`
 5. `common/src/main/java/cool/muyucloud/croparia/registry/**`
-6. `fabric/src/main/java/**` 与 `neoforge/src/main/java/**` 的平台入口初始化类
+6. `fabric/src/main/java/**` 与 `forge/src/main/java/**` 的平台入口初始化类
 
 备注：`api/core/recipe/*.java`（如 `InfusorRecipe`/`SoakRecipe`/`RitualRecipe`）可先做“窄 JUnit”验证纯匹配逻辑，但涉及 `Items/Component/Registry` 的分支建议放入 loader-backed 测试。
 

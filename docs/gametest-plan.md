@@ -1,4 +1,4 @@
-# NeoForge GameTest 规划（2026-03-08）
+# Forge GameTest 规划（2026-03-08）
 
 ## 1. 目标
 
@@ -10,7 +10,7 @@
 ### 2.1 已由 JUnit 覆盖
 
 - `common`：codec/json/placeholder/repo/generator util/config/crop registry 等纯逻辑。
-- `fabric`/`neoforge` JUnit：loader 运行时可达性、部分运行时语义镜像。
+- `fabric`/`forge` JUnit：loader 运行时可达性、部分运行时语义镜像。
 
 ### 2.2 计划由 GameTest 覆盖
 
@@ -59,9 +59,9 @@
 
 ## 5. 执行方式
 
-1. 在 `neoforge/src/main/java/.../gametest/` 增加 `@GameTest` 方法。  
+1. 在 `forge/src/main/java/.../gametest/` 增加 `@GameTest` 方法。  
 2. 在对应结构目录增加模板（从 `minecraft:empty` 逐步迁移）。  
-3. 启动 `:neoforge:runServer` 后执行：`/test runall croparia`。  
+3. 启动 `:forge:runServer` 后执行：`/test runall croparia`。  
 4. 将失败案例回归到 JUnit（纯逻辑）或保留在 GameTest（世界交互）。
 
 ## 6. 里程碑与完成定义
