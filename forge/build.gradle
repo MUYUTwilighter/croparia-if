@@ -10,6 +10,10 @@ archives_name = "$archives_name-$minecraft_version"
 
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
+    mixin {
+        useLegacyMixinAp = true
+        defaultRefmapName = "croparia-if-${minecraft_version}-forge-forge-refmap.json"
+    }
     forge {
         convertAccessWideners = true
         extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
