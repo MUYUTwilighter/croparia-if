@@ -16,7 +16,7 @@ template = """
     {
       "item": "${material.result.id}",
       "count": ${material.result.amount},
-      "components": ${material.result.components}
+      "nbt": ${material.result.nbt}
     }
   ]
 }

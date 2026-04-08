@@ -7,7 +7,7 @@ template = """
   "ingredient": "${seed}",
   "result": {
     "id": "${material.result.id}",
-    "components": ${material.result.components},
+    "nbt": ${material.result.nbt},
     "amount": 4
   }
 }

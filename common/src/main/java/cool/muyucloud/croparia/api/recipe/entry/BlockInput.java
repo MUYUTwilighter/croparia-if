@@ -287,7 +287,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
         }
 
         @Override
-        public BlockInput deserialize(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
+        public @NotNull BlockInput deserialize(JsonObject jsonObject, JsonDeserializationContext jsonDeserializationContext) {
             return CodecUtil.getOrThrow(CodecUtil.decodeJson(jsonObject, CODEC_COMP.codec()), IllegalArgumentException::new);
         }
     }

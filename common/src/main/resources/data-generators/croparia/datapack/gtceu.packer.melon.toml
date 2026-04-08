@@ -29,7 +29,7 @@ template = """
                     "count": {material.result.amount},
                     "ingredient": {
                         "item": "${material.result.id}",
-                        "components": ${material.result.components}
+                        "nbt": ${material.result.nbt}
                     }
                 },
                 "chance": 10000,
