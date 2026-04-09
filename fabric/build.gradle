@@ -82,7 +82,6 @@ processResources {
 shadowJar {
     configurations = [project.configurations.shadowBundle]
     archiveClassifier = 'dev-shadow'
-    relocate 'io.github.wasabithumb.jtoml', 'cool.muyucloud.shadow.jtoml'
 }
 
 remapJar {
