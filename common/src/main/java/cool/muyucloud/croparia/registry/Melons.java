@@ -88,10 +88,8 @@ public class Melons {
     public static final Melon CREEPER_HEAD = vanilla("creeper_head", Blocks.CREEPER_HEAD, 0x00FF00, 5);
     public static final Melon SKELETON_SKULL = vanilla("skeleton_skull", Blocks.SKELETON_SKULL, 0xFFFFE0, 5);
     public static final Melon ZOMBIE_HEAD = vanilla("zombie_head", Blocks.ZOMBIE_HEAD, 0x00AA00, 5);
-
-    public static final Melon PIGLIN_HEAD = vanilla("piglin_head", Blocks.PIGLIN_HEAD, 0xFFD700, 6);
-
-    public static final Melon PLAYER_HEAD = vanilla("player_head", Blocks.PLAYER_HEAD, 0xFFDAB9, 7);
+    public static final Melon PIGLIN_HEAD = vanilla("piglin_head", Blocks.PIGLIN_HEAD, 0xFFD700, 5);
+    public static final Melon PLAYER_HEAD = vanilla("player_head", Blocks.PLAYER_HEAD, 0xFFDAB9, 5);
 
 
     public static void register() {

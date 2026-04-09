@@ -1,5 +1,5 @@
 registry = "croparia:crops"
-path = "croparia/recipes/gtceu/packer/${id.namespace}/${id.path}.json"
+path = "croparia/recipe/gtceu/packer/${id.namespace}/${id.path}.json"
 dependencies = "gtceu"
 template = """
 {
