@@ -5,8 +5,10 @@ import cool.muyucloud.croparia.api.crop.Crop;
 import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.registry.DgRegistries;
 import cool.muyucloud.croparia.util.text.Texts;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -15,10 +17,10 @@ import net.minecraft.world.level.block.SoundType;
 import org.jetbrains.annotations.NotNull;
 
 public class CropariaCropBlock extends CropBlock implements CropAccess<Crop> {
-    private final ResourceLocation cropId;
+    private final Identifier cropId;
 
     public CropariaCropBlock(Crop crop) {
-        super(Properties.of().noCollission().sound(SoundType.CROP));
+        super(Properties.of().noCollision().sound(SoundType.CROP).setId(ResourceKey.create(Registries.BLOCK, crop.getKey())));
         this.cropId = crop.getKey();
     }
 

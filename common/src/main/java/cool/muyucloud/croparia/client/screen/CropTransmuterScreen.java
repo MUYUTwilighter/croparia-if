@@ -4,11 +4,12 @@ import cool.muyucloud.croparia.api.core.menu.CropTransmuterMenu;
 import cool.muyucloud.croparia.api.core.network.CropTransmuterRedstoneModePacket;
 import cool.muyucloud.croparia.api.core.network.CropTransmuterSelectPacket;
 import cool.muyucloud.croparia.api.crop.util.Material;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuterMenu> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.withDefaultNamespace(
+    private static final Identifier TEXTURE = Identifier.withDefaultNamespace(
         "textures/gui/container/dispenser.png"
     );
     private static final int PANEL_CELL = 18;
@@ -77,7 +78,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     protected void renderBg(@NotNull GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         int left = this.leftPos;
         int top = this.topPos;
-        graphics.blit(TEXTURE, left, top, 0, 0, this.imageWidth, this.imageHeight);
+        graphics.blit(TEXTURE, left, top, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
         renderMachineSlots(graphics);
         renderSelectionPanel(graphics, mouseX, mouseY);
     }
@@ -151,7 +152,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         int hovered = getHoveredCandidateIndex(mouseX, mouseY, candidates.size());
         int start = getVisibleStart();
         int end = Math.min(start + PANEL_COLS * PANEL_ROWS, candidates.size());
-        ResourceLocation selected = this.getSelectedStack().getItem().arch$registryName();
+        Identifier selected = this.getSelectedStack().getItem().arch$registryName();
         for (int local = 0; local < PANEL_COLS * PANEL_ROWS; local++) {
             int col = local % PANEL_COLS;
             int row = local / PANEL_COLS;
@@ -171,7 +172,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
             }
             graphics.renderItem(stack, x + 1, y + 1);
             graphics.renderItemDecorations(this.font, stack, x + 1, y + 1);
-            ResourceLocation id = stack.getItem().arch$registryName();
+            Identifier id = stack.getItem().arch$registryName();
             if (selected != null && selected.equals(id)) {
                 graphics.renderOutline(x, y, PANEL_CELL, PANEL_CELL, PANEL_CELL_SELECTED);
             }
@@ -184,16 +185,16 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         if (candidates.isEmpty()) return;
         int hovered = getHoveredCandidateIndex(mouseX, mouseY, candidates.size());
         if (hovered >= 0 && hovered < candidates.size()) {
-            graphics.renderTooltip(this.font, candidates.get(hovered), mouseX, mouseY);
+            graphics.setTooltipForNextFrame(this.font, candidates.get(hovered), mouseX, mouseY);
         }
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (handleSelectionClick(mouseX, mouseY, button)) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
+        if (handleSelectionClick(event.x(), event.y(), event.button())) {
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, isDoubleClick);
     }
 
     private boolean handleSelectionClick(double mouseX, double mouseY, int button) {

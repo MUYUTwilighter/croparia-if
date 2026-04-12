@@ -1,7 +1,7 @@
 package cool.muyucloud.croparia.api.generator.util;
 
 import com.mojang.serialization.JsonOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -18,7 +18,7 @@ class PackCacheAndDgRegistryTest {
         DgRegistry<DummyEntry> mapRegistry = DgRegistry.ofMap(Map.of(one.getKey(), one, two.getKey(), two));
 
         assertEquals(Optional.of(one), mapRegistry.forName(one.getKey()));
-        assertFalse(mapRegistry.forName(ResourceLocation.fromNamespaceAndPath("croparia_test", "none")).isPresent());
+        assertFalse(mapRegistry.forName(Identifier.fromNamespaceAndPath("croparia_test", "none")).isPresent());
 
         DgRegistry<DummyEnumEntry> enumRegistry = DgRegistry.ofEnum(DummyEnumEntry.class);
         assertTrue(enumRegistry.forName(DummyEnumEntry.A.getKey()).isPresent());
@@ -27,7 +27,7 @@ class PackCacheAndDgRegistryTest {
 
     @Test
     void registryCodecRoundTripUsesRegisteredInstance() {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("croparia_test", "registry_" + UUID.randomUUID());
+        Identifier id = Identifier.fromNamespaceAndPath("croparia_test", "registry_" + UUID.randomUUID());
         DgRegistry<DummyEntry> registry = DgRegistry.ofMap(Map.of());
         DgRegistry.register(id, registry);
 
@@ -38,19 +38,19 @@ class PackCacheAndDgRegistryTest {
 
     @Test
     void getIdReturnsRegisteredId() {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("croparia_test", "registry_" + UUID.randomUUID());
+        Identifier id = Identifier.fromNamespaceAndPath("croparia_test", "registry_" + UUID.randomUUID());
         DgRegistry<DummyEntry> registry = DgRegistry.ofMap(Map.of());
         DgRegistry.register(id, registry);
         assertEquals(id, registry.getId());
     }
 
-    private record DummyEntry(ResourceLocation key) implements DgEntry {
+    private record DummyEntry(Identifier key) implements DgEntry {
         DummyEntry(String path) {
-            this(ResourceLocation.fromNamespaceAndPath("croparia_test", path));
+            this(Identifier.fromNamespaceAndPath("croparia_test", path));
         }
 
         @Override
-        public ResourceLocation getKey() {
+        public Identifier getKey() {
             return key;
         }
 
@@ -63,14 +63,14 @@ class PackCacheAndDgRegistryTest {
     private enum DummyEnumEntry implements DgEntry {
         A("a"), B("b");
 
-        private final ResourceLocation key;
+        private final Identifier key;
 
         DummyEnumEntry(String path) {
-            this.key = ResourceLocation.fromNamespaceAndPath("croparia_test", "enum_" + path);
+            this.key = Identifier.fromNamespaceAndPath("croparia_test", "enum_" + path);
         }
 
         @Override
-        public ResourceLocation getKey() {
+        public Identifier getKey() {
             return key;
         }
 

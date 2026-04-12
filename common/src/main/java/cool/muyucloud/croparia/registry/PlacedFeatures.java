@@ -4,7 +4,7 @@ import cool.muyucloud.croparia.CropariaIf;
 import dev.architectury.registry.level.biome.BiomeModifications;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -19,7 +19,7 @@ public class PlacedFeatures {
 
     public static final Map.Entry<GenerationStep.Decoration, ResourceKey<PlacedFeature>> ELEMATILIUS_ORE = register(
         GenerationStep.Decoration.UNDERGROUND_ORES,
-        context -> context.hasTag(TagKey.create(Registries.BIOME, ResourceLocation.tryParse("minecraft:is_overworld"))),
+        context -> context.hasTag(TagKey.create(Registries.BIOME, Identifier.tryParse("minecraft:is_overworld"))),
         "elematilius_ore"
     );
 

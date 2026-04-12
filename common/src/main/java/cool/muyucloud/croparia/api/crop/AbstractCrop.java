@@ -2,11 +2,11 @@ package cool.muyucloud.croparia.api.crop;
 
 import cool.muyucloud.croparia.api.crop.util.Material;
 import cool.muyucloud.croparia.api.generator.util.TranslatableEntry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractCrop<T> implements TranslatableEntry {
-    public static String defaultTranslation(ResourceLocation id) {
+    public static String defaultTranslation(Identifier id) {
         String name = id.getPath();
         name = name.replaceAll("_", " ").trim();
         StringBuilder builder = new StringBuilder();

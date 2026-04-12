@@ -6,6 +6,7 @@ import cool.muyucloud.croparia.CropariaIf;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.player.Player;
 
 import static net.minecraft.commands.CommandSourceStack.ERROR_NOT_PLAYER;
@@ -13,7 +14,7 @@ import static net.minecraft.commands.CommandSourceStack.ERROR_NOT_PLAYER;
 @SuppressWarnings("unused")
 public class CommonCommandRoot {
     private static final LiteralArgumentBuilder<CommandSourceStack> ROOT = Commands.literal("cropariaServer")
-        .requires(s -> s.hasPermission(2))
+        .requires(s -> s.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
         .then(CropCommand.buildCrop(false))
         .then(CropCommand.buildMelon(false))
         .then(GeneratorCommand.buildGenerator(false))

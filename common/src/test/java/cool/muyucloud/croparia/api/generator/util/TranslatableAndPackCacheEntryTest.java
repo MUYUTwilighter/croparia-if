@@ -1,7 +1,7 @@
 package cool.muyucloud.croparia.api.generator.util;
 
 import cool.muyucloud.croparia.api.placeholder.Template;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -13,7 +13,7 @@ class TranslatableAndPackCacheEntryTest {
     @Test
     void translatableEntryPlaceholderExposesIdAndTranslations() {
         TranslatableEntry entry = new DummyTranslatableEntry(
-            ResourceLocation.fromNamespaceAndPath("croparia_test", "sample"),
+            Identifier.fromNamespaceAndPath("croparia_test", "sample"),
             Map.of("en_us", "Apple", "zh_cn", "PingGuo")
         );
 
@@ -34,9 +34,9 @@ class TranslatableAndPackCacheEntryTest {
         assertEquals("v1", a.getCache().orElseThrow());
     }
 
-    private record DummyTranslatableEntry(ResourceLocation key, Map<String, String> translations) implements TranslatableEntry {
+    private record DummyTranslatableEntry(Identifier key, Map<String, String> translations) implements TranslatableEntry {
         @Override
-        public ResourceLocation getKey() {
+        public Identifier getKey() {
             return key;
         }
 

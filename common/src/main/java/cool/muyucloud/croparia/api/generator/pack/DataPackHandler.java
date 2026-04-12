@@ -3,7 +3,7 @@ package cool.muyucloud.croparia.api.generator.pack;
 import com.google.gson.JsonObject;
 import cool.muyucloud.croparia.api.generator.util.AlwaysEnabledFileResourcePackProvider;
 import cool.muyucloud.croparia.mixin.PackRepositoryMixin;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.PackSource;
@@ -22,7 +22,7 @@ import java.util.function.Supplier;
  *
  */
 public class DataPackHandler extends PackHandler {
-    public static final Map<ResourceLocation, DataPackHandler> REGISTRY = new HashMap<>();
+    public static final Map<Identifier, DataPackHandler> REGISTRY = new HashMap<>();
 
     public static <P extends DataPackHandler> P register(P pack) {
         REGISTRY.put(pack.getId(), pack);
@@ -33,7 +33,7 @@ public class DataPackHandler extends PackHandler {
     /**
      * Register a new data pack handler so that it will be loaded by Minecraft.
      */
-    public static DataPackHandler register(ResourceLocation id, Path path, JsonObject meta, Supplier<Boolean> override) {
+    public static DataPackHandler register(Identifier id, Path path, JsonObject meta, Supplier<Boolean> override) {
         return register(new DataPackHandler(id, path, meta, override));
     }
 
@@ -41,7 +41,7 @@ public class DataPackHandler extends PackHandler {
         this.getId().toString(), getRoot(), PackType.SERVER_DATA, PackSource.BUILT_IN
     );
 
-    public DataPackHandler(ResourceLocation id, Path path, JsonObject meta, Supplier<Boolean> override) {
+    public DataPackHandler(Identifier id, Path path, JsonObject meta, Supplier<Boolean> override) {
         super(id, path, meta, override);
     }
 

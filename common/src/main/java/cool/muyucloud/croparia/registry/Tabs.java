@@ -8,7 +8,7 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.function.Supplier;
@@ -48,6 +48,6 @@ public class Tabs {
     }
 
     public static CreativeModeTab get(String id) {
-        return BuiltInRegistries.CREATIVE_MODE_TAB.get(ResourceLocation.tryBuild(CropariaIf.MOD_ID, id));
+        return BuiltInRegistries.CREATIVE_MODE_TAB.getValue(Identifier.tryBuild(CropariaIf.MOD_ID, id));
     }
 }

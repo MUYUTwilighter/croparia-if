@@ -16,7 +16,7 @@ import cool.muyucloud.croparia.util.Ref;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -37,10 +37,10 @@ import java.util.regex.Pattern;
  */
 public abstract class PackHandler {
     public static final Gson GSON = new Gson();
-    private static final Map<ResourceLocation, PackHandler> PACKS = new HashMap<>();  // For command suggestion only
+    private static final Map<Identifier, PackHandler> PACKS = new HashMap<>();  // For command suggestion only
     private static final Pattern PATTERN = Pattern.compile("^data-generators/([^/]+)/([^/]+)/[^/]+$");
-    private static final LazySupplier<Map<ResourceLocation, Collection<JarJarEntry>>> BUILTIN_GENERATORS = LazySupplier.of(() -> {
-        Map<ResourceLocation, Collection<JarJarEntry>> map = new HashMap<>();
+    private static final LazySupplier<Map<Identifier, Collection<JarJarEntry>>> BUILTIN_GENERATORS = LazySupplier.of(() -> {
+        Map<Identifier, Collection<JarJarEntry>> map = new HashMap<>();
         forEachJar((file, modId) -> {
             if (file.isFile() && file.getName().endsWith(".jar")) {
                 try (JarFile jar = new JarFile(file)) {
@@ -50,7 +50,7 @@ public abstract class PackHandler {
                         String name = entry.getName();
                         Matcher matcher = PATTERN.matcher(name);
                         if (matcher.find()) {
-                            ResourceLocation id = ResourceLocation.tryBuild(matcher.group(1), matcher.group(2));
+                            Identifier id = Identifier.tryBuild(matcher.group(1), matcher.group(2));
                             if (id == null) {
                                 DataGenerator.LOGGER.error("Invalid generator entry \"%s\" in mod \"%s\"".formatted(name, modId));
                                 continue;
@@ -79,7 +79,7 @@ public abstract class PackHandler {
         PACKS.values().forEach(consumer);
     }
 
-    public static Optional<PackHandler> byId(ResourceLocation id) {
+    public static Optional<PackHandler> byId(Identifier id) {
         return Optional.ofNullable(PACKS.get(id));
     }
 
@@ -88,18 +88,18 @@ public abstract class PackHandler {
         throw new NotImplementedException("Not implemented");
     }
 
-    public static Collection<JarJarEntry> getBuiltinGenerators(ResourceLocation id) {
+    public static Collection<JarJarEntry> getBuiltinGenerators(Identifier id) {
         return BUILTIN_GENERATORS.get().getOrDefault(id, List.of());
     }
 
-    protected final ResourceLocation id;
+    protected final Identifier id;
     protected final Path root;
     protected final JsonObject meta;
     protected final transient Supplier<Boolean> override;
     protected final transient PackCache cache = new PackCache();
     protected final transient Map<String, DataGenerator> generators = new HashMap<>();
 
-    public PackHandler(ResourceLocation id, Path path, JsonObject meta, Supplier<Boolean> override) {
+    public PackHandler(Identifier id, Path path, JsonObject meta, Supplier<Boolean> override) {
         this.id = id;
         this.root = path;
         this.meta = meta;
@@ -129,7 +129,7 @@ public abstract class PackHandler {
         return this.override.get();
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return this.id;
     }
 

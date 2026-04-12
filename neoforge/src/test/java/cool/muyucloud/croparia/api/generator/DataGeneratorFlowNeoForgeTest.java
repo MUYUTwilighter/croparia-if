@@ -6,7 +6,7 @@ import cool.muyucloud.croparia.api.generator.util.DgEntry;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.api.generator.util.TranslatableEntry;
 import cool.muyucloud.croparia.api.placeholder.Template;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
@@ -59,7 +59,7 @@ class DataGeneratorFlowNeoForgeTest {
         DataGenerator generator = new DataGenerator(
             true,
             true,
-            List.of(second.getKey(), ResourceLocation.fromNamespaceAndPath("croparia_test", "missing")),
+            List.of(second.getKey(), Identifier.fromNamespaceAndPath("croparia_test", "missing")),
             new Template("${id}.json"),
             DgRegistry.ofMap(linkedMap(first, second)),
             new Template("selected=${id}")
@@ -145,8 +145,8 @@ class DataGeneratorFlowNeoForgeTest {
     }
 
     @SafeVarargs
-    private static <E extends DgEntry> Map<ResourceLocation, E> linkedMap(E... entries) {
-        Map<ResourceLocation, E> map = new LinkedHashMap<>();
+    private static <E extends DgEntry> Map<Identifier, E> linkedMap(E... entries) {
+        Map<Identifier, E> map = new LinkedHashMap<>();
         for (E entry : entries) {
             map.put(entry.getKey(), entry);
         }
@@ -164,7 +164,7 @@ class DataGeneratorFlowNeoForgeTest {
     private static final class TestPackHandler extends PackHandler {
         private TestPackHandler(Path root) {
             super(
-                ResourceLocation.fromNamespaceAndPath("croparia_test", "pack_" + UUID.randomUUID()),
+                Identifier.fromNamespaceAndPath("croparia_test", "pack_" + UUID.randomUUID()),
                 root,
                 new JsonObject(),
                 () -> false
@@ -179,13 +179,13 @@ class DataGeneratorFlowNeoForgeTest {
         }
     }
 
-    private record TestEntry(ResourceLocation key, boolean load) implements DgEntry {
+    private record TestEntry(Identifier key, boolean load) implements DgEntry {
         private TestEntry(String path, boolean load) {
-            this(ResourceLocation.fromNamespaceAndPath("croparia_test", path), load);
+            this(Identifier.fromNamespaceAndPath("croparia_test", path), load);
         }
 
         @Override
-        public ResourceLocation getKey() {
+        public Identifier getKey() {
             return key;
         }
 
@@ -196,12 +196,12 @@ class DataGeneratorFlowNeoForgeTest {
     }
 
     private static final class TestTranslatableEntry implements TranslatableEntry {
-        private final ResourceLocation key;
+        private final Identifier key;
         private final String translationKey;
         private final Map<String, String> translations;
 
         private TestTranslatableEntry(String path, String translationKey, Map<String, String> translations) {
-            this.key = ResourceLocation.fromNamespaceAndPath("croparia_test", path);
+            this.key = Identifier.fromNamespaceAndPath("croparia_test", path);
             this.translationKey = translationKey;
             this.translations = translations;
         }
@@ -227,7 +227,7 @@ class DataGeneratorFlowNeoForgeTest {
         }
 
         @Override
-        public ResourceLocation getKey() {
+        public Identifier getKey() {
             return key;
         }
 

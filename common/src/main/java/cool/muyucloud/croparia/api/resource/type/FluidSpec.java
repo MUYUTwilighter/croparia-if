@@ -10,7 +10,7 @@ import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.component.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.NotNull;
@@ -21,9 +21,9 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class FluidSpec implements TypedResource<Fluid>, DataComponentHolder {
     public static final MapCodec<FluidSpec> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.fieldOf("id").forGetter(fluidSpec -> fluidSpec.getResource().arch$registryName()),
+        Identifier.CODEC.fieldOf("id").forGetter(fluidSpec -> fluidSpec.getResource().arch$registryName()),
         DataComponentMap.CODEC.fieldOf("components").forGetter(FluidSpec::getComponents)
-    ).apply(instance, (id, nbt) -> new FluidSpec(BuiltInRegistries.FLUID.get(id), nbt)));
+    ).apply(instance, (id, nbt) -> new FluidSpec(BuiltInRegistries.FLUID.getValue(id), nbt)));
     public static final FluidSpec EMPTY = FluidSpec.of(Fluids.EMPTY);
     public static final TypeToken<FluidSpec> TYPE = TypeToken.register(CropariaIf.of("fluid_spec"), EMPTY, CODEC).orElseThrow();
 
@@ -101,7 +101,7 @@ public class FluidSpec implements TypedResource<Fluid>, DataComponentHolder {
         return this.getResource() == spec.getResource() && this.getComponents().equals(spec.getComponents());
     }
 
-    public boolean is(@NotNull ResourceLocation tag) {
+    public boolean is(@NotNull Identifier tag) {
         return TagUtil.isIn(Registries.FLUID, tag, this.getResource());
     }
 

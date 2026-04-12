@@ -18,15 +18,15 @@ package cool.muyucloud.croparia.compat.emi;
 //        CropariaIf.LOGGER.debug("Registering emi recipes...");
 //        registry.addCategory(EmiInfusorRecipe.CATEGORY);
 //        registry.addWorkstation(EmiInfusorRecipe.CATEGORY, EmiInfusorRecipe.WORKSTATION);
-//        for (RecipeHolder<InfusorRecipe> holder : registry.getRecipeManager().getAllRecipesFor(RecipeTypes.INFUSOR.get())) {
+//        for (RecipeHolder<InfusorRecipe> holder : registry.recipeAccess().getAllRecipesFor(RecipeTypes.INFUSOR.get())) {
 //            registry.addRecipe(new EmiInfusorRecipe(holder));
 //        }
 //        registry.addCategory(EmiRitualRecipe.CATEGORY);
-//        for (RecipeHolder<RitualRecipe> holder : registry.getRecipeManager().getAllRecipesFor(RecipeTypes.RITUAL.get())) {
+//        for (RecipeHolder<RitualRecipe> holder : registry.recipeAccess().getAllRecipesFor(RecipeTypes.RITUAL.get())) {
 //            registry.addRecipe(new EmiRitualRecipe(holder));
 //        }
 //        registry.addCategory(EmiRitualStructure.CATEGORY);
-//        for (RecipeHolder<RitualStructure> holder : registry.getRecipeManager().getAllRecipesFor(RecipeTypes.RITUAL_STRUCTURE.get())) {
+//        for (RecipeHolder<RitualStructure> holder : registry.recipeAccess().getAllRecipesFor(RecipeTypes.RITUAL_STRUCTURE.get())) {
 //            registry.addRecipe(new EmiRitualStructure(holder));
 //        }
 //    }

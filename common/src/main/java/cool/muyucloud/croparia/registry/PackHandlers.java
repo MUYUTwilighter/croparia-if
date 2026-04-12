@@ -12,7 +12,7 @@ public class PackHandlers {
     public static final DataPackHandler DATAPACK = DataPackHandler.register(
         CropariaIf.of("datapack"), CropariaIf.CONFIG.getFilePath().resolve("datapack"), JsonBuilder.map(
             "pack", JsonBuilder.map(
-                "pack_format", SharedConstants.getCurrentVersion().getPackVersion(PackType.SERVER_DATA),
+                "pack_format", SharedConstants.getCurrentVersion().packVersion(PackType.SERVER_DATA).major(),
                 "description", "Croparia mandatory datapack, please do not modify"
             )
         ), CropariaIf.CONFIG::getOverride
@@ -20,7 +20,7 @@ public class PackHandlers {
     public static final ResourcePackHandler RESOURCEPACK = ResourcePackHandler.register(
         CropariaIf.of("resourcepack"), CropariaIf.CONFIG.getFilePath().resolve("resourcepack"), JsonBuilder.map(
             "pack", JsonBuilder.map(
-                "pack_format", SharedConstants.getCurrentVersion().getPackVersion(PackType.CLIENT_RESOURCES),
+                "pack_format", SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES).major(),
                 "description", "Croparia mandatory resourcepack, please do not modify"
             )
         ), CropariaIf.CONFIG::getOverride

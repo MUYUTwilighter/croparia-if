@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.api.generator.util;
 
 import com.mojang.logging.LogUtils;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.minecraft.FileUtil;
+import net.minecraft.util.FileUtil;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackSelectionConfig;
 import net.minecraft.server.packs.PackType;

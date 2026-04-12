@@ -10,12 +10,13 @@ import java.util.Collection;
 
 @Mixin(RecipeManager.class)
 public abstract class RecipeManagerMixin implements RecipeManagerAccess {
+
     @Shadow
-    protected abstract <I extends RecipeInput, T extends Recipe<I>> Collection<RecipeHolder<T>> byType(RecipeType<T> type);
+    private RecipeMap recipes;
 
     @Unique
     @Override
     public <I extends RecipeInput, R extends Recipe<I>> Collection<RecipeHolder<R>> cif$byType(RecipeType<R> type) {
-        return this.byType(type);
+        return this.recipes.byType(type);
     }
 }

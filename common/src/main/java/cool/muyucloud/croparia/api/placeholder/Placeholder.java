@@ -11,7 +11,7 @@ import cool.muyucloud.croparia.api.recipe.entry.BlockOutput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -62,10 +62,10 @@ public class Placeholder<T> implements RegexParser<T> {
     });
     public static final Placeholder<JsonObject> JSON_OBJECT = Placeholder.buildMap(TypeMapper.of(MapReader::json), Placeholder.JSON, builder -> builder);
     public static final Placeholder<JsonArray> JSON_ARRAY = Placeholder.buildList(TypeMapper.of(ListReader::jsonArray), Placeholder.JSON, builder -> builder);
-    public static final Placeholder<ResourceLocation> ID = Placeholder.build(node -> node
-        .self(RegexParser.of(ResourceLocation::toString))
-        .then(PatternKey.literal("namespace"), RegexParser.of(ResourceLocation::getNamespace))
-        .then(PatternKey.literal("path"), RegexParser.of(ResourceLocation::getPath))
+    public static final Placeholder<Identifier> ID = Placeholder.build(node -> node
+        .self(RegexParser.of(Identifier::toString))
+        .then(PatternKey.literal("namespace"), RegexParser.of(Identifier::getNamespace))
+        .then(PatternKey.literal("path"), RegexParser.of(Identifier::getPath))
     );
     public static final Placeholder<DataComponentPatch> DATA_COMPONENTS = lazy(Builtins::dataComponents);
     public static final Placeholder<BlockOutput> BLOCK_OUTPUT = lazy(Builtins::blockOutput);

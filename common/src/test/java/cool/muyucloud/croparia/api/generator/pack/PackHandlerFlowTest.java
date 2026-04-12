@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.api.generator.pack;
 
 import com.google.gson.JsonObject;
 import cool.muyucloud.croparia.api.generator.DataGenerator;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -50,7 +50,7 @@ class PackHandlerFlowTest {
 
         private ProbePackHandler(Path root, boolean override) {
             super(
-                ResourceLocation.fromNamespaceAndPath("croparia_test", "pack_" + UUID.randomUUID()),
+                Identifier.fromNamespaceAndPath("croparia_test", "pack_" + UUID.randomUUID()),
                 root,
                 new JsonObject(),
                 () -> override

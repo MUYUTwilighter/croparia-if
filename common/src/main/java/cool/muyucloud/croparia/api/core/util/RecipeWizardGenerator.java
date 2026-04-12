@@ -28,7 +28,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -80,30 +80,30 @@ public class RecipeWizardGenerator {
         }
     }
 
-    protected static final Map<ResourceLocation, ArrayList<Placeholder<UseOnContext>>> EXTENSIONS = new HashMap<>();
+    protected static final Map<Identifier, ArrayList<Placeholder<UseOnContext>>> EXTENSIONS = new HashMap<>();
 
-    public static Placeholder<UseOnContext> register(ResourceLocation id, Placeholder<UseOnContext> placeholder) {
+    public static Placeholder<UseOnContext> register(Identifier id, Placeholder<UseOnContext> placeholder) {
         ArrayList<Placeholder<UseOnContext>> list = EXTENSIONS.computeIfAbsent(id, k -> new ArrayList<>());
         list.add(placeholder);
         list.trimToSize();
         return placeholder;
     }
 
-    public static Placeholder<UseOnContext> register(ResourceLocation id, Pattern key, TypeMapper<UseOnContext, String> function) {
+    public static Placeholder<UseOnContext> register(Identifier id, Pattern key, TypeMapper<UseOnContext, String> function) {
         return register(id, key, function, Placeholder.STRING);
     }
 
-    public static <T> Placeholder<UseOnContext> register(ResourceLocation id, Pattern key, TypeMapper<UseOnContext, T> function, Placeholder<T> parser) {
+    public static <T> Placeholder<UseOnContext> register(Identifier id, Pattern key, TypeMapper<UseOnContext, T> function, Placeholder<T> parser) {
         return register(id, Placeholder.build(builder -> builder.then(key, function, parser)));
     }
 
     public static final Placeholder<UseOnContext> TIMESTAMP = register(
-        ResourceLocation.parse("default"),
+        Identifier.parse("default"),
         Pattern.compile("^datetime$"),
         TypeMapper.of(context -> LocalDateTime.now().format(FORMATTER))
     );
     public static final Placeholder<UseOnContext> MAIN_HAND = register(
-        ResourceLocation.parse("default"), Pattern.compile("^main_hand$"), TypeMapper.of(context -> {
+        Identifier.parse("default"), Pattern.compile("^main_hand$"), TypeMapper.of(context -> {
             ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.MAIN_HAND);
             if (stack.isEmpty()) {
                 Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.main_hand"));
@@ -114,7 +114,7 @@ public class RecipeWizardGenerator {
         }), Placeholder.ITEM_OUTPUT
     );
     public static final Placeholder<UseOnContext> OFF_HAND = register(
-        ResourceLocation.parse("default"), Pattern.compile("^off_hand$"), TypeMapper.of(context -> {
+        Identifier.parse("default"), Pattern.compile("^off_hand$"), TypeMapper.of(context -> {
             ItemStack stack = Objects.requireNonNull(context.getPlayer()).getItemInHand(InteractionHand.OFF_HAND);
             if (stack.isEmpty()) {
                 Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.off_hand"));
@@ -125,7 +125,7 @@ public class RecipeWizardGenerator {
         }), Placeholder.ITEM_OUTPUT
     );
     public static final Placeholder<UseOnContext> ITEM = register(
-        ResourceLocation.parse("default"), Pattern.compile("^item$"), TypeMapper.of(context -> {
+        Identifier.parse("default"), Pattern.compile("^item$"), TypeMapper.of(context -> {
             List<ItemEntity> entities = context.getLevel().getEntities(
                 EntityTypeTest.forClass(ItemEntity.class),
                 new AABB(context.getClickedPos()),
@@ -141,7 +141,7 @@ public class RecipeWizardGenerator {
         }), Placeholder.ITEM_OUTPUT
     );
     public static final Placeholder<UseOnContext> BLOCK_GENERIC = register(
-        ResourceLocation.parse("default"), Placeholder.build(builder -> builder.then(
+        Identifier.parse("default"), Placeholder.build(builder -> builder.then(
             PatternKey.literal("block"), TypeMapper.of(context -> {
                 BlockPos pos = context.getClickedPos();
                 BlockState state = context.getLevel().getBlockState(pos);
@@ -166,7 +166,7 @@ public class RecipeWizardGenerator {
                     return Optional.of(BlockOutput.of(state));
                 }, Placeholder.BLOCK_OUTPUT
             ).then(PatternKey.literal("facing"), (context, placeholder1, matcher) -> {
-                    Vec3i offset = context.getClickedFace().getNormal();
+                    Vec3i offset = context.getClickedFace().getUnitVec3i();
                     BlockPos pos = context.getClickedPos().offset(offset);
                     BlockState state = context.getLevel().getBlockState(pos);
                     if (state.isAir()) {
@@ -178,7 +178,7 @@ public class RecipeWizardGenerator {
                 }, Placeholder.BLOCK_OUTPUT
             ).then(
                 PatternKey.literal("opposite"), (context, placeholder1, matcher) -> {
-                    Vec3i offset = context.getClickedFace().getOpposite().getNormal();
+                    Vec3i offset = context.getClickedFace().getOpposite().getUnitVec3i();
                     BlockPos pos = context.getClickedPos().offset(offset);
                     BlockState state = context.getLevel().getBlockState(pos);
                     if (state.isAir()) {
@@ -190,7 +190,7 @@ public class RecipeWizardGenerator {
                 }, Placeholder.BLOCK_OUTPUT
             ).then(
                 PatternKey.literal("left"), (context, placeholder1, matcher) -> {
-                    Vec3i offset = context.getClickedFace().getClockWise().getNormal();
+                    Vec3i offset = context.getClickedFace().getClockWise().getUnitVec3i();
                     BlockPos pos = context.getClickedPos().offset(offset);
                     BlockState state = context.getLevel().getBlockState(pos);
                     if (state.isAir()) {
@@ -202,7 +202,7 @@ public class RecipeWizardGenerator {
                 }, Placeholder.BLOCK_OUTPUT
             ).then(
                 PatternKey.literal("right"), (context, placeholder1, matcher) -> {
-                    Vec3i offset = context.getClickedFace().getCounterClockWise().getNormal();
+                    Vec3i offset = context.getClickedFace().getCounterClockWise().getUnitVec3i();
                     BlockPos pos = context.getClickedPos().offset(offset);
                     BlockState state = context.getLevel().getBlockState(pos);
                     if (state.isAir()) {
@@ -216,7 +216,7 @@ public class RecipeWizardGenerator {
         ))
     );
     public static final Placeholder<UseOnContext> BLOCK = register(
-        ResourceLocation.parse("default"), Pattern.compile("^block$"), TypeMapper.of(context -> {
+        Identifier.parse("default"), Pattern.compile("^block$"), TypeMapper.of(context -> {
             Level level = context.getLevel();
             BlockState block = level.getBlockState(context.getClickedPos());
             if (block.isAir()) {
@@ -227,11 +227,11 @@ public class RecipeWizardGenerator {
             return BlockOutput.of(block);
         }), Placeholder.BLOCK_OUTPUT
     );
-    public static final Placeholder<UseOnContext> NEIGHBOR = register(ResourceLocation.parse("default"), Pattern.compile("^neighbor$"), TypeMapper.of(context -> {
+    public static final Placeholder<UseOnContext> NEIGHBOR = register(Identifier.parse("default"), Pattern.compile("^neighbor$"), TypeMapper.of(context -> {
         Level level = context.getLevel();
         for (Direction direction : Direction.values()) {
             if (direction == Direction.UP || direction == Direction.DOWN) continue;
-            BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getNormal()));
+            BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getUnitVec3i()));
             if (!state.isAir()) {
                 return BlockOutput.of(state);
             }
@@ -240,7 +240,7 @@ public class RecipeWizardGenerator {
         Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.neighbor"));
         throw new ReplaceException();
     }), Placeholder.BLOCK_OUTPUT);
-    public static final Placeholder<UseOnContext> BELOW = register(ResourceLocation.parse("default"), Pattern.compile("^below$"), TypeMapper.of(context -> {
+    public static final Placeholder<UseOnContext> BELOW = register(Identifier.parse("default"), Pattern.compile("^below$"), TypeMapper.of(context -> {
         Level level = context.getLevel();
         BlockState state = level.getBlockState(context.getClickedPos().below());
         if (state.isAir()) {
@@ -289,7 +289,7 @@ public class RecipeWizardGenerator {
             throw new ReplaceException();
         }
     }));
-    public static final Placeholder<UseOnContext> FURNACE_INPUT = register(ResourceLocation.parse("furnace"), Pattern.compile("^furnace_input$"), TypeMapper.of(context -> {
+    public static final Placeholder<UseOnContext> FURNACE_INPUT = register(Identifier.parse("furnace"), Pattern.compile("^furnace_input$"), TypeMapper.of(context -> {
         BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
         if (be instanceof AbstractFurnaceBlockEntity furnace) {
             ItemStack stack = furnace.getItem(0);
@@ -303,7 +303,7 @@ public class RecipeWizardGenerator {
         }
         throw new ReplaceException();
     }), Placeholder.ITEM_OUTPUT);
-    public static final Placeholder<UseOnContext> FURNACE_TIME = register(ResourceLocation.parse("furnace"), Pattern.compile("^furnace_time$"), TypeMapper.of(context -> {
+    public static final Placeholder<UseOnContext> FURNACE_TIME = register(Identifier.parse("furnace"), Pattern.compile("^furnace_time$"), TypeMapper.of(context -> {
         BlockEntity be = context.getLevel().getBlockEntity(context.getClickedPos());
         if (!(be instanceof AbstractFurnaceBlockEntity furnace)) {
             Texts.overlay(Objects.requireNonNull(context.getPlayer()), Texts.translatable("overlay.croparia.recipe_wizard.furnace.no_furnace"));
@@ -322,7 +322,7 @@ public class RecipeWizardGenerator {
         return String.valueOf(((AbstractFurnaceBlockEntityAccess) furnace).cif$getBurnDuration(fuel) * fuel.getCount());
     }));
 
-    protected static Collection<Placeholder<UseOnContext>> getExtensions(ResourceLocation id) {
+    protected static Collection<Placeholder<UseOnContext>> getExtensions(Identifier id) {
         return EXTENSIONS.getOrDefault(id, new ArrayList<>());
     }
 
@@ -331,7 +331,7 @@ public class RecipeWizardGenerator {
         Dependencies.CODEC.optionalFieldOf("dependencies", Dependencies.EMPTY).forGetter(RecipeWizardGenerator::getDependencies),
         BlockInput.CODEC.fieldOf("block").forGetter(RecipeWizardGenerator::getBlock),
         Template.CODEC.fieldOf("path").forGetter(RecipeWizardGenerator::getPath),
-        CodecUtil.listOf(ResourceLocation.CODEC).optionalFieldOf("extensions", List.of()).forGetter(RecipeWizardGenerator::getExtensions),
+        CodecUtil.listOf(Identifier.CODEC).optionalFieldOf("extensions", List.of()).forGetter(RecipeWizardGenerator::getExtensions),
         Template.CODEC.fieldOf("template").forGetter(RecipeWizardGenerator::getTemplate)
     ).apply(instance, RecipeWizardGenerator::new));
 
@@ -339,23 +339,23 @@ public class RecipeWizardGenerator {
     private final Dependencies dependencies;
     private final BlockInput block;
     private final Template path;
-    private final List<ResourceLocation> extensions;
+    private final List<Identifier> extensions;
     private final Template template;
     private final transient Placeholder<UseOnContext> placeholder;
 
-    public RecipeWizardGenerator(boolean enabled, Dependencies dependencies, BlockInput block, Template path, List<ResourceLocation> extensions, Template template) {
+    public RecipeWizardGenerator(boolean enabled, Dependencies dependencies, BlockInput block, Template path, List<Identifier> extensions, Template template) {
         this.enabled = enabled;
         this.dependencies = dependencies;
         this.block = block;
         this.path = path;
-        this.extensions = extensions instanceof ImmutableList<ResourceLocation> immutable ? immutable : ImmutableList.copyOf(extensions);
+        this.extensions = extensions instanceof ImmutableList<Identifier> immutable ? immutable : ImmutableList.copyOf(extensions);
         this.template = template;
         this.placeholder = Placeholder.build(builder -> {
-            Collection<Placeholder<UseOnContext>> defaults = getExtensions(ResourceLocation.parse("default"));
+            Collection<Placeholder<UseOnContext>> defaults = getExtensions(Identifier.parse("default"));
             for (Placeholder<UseOnContext> p : defaults) {
                 builder.overwrite(p, TypeMapper.identity());
             }
-            for (ResourceLocation id : this.getExtensions()) {
+            for (Identifier id : this.getExtensions()) {
                 Collection<Placeholder<UseOnContext>> extension = getExtensions(id);
                 for (Placeholder<UseOnContext> p : extension) {
                     builder.overwrite(p, TypeMapper.identity());
@@ -381,7 +381,7 @@ public class RecipeWizardGenerator {
         return dependencies;
     }
 
-    public List<ResourceLocation> getExtensions() {
+    public List<Identifier> getExtensions() {
         return extensions;
     }
 

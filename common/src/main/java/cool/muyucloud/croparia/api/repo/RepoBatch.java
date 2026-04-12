@@ -72,7 +72,7 @@ public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<
             return;
         }
         for (int i = 0; i < units.size(); i++) {
-            CompoundTag unit = nbt.getCompound(i);
+            CompoundTag unit = nbt.getCompoundOrEmpty(i);
             units.get(i).load(unit);
         }
     }

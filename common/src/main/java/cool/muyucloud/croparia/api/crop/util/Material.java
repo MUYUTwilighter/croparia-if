@@ -8,7 +8,7 @@ import cool.muyucloud.croparia.util.TagUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,17 +27,17 @@ public abstract class Material<T> {
 
     protected final boolean tag;
     @NotNull
-    protected final ResourceLocation id;
+    protected final Identifier id;
     protected final int count;
 
     public Material(@NotNull String name, int count) {
         this.count = count;
         if (name.startsWith("#")) {
             this.tag = true;
-            this.id = ResourceLocation.parse(name.substring(1));
+            this.id = Identifier.parse(name.substring(1));
         } else {
             this.tag = false;
-            this.id = ResourceLocation.parse(name);
+            this.id = Identifier.parse(name);
         }
     }
 
@@ -45,7 +45,7 @@ public abstract class Material<T> {
         return tag;
     }
 
-    public @NotNull ResourceLocation getId() {
+    public @NotNull Identifier getId() {
         return id;
     }
 
@@ -63,7 +63,7 @@ public abstract class Material<T> {
      *
      * @see #candidates()
      */
-    protected Collection<T> rawCandidates(ResourceLocation registryName) {
+    protected Collection<T> rawCandidates(Identifier registryName) {
         @Nullable
         Registry<T> registry = CifUtil.castUnsafe(BuiltInRegistries.REGISTRY.get(registryName));
         if (registry == null) {
@@ -78,7 +78,7 @@ public abstract class Material<T> {
             }
             return result;
         } else {
-            T value = registry.get(this.getId());
+            T value = registry.getValue(this.getId());
             if (value != null) {
                 return Collections.singletonList(value);
             } else {
@@ -94,7 +94,7 @@ public abstract class Material<T> {
     /**
      * Get filtered candidate entries
      *
-     * @see #rawCandidates(ResourceLocation)
+     * @see #rawCandidates(Identifier)
      */
     public abstract @NotNull List<T> candidates();
 

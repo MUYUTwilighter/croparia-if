@@ -5,8 +5,10 @@ import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.api.crop.Melon;
 import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.text.Texts;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +20,7 @@ public class MelonSeed extends BlockItem implements CropAccess<Melon> {
     public MelonSeed(Melon melon) {
         super(
             melon.getStem().get(),
-            new Properties().arch$tab(Tabs.MELONS)
+            new Properties().arch$tab(Tabs.MELONS).setId(ResourceKey.create(Registries.ITEM, melon.getKey()))
         );
         this.melon = melon;
     }

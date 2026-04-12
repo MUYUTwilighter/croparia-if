@@ -8,6 +8,7 @@ import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.config.ConfigObject;
 import me.shedaniel.rei.api.client.gui.widgets.CloseableScissors;
 import me.shedaniel.rei.api.client.gui.widgets.WidgetWithBounds;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.GuiGraphics;
 import org.joml.Matrix4f;
 
@@ -96,24 +97,24 @@ public class PatchedOverflow extends PatchedTranslatable {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (containsMouse(mouseX, mouseY)) {
-            if (button == 0) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
+        if (containsMouse(event.x(), event.y())) {
+            if (event.button() == 0) {
                 setDragging(true);
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, isDoubleClick);
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (isDragging() && button == 0) {
+    public boolean mouseReleased(MouseButtonEvent event) {
+        if (isDragging() && event.button() == 0) {
             setDragging(false);
         }
         if (draggedX < 1 && draggedY < 1) {
             draggedX = 0;
             draggedY = 0;
-            return super.mouseReleased(mouseX, mouseY, button);
+            return super.mouseReleased(event);
         }
         draggedX = 0;
         draggedY = 0;
@@ -121,10 +122,10 @@ public class PatchedOverflow extends PatchedTranslatable {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
         draggedX += deltaX;
         draggedY += deltaY;
-        if (isDragging() && button == 0) {
+        if (isDragging() && event.button() == 0) {
             double newXTranslate = translate.target().x;
             double newYTranslate = translate.target().y;
             newXTranslate += deltaX * scale.doubleValue();
@@ -135,6 +136,6 @@ public class PatchedOverflow extends PatchedTranslatable {
             return true;
         }
 
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return super.mouseDragged(event, deltaX, deltaY);
     }
 }

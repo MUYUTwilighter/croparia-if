@@ -9,7 +9,7 @@ import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import dev.architectury.registry.registries.DeferredRegister;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class Recipes {
-    private static final Map<ResourceLocation, TypedSerializer<?>> TYPES = new HashMap<>();
+    private static final Map<Identifier, TypedSerializer<?>> TYPES = new HashMap<>();
     private static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(CropariaIf.MOD_ID, Registries.RECIPE_TYPE);
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(CropariaIf.MOD_ID, Registries.RECIPE_SERIALIZER);
 
@@ -41,7 +41,7 @@ public class Recipes {
         TYPES.forEach((id, supplier) -> consumer.accept(supplier));
     }
 
-    public static TypedSerializer<?> find(ResourceLocation id) {
+    public static TypedSerializer<?> find(Identifier id) {
         return TYPES.get(id);
     }
 

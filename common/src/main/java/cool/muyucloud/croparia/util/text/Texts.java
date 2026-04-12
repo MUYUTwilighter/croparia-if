@@ -7,7 +7,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -69,36 +69,36 @@ public class Texts {
     public static Style suggestCommand(String... words) {
         if (words.length == 0) return Style.EMPTY;
         return Style.EMPTY.withUnderlined(true).withClickEvent(
-            new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, (words[0].startsWith("/") ? "" : "/") + String.join(" ", words))
+            new ClickEvent.SuggestCommand((words[0].startsWith("/") ? "" : "/") + String.join(" ", words))
         );
     }
 
     public static Style runCommand(String... words) {
         if (words.length == 0) return Style.EMPTY;
         return Style.EMPTY.withUnderlined(true).withClickEvent(
-            new ClickEvent(ClickEvent.Action.RUN_COMMAND, (words[0].startsWith("/") ? "" : "/") + String.join(" ", words))
+            new ClickEvent.RunCommand((words[0].startsWith("/") ? "" : "/") + String.join(" ", words))
         );
     }
 
     public static Style copyText(String text) {
-        return Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, text)).applyTo(
+        return Style.EMPTY.withClickEvent(new ClickEvent.CopyToClipboard(text)).applyTo(
             hoverText(Texts.translatable("commands.croparia.click2copy", text))
         );
     }
 
     public static MutableComponent openFileButton(String path) {
         return Texts.translatable("commands.croparia.openFile")
-            .withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, path)))
+            .withStyle(Style.EMPTY.withClickEvent(new ClickEvent.OpenFile(path)))
             .withStyle(Texts.blockMouseBehavior())
             .withStyle(ChatFormatting.GREEN);
     }
 
     public static Style openFile(String path) {
-        return Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, path));
+        return Style.EMPTY.withClickEvent(new ClickEvent.OpenFile(path));
     }
 
-    public static Style hoverItem(ResourceLocation id) {
-        Item item = BuiltInRegistries.ITEM.get(id);
+    public static Style hoverItem(Identifier id) {
+        Item item = BuiltInRegistries.ITEM.getValue(id);
         return hoverItem(item);
     }
 
@@ -107,18 +107,15 @@ public class Texts {
     }
 
     public static Style hoverItem(ItemStack stack) {
-        return stack.isEmpty() ? Style.EMPTY : Style.EMPTY.withHoverEvent(new HoverEvent(
-            HoverEvent.Action.SHOW_ITEM,
-            new HoverEvent.ItemStackInfo(stack)
-        ));
+        return stack.isEmpty() ? Style.EMPTY : Style.EMPTY.withHoverEvent(new HoverEvent.ShowItem(stack));
     }
 
     public static Style hoverText(String text) {
-        return Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Texts.literal(text)));
+        return Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(Texts.literal(text)));
     }
 
     public static Style hoverText(Component text) {
-        return Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, text));
+        return Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(text));
     }
 
     public static Style blockMouseBehavior() {

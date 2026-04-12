@@ -15,7 +15,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -26,11 +26,11 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
     public static final MapCodec<ItemSpec> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.fieldOf("id").forGetter(itemSpec -> itemSpec.getResource().arch$registryName()),
+        Identifier.CODEC.fieldOf("id").forGetter(itemSpec -> itemSpec.getResource().arch$registryName()),
         CodecUtil.optionalFieldsOf(DataComponentPatch.CODEC, DataComponentPatch.EMPTY, "components", "nbt").forGetter(ItemSpec::getComponentsPatch)
-    ).apply(instance, (id, components) -> new ItemSpec(BuiltInRegistries.ITEM.get(id), components)));
-    public static final Codec<ItemSpec> CODEC_STR = ResourceLocation.CODEC.xmap(
-        id -> new ItemSpec(BuiltInRegistries.ITEM.get(id), DataComponentPatch.EMPTY),
+    ).apply(instance, (id, components) -> new ItemSpec(BuiltInRegistries.ITEM.getValue(id), components)));
+    public static final Codec<ItemSpec> CODEC_STR = Identifier.CODEC.xmap(
+        id -> new ItemSpec(BuiltInRegistries.ITEM.getValue(id), DataComponentPatch.EMPTY),
         itemSpec -> itemSpec.getResource().arch$registryName()
     );
     public static final MultiCodec<ItemSpec> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
@@ -127,7 +127,7 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
         return ItemStack.isSameItemSameComponents(stack, this.createStack());
     }
 
-    public boolean is(@NotNull ResourceLocation tag) {
+    public boolean is(@NotNull Identifier tag) {
         return TagUtil.isIn(Registries.ITEM, tag, this.getResource());
     }
 

@@ -17,7 +17,7 @@ import mezz.jei.common.gui.elements.DrawableResource;
 import mezz.jei.library.ingredients.TypedIngredient;
 import mezz.jei.library.render.ItemStackRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +58,7 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
         else return toDrawable(stations.getFirst().get());
     }
 
-    public @NotNull ResourceLocation getUid() {
+    public @NotNull Identifier getUid() {
         return this.getTypedSerializer().getId();
     }
 

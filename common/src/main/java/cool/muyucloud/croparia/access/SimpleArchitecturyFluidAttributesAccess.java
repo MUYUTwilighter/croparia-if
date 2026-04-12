@@ -3,16 +3,16 @@ package cool.muyucloud.croparia.access;
 import cool.muyucloud.croparia.api.crop.util.Color;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface SimpleArchitecturyFluidAttributesAccess {
     Component cif$getName();
 
     void cif$setName(Component name);
 
-    ResourceLocation cif$getRenderOverlayTexture();
+    Identifier cif$getRenderOverlayTexture();
 
-    void cif$setRenderOverlayTexture(ResourceLocation texture);
+    void cif$setRenderOverlayTexture(Identifier texture);
 
     Color cif$getFogColor();
 
@@ -26,11 +26,11 @@ public interface SimpleArchitecturyFluidAttributesAccess {
         return cast(instance).cif$getName();
     }
 
-    static void setRenderOverlayTexture(SimpleArchitecturyFluidAttributes instance, ResourceLocation texture) {
+    static void setRenderOverlayTexture(SimpleArchitecturyFluidAttributes instance, Identifier texture) {
         cast(instance).cif$setRenderOverlayTexture(texture);
     }
 
-    static ResourceLocation getRenderOverlayTexture(SimpleArchitecturyFluidAttributes instance) {
+    static Identifier getRenderOverlayTexture(SimpleArchitecturyFluidAttributes instance) {
         return cast(instance).cif$getRenderOverlayTexture();
     }
 

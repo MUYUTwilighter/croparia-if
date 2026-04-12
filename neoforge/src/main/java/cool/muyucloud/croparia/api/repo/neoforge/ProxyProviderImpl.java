@@ -16,23 +16,23 @@ import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.Optional;
 
-@SuppressWarnings({"UnstableApiUsage", "unused"})
+    @SuppressWarnings({"UnstableApiUsage", "unused"})
 public class ProxyProviderImpl {
     public static Optional<PlatformItemProxy> findItem(Level world, BlockPos pos, Direction direction) {
-        IItemHandler handler = Capabilities.ItemHandler.BLOCK.getCapability(world, pos, null, null, direction);
-        return handler == null ? Optional.empty() : Optional.of(PlatformItemProxyImpl.of(handler));
+        Object handler = Capabilities.Item.BLOCK.getCapability(world, pos, null, null, direction);
+        return handler instanceof IItemHandler itemHandler ? Optional.of(PlatformItemProxyImpl.of(itemHandler)) : Optional.empty();
     }
 
     public static Optional<PlatformFluidProxy> findFluid(Level world, BlockPos pos, Direction direction) {
-        IFluidHandler handler = Capabilities.FluidHandler.BLOCK.getCapability(world, pos, null, null, direction);
-        return handler == null ? Optional.empty() : Optional.of(PlatformFluidProxyImpl.of(handler));
+        Object handler = Capabilities.Fluid.BLOCK.getCapability(world, pos, null, null, direction);
+        return handler instanceof IFluidHandler fluidHandler ? Optional.of(PlatformFluidProxyImpl.of(fluidHandler)) : Optional.empty();
     }
 
     public static void registerItem(ProxyProvider<ItemSpec> provider, Block... blocks) {
-        ((BlockCapabilityAccess) (Object) Capabilities.ItemHandler.BLOCK).croparia_if$registerItem(provider, blocks);
+        ((BlockCapabilityAccess) (Object) Capabilities.Item.BLOCK).croparia_if$registerItem(provider, blocks);
     }
 
     public static void registerFluid(ProxyProvider<FluidSpec> provider, Block... blocks) {
-        ((BlockCapabilityAccess) (Object) Capabilities.FluidHandler.BLOCK).croparia_if$registerFluid(provider, blocks);
+        ((BlockCapabilityAccess) (Object) Capabilities.Fluid.BLOCK).croparia_if$registerFluid(provider, blocks);
     }
 }

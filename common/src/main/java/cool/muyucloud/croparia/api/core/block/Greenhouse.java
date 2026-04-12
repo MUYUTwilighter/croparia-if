@@ -12,13 +12,13 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -26,6 +26,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
@@ -35,12 +37,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Greenhouse extends BaseEntityBlock {
     public static final MapCodec<Greenhouse> CODEC = simpleCodec(Greenhouse::new);
-    public static TagKey<Block> UNHARVESTABLE = TagKey.create(BuiltInRegistries.BLOCK.key(), ResourceLocation.tryParse("croparia:greenhouse_unharvestable"));
+    public static TagKey<Block> UNHARVESTABLE = TagKey.create(BuiltInRegistries.BLOCK.key(), Identifier.tryParse("croparia:greenhouse_unharvestable"));
     protected final VoxelShape SHAPE = Block.box(1.0, 1.0, 0.0, 15.0, 3.0, 15.0);
 
     public Greenhouse(Properties settings) {
@@ -57,12 +60,21 @@ public class Greenhouse extends BaseEntityBlock {
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
-        this.updateShape(state, Direction.DOWN, state, level, pos, pos);
+        this.updateShape(state, level, level, pos, Direction.DOWN, pos, state, level.getRandom());
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-        super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+    protected BlockState updateShape(
+        BlockState state,
+        LevelReader level,
+        ScheduledTickAccess scheduledTickAccess,
+        BlockPos pos,
+        Direction direction,
+        BlockPos neighborPos,
+        BlockState neighborState,
+        RandomSource random
+    ) {
+        super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
         // Filter client level
         if (!(level instanceof ServerLevel serverLevel)) return state;
         // Filter unharvestable blocks
@@ -84,25 +96,14 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(ItemStack itemStack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
-        if (!world.isClientSide) {
+    protected @NotNull InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+        if (!world.isClientSide()) {
             MenuProvider screenHandlerFactory = state.getMenuProvider(world, pos);
             if (screenHandlerFactory != null) {
                 player.openMenu(screenHandlerFactory);
             }
         }
-        return ItemInteractionResult.SUCCESS;
-    }
-
-    @Override
-    public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
-        if (state.getBlock() != newState.getBlock()) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof GreenhouseBlockEntity) {
-                Containers.dropContentsOnDestroy(state, newState, world, pos);
-            }
-            super.onRemove(state, world, pos, newState, moved);
-        }
+        return InteractionResult.SUCCESS;
     }
 
     @Override

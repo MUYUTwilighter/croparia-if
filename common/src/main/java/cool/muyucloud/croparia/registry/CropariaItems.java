@@ -13,7 +13,8 @@ import cool.muyucloud.croparia.api.crop.item.Croparia;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodProperties;
@@ -30,7 +31,7 @@ public class CropariaItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(CropariaIf.MOD_ID, Registries.ITEM);
 
     public static final RegistrySupplier<RecipeWizard> RECIPE_WIZARD = registerItem(
-        "recipe_wizard", properties -> new RecipeWizard(new Item.Properties()
+        "recipe_wizard", properties -> new RecipeWizard(properties
             .arch$tab(Tabs.MAIN).rarity(Rarity.UNCOMMON).stacksTo(1))
     );
     public static final RegistrySupplier<BlockItem> ACTIVATED_SHRIEKER = registerItem(
@@ -114,10 +115,6 @@ public class CropariaItems {
     public static final RegistrySupplier<InfiniteApple> INFINITE_APPLE = registerItem(
         "infinite_apple", properties -> new InfiniteApple(properties.food(
             new FoodProperties.Builder().alwaysEdible().nutrition(5).saturationModifier(4.0F)
-                .effect(new MobEffectInstance(MobEffects.REGENERATION, 100, 1), 1F)
-                .effect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 0), 1F)
-                .effect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 100, 0), 1F)
-                .effect(new MobEffectInstance(MobEffects.ABSORPTION, 100, 3), 1F)
                 .build()
         ).stacksTo(1).arch$tab(Tabs.MAIN).rarity(Rarity.EPIC)));
     public static final RegistrySupplier<MagicRope> MAGIC_ROPE = registerItem(
@@ -138,16 +135,16 @@ public class CropariaItems {
         @NotNull String name, @NotNull Function<Item.Properties, T> supplier
     ) {
         return ITEMS.register(name, () -> supplier.apply(
-            new Item.Properties()
+            new Item.Properties().setId(ResourceKey.create(Registries.ITEM, CropariaIf.of(name)))
         ));
     }
 
     @NotNull
     public static <T extends Item> RegistrySupplier<T> registerItem(
-        @NotNull ResourceLocation id, @NotNull Function<Item.Properties, T> supplier
+        @NotNull Identifier id, @NotNull Function<Item.Properties, T> supplier
     ) {
         return ITEMS.register(id, () -> supplier.apply(
-            new Item.Properties()
+            new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))
         ));
     }
 

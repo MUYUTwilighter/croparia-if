@@ -4,12 +4,10 @@ import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.core.component.DataComponentPredicate;
-import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
@@ -31,8 +29,8 @@ import java.util.Objects;
 
 @SuppressWarnings("unused")
 public class CifUtil {
-    public static ResourceLocation formatId(String pattern, ResourceLocation id) {
-        return ResourceLocation.tryBuild(id.getNamespace(), pattern.formatted(id.getPath()));
+    public static Identifier formatId(String pattern, Identifier id) {
+        return Identifier.tryBuild(id.getNamespace(), pattern.formatted(id.getPath()));
     }
 
     @SuppressWarnings("unused")
@@ -53,7 +51,7 @@ public class CifUtil {
     }
 
     @SuppressWarnings("unused")
-    public static ServerLevel getLevel(ResourceLocation id, MinecraftServer server) {
+    public static ServerLevel getLevel(Identifier id, MinecraftServer server) {
         return server.getLevel(ResourceKey.create(Registries.DIMENSION, id));
     }
 
@@ -80,7 +78,7 @@ public class CifUtil {
      */
     public static ItemStack transferItemNear(Level world, BlockPos pos, ItemStack stack) {
         for (Direction d : Direction.values()) {
-            BlockEntity neighbor = world.getBlockEntity(pos.offset(d.getNormal()));
+            BlockEntity neighbor = world.getBlockEntity(pos.offset(d.getUnitVec3i()));
             if (neighbor instanceof Container container) {
                 for (int i = 0; i < container.getContainerSize(); i++) {
                     if (stack.isEmpty()) {
@@ -134,10 +132,8 @@ public class CifUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static DataComponentPredicate extractPredicate(DataComponentPatch patch) {
-        DataComponentPredicate.Builder builder = DataComponentPredicate.builder();
-        patch.entrySet().forEach(entry -> builder.expect((DataComponentType<Object>) entry.getKey(), (Object) entry.getValue()));
-        return builder.build();
+    public static DataComponentPatch extractPatch(DataComponentPatch patch) {
+        return patch;
     }
 
     public static int toIntSafe(long value) {

@@ -7,7 +7,7 @@ import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.util.FileUtil;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -25,8 +25,8 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
 
     private final Path path;
     private final Codec<C> codec;
-    private final Map<ResourceLocation, C> all = new HashMap<>();
-    private final Map<ResourceLocation, C> loaded = new HashMap<>();
+    private final Map<Identifier, C> all = new HashMap<>();
+    private final Map<Identifier, C> loaded = new HashMap<>();
 
     public CropRegistry(Path path, Codec<C> codec) {
         this.path = path;
@@ -99,7 +99,7 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
         return cropPath;
     }
 
-    public boolean exists(ResourceLocation name) {
+    public boolean exists(Identifier name) {
         return all.containsKey(name);
     }
 
@@ -110,7 +110,7 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
     }
 
     @Override
-    public Optional<C> forName(ResourceLocation id) {
+    public Optional<C> forName(Identifier id) {
         return Optional.ofNullable(this.all.get(id));
     }
 

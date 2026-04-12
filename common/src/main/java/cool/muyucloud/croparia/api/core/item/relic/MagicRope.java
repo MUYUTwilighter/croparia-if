@@ -23,8 +23,8 @@ public class MagicRope extends Item {
 
     public @NotNull InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
-        if (!level.isClientSide && context.getPlayer() instanceof ServerPlayer player && player.getServer() != null) {
-            MinecraftServer server = player.getServer();
+        if (!level.isClientSide() && context.getPlayer() instanceof ServerPlayer player && player.level().getServer() != null) {
+            MinecraftServer server = player.level().getServer();
             ItemStack itemStack = context.getItemInHand();
             if (player.isShiftKeyDown()) {
                 TargetPos targetPos = new TargetPos(player);

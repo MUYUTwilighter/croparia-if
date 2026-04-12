@@ -10,7 +10,7 @@ package cool.muyucloud.croparia.compat.emi.recipe;
 //import dev.emi.emi.api.stack.EmiStack;
 //import dev.emi.emi.api.widget.SlotWidget;
 //import dev.emi.emi.api.widget.WidgetHolder;
-//import net.minecraft.resources.ResourceLocation;
+//import net.minecraft.resources.Identifier;
 //import net.minecraft.world.item.crafting.Ingredient;
 //import net.minecraft.world.item.crafting.RecipeHolder;
 //import org.jetbrains.annotations.Nullable;
@@ -18,9 +18,9 @@ package cool.muyucloud.croparia.compat.emi.recipe;
 //import java.util.List;
 //
 //public class EmiRitualRecipe implements EmiRecipe {
-//    public static final EmiRecipeCategory CATEGORY = new EmiRecipeCategory(ResourceLocation.tryParse("croparia:ritual"), EmiIngredient.of(Ingredient.of(CropariaItems.RITUAL_STAND.get())));
+//    public static final EmiRecipeCategory CATEGORY = new EmiRecipeCategory(Identifier.tryParse("croparia:ritual"), EmiIngredient.of(Ingredient.of(CropariaItems.RITUAL_STAND.get())));
 //
-//    private final ResourceLocation id;
+//    private final Identifier id;
 //    private final EmiIngredient ritual;
 //    private final EmiIngredient result;
 //    private final EmiIngredient ingredient;
@@ -45,7 +45,7 @@ package cool.muyucloud.croparia.compat.emi.recipe;
 //    }
 //
 //    @Override
-//    public @Nullable ResourceLocation getId() {
+//    public @Nullable Identifier getId() {
 //        return id;
 //    }
 //

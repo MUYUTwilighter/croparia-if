@@ -12,7 +12,7 @@ import mezz.jei.library.focus.Focus;
 import mezz.jei.library.ingredients.TypedIngredient;
 import mezz.jei.library.render.ItemStackRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -27,8 +27,8 @@ public class DynamicSlot extends AbstractInputManager<DynamicSlot> {
             TypedIngredient.createUnvalidated(VanillaTypes.ITEM_STACK, manager.getCurrentStack())));
     public static final MouseMoveHandler.NoReturn<DynamicSlot> HIGHLIGHT = (manager, a, b) -> manager.addDrawable(
         "highlight", (guiGraphics, xOffset, yOffset) -> guiGraphics.fill(
-            RenderType.guiOverlay(), xOffset + 1, yOffset + 1, xOffset + JeiCategory.SLOT_SIZE_HIGHLIGHT,
-            yOffset + JeiCategory.SLOT_SIZE_HIGHLIGHT, 1, 0x80FFFFFF));
+            RenderPipelines.GUI, xOffset + 1, yOffset + 1, xOffset + JeiCategory.SLOT_SIZE_HIGHLIGHT,
+            yOffset + JeiCategory.SLOT_SIZE_HIGHLIGHT, 0x80FFFFFF));
     public static final MouseMoveHandler.NoReturn<DynamicSlot> CLEAR = (manager, a, b) -> manager.removeDrawable("highlight");
 
     private final Function<DynamicSlot, List<ItemStack>> stacks;
@@ -51,7 +51,7 @@ public class DynamicSlot extends AbstractInputManager<DynamicSlot> {
             double mouseX = mouseX();
             double mouseY = mouseY();
             if (0 < mouseX && mouseX < this.getWidth() && 0 < mouseY && mouseY < this.getHeight()) {
-                guiGraphics.renderTooltip(Minecraft.getInstance().font, this.getCurrentStack(), CifUtil.toIntSafe(parentMouseX()), CifUtil.toIntSafe(parentMouseY()));
+                guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.getCurrentStack(), CifUtil.toIntSafe(parentMouseX()), CifUtil.toIntSafe(parentMouseY()));
             }
         };
     }

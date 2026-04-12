@@ -5,21 +5,24 @@ import cool.muyucloud.croparia.api.crop.AbstractFruit;
 import cool.muyucloud.croparia.api.crop.Crop;
 import cool.muyucloud.croparia.registry.Tabs;
 import cool.muyucloud.croparia.util.text.Texts;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @SuppressWarnings("UnstableApiUsage")
 public class CropFruit extends Item implements AbstractFruit<Crop> {
     private final Crop crop;
 
     public CropFruit(Crop crop) {
-        super(new Properties().arch$tab(Tabs.CROPS));
+        super(new Properties().arch$tab(Tabs.CROPS).setId(ResourceKey.create(Registries.ITEM, crop.getKey())));
         this.crop = crop;
     }
 
@@ -27,7 +30,7 @@ public class CropFruit extends Item implements AbstractFruit<Crop> {
         if (!CropariaIf.CONFIG.getFruitUse()) {
             return InteractionResult.PASS;
         }
-        if (!context.getLevel().isClientSide) {
+        if (!context.getLevel().isClientSide()) {
             ItemStack material = getCrop().getMaterial().asItem();
             context.getLevel().addFreshEntity(new ItemEntity(
                 context.getLevel(),
@@ -43,7 +46,7 @@ public class CropFruit extends Item implements AbstractFruit<Crop> {
     }
 
     @Override
-    public @NotNull Component getName(ItemStack itemStack) {
+    public @NotNull Component getName(@NonNull ItemStack itemStack) {
         MutableComponent cropName = Texts.translatable(this.getCrop().getTranslationKey());
         return Texts.translatable("item." + CropariaIf.MOD_ID + ".crop.fruit", cropName);
     }

@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.api.crop.util.Material;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +27,7 @@ class CropRegistryTest {
     @Test
     void registerTriggersOnRegisterOnlyWhenTransitioningToLoaded(@TempDir Path tempDir) {
         CropRegistry<DummyCrop> registry = new CropRegistry<>(tempDir, DummyCrop.CODEC);
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("croparia_test", "alpha");
+        Identifier id = Identifier.fromNamespaceAndPath("croparia_test", "alpha");
 
         DummyCrop firstLoaded = new DummyCrop(id, true, "k", Map.of("en_us", "A"));
         DummyCrop secondLoaded = new DummyCrop(id, true, "k", Map.of("en_us", "B"));
@@ -64,9 +64,9 @@ class CropRegistryTest {
         registry.readCrops();
 
         assertEquals(2, registry.size());
-        assertTrue(registry.exists(ResourceLocation.fromNamespaceAndPath("croparia_test", "a")));
-        assertTrue(registry.exists(ResourceLocation.fromNamespaceAndPath("croparia_test", "b")));
-        assertFalse(registry.exists(ResourceLocation.fromNamespaceAndPath("croparia_test", "x")));
+        assertTrue(registry.exists(Identifier.fromNamespaceAndPath("croparia_test", "a")));
+        assertTrue(registry.exists(Identifier.fromNamespaceAndPath("croparia_test", "b")));
+        assertFalse(registry.exists(Identifier.fromNamespaceAndPath("croparia_test", "x")));
 
         List<String> loadedIds = registryLoaded(registry).stream()
             .map(c -> c.getKey().toString())
@@ -91,14 +91,14 @@ class CropRegistryTest {
         registry.readCrops();
 
         assertEquals(1, registry.size());
-        assertTrue(registry.exists(ResourceLocation.fromNamespaceAndPath("croparia_test", "ok")));
+        assertTrue(registry.exists(Identifier.fromNamespaceAndPath("croparia_test", "ok")));
     }
 
     @Test
     void dumpCropWritesNamespacedPath(@TempDir Path tempDir) throws IOException {
         CropRegistry<DummyCrop> registry = new CropRegistry<>(tempDir, DummyCrop.CODEC);
         DummyCrop crop = new DummyCrop(
-            ResourceLocation.fromNamespaceAndPath("croparia_test", "dump_target"),
+            Identifier.fromNamespaceAndPath("croparia_test", "dump_target"),
             true,
             "key.dump",
             Map.of("en_us", "Dump Target")
@@ -116,8 +116,8 @@ class CropRegistryTest {
     @Test
     void dumpCropsWritesAllRegisteredCrops(@TempDir Path tempDir) throws IOException {
         CropRegistry<DummyCrop> registry = new CropRegistry<>(tempDir, DummyCrop.CODEC);
-        DummyCrop a = new DummyCrop(ResourceLocation.fromNamespaceAndPath("croparia_test", "a"), true, "k.a", Map.of("en_us", "A"));
-        DummyCrop b = new DummyCrop(ResourceLocation.fromNamespaceAndPath("croparia_test", "b"), false, "k.b", Map.of("en_us", "B"));
+        DummyCrop a = new DummyCrop(Identifier.fromNamespaceAndPath("croparia_test", "a"), true, "k.a", Map.of("en_us", "A"));
+        DummyCrop b = new DummyCrop(Identifier.fromNamespaceAndPath("croparia_test", "b"), false, "k.b", Map.of("en_us", "B"));
         registry.register(a);
         registry.register(b);
 
@@ -135,7 +135,7 @@ class CropRegistryTest {
 
     private static final class DummyCrop extends AbstractCrop<Object> {
         private static final Codec<DummyCrop> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ResourceLocation.CODEC.fieldOf("id").forGetter(DummyCrop::getKey),
+            Identifier.CODEC.fieldOf("id").forGetter(DummyCrop::getKey),
             Codec.BOOL.optionalFieldOf("load", true).forGetter(DummyCrop::shouldLoad),
             Codec.STRING.optionalFieldOf("translation_key", "dummy.translation").forGetter(DummyCrop::getTranslationKey),
             Codec.unboundedMap(Codec.STRING, Codec.STRING).optionalFieldOf("translations", Map.of("en_us", "Dummy")).forGetter(DummyCrop::getTranslations)
@@ -158,13 +158,13 @@ class CropRegistryTest {
             }
         };
 
-        private final ResourceLocation id;
+        private final Identifier id;
         private final boolean load;
         private final String translationKey;
         private final ImmutableMap<String, String> translations;
         private final AtomicInteger registerCalls = new AtomicInteger(0);
 
-        private DummyCrop(ResourceLocation id, boolean load, String translationKey, Map<String, String> translations) {
+        private DummyCrop(Identifier id, boolean load, String translationKey, Map<String, String> translations) {
             this.id = id;
             this.load = load;
             this.translationKey = translationKey;
@@ -172,7 +172,7 @@ class CropRegistryTest {
         }
 
         @Override
-        public @NotNull ResourceLocation getKey() {
+        public @NotNull Identifier getKey() {
             return id;
         }
 

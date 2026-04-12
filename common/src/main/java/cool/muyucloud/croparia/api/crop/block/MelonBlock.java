@@ -5,7 +5,9 @@ import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.api.crop.Melon;
 import cool.muyucloud.croparia.util.text.Texts;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -15,7 +17,7 @@ public class MelonBlock extends Block implements CropAccess<Melon> {
     private final Melon melon;
 
     public MelonBlock(Melon melon) {
-        super(Properties.ofFullCopy(Blocks.PUMPKIN));
+        super(Properties.ofFullCopy(Blocks.PUMPKIN).setId(ResourceKey.create(Registries.BLOCK, melon.getKey())));
         this.melon = melon;
     }
 

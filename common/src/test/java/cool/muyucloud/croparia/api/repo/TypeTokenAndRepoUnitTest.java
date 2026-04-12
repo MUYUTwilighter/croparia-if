@@ -6,7 +6,7 @@ import com.mojang.serialization.MapCodec;
 import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.TypedResource;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -42,7 +42,7 @@ class TypeTokenAndRepoUnitTest {
     }
 
     private static TypeToken<DummyResource> registerDummyToken(String pathSuffix) {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("croparia_test", "dummy_" + pathSuffix + "_" + UUID.randomUUID());
+        Identifier id = Identifier.fromNamespaceAndPath("croparia_test", "dummy_" + pathSuffix + "_" + UUID.randomUUID());
         TypeToken<DummyResource> token = TypeToken.registerOrThrow(id, new DummyResource(""), DummyResource.CODEC);
         DummyResource.TOKEN = token;
         return token;
@@ -53,12 +53,12 @@ class TypeTokenAndRepoUnitTest {
         TypeToken<DummyResource> token = registerDummyToken("codec");
         assertTrue(TypeToken.get(token.id()).isPresent());
 
-        var idJson = ResourceLocation.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, token.id()).getOrThrow();
+        var idJson = Identifier.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, token.id()).getOrThrow();
         TypeToken<?> decoded = TypeToken.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE, idJson).getOrThrow();
         assertEquals(token.id(), decoded.id());
 
-        ResourceLocation unknown = ResourceLocation.fromNamespaceAndPath("croparia_test", "unknown_" + UUID.randomUUID());
-        var unknownJson = ResourceLocation.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, unknown).getOrThrow();
+        Identifier unknown = Identifier.fromNamespaceAndPath("croparia_test", "unknown_" + UUID.randomUUID());
+        var unknownJson = Identifier.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, unknown).getOrThrow();
         assertTrue(TypeToken.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE, unknownJson).isError());
     }
 
@@ -139,7 +139,7 @@ class TypeTokenAndRepoUnitTest {
 
     @Test
     void registerOrThrowRejectsDuplicateId() {
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath("croparia_test", "dup_" + UUID.randomUUID());
+        Identifier id = Identifier.fromNamespaceAndPath("croparia_test", "dup_" + UUID.randomUUID());
         TypeToken<DummyResource> first = TypeToken.registerOrThrow(id, new DummyResource(""), DummyResource.CODEC);
         DummyResource.TOKEN = first;
         assertThrows(IllegalArgumentException.class, () -> TypeToken.registerOrThrow(id, new DummyResource(""), DummyResource.CODEC));

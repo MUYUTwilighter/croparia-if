@@ -22,7 +22,7 @@ import cool.muyucloud.croparia.util.supplier.HolderSupplier;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,7 +45,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
     }
 
     public static final MapCodec<Crop> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        CodecUtil.fieldsOf(ResourceLocation.CODEC, "id", "name").forGetter(Crop::getKey),
+        CodecUtil.fieldsOf(Identifier.CODEC, "id", "name").forGetter(Crop::getKey),
         CodecUtil.fieldsOf(ItemMaterial.CODEC, "material", "tag").forGetter(Crop::getMaterial),
         Color.CODEC.fieldOf("color").forGetter(Crop::getColor),
         Codec.INT.fieldOf("tier").forGetter(Crop::getTier),
@@ -68,12 +68,12 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         .concat(AbstractCrop.PLACEHOLDER, TypeMapper.of(crop -> crop))
     );
 
-    public static String defaultTranslationKey(ResourceLocation id) {
+    public static String defaultTranslationKey(Identifier id) {
         return "crop.%s.%s".formatted(id.getNamespace(), id.getPath());
     }
 
     @NotNull
-    private final ResourceLocation id;
+    private final Identifier id;
     @NotNull
     private final ItemMaterial material;
     @NotNull
@@ -98,7 +98,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
     );
 
     public Crop(
-        @NotNull ResourceLocation id, @NotNull ItemMaterial material, @NotNull Color color, int tier, @Nullable String type,
+        @NotNull Identifier id, @NotNull ItemMaterial material, @NotNull Color color, int tier, @Nullable String type,
         @Nullable Map<String, String> translations, @NotNull CropDependencies dependencies
     ) {
         this.id = id;
@@ -119,7 +119,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
     }
 
     @Override
-    public @NotNull ResourceLocation getKey() {
+    public @NotNull Identifier getKey() {
         return this.id;
     }
 
@@ -194,7 +194,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return this.dependencies;
     }
 
-    public @NotNull ResourceLocation getBlockId() {
+    public @NotNull Identifier getBlockId() {
         return block.getId();
     }
 
@@ -202,7 +202,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return block.toOptional();
     }
 
-    public @NotNull ResourceLocation getSeedId() {
+    public @NotNull Identifier getSeedId() {
         return seed.getId();
     }
 
@@ -210,7 +210,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return seed.toOptional();
     }
 
-    public @NotNull ResourceLocation getFruitId() {
+    public @NotNull Identifier getFruitId() {
         return fruit.getId();
     }
 

@@ -23,7 +23,7 @@ import cool.muyucloud.croparia.util.supplier.HolderSupplier;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +32,7 @@ import java.util.*;
 
 public class Melon extends AbstractCrop<Block> {
     public static final MapCodec<Melon> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        CodecUtil.fieldsOf(ResourceLocation.CODEC, "id", "name").forGetter(Melon::getKey),
+        CodecUtil.fieldsOf(Identifier.CODEC, "id", "name").forGetter(Melon::getKey),
         CodecUtil.fieldsOf(BlockMaterial.CODEC, "material", "tag").forGetter(Melon::getMaterial),
         Color.CODEC.fieldOf("color").forGetter(Melon::getColor),
         Codec.INT.fieldOf("tier").forGetter(Melon::getTier),
@@ -54,7 +54,7 @@ public class Melon extends AbstractCrop<Block> {
         .concat(AbstractCrop.PLACEHOLDER, TypeMapper.of(melon -> melon))
     );
 
-    private final ResourceLocation id;
+    private final Identifier id;
     private final Color color;
     private final int tier;
     private final BlockMaterial material;
@@ -70,7 +70,7 @@ public class Melon extends AbstractCrop<Block> {
         () -> this.getDependencies().shouldLoad() && CropariaIf.CONFIG.isCropValid(this.getKey())
     );
 
-    public Melon(ResourceLocation id, BlockMaterial material, Color color, int tier, Map<String, String> translations, CropDependencies dependencies) {
+    public Melon(Identifier id, BlockMaterial material, Color color, int tier, Map<String, String> translations, CropDependencies dependencies) {
         this.id = id;
         this.color = color;
         this.tier = tier;
@@ -173,7 +173,7 @@ public class Melon extends AbstractCrop<Block> {
     }
 
     @Override
-    public @NotNull ResourceLocation getKey() {
+    public @NotNull Identifier getKey() {
         return this.id;
     }
 

@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.core.component;
 
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.util.text.Texts;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
@@ -20,7 +21,7 @@ public record Text(MutableComponent text) implements TooltipProvider {
     public static final Codec<Text> CODEC = ComponentSerialization.CODEC.xmap(component -> new Text(Texts.literal("").append(component)), Text::text);
 
     @Override
-    public void addToTooltip(Item.TooltipContext context, Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag) {
+    public void addToTooltip(Item.TooltipContext context, Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag, DataComponentGetter componentGetter) {
         tooltipAdder.accept(text);
     }
 

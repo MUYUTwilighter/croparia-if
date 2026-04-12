@@ -6,14 +6,13 @@ import cool.muyucloud.croparia.api.core.block.entity.CropTransmuterBlockEntity;
 import cool.muyucloud.croparia.api.core.block.entity.GreenhouseBlockEntity;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
-import net.minecraft.Util;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Constructor;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -43,9 +42,24 @@ public class BlockEntities {
         @NotNull BlockEntityType.BlockEntitySupplier<? extends T> factory,
         @NotNull Set<? extends Supplier<? extends Block>> validBlocks
         ) {
-        return BLOCK_ENTITIES.register(name, () -> new BlockEntityType<>(
-            factory, validBlocks.stream().map(Supplier::get).collect(Collectors.toSet()), Util.fetchChoiceType(References.BLOCK_ENTITY, CropariaIf.of(name).toString())
+        return BLOCK_ENTITIES.register(name, () -> createType(
+            factory,
+            validBlocks.stream().map(Supplier::get).collect(Collectors.toSet())
         ));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends BlockEntity> BlockEntityType<T> createType(
+        BlockEntityType.BlockEntitySupplier<? extends T> factory,
+        Set<Block> validBlocks
+    ) {
+        try {
+            Constructor<BlockEntityType> constructor = BlockEntityType.class.getDeclaredConstructor(BlockEntityType.BlockEntitySupplier.class, Set.class);
+            constructor.setAccessible(true);
+            return constructor.newInstance(factory, validBlocks);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Failed to construct block entity type", e);
+        }
     }
 
     public static void register() {

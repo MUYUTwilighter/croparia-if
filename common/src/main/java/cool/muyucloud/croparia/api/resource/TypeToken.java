@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -15,11 +15,11 @@ import java.util.Optional;
 
 @ApiStatus.Experimental
 @SuppressWarnings("unused")
-public record TypeToken<T extends TypedResource<?>>(@NotNull ResourceLocation id, @NotNull T empty,
+public record TypeToken<T extends TypedResource<?>>(@NotNull Identifier id, @NotNull T empty,
                                                     @NotNull MapCodec<T> codec) {
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final Codec<TypeToken<?>> CODEC = ResourceLocation.CODEC.comapFlatMap(id -> {
+    public static final Codec<TypeToken<?>> CODEC = Identifier.CODEC.comapFlatMap(id -> {
         Optional<TypeToken<TypedResource<?>>> type = get(id);
         if (type.isEmpty()) {
             return DataResult.error(() -> "Undefined SpecType: %s".formatted(id));
@@ -28,9 +28,9 @@ public record TypeToken<T extends TypedResource<?>>(@NotNull ResourceLocation id
         }
     }, TypeToken::id);
 
-    private static final Map<ResourceLocation, TypeToken<?>> REGISTRY_BY_ID = new HashMap<>();
+    private static final Map<Identifier, TypeToken<?>> REGISTRY_BY_ID = new HashMap<>();
 
-    public static <T extends TypedResource<?>> Optional<TypeToken<T>> register(ResourceLocation id, T empty, MapCodec<T> codec) {
+    public static <T extends TypedResource<?>> Optional<TypeToken<T>> register(Identifier id, T empty, MapCodec<T> codec) {
         if (REGISTRY_BY_ID.containsKey(id)) {
             return Optional.empty();
         }
@@ -39,12 +39,12 @@ public record TypeToken<T extends TypedResource<?>>(@NotNull ResourceLocation id
         return Optional.of(type);
     }
 
-    public static <T extends TypedResource<?>> TypeToken<T> registerOrThrow(ResourceLocation id, T empty, MapCodec<T> codec) {
+    public static <T extends TypedResource<?>> TypeToken<T> registerOrThrow(Identifier id, T empty, MapCodec<T> codec) {
         return register(id, empty, codec).orElseThrow(() -> new IllegalArgumentException("Duplicate TypeToken: %s".formatted(id)));
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends TypedResource<?>> Optional<TypeToken<T>> get(ResourceLocation id) {
+    public static <T extends TypedResource<?>> Optional<TypeToken<T>> get(Identifier id) {
         TypeToken<?> type = REGISTRY_BY_ID.get(id);
         try {
             return Optional.ofNullable((TypeToken<T>) type);

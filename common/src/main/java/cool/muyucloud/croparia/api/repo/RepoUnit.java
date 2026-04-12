@@ -45,11 +45,11 @@ public class RepoUnit<T extends TypedResource<?>> implements Repo<T> {
         this.setResource(this.getType().codec().codec().decode(NbtOps.INSTANCE, nbt.get("resource")).getOrThrow(msg -> {
             throw new IllegalArgumentException(msg);
         }).getFirst());
-        this.setAmount(nbt.getLong("amount"));
-        this.setCapacity(nbt.getLong("capacity"));
-        this.setConsumable(nbt.getBoolean("consumable"));
-        this.setAcceptable(nbt.getBoolean("acceptable"));
-        this.setLocked(nbt.getBoolean("locked"));
+        this.setAmount(nbt.getLongOr("amount", 0L));
+        this.setCapacity(nbt.getLongOr("capacity", 0L));
+        this.setConsumable(nbt.getBooleanOr("consumable", false));
+        this.setAcceptable(nbt.getBooleanOr("acceptable", false));
+        this.setLocked(nbt.getBooleanOr("locked", false));
     }
 
     public void save(JsonObject json) {

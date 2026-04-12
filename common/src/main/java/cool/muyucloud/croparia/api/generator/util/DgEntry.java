@@ -4,7 +4,7 @@ import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.PlaceholderAccess;
 import cool.muyucloud.croparia.api.placeholder.TypeMapper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public interface DgEntry extends PlaceholderAccess {
@@ -13,7 +13,7 @@ public interface DgEntry extends PlaceholderAccess {
     ));
 
     @NotNull
-    ResourceLocation getKey();
+    Identifier getKey();
 
     default Placeholder<? extends DgEntry> placeholder() {
         return PLACEHOLDER;

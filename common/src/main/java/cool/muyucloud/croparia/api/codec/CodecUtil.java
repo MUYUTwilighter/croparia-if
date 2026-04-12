@@ -11,7 +11,8 @@ import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.json.JsonTransformer;
 import cool.muyucloud.croparia.reflection.RecordCodecBuilderReflection;
 import cool.muyucloud.croparia.util.FileUtil;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryOps;
 import org.jetbrains.annotations.ApiStatus;
@@ -268,8 +269,8 @@ public class CodecUtil {
      * @return stream codec of target type.
      *
      */
-    public static <B extends FriendlyByteBuf, T, I> StreamCodec<B, T> mapStream(Codec<I> codec, Function<? super I, ? extends T> parser, Function<? super T, ? extends I> getter) {
-        StreamCodec<B, I> stream = toStream(codec);
+    public static <T, I> StreamCodec<RegistryFriendlyByteBuf, T> mapStream(Codec<I> codec, Function<? super I, ? extends T> parser, Function<? super T, ? extends I> getter) {
+        StreamCodec<RegistryFriendlyByteBuf, I> stream = toStream(codec);
         return stream.map(parser, getter);
     }
 
@@ -279,8 +280,8 @@ public class CodecUtil {
      * @param codec the codec
      *
      */
-    public static <B extends FriendlyByteBuf, T> StreamCodec<B, T> toStream(Codec<T> codec) {
-        return StreamCodec.of((buf, inst) -> buf.writeJsonWithCodec(codec, inst), buf -> buf.readJsonWithCodec(codec));
+    public static <T> StreamCodec<RegistryFriendlyByteBuf, T> toStream(Codec<T> codec) {
+        return ByteBufCodecs.fromCodecWithRegistries(codec);
     }
 
     public static <T> Optional<RegistryOps<T>> getRegistryOps(DynamicOps<T> ops) {

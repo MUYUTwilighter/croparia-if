@@ -10,6 +10,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -32,7 +33,7 @@ public class MelonStem extends StemBlock implements CropAccess<Melon> {
             melon.getMelon().adaptKey(),
             melon.getAttach().adaptKey(),
             melon.getSeed().adaptKey(),
-            Properties.ofFullCopy(Blocks.PUMPKIN_STEM)
+            Properties.ofFullCopy(Blocks.PUMPKIN_STEM).setId(ResourceKey.create(Registries.BLOCK, melon.getKey()))
         );
         this.melon = melon;
     }
@@ -53,7 +54,7 @@ public class MelonStem extends StemBlock implements CropAccess<Melon> {
             BlockPos melonPos = pos.relative(direction);
             BlockState melonBase = level.getBlockState(melonPos.below());
             if (level.getBlockState(melonPos).canBeReplaced() && (melonBase.is(Blocks.FARMLAND) || melonBase.is(BlockTags.DIRT))) {
-                Registry<Block> registry = level.registryAccess().registryOrThrow(Registries.BLOCK);
+                Registry<Block> registry = level.registryAccess().lookupOrThrow(Registries.BLOCK);
                 Optional<Block> optional = registry.getOptional(this.getCrop().getMelon().adaptKey());
                 Optional<Block> optional2 = registry.getOptional(this.getCrop().getAttach().adaptKey());
                 if (optional.isPresent() && optional2.isPresent()) {

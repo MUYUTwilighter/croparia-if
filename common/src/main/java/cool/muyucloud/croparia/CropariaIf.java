@@ -18,7 +18,7 @@ import dev.architectury.utils.Env;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 
@@ -122,8 +122,8 @@ public class CropariaIf {
         }
     }
 
-    public static ResourceLocation of(String path) {
-        ResourceLocation id = ResourceLocation.tryBuild(MOD_ID, path);
+    public static Identifier of(String path) {
+        Identifier id = Identifier.tryBuild(MOD_ID, path);
         if (id == null) {
             throw new IllegalArgumentException("Invalid path: " + path);
         } else {

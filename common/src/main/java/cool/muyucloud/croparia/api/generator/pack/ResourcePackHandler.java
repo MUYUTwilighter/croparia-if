@@ -5,7 +5,7 @@ import cool.muyucloud.croparia.mixin.ReloadableResourceManagerImplMixin;
 import cool.muyucloud.croparia.util.Ref;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PathPackResources;
@@ -27,7 +27,7 @@ import java.util.function.Supplier;
  */
 @SuppressWarnings("unused")
 public class ResourcePackHandler extends PackHandler {
-    public static final Map<ResourceLocation, ResourcePackHandler> REGISTRY = new HashMap<>();
+    public static final Map<Identifier, ResourcePackHandler> REGISTRY = new HashMap<>();
 
     public static <P extends ResourcePackHandler> P register(P pack) {
         REGISTRY.put(pack.getId(), pack);
@@ -41,7 +41,7 @@ public class ResourcePackHandler extends PackHandler {
      * @see ReloadableResourceManagerImplMixin
      *
      */
-    public static ResourcePackHandler register(ResourceLocation id, Path path, JsonObject meta, Supplier<Boolean> override) {
+    public static ResourcePackHandler register(Identifier id, Path path, JsonObject meta, Supplier<Boolean> override) {
         return register(new ResourcePackHandler(id, path, meta, override));
     }
 
@@ -54,7 +54,7 @@ public class ResourcePackHandler extends PackHandler {
         ), getRoot()
     );
 
-    public ResourcePackHandler(ResourceLocation id, Path path, JsonObject meta, Supplier<Boolean> override) {
+    public ResourcePackHandler(Identifier id, Path path, JsonObject meta, Supplier<Boolean> override) {
         super(id, path, meta, override);
     }
 

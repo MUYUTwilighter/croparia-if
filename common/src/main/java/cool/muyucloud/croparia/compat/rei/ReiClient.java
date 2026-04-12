@@ -31,15 +31,6 @@ public class ReiClient implements REIClientPlugin {
 
     @Override
     public void registerDisplays(DisplayRegistry registry) {
-        CropariaIf.LOGGER.debug("Registering rei recipe displays...");
-        CATEGORIES.forEach(category -> registerDisplay(registry, category));
-    }
-
-    private static <R extends DisplayableRecipe<?>> void registerDisplay(DisplayRegistry registry, ReiCategory<R> category) {
-        TypedSerializer<R> type = category.getRecipeType();
-        registry.registerRecipeFiller(
-            type.getRecipeClass(), type,
-            holder -> new ReiDisplay<>(holder, category)
-        );
+        CropariaIf.LOGGER.debug("Skipping REI recipe display registration during core 1.21.11 migration");
     }
 }

@@ -4,16 +4,17 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.RelativeMovement;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
@@ -26,7 +27,7 @@ import java.util.function.Consumer;
 
 public class TargetPos implements TooltipProvider {
     public static final MapCodec<TargetPos> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.fieldOf("dim").forGetter(TargetPos::getDim),
+        Identifier.CODEC.fieldOf("dim").forGetter(TargetPos::getDim),
         BlockPos.CODEC.fieldOf("pos").forGetter(TargetPos::getPos)
     ).apply(instance, TargetPos::new));
     public static final DataComponentType<TargetPos> TYPE = DataComponentType.<TargetPos>builder().persistent(CODEC.codec()).build();
@@ -50,17 +51,17 @@ public class TargetPos implements TooltipProvider {
     public TargetPos(@NotNull ResourceKey<Level> dim, @NotNull BlockPos pos) {
         this.pos = pos;
         this.dimKey = dim;
-        this.dimName = Texts.literal(dim.location().toString());
+        this.dimName = Texts.literal(dim.identifier().toString());
         this.tooltip = Texts.translatable("tooltip.croparia.bounded_position", this.getDimName(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
     }
 
-    public TargetPos(@NotNull ResourceLocation dim, @NotNull BlockPos pos) {
+    public TargetPos(@NotNull Identifier dim, @NotNull BlockPos pos) {
         this(ResourceKey.create(Registries.DIMENSION, dim), pos);
     }
 
     @NotNull
-    public ResourceLocation getDim() {
-        return dimKey.location();
+    public Identifier getDim() {
+        return dimKey.identifier();
     }
 
     @NotNull
@@ -87,12 +88,12 @@ public class TargetPos implements TooltipProvider {
     }
 
     @Override
-    public void addToTooltip(Item.TooltipContext tooltipContext, @NotNull Consumer<Component> consumer, TooltipFlag tooltipFlag) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, @NotNull Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter componentGetter) {
         consumer.accept(getTooltip());
     }
 
     public void teleport(@NotNull Entity entity, @NotNull MinecraftServer server) {
-        this.getLevel(server).ifPresent(level -> entity.teleportTo(level, getPos().getX(), getPos().getY(), getPos().getZ(), RelativeMovement.ROTATION, 0, 0));
+        this.getLevel(server).ifPresent(level -> entity.teleportTo(level, getPos().getX(), getPos().getY(), getPos().getZ(), Relative.ROTATION, 0, 0, false));
     }
 
     @Override

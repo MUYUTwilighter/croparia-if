@@ -16,7 +16,7 @@ package cool.muyucloud.croparia.compat.emi.recipe;
 //import net.minecraft.core.component.DataComponents;
 //import net.minecraft.core.registries.BuiltInRegistries;
 //import net.minecraft.network.chat.Component;
-//import net.minecraft.resources.ResourceLocation;
+//import net.minecraft.resources.Identifier;
 //import net.minecraft.world.item.ItemStack;
 //import net.minecraft.world.item.crafting.Ingredient;
 //import net.minecraft.world.item.crafting.RecipeHolder;
@@ -25,7 +25,7 @@ package cool.muyucloud.croparia.compat.emi.recipe;
 //import java.util.List;
 //
 //public class EmiRitualStructure implements EmiRecipe {
-//    public static final EmiRecipeCategory CATEGORY = new EmiRecipeCategory(ResourceLocation.tryParse("croparia:ritual_structure"), EmiIngredient.of(Ingredient.of(CropariaItems.RITUAL_STAND.get())));
+//    public static final EmiRecipeCategory CATEGORY = new EmiRecipeCategory(Identifier.tryParse("croparia:ritual_structure"), EmiIngredient.of(Ingredient.of(CropariaItems.RITUAL_STAND.get())));
 //    public static final EmiIngredient AIR = EmiStack.of(BlockStatePredicate.STACK_AIR);
 //    public static final EmiIngredient ANY = EmiStack.of(BlockStatePredicate.STACK_ANY);
 //    public static final EmiIngredient UNKNOWN = EmiStack.of(BlockStatePredicate.STACK_UNKNOWN);
@@ -43,7 +43,7 @@ package cool.muyucloud.croparia.compat.emi.recipe;
 //    private final RitualStructure recipe;
 //    private final EmiIngredient[][][] structure;
 //    private final EmiIngredient ritual;
-//    private final ResourceLocation id;
+//    private final Identifier id;
 //    private final List<EmiIngredient> inputs;
 //    private final List<EmiStack> outputs;
 //    private final Vec3i size;
@@ -55,7 +55,7 @@ package cool.muyucloud.croparia.compat.emi.recipe;
 //        RitualStructure recipe = holder.value();
 //        this.recipe = recipe;
 //        this.structure = new EmiIngredient[recipe.maxY()][recipe.maxZ()][recipe.maxX()];
-//        this.ritual = EmiStack.of(BuiltInRegistries.ITEM.get(holder.id()));
+//        this.ritual = EmiStack.of(BuiltInRegistries.ITEM.getValue(holder.id()));
 //        this.id = holder.id();
 //        this.inputs = recipe.getPredicates().stream().map(predicate -> EmiIngredient.of(predicate.availableBlockItems().stream().map(EmiStack::of).toList())).toList();
 //        this.outputs = ritual.getEmiStacks();
@@ -94,7 +94,7 @@ package cool.muyucloud.croparia.compat.emi.recipe;
 //    }
 //
 //    @Override
-//    public @Nullable ResourceLocation getId() {
+//    public @Nullable Identifier getId() {
 //        return this.id;
 //    }
 //

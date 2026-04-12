@@ -8,11 +8,11 @@ import cool.muyucloud.croparia.registry.CropariaBlocks;
 import cool.muyucloud.croparia.registry.DgRegistries;
 import cool.muyucloud.croparia.registry.MenuTypes;
 import cool.muyucloud.croparia.util.Ref;
+import dev.architectury.registry.client.gui.MenuScreenRegistry;
 import dev.architectury.event.events.client.ClientLifecycleEvent;
 import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
-import dev.architectury.registry.menu.MenuRegistry;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.world.level.block.StemBlock;
 
 public class CropariaIfClient {
@@ -26,11 +26,7 @@ public class CropariaIfClient {
         DgRegistries.CROPS.forLoaded(crop -> {
             // Crop Color
             ColorHandlerRegistry.registerBlockColors((state, getter, pos, i) -> crop.getColor().getValue(), crop.getCropBlock().orElseThrow());
-            RenderTypeRegistry.register(RenderType.cutoutMipped(), crop.getCropBlock().orElseThrow());
-            // Fruit Color
-            ColorHandlerRegistry.registerItemColors((stack, i) -> i == 1 ? 0xFF000000 | crop.getColor().getValue() : -1, crop.getCropFruit().orElseThrow());
-            // Seed Color
-            ColorHandlerRegistry.registerItemColors((stack, i) -> crop.getColor().getValue(), crop.getCropSeed().orElseThrow());
+            RenderTypeRegistry.register(ChunkSectionLayer.CUTOUT, crop.getCropBlock().orElseThrow());
         });
         DgRegistries.MELONS.forLoaded(melon -> {
             // Melon Block Color
@@ -40,12 +36,6 @@ public class CropariaIfClient {
                 }
                 return -1;
             }, melon.getMelon());
-            ColorHandlerRegistry.registerItemColors((stack, i) -> {
-                if (i == 0) {
-                    return melon.getColor().getValue();
-                }
-                return -1;
-            }, melon.getMelonItem());
             // Stem Color
             ColorHandlerRegistry.registerBlockColors((state, getter, pos, tintIndex) -> {
                 if (tintIndex == 0) {
@@ -60,7 +50,7 @@ public class CropariaIfClient {
                 }
                 return -1;
             }, melon.getStem());
-            RenderTypeRegistry.register(RenderType.cutoutMipped(), melon.getStem().get());
+            RenderTypeRegistry.register(ChunkSectionLayer.CUTOUT, melon.getStem().get());
             // Attach Color
             ColorHandlerRegistry.registerBlockColors((state, getter, pos, tintIndex) -> {
                 if (tintIndex == 0) {
@@ -71,22 +61,12 @@ public class CropariaIfClient {
                 }
                 return -1;
             }, melon.getAttach());
-            RenderTypeRegistry.register(RenderType.cutoutMipped(), melon.getAttach().get());
-            // Seed Color
-            ColorHandlerRegistry.registerItemColors((stack, i) -> melon.getColor().getValue(), melon.getSeed().get());
-        });
-        DgRegistries.ELEMENTS.forEach(element -> {
-            if (!element.shouldLoad()) return;
-            // Elemental Bucket Color
-            ColorHandlerRegistry.registerItemColors((stack, i) -> {
-                if (i == 1) return 0xFF000000 | element.getColor().getValue();
-                return -1;
-            }, element.getBucket());
+            RenderTypeRegistry.register(ChunkSectionLayer.CUTOUT, melon.getAttach().get());
         });
         CropariaIf.LOGGER.debug("Registering cutout rendering");
-        RenderTypeRegistry.register(RenderType.cutout(), CropariaBlocks.GREENHOUSE.get());
-        RenderTypeRegistry.register(RenderType.cutout(), CropariaBlocks.ACTIVATED_SHRIEKER.get());
-        MenuRegistry.registerScreenFactory(MenuTypes.CROP_TRANSMUTER.get(), CropTransmuterScreen::new);
+        RenderTypeRegistry.register(ChunkSectionLayer.CUTOUT, CropariaBlocks.GREENHOUSE.get());
+        RenderTypeRegistry.register(ChunkSectionLayer.CUTOUT, CropariaBlocks.ACTIVATED_SHRIEKER.get());
+        MenuScreenRegistry.registerScreenFactory(MenuTypes.CROP_TRANSMUTER.get(), CropTransmuterScreen::new);
         ClientLifecycleEvent.CLIENT_STOPPING.register(client -> PackHandler.forEach(
             pack -> pack.onClientStopping(Ref.of(client))
         ));

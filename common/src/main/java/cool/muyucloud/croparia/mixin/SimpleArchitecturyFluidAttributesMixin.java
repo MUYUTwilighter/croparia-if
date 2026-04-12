@@ -5,7 +5,7 @@ import cool.muyucloud.croparia.api.crop.util.Color;
 import dev.architectury.core.fluid.ArchitecturyFluidAttributes;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -17,7 +17,7 @@ public abstract class SimpleArchitecturyFluidAttributesMixin implements Architec
     private Component cif$name;
     @Unique
     @Nullable
-    private ResourceLocation cif$renderOverlayTexture;
+    private Identifier cif$renderOverlayTexture;
     private Color cif$FogColor;
 
     @Override
@@ -31,12 +31,12 @@ public abstract class SimpleArchitecturyFluidAttributesMixin implements Architec
     }
 
     @Override
-    public ResourceLocation cif$getRenderOverlayTexture() {
+    public Identifier cif$getRenderOverlayTexture() {
         return this.cif$renderOverlayTexture;
     }
 
     @Override
-    public void cif$setRenderOverlayTexture(ResourceLocation texture) {
+    public void cif$setRenderOverlayTexture(Identifier texture) {
         this.cif$renderOverlayTexture = texture;
     }
 

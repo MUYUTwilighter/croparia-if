@@ -23,7 +23,7 @@ public class GreenhouseItem extends BlockItem {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         ItemStack stack = context.getItemInHand();
-        if (!world.isClientSide && !stack.isEmpty()) {
+        if (!world.isClientSide() && !stack.isEmpty()) {
             if (world.isEmptyBlock(pos.above()) && (world.getBlockState(pos).getBlock() instanceof CropBlock
                 || world.getBlockState(pos).getBlock() instanceof StemBlock || world.getBlockState(pos).getBlock() instanceof AttachedStemBlock)) {
                 world.setBlockAndUpdate(pos.above(), this.getBlock().defaultBlockState());

@@ -12,7 +12,7 @@ import cool.muyucloud.croparia.util.ResourceLocationArgument;
 import cool.muyucloud.croparia.util.text.DelegateSource;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -33,10 +33,10 @@ public class GeneratorCommand {
 
     public static <S> LiteralArgumentBuilder<S> buildDumpBuiltin(boolean client) {
         LiteralArgumentBuilder<S> dumpBuiltin = LiteralArgumentBuilder.literal("dumpBuiltin");
-        RequiredArgumentBuilder<S, ResourceLocation> pack = buildPack();
+        RequiredArgumentBuilder<S, Identifier> pack = buildPack();
         pack.executes(context -> {
             DelegateSource<S> source = DelegateSource.of(context);
-            ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            Identifier packId = ResourceLocationArgument.getId(context, "pack");
             Optional<PackHandler> mayHandler = PackHandler.byId(packId);
             if (mayHandler.isEmpty() || packId == null) {
                 source.failure(Texts.translatable("commands.croparia.generator.badPack"));
@@ -66,7 +66,7 @@ public class GeneratorCommand {
         });
         RequiredArgumentBuilder<S, String> generator = RequiredArgumentBuilder.argument("generator", StringArgumentType.greedyString());
         generator.suggests((context, builder) -> {
-            ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            Identifier packId = ResourceLocationArgument.getId(context, "pack");
             if (packId == null) return builder.buildFuture();
             String prefix = "data-generators/%s/%s/".formatted(packId.getNamespace(), packId.getPath());
             PackHandler.getBuiltinGenerators(packId).forEach(jarJarEntry -> {
@@ -76,7 +76,7 @@ public class GeneratorCommand {
             return builder.buildFuture();
         }).executes(context -> {
             DelegateSource<S> source = DelegateSource.of(context);
-            ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            Identifier packId = ResourceLocationArgument.getId(context, "pack");
             Optional<PackHandler> mayHandler = PackHandler.byId(packId);
             if (mayHandler.isEmpty() || packId == null) {
                 source.failure(Texts.translatable("commands.croparia.generator.badPack"));
@@ -113,10 +113,10 @@ public class GeneratorCommand {
 
     public static <S> LiteralArgumentBuilder<S> buildClearBuiltin() {
         LiteralArgumentBuilder<S> clearBuiltin = LiteralArgumentBuilder.literal("clearBuiltin");
-        RequiredArgumentBuilder<S, ResourceLocation> pack = buildPack();
+        RequiredArgumentBuilder<S, Identifier> pack = buildPack();
         pack.executes(context -> {
             DelegateSource<S> source = DelegateSource.of(context);
-            ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            Identifier packId = ResourceLocationArgument.getId(context, "pack");
             Optional<PackHandler> mayHandler = PackHandler.byId(packId);
             if (mayHandler.isEmpty() || packId == null) {
                 source.failure(Texts.translatable("commands.croparia.generator.badPack"));
@@ -142,7 +142,7 @@ public class GeneratorCommand {
         });
         RequiredArgumentBuilder<S, String> generator = RequiredArgumentBuilder.argument("generator", StringArgumentType.greedyString());
         generator.suggests((context, builder) -> {
-            ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            Identifier packId = ResourceLocationArgument.getId(context, "pack");
             if (packId == null) return builder.buildFuture();
             String prefix = "data-generators/%s/%s/".formatted(packId.getNamespace(), packId.getPath());
             PackHandler.getBuiltinGenerators(packId).forEach(jarJarEntry -> {
@@ -152,7 +152,7 @@ public class GeneratorCommand {
             return builder.buildFuture();
         }).executes(context -> {
             DelegateSource<S> source = DelegateSource.of(context);
-            ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            Identifier packId = ResourceLocationArgument.getId(context, "pack");
             Optional<PackHandler> mayHandler = PackHandler.byId(packId);
             if (mayHandler.isEmpty() || packId == null) {
                 source.failure(Texts.translatable("commands.croparia.generator.badPack"));
@@ -190,10 +190,10 @@ public class GeneratorCommand {
 
     public static <S> LiteralArgumentBuilder<S> buildQuery() {
         LiteralArgumentBuilder<S> query = LiteralArgumentBuilder.literal("query");
-        RequiredArgumentBuilder<S, ResourceLocation> pack = buildPack();
+        RequiredArgumentBuilder<S, Identifier> pack = buildPack();
         pack.executes(context -> {
             DelegateSource<S> source = DelegateSource.of(context);
-            ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            Identifier packId = ResourceLocationArgument.getId(context, "pack");
             Optional<PackHandler> mayHandler = PackHandler.byId(packId);
             if (mayHandler.isEmpty()) {
                 source.failure(Texts.translatable("commands.croparia.generator.badPack"));
@@ -210,7 +210,7 @@ public class GeneratorCommand {
         RequiredArgumentBuilder<S, String> generator = RequiredArgumentBuilder.argument("generator", StringArgumentType.greedyString());
         generator.suggests((context, builder) -> {
             DelegateSource<S> source = DelegateSource.of(context);
-            ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            Identifier packId = ResourceLocationArgument.getId(context, "pack");
             Optional<PackHandler> mayHandler = PackHandler.byId(packId);
             if (mayHandler.isEmpty()) {
                 source.failure(Texts.translatable("commands.croparia.generator.badPack"));
@@ -220,7 +220,7 @@ public class GeneratorCommand {
             return builder.buildFuture();
         }).executes(context -> {
             DelegateSource<S> source = DelegateSource.of(context);
-            ResourceLocation packId = ResourceLocationArgument.getId(context, "pack");
+            Identifier packId = ResourceLocationArgument.getId(context, "pack");
             Optional<PackHandler> mayHandler = PackHandler.byId(packId);
             if (mayHandler.isEmpty()) {
                 source.failure(Texts.translatable("commands.croparia.generator.badPack"));
@@ -244,8 +244,8 @@ public class GeneratorCommand {
         return query.then(pack.then(generator));
     }
 
-    public static <S> RequiredArgumentBuilder<S, ResourceLocation> buildPack() {
-        RequiredArgumentBuilder<S, ResourceLocation> pack = RequiredArgumentBuilder.argument("pack", ResourceLocationArgument.id());
+    public static <S> RequiredArgumentBuilder<S, Identifier> buildPack() {
+        RequiredArgumentBuilder<S, Identifier> pack = RequiredArgumentBuilder.argument("pack", ResourceLocationArgument.id());
         pack.suggests((context, builder) -> {
             PackHandler.suggestPacks(builder);
             return builder.buildFuture();

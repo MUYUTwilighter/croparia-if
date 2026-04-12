@@ -12,7 +12,7 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
@@ -23,11 +23,11 @@ import java.util.Optional;
 
 @SuppressWarnings("unused")
 public class ItemOutput implements SlotDisplay {
-    public static final Codec<ItemOutput> CODEC_STR = ResourceLocation.CODEC.xmap(
+    public static final Codec<ItemOutput> CODEC_STR = Identifier.CODEC.xmap(
         id -> new ItemOutput(id, 1), ItemOutput::getId
     );
     public static final MapCodec<ItemOutput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.fieldOf("id").forGetter(ItemOutput::getId),
+        Identifier.CODEC.fieldOf("id").forGetter(ItemOutput::getId),
         DataComponentPatch.CODEC.optionalFieldOf("components").forGetter(itemOutput -> Optional.of(itemOutput.getComponentsPatch())),
         Codec.LONG.optionalFieldOf("amount").forGetter(result -> Optional.of(result.getAmount()))
     ).apply(instance, (id, components, amount) -> new ItemOutput(id, components.orElse(DataComponentPatch.EMPTY), amount.orElse(1L))));
@@ -45,7 +45,7 @@ public class ItemOutput implements SlotDisplay {
     }
 
     @NotNull
-    private final ResourceLocation id;
+    private final Identifier id;
     @NotNull
     private final DataComponentPatch components;
     private final long amount;
@@ -58,7 +58,7 @@ public class ItemOutput implements SlotDisplay {
         this.id = BuiltInRegistries.ITEM.getKey(Items.AIR);
         this.components = DataComponentPatch.EMPTY;
         this.amount = 0;
-        this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.get(this.id), this.components);
+        this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.getValue(this.id), this.components);
         this.displayStack = this.toSpec().createStack(this.getAmount());
     }
 
@@ -66,16 +66,16 @@ public class ItemOutput implements SlotDisplay {
         this(Objects.requireNonNull(stack.getItem().arch$registryName()), stack.getComponentsPatch(), stack.getCount());
     }
 
-    public ItemOutput(@NotNull ResourceLocation id, int amount) {
+    public ItemOutput(@NotNull Identifier id, int amount) {
         this(id, DataComponentPatch.EMPTY, amount);
     }
 
-    public ItemOutput(@NotNull ResourceLocation id, @NotNull DataComponentPatch components, long amount) {
+    public ItemOutput(@NotNull Identifier id, @NotNull DataComponentPatch components, long amount) {
         this.id = id;
         this.components = components;
         this.amount = amount;
         if (this.amount <= 0) CropariaIf.LOGGER.warn("Creating ItemOutput with non-positive amount: {}", this.amount);
-        this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.get(id), components);
+        this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.getValue(id), components);
         if (this.itemSpec.isEmpty()) throw new IllegalArgumentException("Unknown or invalid item: " + id);
         this.displayStack = this.toSpec().createStack(this.getAmount());
     }
@@ -85,7 +85,7 @@ public class ItemOutput implements SlotDisplay {
     }
 
     @NotNull
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return this.id;
     }
 

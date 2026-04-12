@@ -10,7 +10,7 @@ import cool.muyucloud.croparia.api.generator.util.PackCacheEntry;
 import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.Template;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,13 +25,13 @@ public class AggregatedGenerator extends DataGenerator {
             base.getPath(), base.getRegistry(), content, base.getTemplate()
         )
     );
-    public static final ResourceLocation TYPE = CropariaIf.of("aggregated");
+    public static final Identifier TYPE = CropariaIf.of("aggregated");
     public static final Placeholder<String> CONTENT_PLACEHOLDER = Placeholder.build(builder -> builder
         .then(PatternKey.literal("content"), Placeholder.STRING));
 
     private final Template content;
 
-    public AggregatedGenerator(boolean enabled, boolean startup, List<ResourceLocation> whitelist, Template path, DgRegistry<? extends DgEntry> iterable, Template content, Template template) {
+    public AggregatedGenerator(boolean enabled, boolean startup, List<Identifier> whitelist, Template path, DgRegistry<? extends DgEntry> iterable, Template content, Template template) {
         super(enabled, startup, whitelist, path, iterable, template);
         this.content = content;
     }
@@ -79,7 +79,7 @@ public class AggregatedGenerator extends DataGenerator {
     }
 
     @Override
-    public ResourceLocation getType() {
+    public Identifier getType() {
         return TYPE;
     }
 }

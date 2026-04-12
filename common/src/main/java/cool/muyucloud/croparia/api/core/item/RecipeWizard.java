@@ -15,7 +15,7 @@ import cool.muyucloud.croparia.util.FileUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.function.Function;
 
 public class RecipeWizard extends Item {
-    public static final ResourceLocation PACK_ID = CropariaIf.of("recipe_wizard");
+    public static final Identifier PACK_ID = CropariaIf.of("recipe_wizard");
     public static final OnLoadSupplier<Collection<RecipeWizardGenerator>> GENERATORS = OnLoadSupplier.of(() -> {
         for (JarJarEntry entry : PackHandler.getBuiltinGenerators(PACK_ID)) {
             String name = entry.getJarEntry().getName();
@@ -64,13 +64,15 @@ public class RecipeWizard extends Item {
     static {
         OPERATIONS.put(
             // Build Ritual Structure
-            BlockInput.ofTag(TagKey.create(Registries.BLOCK, ResourceLocation.parse("croparia:ritual_stands"))),
+            BlockInput.ofTag(TagKey.create(Registries.BLOCK, Identifier.parse("croparia:ritual_stands"))),
             context -> {
                 BlockState state = context.getLevel().getBlockState(context.getClickedPos());
-                return RitualStructure.TYPED_SERIALIZER.find(new RitualStructureContainer(state), context.getLevel()).map(structure -> {
-                    structure.tryBuild(context.getLevel(), context.getClickedPos());
-                    return InteractionResult.SUCCESS;
-                }).orElse(InteractionResult.PASS);
+                Optional<RitualStructure> structure = RitualStructure.TYPED_SERIALIZER.find(new RitualStructureContainer(state), context.getLevel());
+                if (structure.isEmpty()) {
+                    return InteractionResult.PASS;
+                }
+                structure.get().tryBuild(context.getLevel(), context.getClickedPos());
+                return InteractionResult.SUCCESS;
             }
         );
         OPERATIONS.put(
@@ -123,7 +125,7 @@ public class RecipeWizard extends Item {
         for (RecipeWizardGenerator generator : GENERATORS.get()) {
             if (generator.matches(target)) {
                 generator.handle(context);
-                player.getCooldowns().addCooldown(context.getItemInHand().getItem(), 5);
+                player.getCooldowns().addCooldown(context.getItemInHand(), 5);
                 return InteractionResult.SUCCESS;
             }
         }

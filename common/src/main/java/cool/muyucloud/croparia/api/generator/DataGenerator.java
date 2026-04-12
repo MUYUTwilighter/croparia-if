@@ -16,7 +16,7 @@ import cool.muyucloud.croparia.api.generator.util.DgListener;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.api.placeholder.Template;
 import cool.muyucloud.croparia.util.Dependencies;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -32,7 +32,7 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 public class DataGenerator implements DgListener {
     public static final Logger LOGGER = LogUtils.getLogger();
-    private static final Map<ResourceLocation, MapCodec<? extends DataGenerator>> REGISTRY = new HashMap<>();
+    private static final Map<Identifier, MapCodec<? extends DataGenerator>> REGISTRY = new HashMap<>();
 
     /**
      * Registers a data generator codec, used to get Generator API known of custom data generator types.
@@ -43,7 +43,7 @@ public class DataGenerator implements DgListener {
      * @param <C>   the type of the codec
      * @return the codec
      */
-    public static <G extends DataGenerator, C extends MapCodec<G>> C register(ResourceLocation id, C codec) {
+    public static <G extends DataGenerator, C extends MapCodec<G>> C register(Identifier id, C codec) {
         REGISTRY.put(id, codec);
         return codec;
     }
@@ -64,7 +64,7 @@ public class DataGenerator implements DgListener {
             if (!dependencies.available()) return Optional.empty();
         }
         JsonElement rawType = json.get("type");
-        ResourceLocation type = ResourceLocation.tryParse(rawType == null ? "croparia:generator" : rawType.getAsString());
+        Identifier type = Identifier.tryParse(rawType == null ? "croparia:generator" : rawType.getAsString());
         MapCodec<? extends DataGenerator> codec = REGISTRY.get(type);
         if (codec == null) {
             throw new JsonParseException("Unknown data generator type: " + type);
@@ -75,7 +75,7 @@ public class DataGenerator implements DgListener {
     public static final MapCodec<DataGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
         Codec.BOOL.optionalFieldOf("enabled").forGetter(DataGenerator::optionalEnabled),
         Codec.BOOL.optionalFieldOf("startup").forGetter(DataGenerator::optionalStartup),
-        ResourceLocation.CODEC.listOf().optionalFieldOf("whitelist").forGetter(DataGenerator::optionalWhitelist),
+        Identifier.CODEC.listOf().optionalFieldOf("whitelist").forGetter(DataGenerator::optionalWhitelist),
         Template.CODEC.fieldOf("path").forGetter(DataGenerator::getPath),
         DgRegistry.CODEC.fieldOf("registry").forGetter(DataGenerator::getRegistry),
         Template.CODEC.optionalFieldOf("template", Template.EMPTY).forGetter(DataGenerator::getTemplate)
@@ -83,22 +83,22 @@ public class DataGenerator implements DgListener {
         enabled.orElse(true), startup.orElse(false), whitelist.orElse(List.of()), path, registry, template
     )));
 
-    private static final ResourceLocation TYPE = CropariaIf.of("generator");
+    private static final Identifier TYPE = CropariaIf.of("generator");
 
     private final boolean enabled;
     private final boolean startup;
-    private final List<ResourceLocation> whitelist;
+    private final List<Identifier> whitelist;
     private final Template path;
     private final DgRegistry<? extends DgEntry> registry;
     private final Template template;
     @Nullable
     protected transient String name;
 
-    public DataGenerator(boolean enabled, boolean startup, List<ResourceLocation> whitelist,
+    public DataGenerator(boolean enabled, boolean startup, List<Identifier> whitelist,
                          Template path, DgRegistry<? extends DgEntry> registry, Template template) {
         this.enabled = enabled;
         this.startup = startup;
-        this.whitelist = whitelist instanceof ImmutableList<ResourceLocation> immutable ? immutable : ImmutableList.copyOf(whitelist);
+        this.whitelist = whitelist instanceof ImmutableList<Identifier> immutable ? immutable : ImmutableList.copyOf(whitelist);
         this.path = path;
         this.registry = registry;
         this.template = template;
@@ -134,11 +134,11 @@ public class DataGenerator implements DgListener {
         return this.isStartup() ? Optional.of(true) : Optional.empty();
     }
 
-    public List<ResourceLocation> getWhitelist() {
+    public List<Identifier> getWhitelist() {
         return whitelist;
     }
 
-    public Optional<List<ResourceLocation>> optionalWhitelist() {
+    public Optional<List<Identifier>> optionalWhitelist() {
         return this.getWhitelist().isEmpty() ? Optional.empty() : Optional.of(this.getWhitelist());
     }
 
@@ -172,7 +172,7 @@ public class DataGenerator implements DgListener {
                     }
                 }
             } else {
-                for (ResourceLocation id : this.getWhitelist()) {
+                for (Identifier id : this.getWhitelist()) {
                     this.getRegistry().forName(id).ifPresent(e -> this.generate(e, pack));
                 }
             }
@@ -185,7 +185,7 @@ public class DataGenerator implements DgListener {
         pack.cache(relative, replaced, this);
     }
 
-    public ResourceLocation getType() {
+    public Identifier getType() {
         return TYPE;
     }
 

@@ -22,7 +22,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -52,7 +52,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     public static final BlockInput UNKNOWN = BlockInput.of(CropariaIf.of("unknown"));
     public static final BlockInput ANY = new BlockInput(null, null, BlockProperties.EMPTY);
     public static final MapCodec<BlockInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.optionalFieldOf("id").forGetter(BlockInput::getId),
+        Identifier.CODEC.optionalFieldOf("id").forGetter(BlockInput::getId),
         TagKey.codec(Registries.BLOCK).optionalFieldOf("tag").forGetter(BlockInput::getTag),
         BlockProperties.CODEC.optionalFieldOf("properties", BlockProperties.EMPTY).forGetter(BlockInput::getProperties)
     ).apply(instance, (id, tag, properties) -> create(id.orElse(null), tag.orElse(null), properties)));
@@ -75,26 +75,26 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     public static BlockInput create(String s) {
         if (s.startsWith("#")) {
             s = s.substring(1);
-            TagKey<Block> tag = TagKey.create(Registries.BLOCK, ResourceLocation.parse(s));
+            TagKey<Block> tag = TagKey.create(Registries.BLOCK, Identifier.parse(s));
             return ofTag(tag);
         } else if (s.isEmpty()) {
             return ANY;
         } else {
-            return of(ResourceLocation.parse(s));
+            return of(Identifier.parse(s));
         }
     }
 
-    protected static BlockInput create(@Nullable ResourceLocation id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties) {
+    protected static BlockInput create(@Nullable Identifier id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties) {
         BlockInput blockInput = new BlockInput(id, tag, properties);
         if (blockInput.isAny()) return ANY;
         else return blockInput;
     }
 
-    public static BlockInput ofTag(ResourceLocation id) {
+    public static BlockInput ofTag(Identifier id) {
         return ofTag(TagKey.create(Registries.BLOCK, id));
     }
 
-    public static BlockInput ofTag(ResourceLocation id, BlockProperties properties) {
+    public static BlockInput ofTag(Identifier id, BlockProperties properties) {
         return ofTag(TagKey.create(Registries.BLOCK, id), properties);
     }
 
@@ -106,11 +106,11 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
         return new BlockInput(null, tag, properties);
     }
 
-    public static BlockInput of(@NotNull ResourceLocation id) {
+    public static BlockInput of(@NotNull Identifier id) {
         return of(id, BlockProperties.EMPTY);
     }
 
-    public static BlockInput of(@NotNull ResourceLocation id, BlockProperties properties) {
+    public static BlockInput of(@NotNull Identifier id, BlockProperties properties) {
         return new BlockInput(id, null, properties);
     }
 
@@ -123,7 +123,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     }
 
     @Nullable
-    private final ResourceLocation id;
+    private final Identifier id;
     @Nullable
     private final TagKey<Block> tag;
     @NotNull
@@ -131,7 +131,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     private transient OnLoadSupplier<ImmutableList<ItemStack>> displayStacks;
     private boolean virtualRender = false;
 
-    protected BlockInput(@Nullable ResourceLocation id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties) {
+    protected BlockInput(@Nullable Identifier id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties) {
         this.id = id;
         this.tag = tag;
         if (this.id != null && this.tag != null)
@@ -183,11 +183,11 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
         });
     }
 
-    public Optional<ResourceLocation> getId() {
+    public Optional<Identifier> getId() {
         return Optional.ofNullable(id);
     }
 
-    public ResourceLocation getDisplayId() {
+    public Identifier getDisplayId() {
         return this.getTag().map(TagKey::location).orElse(this.getDisplayStacks().getFirst().getItem().arch$registryName());
     }
 
@@ -203,7 +203,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     public BlockState getExampleState() {
         BlockState state;
         if (this.getId().isPresent()) {
-            state = BuiltInRegistries.BLOCK.get(this.getId().get()).defaultBlockState();
+            state = BuiltInRegistries.BLOCK.getValue(this.getId().get()).defaultBlockState();
         } else if (this.getTag().isPresent()) {
             Iterable<Holder<Block>> candidates = TagUtil.forEntries(this.getTag().get());
             if (candidates.iterator().hasNext()) {
@@ -227,7 +227,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     }
 
     public String getTaggable() {
-        Optional<String> id = this.getId().map(ResourceLocation::toString);
+        Optional<String> id = this.getId().map(Identifier::toString);
         Optional<String> tag = this.getTag().map(t -> "#" + t.location());
         return id.orElse(tag.orElse(""));
     }
@@ -275,7 +275,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
 
     @Override
     public boolean test(LootContext lootContext) {
-        BlockState state = lootContext.getParam(LootContextParams.BLOCK_STATE);
+        BlockState state = lootContext.getParameter(LootContextParams.BLOCK_STATE);
         return this.matches(state);
     }
 }

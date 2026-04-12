@@ -5,7 +5,7 @@ import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
 import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
 import cool.muyucloud.croparia.registry.DgRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +29,7 @@ public class CropUtil {
         @Nullable Map<String, String> rawDependencies, @Nullable Map<String, String> translations
     ) {
         type = type == null ? Crop.DEFAULT_TYPE : type;
-        ResourceLocation id = ResourceLocation.parse(rawId);
+        Identifier id = Identifier.parse(rawId);
         CropDependencies dependencies = rawDependencies == null ? CropDependencies.EMPTY : new CropDependencies(rawDependencies);
         Crop crop = new Crop(id, new ItemMaterial(material), new Color(color), tier, type, translations, dependencies);
         DgRegistries.CROPS.register(crop);

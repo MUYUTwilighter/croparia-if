@@ -33,6 +33,8 @@ import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,7 +91,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     public void tryHarvestMelon(ServerLevel level, BlockState stem, BlockPos stemPos) {
         // Find melon
         Direction facing = stem.getValue(AttachedStemBlock.FACING);
-        BlockPos melonPos = stemPos.offset(facing.getNormal());
+        BlockPos melonPos = stemPos.offset(facing.getUnitVec3i());
         BlockState melonState = level.getBlockState(melonPos);
         // Get drops
         List<ItemStack> droppedStacks = Block.getDrops(melonState, level, melonPos, level.getBlockEntity(melonPos));
@@ -113,15 +115,15 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
-        ContainerHelper.loadAllItems(nbt, this.inventory, provider);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        ContainerHelper.loadAllItems(input, this.inventory);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        ContainerHelper.saveAllItems(nbt, this.inventory, provider);
-        super.saveAdditional(nbt, provider);
+    protected void saveAdditional(ValueOutput output) {
+        ContainerHelper.saveAllItems(output, this.inventory);
+        super.saveAdditional(output);
     }
 
     public int getContainerSize() {

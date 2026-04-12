@@ -1,7 +1,7 @@
 package cool.muyucloud.croparia.config;
 
 import dev.architectury.platform.Platform;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,7 +60,7 @@ public class Config {
     @NotNull
     private Integer melonYield;
     @NotNull
-    private final List<ResourceLocation> cropBlackList;
+    private final List<Identifier> cropBlackList;
     private final List<String> modBlackList;
 
     /**
@@ -185,7 +185,7 @@ public class Config {
         this.ritual = ritual;
     }
 
-    public @NotNull List<ResourceLocation> getCropBlackList() {
+    public @NotNull List<Identifier> getCropBlackList() {
         return cropBlackList;
     }
 
@@ -195,7 +195,7 @@ public class Config {
 
     public List<String> getBlacklist() {
         List<String> blacklist = new ArrayList<>(this.getCropBlackList().size() + this.getModBlackList().size());
-        for (ResourceLocation id : this.getCropBlackList()) {
+        for (Identifier id : this.getCropBlackList()) {
             blacklist.add(id.toString());
         }
         for (String token : this.getModBlackList()) {
@@ -211,14 +211,14 @@ public class Config {
             if (token.startsWith("@")) {
                 this.getModBlackList().add(token.substring(1));
             } else {
-                ResourceLocation id = ResourceLocation.tryParse(token);
+                Identifier id = Identifier.tryParse(token);
                 if (id != null) this.getCropBlackList().add(id);
             }
         }
     }
 
-    public boolean isCropValid(ResourceLocation id) {
-        for (ResourceLocation e : this.getCropBlackList()) {
+    public boolean isCropValid(Identifier id) {
+        for (Identifier e : this.getCropBlackList()) {
             if (e.equals(id)) {
                 return false;
             }

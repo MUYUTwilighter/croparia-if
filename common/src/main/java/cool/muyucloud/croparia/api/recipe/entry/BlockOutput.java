@@ -14,7 +14,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -28,11 +28,11 @@ import java.util.Optional;
 
 @SuppressWarnings("unused")
 public class BlockOutput implements SlotDisplay {
-    public static final Codec<BlockOutput> CODEC_STR = ResourceLocation.CODEC.xmap(
+    public static final Codec<BlockOutput> CODEC_STR = Identifier.CODEC.xmap(
         BlockOutput::create, BlockOutput::getId
     );
     public static final MapCodec<BlockOutput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        ResourceLocation.CODEC.fieldOf("id").forGetter(BlockOutput::getId),
+        Identifier.CODEC.fieldOf("id").forGetter(BlockOutput::getId),
         BlockProperties.CODEC.optionalFieldOf("properties").forGetter(blockOutput -> Optional.of(blockOutput.getProperties()))
     ).apply(instance, (id, properties) -> create(id, properties.orElse(BlockProperties.EMPTY))));
     public static final MultiCodec<BlockOutput> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
@@ -48,16 +48,16 @@ public class BlockOutput implements SlotDisplay {
     }
 
     @NotNull
-    private final ResourceLocation id;
+    private final Identifier id;
     @NotNull
     private final BlockProperties properties;
     private final transient ItemStack displayStack;
 
-    public static BlockOutput create(@NotNull ResourceLocation id) {
+    public static BlockOutput create(@NotNull Identifier id) {
         return create(id, BlockProperties.EMPTY);
     }
 
-    protected static BlockOutput create(@NotNull ResourceLocation id, @NotNull BlockProperties properties) {
+    protected static BlockOutput create(@NotNull Identifier id, @NotNull BlockProperties properties) {
         return new BlockOutput(id, properties);
     }
 
@@ -65,7 +65,7 @@ public class BlockOutput implements SlotDisplay {
         return create(Objects.requireNonNull(state.getBlock().arch$registryName()), BlockProperties.extract(state));
     }
 
-    protected BlockOutput(@NotNull ResourceLocation id, @NotNull BlockProperties properties) {
+    protected BlockOutput(@NotNull Identifier id, @NotNull BlockProperties properties) {
         this.id = id;
         this.properties = properties;
         this.displayStack = BuiltInRegistries.BLOCK.getOptional(this.getId()).map(block -> {
@@ -75,7 +75,7 @@ public class BlockOutput implements SlotDisplay {
         }).orElseThrow(() -> new IllegalArgumentException("Unknown block: " + id));
     }
 
-    public @NotNull ResourceLocation getId() {
+    public @NotNull Identifier getId() {
         return id;
     }
 

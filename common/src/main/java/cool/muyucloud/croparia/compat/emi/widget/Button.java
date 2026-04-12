@@ -5,7 +5,7 @@ package cool.muyucloud.croparia.compat.emi.widget;
 //import dev.emi.emi.api.widget.TextureWidget;
 //import dev.emi.emi.api.widget.Widget;
 //import net.minecraft.client.gui.GuiGraphics;
-//import net.minecraft.resources.ResourceLocation;
+//import net.minecraft.resources.Identifier;
 //
 //import java.util.function.BooleanSupplier;
 //
@@ -13,14 +13,14 @@ package cool.muyucloud.croparia.compat.emi.widget;
 //    protected final int x, y, width, height, u, v;
 //    protected final BooleanSupplier active;
 //    protected final ButtonWidget.ClickAction action;
-//    protected final ResourceLocation normal, hover;
+//    protected final Identifier normal, hover;
 //    protected final Bounds bounds;
 //
-//    public Button(int x, int y, int width, int height, ResourceLocation normal, ResourceLocation hover, BooleanSupplier isActive, ButtonWidget.ClickAction action) {
+//    public Button(int x, int y, int width, int height, Identifier normal, Identifier hover, BooleanSupplier isActive, ButtonWidget.ClickAction action) {
 //        this(x, y, width, height, 0, 0, normal, hover, isActive, action);
 //    }
 //
-//    public Button(int x, int y, int width, int height, int u, int v, ResourceLocation normal, ResourceLocation hover, BooleanSupplier isActive, ButtonWidget.ClickAction action) {
+//    public Button(int x, int y, int width, int height, int u, int v, Identifier normal, Identifier hover, BooleanSupplier isActive, ButtonWidget.ClickAction action) {
 //        this.x = x;
 //        this.y = y;
 //        this.width = width;

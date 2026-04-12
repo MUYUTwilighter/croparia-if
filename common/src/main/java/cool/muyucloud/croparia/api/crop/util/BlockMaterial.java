@@ -13,7 +13,7 @@ import cool.muyucloud.croparia.api.placeholder.TypeMapper;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -41,7 +41,7 @@ public class BlockMaterial extends Material<Block> {
         .concat(Material.PLACEHOLDER, TypeMapper.of(material -> material)));
 
     private transient final OnLoadSupplier<List<Block>> blocks = OnLoadSupplier.of(
-        () -> this.rawCandidates(BuiltInRegistries.BLOCK.key().location()).stream().filter(block -> {
+        () -> this.rawCandidates(BuiltInRegistries.BLOCK.key().identifier()).stream().filter(block -> {
             boolean blacklist = CropariaIf.CONFIG.isModValid(Objects.requireNonNull(block.arch$registryName()).getNamespace());
             boolean hasItem = block.asItem() instanceof BlockItem;
             return blacklist & hasItem;
@@ -51,7 +51,7 @@ public class BlockMaterial extends Material<Block> {
         this.candidates().stream().map(block -> block.asItem().getDefaultInstance()).toList()
     );
 
-    public static ResourceLocation parse(ItemStack stack) {
+    public static Identifier parse(ItemStack stack) {
         Item item = stack.getItem();
         if (item instanceof BlockItem blockItem) {
             return blockItem.getBlock().arch$registryName();

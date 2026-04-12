@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,9 +59,9 @@ public class FakePlayer extends Player {
     }
 
     public FakePlayer(@NotNull Level level) {
-        super(level, BlockPos.ZERO, 0, new GameProfile(UUID.randomUUID(), "FakePlayer"));
-        this.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), 90);
-        CropariaIf.LOGGER.debug("Created fake player for {}", level.dimension().location());
+        super(level, new GameProfile(UUID.randomUUID(), "FakePlayer"));
+        this.snapTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), 90.0F);
+        CropariaIf.LOGGER.debug("Created fake player for {}", level.dimension().identifier());
     }
 
     public InteractionResult useItemOn(@NotNull BlockPos pos, @NotNull ItemStack item) {
@@ -79,5 +80,10 @@ public class FakePlayer extends Player {
     @Override
     public boolean isCreative() {
         return false;
+    }
+
+    @Override
+    public @NotNull GameType gameMode() {
+        return GameType.SURVIVAL;
     }
 }

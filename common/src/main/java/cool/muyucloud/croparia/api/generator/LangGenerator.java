@@ -11,7 +11,7 @@ import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.Template;
 import cool.muyucloud.croparia.api.placeholder.TypeMapper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,10 +37,10 @@ public class LangGenerator extends DataGenerator {
             throw new IllegalArgumentException("Iterable %s is not translatable".formatted(dg.getRegistry()), e);
         }
     }, lg -> lg);
-    public static final ResourceLocation TYPE = CropariaIf.of("lang");
+    public static final Identifier TYPE = CropariaIf.of("lang");
 
     public LangGenerator(
-        boolean enabled, boolean startup, List<ResourceLocation> whitelist, Template path,
+        boolean enabled, boolean startup, List<Identifier> whitelist, Template path,
         DgRegistry<? extends TranslatableEntry> registry, Template template
     ) {
         super(enabled, startup, whitelist, path, registry, template);
@@ -86,7 +86,7 @@ public class LangGenerator extends DataGenerator {
     }
 
     @Override
-    public ResourceLocation getType() {
+    public Identifier getType() {
         return TYPE;
     }
 }

@@ -22,7 +22,8 @@ import cool.muyucloud.croparia.util.text.Texts;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Items;
@@ -62,7 +63,7 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
         .overwrite(DgEntry.PLACEHOLDER, TypeMapper.of(element -> element))
     );
 
-    private final ResourceLocation id;
+    private final Identifier id;
     private final Color color;
     private final String translationKey;
     private final SimpleArchitecturyFluidAttributes fluidAttr;
@@ -110,7 +111,7 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
         this.fluidFlowing = CropariaFluids.registerFluid(parseId("fluid_%s_flow"), () -> new ElementalFlowing(this, fluidAttr));
         this.fluidBlock = CropariaBlocks.registerBlock(parseId("fluid_%s"),
             properties -> new ElementalLiquidBlock(this, BlockBehaviour.Properties.of().replaceable()
-                .lightLevel(state -> 8).noCollission().strength(100.0F).noLootTable()
+                .lightLevel(state -> 8).noCollision().strength(100.0F).noLootTable().setId(ResourceKey.create(Registries.BLOCK, this.getKey()))
             ));
         this.bucket = CropariaItems.registerItem(parseId("bucket_%s"), properties -> new ElementalBucket(
             this, this.getFluidSource(),
@@ -125,7 +126,7 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
         this.tag = TagKey.create(Registries.FLUID, parseId("fluid/%s"));
     }
 
-    public ResourceLocation parseId(String pattern) {
+    public Identifier parseId(String pattern) {
         return CifUtil.formatId(pattern, this.getKey());
     }
 
@@ -171,7 +172,7 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
     }
 
     @Override
-    public @NotNull ResourceLocation getKey() {
+    public @NotNull Identifier getKey() {
         return this.id;
     }
 

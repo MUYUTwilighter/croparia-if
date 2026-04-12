@@ -5,7 +5,7 @@ import cool.muyucloud.croparia.api.resource.type.FluidSpec;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
 import cool.muyucloud.croparia.neoforge.access.BlockCapabilityAccess;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.capabilities.BaseCapability;
 import net.neoforged.neoforge.capabilities.BlockCapability;
@@ -28,16 +28,15 @@ public abstract class BlockCapabilityMixin<T, C extends @Nullable Object> extend
     @Final
     Map<Block, List<IBlockCapabilityProvider<T, C>>> providers;
 
-    protected BlockCapabilityMixin(ResourceLocation name, Class<T> typeClass, Class<C> contextClass) {
+    protected BlockCapabilityMixin(Identifier name, Class<T> typeClass, Class<C> contextClass) {
         super(name, typeClass, contextClass);
-        System.out.println("test");
     }
 
     @Override
     @Unique
     public void croparia_if$registerItem(ProxyProvider<ItemSpec> provider, Block... blocks) {
         //noinspection EqualsBetweenInconvertibleTypes
-        if (!Objects.equals(this, Capabilities.ItemHandler.BLOCK)) {
+        if (!Objects.equals(this, Capabilities.Item.BLOCK)) {
             throw new UnsupportedOperationException("Calling registerItem on the wrong capability!");
         }
         for (Block block : blocks) {
@@ -52,7 +51,7 @@ public abstract class BlockCapabilityMixin<T, C extends @Nullable Object> extend
     @Unique
     public void croparia_if$registerFluid(ProxyProvider<FluidSpec> provider, Block... blocks) {
         //noinspection EqualsBetweenInconvertibleTypes
-        if (!Objects.equals(this, Capabilities.FluidHandler.BLOCK)) {
+        if (!Objects.equals(this, Capabilities.Fluid.BLOCK)) {
             throw new UnsupportedOperationException("Calling registerFluid on the wrong capability!");
         }
         for (Block block : blocks) {

@@ -5,7 +5,7 @@ import cool.muyucloud.croparia.api.core.block.ActivatedShrieker;
 import cool.muyucloud.croparia.registry.BlockEntities;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -26,12 +26,12 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.entity.monster.warden.WardenSpawnTracker;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SculkShriekerBlockEntity;
@@ -42,6 +42,8 @@ import net.minecraft.world.level.gameevent.GameEventListener;
 import net.minecraft.world.level.gameevent.PositionSource;
 import net.minecraft.world.level.gameevent.vibrations.VibrationSystem;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -75,24 +77,14 @@ public class ActivatedShriekerBlockEntity extends BlockEntity implements GameEve
         return this.vibrationUser;
     }
 
-    protected void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-        super.loadAdditional(compoundTag, provider);
-
-        RegistryOps<Tag> registryOps = provider.createSerializationContext(NbtOps.INSTANCE);
-        if (compoundTag.contains("listener", 10)) {
-            Data.CODEC.parse(registryOps, compoundTag.getCompound("listener")).resultOrPartial(
-                string -> LOGGER.error("Failed to parse vibration listener for Sculk Shrieker: '{}'", string)
-            ).ifPresent((data) -> this.vibrationData = data);
-        }
-
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.vibrationData = input.read("listener", VibrationSystem.Data.CODEC).orElseGet(VibrationSystem.Data::new);
     }
 
-    protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-        super.saveAdditional(compoundTag, provider);
-        RegistryOps<Tag> registryOps = provider.createSerializationContext(NbtOps.INSTANCE);
-        Data.CODEC.encodeStart(registryOps, this.vibrationData).resultOrPartial(
-            string -> LOGGER.error("Failed to encode vibration listener for Sculk Shrieker: '{}'", string)
-        ).ifPresent((tag) -> compoundTag.put("listener", tag));
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.store("listener", VibrationSystem.Data.CODEC, this.vibrationData);
     }
 
     @Nullable
@@ -149,7 +141,7 @@ public class ActivatedShriekerBlockEntity extends BlockEntity implements GameEve
     }
 
     private boolean canRespond(ServerLevel serverLevel) {
-        return this.getBlockState().getValue(ActivatedShrieker.CAN_SUMMON) && serverLevel.getDifficulty() != Difficulty.PEACEFUL && serverLevel.getGameRules().getBoolean(GameRules.RULE_DO_WARDEN_SPAWNING);
+        return this.getBlockState().getValue(ActivatedShrieker.CAN_SUMMON) && serverLevel.getDifficulty() != Difficulty.PEACEFUL && serverLevel.getGameRules().get(GameRules.SPAWN_WARDENS);
     }
 
     public void tryRespond(ServerLevel serverLevel) {
@@ -176,7 +168,7 @@ public class ActivatedShriekerBlockEntity extends BlockEntity implements GameEve
     }
 
     private boolean trySummonWarden(ServerLevel serverLevel) {
-        return SpawnUtil.trySpawnMob(EntityType.WARDEN, MobSpawnType.TRIGGERED, serverLevel, this.getBlockPos(), 20, 5, 6, SpawnUtil.Strategy.ON_TOP_OF_COLLIDER).isPresent();
+        return SpawnUtil.trySpawnMob(EntityType.WARDEN, EntitySpawnReason.TRIGGERED, serverLevel, this.getBlockPos(), 20, 5, 6, SpawnUtil.Strategy.ON_TOP_OF_COLLIDER, false).isPresent();
     }
 
     public VibrationSystem.@NotNull Listener getListener() {

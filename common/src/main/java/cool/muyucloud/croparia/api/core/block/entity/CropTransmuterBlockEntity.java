@@ -33,6 +33,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -133,19 +135,19 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
-        ContainerHelper.loadAllItems(nbt, this.inventory, provider);
-        this.selectedIndex = Math.max(0, nbt.getInt(NBT_SELECTED_INDEX));
-        this.positiveRedstone = !nbt.contains(NBT_POSITIVE_REDSTONE) || nbt.getBoolean(NBT_POSITIVE_REDSTONE);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        ContainerHelper.loadAllItems(input, this.inventory);
+        this.selectedIndex = Math.max(0, input.getIntOr(NBT_SELECTED_INDEX, 0));
+        this.positiveRedstone = input.getBooleanOr(NBT_POSITIVE_REDSTONE, true);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        ContainerHelper.saveAllItems(nbt, this.inventory, provider);
-        nbt.putInt(NBT_SELECTED_INDEX, this.selectedIndex);
-        nbt.putBoolean(NBT_POSITIVE_REDSTONE, this.positiveRedstone);
-        super.saveAdditional(nbt, provider);
+    protected void saveAdditional(ValueOutput output) {
+        ContainerHelper.saveAllItems(output, this.inventory);
+        output.putInt(NBT_SELECTED_INDEX, this.selectedIndex);
+        output.putBoolean(NBT_POSITIVE_REDSTONE, this.positiveRedstone);
+        super.saveAdditional(output);
     }
 
     @Override

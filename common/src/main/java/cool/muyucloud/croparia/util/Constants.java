@@ -4,22 +4,22 @@ import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 @SuppressWarnings("unused")
 public class Constants {
-    public static final ResourceLocation ITEM_DROP = ResourceLocation.parse("croparia:textures/gui/item_drop.png");
-    public static final ResourceLocation ELEM_INFUSE = ResourceLocation.parse("croparia:textures/gui/elem_infuse.png");
-    public static final ResourceLocation BLOCK_PLACE = ResourceLocation.parse("croparia:textures/gui/block_place.png");
-    public static final ResourceLocation BLOCK_PLACE_UPON = ResourceLocation.parse("croparia:textures/gui/block_place_upon.png");
-    public static final ResourceLocation LEFT_DARK = ResourceLocation.parse("croparia:textures/gui/left_dark.png");
-    public static final ResourceLocation LEFT_WHITE = ResourceLocation.parse("croparia:textures/gui/left_white.png");
-    public static final ResourceLocation RIGHT_DARK = ResourceLocation.parse("croparia:textures/gui/right_dark.png");
-    public static final ResourceLocation RIGHT_WHITE = ResourceLocation.parse("croparia:textures/gui/right_white.png");
-    public static final ResourceLocation UP_DARK = ResourceLocation.parse("croparia:textures/gui/up_dark.png");
-    public static final ResourceLocation UP_WHITE = ResourceLocation.parse("croparia:textures/gui/up_white.png");
-    public static final ResourceLocation DOWN_DARK = ResourceLocation.parse("croparia:textures/gui/down_dark.png");
-    public static final ResourceLocation DOWN_WHITE = ResourceLocation.parse("croparia:textures/gui/down_white.png");
+    public static final Identifier ITEM_DROP = Identifier.parse("croparia:textures/gui/item_drop.png");
+    public static final Identifier ELEM_INFUSE = Identifier.parse("croparia:textures/gui/elem_infuse.png");
+    public static final Identifier BLOCK_PLACE = Identifier.parse("croparia:textures/gui/block_place.png");
+    public static final Identifier BLOCK_PLACE_UPON = Identifier.parse("croparia:textures/gui/block_place_upon.png");
+    public static final Identifier LEFT_DARK = Identifier.parse("croparia:textures/gui/left_dark.png");
+    public static final Identifier LEFT_WHITE = Identifier.parse("croparia:textures/gui/left_white.png");
+    public static final Identifier RIGHT_DARK = Identifier.parse("croparia:textures/gui/right_dark.png");
+    public static final Identifier RIGHT_WHITE = Identifier.parse("croparia:textures/gui/right_white.png");
+    public static final Identifier UP_DARK = Identifier.parse("croparia:textures/gui/up_dark.png");
+    public static final Identifier UP_WHITE = Identifier.parse("croparia:textures/gui/up_white.png");
+    public static final Identifier DOWN_DARK = Identifier.parse("croparia:textures/gui/down_dark.png");
+    public static final Identifier DOWN_WHITE = Identifier.parse("croparia:textures/gui/down_white.png");
     public static final Style USAGE = Style.EMPTY.withItalic(true).withColor(ChatFormatting.GRAY);
     public static final MutableComponent INPUT_BLOCK = Texts.translatable("tooltip.croparia.input");
     public static final MutableComponent AIR_BLOCK = Texts.translatable("tooltip.croparia.air");

@@ -43,7 +43,7 @@ public class ItemMaterial extends Material<Item> {
     @NotNull
     private final DataComponentPatch components;
     private transient final OnLoadSupplier<List<Item>> items = OnLoadSupplier.of(
-        () -> this.rawCandidates(BuiltInRegistries.ITEM.key().location()).stream().filter(
+        () -> this.rawCandidates(BuiltInRegistries.ITEM.key().identifier()).stream().filter(
             item -> CropariaIf.CONFIG.isModValid(Objects.requireNonNull(item.arch$registryName()).getNamespace())
         ).toList()
     );

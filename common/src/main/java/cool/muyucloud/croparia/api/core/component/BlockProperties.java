@@ -3,9 +3,11 @@ package cool.muyucloud.croparia.api.core.component;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.access.StateHolderAccess;
+import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.Item;
@@ -22,10 +24,7 @@ import java.util.function.Consumer;
 
 public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<String, String>> {
     public static final Codec<BlockProperties> CODEC = Codec.unboundedMap(Codec.STRING, Codec.STRING).xmap(BlockProperties::new, BlockProperties::getProperties);
-    public static final StreamCodec<FriendlyByteBuf, BlockProperties> STREAM_CODEC = StreamCodec.of(
-        (buf, component) -> buf.writeJsonWithCodec(Codec.unboundedMap(Codec.STRING, Codec.STRING), component.getProperties()),
-        buf -> new BlockProperties(buf.readJsonWithCodec(Codec.unboundedMap(Codec.STRING, Codec.STRING)))
-    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, BlockProperties> STREAM_CODEC = CodecUtil.toStream(CODEC);
     public static final DataComponentType<BlockProperties> TYPE;
     public static final BlockProperties EMPTY = new BlockProperties(Map.of());
 
@@ -73,7 +72,7 @@ public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<Stri
     }
 
     @Override
-    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter componentGetter) {
         if (this.getProperties().isEmpty()) return;
         consumer.accept(TITLE);
         this.getProperties().forEach((key, value) -> consumer.accept(Texts.literal("%s=%s".formatted(key, value))));

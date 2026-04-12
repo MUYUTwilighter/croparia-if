@@ -11,7 +11,7 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 public abstract class ReiCategory<R extends DisplayableRecipe<?>> implements DisplayCategory<ReiDisplay<R>> {
@@ -35,7 +35,7 @@ public abstract class ReiCategory<R extends DisplayableRecipe<?>> implements Dis
 
     public abstract TypedSerializer<R> getRecipeType();
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return getCategoryIdentifier().getIdentifier();
     }
 

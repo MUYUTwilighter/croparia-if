@@ -40,15 +40,13 @@ public class ActivatedShrieker extends SculkShriekerBlock {
         super.stepOn(level, blockPos, blockState, entity);
     }
 
-    protected void onRemove(BlockState blockState, Level level, BlockPos blockPos, BlockState blockState2, boolean bl) {
-        if (level instanceof ServerLevel serverLevel) {
-            if (blockState.getValue(SHRIEKING) && !blockState.is(blockState2.getBlock())) {
-                serverLevel.getBlockEntity(blockPos, BlockEntities.ACTIVATED_SHRIEKER.get()).ifPresent(
-                    sculkShriekerBlockEntity -> sculkShriekerBlockEntity.tryRespond(serverLevel)
-                );
-            }
+    @Override
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        if (state.getValue(SHRIEKING)) {
+            level.getBlockEntity(pos, BlockEntities.ACTIVATED_SHRIEKER.get()).ifPresent(
+                sculkShriekerBlockEntity -> sculkShriekerBlockEntity.tryRespond(level)
+            );
         }
-        super.onRemove(blockState, level, blockPos, blockState2, bl);
     }
 
     @Nullable
@@ -68,7 +66,7 @@ public class ActivatedShrieker extends SculkShriekerBlock {
 
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-        return !level.isClientSide ? BaseEntityBlock.createTickerHelper(
+        return !level.isClientSide() ? BaseEntityBlock.createTickerHelper(
             blockEntityType, BlockEntities.ACTIVATED_SHRIEKER.get(),
             (levelx, blockPos, blockStatex, sculkShriekerBlockEntity) -> VibrationSystem.Ticker.tick(
                 levelx, sculkShriekerBlockEntity.getVibrationData(), sculkShriekerBlockEntity.getVibrationUser()

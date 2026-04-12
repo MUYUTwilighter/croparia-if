@@ -9,8 +9,9 @@ import cool.muyucloud.croparia.registry.Recipes;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -26,22 +27,22 @@ import java.util.Optional;
 
 @SuppressWarnings("unused")
 public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeType<R>, RecipeSerializer<R> {
-    public static final Codec<TypedSerializer<?>> CODEC = ResourceLocation.CODEC.xmap(Recipes::find, TypedSerializer::getId);
+    public static final Codec<TypedSerializer<?>> CODEC = Identifier.CODEC.xmap(Recipes::find, TypedSerializer::getId);
 
-    private final ResourceLocation id;
+    private final Identifier id;
     private final List<Mappable<ItemStack>> stations;
     private final Class<? extends R> recipeClass;
     private final MapCodec<R> codec;
     private final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec;
 
     @SafeVarargs
-    public TypedSerializer(ResourceLocation id, Class<? extends R> recipeClass, final MapCodec<R> codec,
+    public TypedSerializer(Identifier id, Class<? extends R> recipeClass, final MapCodec<R> codec,
                            Mappable<ItemStack>... stations) {
         this(id, recipeClass, codec, CodecUtil.toStream(codec.codec()), stations);
     }
 
     @SafeVarargs
-    public TypedSerializer(ResourceLocation id, Class<? extends R> recipeClass, final MapCodec<R> codec,
+    public TypedSerializer(Identifier id, Class<? extends R> recipeClass, final MapCodec<R> codec,
                            final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec,
                            Mappable<ItemStack>... stations) {
         this.id = id;
@@ -71,7 +72,7 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
         ), () -> {
             Level level = getClientLevel();
             if (level == null) return;
-            RecipeManagerAccess access = (RecipeManagerAccess) level.getRecipeManager();
+            RecipeManagerAccess access = (RecipeManagerAccess) level.recipeAccess();
             access.cif$byType(this.adapt()).forEach(holder -> recipes.add((R) holder.value()));
         });
         return recipes;
@@ -79,7 +80,7 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
 
     @SuppressWarnings("unchecked")
     public <I extends RecipeInput> Optional<R> find(I input, Level level) {
-        return level.getRecipeManager().getRecipeFor(this.adapt(), input, level).map(
+        return ((RecipeManager) level.recipeAccess()).getRecipeFor(this.adapt(), input, level).map(
             holder -> (R) holder.value()
         );
     }
@@ -108,7 +109,7 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
         return streamCodec;
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return id;
     }
 

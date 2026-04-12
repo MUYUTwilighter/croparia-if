@@ -5,7 +5,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,8 +15,8 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 public class TagUtil {
     public static <T> Optional<Registry<T>> getRegistry(ResourceKey<? extends Registry<T>> key) {
-        Optional<? extends Registry<?>> maybeRegistry = CropariaIf.getRegistryAccess().flatMap(registryAccess -> registryAccess.registry(key));
-        if (maybeRegistry.isEmpty()) maybeRegistry = BuiltInRegistries.REGISTRY.getOptional(key.location());
+        Optional<? extends Registry<?>> maybeRegistry = CropariaIf.getRegistryAccess().flatMap(registryAccess -> registryAccess.lookup(key));
+        if (maybeRegistry.isEmpty()) maybeRegistry = BuiltInRegistries.REGISTRY.getOptional(key.identifier());
         if (maybeRegistry.isEmpty()) return Optional.empty();
         try {
             if (key.equals(maybeRegistry.get().key())) {
@@ -35,11 +35,11 @@ public class TagUtil {
         return getRegistry(tag.registry()).map(registry -> registry.getTagOrEmpty(tag)).orElse(List.of());
     }
 
-    public static <T> Iterable<Holder<T>> forEntries(ResourceKey<? extends Registry<T>> registry, ResourceLocation id) {
+    public static <T> Iterable<Holder<T>> forEntries(ResourceKey<? extends Registry<T>> registry, Identifier id) {
         return forEntries(TagKey.create(registry, id));
     }
 
-    public static <T> boolean isIn(ResourceKey<? extends Registry<T>> registry, ResourceLocation id, @NotNull T entry) {
+    public static <T> boolean isIn(ResourceKey<? extends Registry<T>> registry, Identifier id, @NotNull T entry) {
         return isIn(TagKey.create(registry, id), entry);
     }
 
@@ -47,7 +47,6 @@ public class TagUtil {
         Optional<Registry<T>> maybeRegistry = getRegistry(tagKey.registry());
         if (maybeRegistry.isEmpty()) return false;
         Registry<T> registry = maybeRegistry.get();
-        Optional<ResourceKey<T>> maybeKey = registry.getResourceKey(entry);
-        return maybeKey.filter(tResourceKey -> registry.getHolderOrThrow(tResourceKey).is(tagKey)).isPresent();
+        return registry.wrapAsHolder(entry).is(tagKey);
     }
 }
