@@ -65,7 +65,7 @@ public abstract class Material<T> {
      */
     protected Collection<T> rawCandidates(Identifier registryName) {
         @Nullable
-        Registry<T> registry = CifUtil.castUnsafe(BuiltInRegistries.REGISTRY.get(registryName));
+        Registry<T> registry = CifUtil.castUnsafe(BuiltInRegistries.REGISTRY.getValue(registryName));
         if (registry == null) {
             return Collections.emptyList();
         }
