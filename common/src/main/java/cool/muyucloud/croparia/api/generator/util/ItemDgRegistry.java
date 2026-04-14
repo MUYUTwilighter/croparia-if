@@ -15,12 +15,12 @@ import java.util.Iterator;
 import java.util.Optional;
 
 public class ItemDgRegistry implements DgRegistry<ItemDgEntry> {
-    private static boolean needsDedicatedClientItemInfo(Item item) {
-        return item instanceof CropSeed
-            || item instanceof CropFruit
-            || item instanceof MelonSeed
-            || item instanceof MelonItem
-            || item instanceof ElementalBucket;
+    private static boolean needsNormalClientItemInfo(Item item) {
+        return !(item instanceof CropSeed)
+            && !(item instanceof CropFruit)
+            && !(item instanceof MelonSeed)
+            && !(item instanceof MelonItem)
+            && !(item instanceof ElementalBucket);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class ItemDgRegistry implements DgRegistry<ItemDgEntry> {
             .keySet()
             .stream()
             .filter(id -> id.getNamespace().equals(CropariaIf.MOD_ID))
-            .filter(id -> !needsDedicatedClientItemInfo(BuiltInRegistries.ITEM.getValue(id)))
+            .filter(id -> needsNormalClientItemInfo(BuiltInRegistries.ITEM.getValue(id)))
             .map(ItemDgEntry::new)
             .iterator();
     }
@@ -38,7 +38,7 @@ public class ItemDgRegistry implements DgRegistry<ItemDgEntry> {
     public Optional<ItemDgEntry> forName(Identifier id) {
         if (BuiltInRegistries.ITEM.containsKey(id)
             && id.getNamespace().equals(CropariaIf.MOD_ID)
-            && !needsDedicatedClientItemInfo(BuiltInRegistries.ITEM.getValue(id))) {
+            && needsNormalClientItemInfo(BuiltInRegistries.ITEM.getValue(id))) {
             return Optional.of(new ItemDgEntry(id));
         }
         return Optional.empty();
