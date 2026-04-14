@@ -12,6 +12,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -65,17 +66,22 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
 
     @SuppressWarnings("unchecked")
     public List<R> find() {
-        List<R> recipes = new ArrayList<>();
-        CropariaIf.ifServerOrElse(server -> recipes.addAll(
+        return this.findHolders().stream().map(holder -> (R) holder.value()).toList();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<RecipeHolder<R>> findHolders() {
+        List<RecipeHolder<R>> holders = new ArrayList<>();
+        CropariaIf.ifServerOrElse(server -> holders.addAll(
             ((RecipeManagerAccess) server.getRecipeManager()).cif$byType(this.adapt())
-                .stream().map(holder -> (R) holder.value()).toList()
+                .stream().map(holder -> (RecipeHolder<R>) holder).toList()
         ), () -> {
             Level level = getClientLevel();
             if (level == null) return;
             RecipeManagerAccess access = (RecipeManagerAccess) level.recipeAccess();
-            access.cif$byType(this.adapt()).forEach(holder -> recipes.add((R) holder.value()));
+            access.cif$byType(this.adapt()).forEach(holder -> holders.add((RecipeHolder<R>) holder));
         });
-        return recipes;
+        return holders;
     }
 
     @SuppressWarnings("unchecked")

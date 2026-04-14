@@ -12,9 +12,7 @@
     "id": "minecraft:enchanted_book",
     "components": {
       "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:density": 5
-        }
+        "minecraft:density": 5
       }
     },
     "amount": 1

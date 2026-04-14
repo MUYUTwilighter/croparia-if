@@ -4,9 +4,7 @@ template = """
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    {
-      "item": "${melon}"
-    }
+    "${melon}"
   ],
   "result": ${material.result.stack}
 }

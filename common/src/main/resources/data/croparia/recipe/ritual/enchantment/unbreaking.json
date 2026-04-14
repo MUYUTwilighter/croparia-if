@@ -7,9 +7,7 @@
     "id": "minecraft:enchanted_book",
     "components": {
       "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:unbreaking": 3
-        }
+        "minecraft:unbreaking": 3
       }
     },
     "amount": 1

@@ -11,7 +11,11 @@ archives_name = "$archives_name-$minecraft_version"
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
     runs {
+        client {
+            property "neoforge.warnings.onlyin.hide", "true"
+        }
         server {
+            property "neoforge.warnings.onlyin.hide", "true"
             source sourceSets.test
         }
     }

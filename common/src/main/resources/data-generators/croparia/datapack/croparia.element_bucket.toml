@@ -5,21 +5,11 @@ template = """
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "minecraft:bucket"
-    },
-    {
-      "item": "${gem}"
-    },
-    {
-      "item": "${gem}"
-    },
-    {
-      "item": "${gem}"
-    },
-    {
-      "item": "${gem}"
-    }
+    "minecraft:bucket",
+    "${gem}",
+    "${gem}",
+    "${gem}",
+    "${gem}"
   ],
   "result": {
     "id": "${bucket}"

@@ -1,18 +1,12 @@
 registry = "croparia:crops"
-path = "croparia/recipe/crafting/seeds/${id.namespace}/${id.path}.json"
+path = "croparia/recipe/crafting/crop/seeds/${id.namespace}/${id.path}.json"
 template = """
 {
   "type": "minecraft:crafting_shaped",
   "key": {
-    "C": {
-      "item": "${croparia}"
-    },
-    "M": {
-      "${material.type}": "${material.id}"
-    },
-    "S": {
-      "tag": "croparia:seed_ingredient"
-    }
+    "C": ${croparia._qis},
+    "M": ${material._qis},
+    "S": "#croparia:seed_ingredient"
   },
   "pattern": [
     "MSM",

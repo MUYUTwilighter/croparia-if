@@ -12,9 +12,7 @@
     "id": "minecraft:enchanted_book",
     "components": {
       "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:protection": 4
-        }
+        "minecraft:protection": 4
       }
     },
     "amount": 1

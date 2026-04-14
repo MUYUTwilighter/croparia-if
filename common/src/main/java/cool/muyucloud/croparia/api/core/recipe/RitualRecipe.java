@@ -186,4 +186,9 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     public int hashCode() {
         return Objects.hash(ritual, block, ingredient, result);
     }
+
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
 }

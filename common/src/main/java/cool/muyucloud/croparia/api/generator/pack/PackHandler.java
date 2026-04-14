@@ -42,26 +42,10 @@ public abstract class PackHandler {
     private static final LazySupplier<Map<Identifier, Collection<JarJarEntry>>> BUILTIN_GENERATORS = LazySupplier.of(() -> {
         Map<Identifier, Collection<JarJarEntry>> map = new HashMap<>();
         forEachJar((file, modId) -> {
-            if (file.isFile() && file.getName().endsWith(".jar")) {
-                try (JarFile jar = new JarFile(file)) {
-                    Enumeration<JarEntry> entries = jar.entries();
-                    while (entries.hasMoreElements()) {
-                        JarEntry entry = entries.nextElement();
-                        String name = entry.getName();
-                        Matcher matcher = PATTERN.matcher(name);
-                        if (matcher.find()) {
-                            Identifier id = Identifier.tryBuild(matcher.group(1), matcher.group(2));
-                            if (id == null) {
-                                DataGenerator.LOGGER.error("Invalid generator entry \"%s\" in mod \"%s\"".formatted(name, modId));
-                                continue;
-                            }
-                            Collection<JarJarEntry> collected = map.computeIfAbsent(id, k -> new ArrayList<>());
-                            collected.add(new JarJarEntry(file, entry));
-                        }
-                    }
-                } catch (IOException e) {
-                    DataGenerator.LOGGER.error("Failed to read generators from mod \"%s\"".formatted(modId), e);
-                }
+            try {
+                collectBuiltinGenerators(file, modId, map);
+            } catch (IOException e) {
+                DataGenerator.LOGGER.error("Failed to read generators from mod \"%s\"".formatted(modId), e);
             }
         });
         return map;
@@ -90,6 +74,45 @@ public abstract class PackHandler {
 
     public static Collection<JarJarEntry> getBuiltinGenerators(Identifier id) {
         return BUILTIN_GENERATORS.get().getOrDefault(id, List.of());
+    }
+
+    private static void collectBuiltinGenerators(File file, String modId, Map<Identifier, Collection<JarJarEntry>> map) throws IOException {
+        if (file.isFile() && file.getName().endsWith(".jar")) {
+            try (JarFile jar = new JarFile(file)) {
+                Enumeration<JarEntry> entries = jar.entries();
+                while (entries.hasMoreElements()) {
+                    JarEntry entry = entries.nextElement();
+                    collectBuiltinGeneratorEntry(file, modId, entry.getName(), new JarJarEntry(file, entry), map);
+                }
+            }
+            return;
+        }
+        if (!file.isDirectory()) {
+            return;
+        }
+        File generatorRoot = new File(file, "data-generators");
+        if (!generatorRoot.isDirectory()) {
+            return;
+        }
+        FileUtil.forFilesIn(generatorRoot, source -> {
+            String relative = file.toPath().relativize(source.toPath()).toString().replace('\\', '/');
+            collectBuiltinGeneratorEntry(file, modId, relative, JarJarEntry.ofFile(file, source), map);
+        });
+    }
+
+    private static void collectBuiltinGeneratorEntry(File sourceRoot, String modId, String name, JarJarEntry entry, Map<Identifier, Collection<JarJarEntry>> map) {
+        Matcher matcher = PATTERN.matcher(name);
+        if (!matcher.find()) {
+            return;
+        }
+        Identifier id = Identifier.tryBuild(matcher.group(1), matcher.group(2));
+        if (id == null) {
+            DataGenerator.LOGGER.error("Invalid generator entry \"%s\" in mod \"%s\"".formatted(name, modId));
+            return;
+        }
+        Collection<JarJarEntry> collected = map.computeIfAbsent(id, k -> new ArrayList<>());
+        collected.add(entry);
+        DataGenerator.LOGGER.debug("Found builtin generator \"%s\" in \"%s\"".formatted(name, sourceRoot.getName()));
     }
 
     protected final Identifier id;

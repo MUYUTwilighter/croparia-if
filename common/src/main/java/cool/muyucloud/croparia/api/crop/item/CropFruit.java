@@ -22,7 +22,7 @@ public class CropFruit extends Item implements AbstractFruit<Crop> {
     private final Crop crop;
 
     public CropFruit(Crop crop) {
-        super(new Properties().arch$tab(Tabs.CROPS).setId(ResourceKey.create(Registries.ITEM, crop.getKey())));
+        super(new Properties().arch$tab(Tabs.CROPS).setId(ResourceKey.create(Registries.ITEM, crop.getFruitId())));
         this.crop = crop;
     }
 

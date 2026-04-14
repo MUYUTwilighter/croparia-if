@@ -6,6 +6,7 @@ import cool.muyucloud.croparia.api.crop.CropRegistry;
 import cool.muyucloud.croparia.api.crop.Melon;
 import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
+import cool.muyucloud.croparia.api.generator.util.ItemDgRegistry;
 
 public class DgRegistries {
     public static final CropRegistry<Crop> CROPS = DgRegistry.register(
@@ -17,6 +18,10 @@ public class DgRegistries {
     @SuppressWarnings("unused")
     public static final DgRegistry.EnumRegistry<Element> ELEMENTS = DgRegistry.register(
         CropariaIf.of("elements"), DgRegistry.ofEnum(Element.class)
+    );
+    @SuppressWarnings("unused")
+    public static final ItemDgRegistry ITEMS = DgRegistry.register(
+        CropariaIf.of("items"), new ItemDgRegistry()
     );
 
     public static void register() {

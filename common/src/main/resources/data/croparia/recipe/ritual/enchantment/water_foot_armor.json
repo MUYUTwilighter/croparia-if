@@ -12,9 +12,7 @@
     "id": "minecraft:enchanted_book",
     "components": {
       "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:depth_strider": 3
-        }
+        "minecraft:depth_strider": 3
       }
     },
     "amount": 1

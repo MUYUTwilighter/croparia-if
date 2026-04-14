@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "item": "minecraft:diamond"
-    },
-    "P": {
-      "item": "minecraft:lapis_lazuli"
-    },
-    "R": {
-      "item": "minecraft:emerald"
-    }
+    "I": "minecraft:diamond",
+    "P": "minecraft:lapis_lazuli",
+    "R": "minecraft:emerald"
   },
   "pattern": [
     "PIP",

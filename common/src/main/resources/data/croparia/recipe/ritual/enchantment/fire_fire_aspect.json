@@ -12,9 +12,7 @@
     "id": "minecraft:enchanted_book",
     "components": {
       "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:fire_aspect": 2
-        }
+        "minecraft:fire_aspect": 2
       }
     },
     "amount": 1

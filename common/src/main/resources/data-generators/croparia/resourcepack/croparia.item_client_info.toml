@@ -1,0 +1,11 @@
+registry = "croparia:items"
+path = "${id.namespace}/items/${id.path}.json"
+startup = true
+template = """
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "${id.namespace}:item/${id.path}"
+  }
+}
+"""

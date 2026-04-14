@@ -140,4 +140,9 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     public int hashCode() {
         return Objects.hash(element, ingredient, result);
     }
+
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
 }

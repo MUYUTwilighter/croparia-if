@@ -12,9 +12,7 @@
     "id": "minecraft:enchanted_book",
     "components": {
       "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:infinity": 1
-        }
+        "minecraft:infinity": 1
       }
     },
     "amount": 1

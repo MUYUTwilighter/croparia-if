@@ -264,4 +264,9 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     public int hashCode() {
         return Objects.hash(ritual, keys, patterns);
     }
+
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
 }

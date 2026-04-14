@@ -26,7 +26,7 @@ public class CropSeed extends BlockItem implements CropAccess<Crop> {
 
     public CropSeed(Crop crop) {
         super(crop.getCropBlock().orElseThrow(),
-            new Properties().arch$tab(Tabs.CROPS).setId(ResourceKey.create(Registries.ITEM, crop.getKey())));
+            new Properties().arch$tab(Tabs.CROPS).setId(ResourceKey.create(Registries.ITEM, crop.getSeedId())));
         this.cropId = crop.getKey();
     }
 

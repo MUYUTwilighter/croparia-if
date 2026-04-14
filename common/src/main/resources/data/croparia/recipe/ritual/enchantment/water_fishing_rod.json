@@ -12,9 +12,7 @@
     "id": "minecraft:enchanted_book",
     "components": {
       "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:luck_of_the_sea": 3
-        }
+        "minecraft:luck_of_the_sea": 3
       }
     },
     "amount": 1

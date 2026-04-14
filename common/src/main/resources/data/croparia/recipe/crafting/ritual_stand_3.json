@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "minecraft:diamond_block"
-    },
-    "P": {
-      "item": "croparia:ritual_stand_2"
-    }
+    "B": "minecraft:diamond_block",
+    "P": "croparia:ritual_stand_2"
   },
   "pattern": [
     "B",

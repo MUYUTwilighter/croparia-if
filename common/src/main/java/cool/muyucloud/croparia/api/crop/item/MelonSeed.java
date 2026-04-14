@@ -20,7 +20,7 @@ public class MelonSeed extends BlockItem implements CropAccess<Melon> {
     public MelonSeed(Melon melon) {
         super(
             melon.getStem().get(),
-            new Properties().arch$tab(Tabs.MELONS).setId(ResourceKey.create(Registries.ITEM, melon.getKey()))
+            new Properties().arch$tab(Tabs.MELONS).setId(ResourceKey.create(Registries.ITEM, melon.getSeed().getId()))
         );
         this.melon = melon;
     }

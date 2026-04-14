@@ -12,9 +12,7 @@
     "id": "minecraft:enchanted_book",
     "components": {
       "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:riptide": 3
-        }
+        "minecraft:riptide": 3
       }
     },
     "amount": 1

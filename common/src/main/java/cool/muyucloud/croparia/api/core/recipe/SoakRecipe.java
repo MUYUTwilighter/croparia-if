@@ -115,4 +115,9 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
     public int hashCode() {
         return Objects.hash(element, probability, input, output);
     }
+
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
 }
