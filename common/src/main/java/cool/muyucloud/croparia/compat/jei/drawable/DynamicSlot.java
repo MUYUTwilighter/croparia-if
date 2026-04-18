@@ -7,6 +7,7 @@ import cool.muyucloud.croparia.util.CifUtil;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.common.Internal;
+import mezz.jei.gui.input.MouseUtil;
 import mezz.jei.common.gui.elements.DrawableIngredient;
 import mezz.jei.library.focus.Focus;
 import mezz.jei.library.ingredients.TypedIngredient;
@@ -51,7 +52,12 @@ public class DynamicSlot extends AbstractInputManager<DynamicSlot> {
             double mouseX = mouseX();
             double mouseY = mouseY();
             if (0 < mouseX && mouseX < this.getWidth() && 0 < mouseY && mouseY < this.getHeight()) {
-                guiGraphics.setTooltipForNextFrame(Minecraft.getInstance().font, this.getCurrentStack(), CifUtil.toIntSafe(parentMouseX()), CifUtil.toIntSafe(parentMouseY()));
+                guiGraphics.setTooltipForNextFrame(
+                    Minecraft.getInstance().font,
+                    this.getCurrentStack(),
+                    CifUtil.toIntSafe(MouseUtil.getX()),
+                    CifUtil.toIntSafe(MouseUtil.getY())
+                );
             }
         };
     }

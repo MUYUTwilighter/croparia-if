@@ -1,87 +1,113 @@
 package cool.muyucloud.croparia.compat.rei.widget;
 
-import com.mojang.math.Transformation;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.widgets.DelegateWidget;
+import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.WidgetWithBounds;
+import me.shedaniel.rei.api.client.util.MatrixUtils;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.gui.GuiGraphics;
-import org.joml.Matrix4f;
+import org.joml.Matrix3x2f;
+import org.joml.Vector3f;
 
 import java.util.function.Supplier;
 
 @SuppressWarnings("UnstableApiUsage")
 public class PatchedTranslatable extends DelegateWidget {
-    private final Supplier<Matrix4f> translate;
+    private final Supplier<Matrix3x2f> translate;
 
-    public PatchedTranslatable(WidgetWithBounds widget, Supplier<Matrix4f> translate) {
+    public PatchedTranslatable(WidgetWithBounds widget, Supplier<Matrix3x2f> translate) {
         super(widget);
         this.translate = translate;
     }
 
-    protected Matrix4f translate() {
+    protected Matrix3x2f translate() {
         return translate.get();
     }
 
-    protected final Matrix4f inverseTranslate() {
-        return new Matrix4f(translate()).invert();
+    protected final Matrix3x2f inverseTranslate() {
+        return MatrixUtils.inverse(translate());
+    }
+
+    private Vector3f transformMouse(double mouseX, double mouseY) {
+        Vector3f mouse = new Vector3f((float) mouseX, (float) mouseY, 1);
+        inverseTranslate().transform(mouse);
+        return mouse;
     }
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
+        graphics.pose().pushMatrix();
+        graphics.pose().mul(translate());
+        Vector3f mouse = transformMouse(mouseX, mouseY);
+        super.render(graphics, (int) mouse.x(), (int) mouse.y(), delta);
+        graphics.pose().popMatrix();
     }
 
     @Override
     public boolean containsMouse(double mouseX, double mouseY) {
-        return super.containsMouse(mouseX, mouseY);
+        Vector3f mouse = transformMouse(mouseX, mouseY);
+        return super.containsMouse(mouse.x(), mouse.y());
     }
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
-        return super.mouseClicked(event, isDoubleClick);
+        Vector3f mouse = transformMouse(event.x(), event.y());
+        return super.mouseClicked(new MouseButtonEvent(mouse.x(), mouse.y(), event.buttonInfo()), isDoubleClick);
     }
 
     @Override
     public boolean mouseReleased(MouseButtonEvent event) {
-        return super.mouseReleased(event);
+        Vector3f mouse = transformMouse(event.x(), event.y());
+        return super.mouseReleased(new MouseButtonEvent(mouse.x(), mouse.y(), event.buttonInfo()));
     }
 
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
-        return super.mouseDragged(event, deltaX, deltaY);
+        Vector3f mouse = transformMouse(event.x(), event.y());
+        return super.mouseDragged(new MouseButtonEvent(mouse.x(), mouse.y(), event.buttonInfo()), deltaX, deltaY);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double amountX, double amountY) {
-        return super.mouseScrolled(mouseX, mouseY, amountX, amountY);
+        Vector3f mouse = transformMouse(mouseX, mouseY);
+        return super.mouseScrolled(mouse.x(), mouse.y(), amountX, amountY);
     }
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        return super.keyPressed(event);
+        try {
+            Widget.translateMouse(inverseTranslate());
+            return super.keyPressed(event);
+        } finally {
+            Widget.popMouse();
+        }
     }
 
     @Override
     public boolean keyReleased(KeyEvent event) {
-        return super.keyReleased(event);
+        try {
+            Widget.translateMouse(inverseTranslate());
+            return super.keyReleased(event);
+        } finally {
+            Widget.popMouse();
+        }
     }
 
     @Override
     public boolean charTyped(CharacterEvent event) {
-        return super.charTyped(event);
-    }
-
-    @Override
-    public double getZRenderingPriority() {
-        Transformation transformation = new Transformation(translate());
-        return transformation.getTranslation().z() + super.getZRenderingPriority();
+        try {
+            Widget.translateMouse(inverseTranslate());
+            return super.charTyped(event);
+        } finally {
+            Widget.popMouse();
+        }
     }
 
     @Override
     public Rectangle getBounds() {
-        return super.getBounds();
+        return MatrixUtils.transform(translate(), super.getBounds());
     }
 }

@@ -17,6 +17,7 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.gui.input.MouseUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Vec3i;
@@ -93,23 +94,23 @@ public class JeiRitualStructure extends JeiCategory<RitualStructure> {
         }).onKeyPressed("x+", InputConstants.KEY_D, (manager, mouseX, mouseY, keyCode, scanCode, modifiers) -> {
             return anchor.mapAndCompare(RangedVec3i::east);
         });
-        add(builder, InputManager.createButton(LEFT_WHITE, LEFT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
+        InputManager yDown = add(builder, InputManager.createButton(LEFT_WHITE, LEFT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
             .setPosition(SLOT_SIZE, this.getHeight() - (BUTTON_SIZE + SLOT_SIZE) / 2)
             .onLeftClicked("y-", (manager, mouseX, mouseY, button) -> anchor.set(anchor.get().dy(-1)));
-        add(builder, InputManager.createButton(RIGHT_WHITE, RIGHT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
+        InputManager yUp = add(builder, InputManager.createButton(RIGHT_WHITE, RIGHT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
             .setPosition(this.getWidth() - SLOT_SIZE - BUTTON_SIZE, this.getHeight() - (BUTTON_SIZE + SLOT_SIZE) / 2)
             .onClicked("y+", (manager, mouseX, mouseY, button) -> anchor.set(anchor.get().dy(1)));
-        add(builder, InputManager.createButton(LEFT_WHITE, LEFT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
+        InputManager xDown = add(builder, InputManager.createButton(LEFT_WHITE, LEFT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
             .setPosition((SLOT_SIZE - BUTTON_SIZE) / 2, displaySize.getZ() * SLOT_SIZE / 2 + SLOT_SIZE - BUTTON_SIZE / 2)
             .onClicked("x-", (manager, mouseX, mouseY, button) -> anchor.set(anchor.get().dx(-1)));
-        add(builder, InputManager.createButton(RIGHT_WHITE, RIGHT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
+        InputManager xUp = add(builder, InputManager.createButton(RIGHT_WHITE, RIGHT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
             .setPosition(displaySize.getX() * SLOT_SIZE + SLOT_SIZE + (SLOT_SIZE - BUTTON_SIZE) / 2,
                 ((displaySize.getZ() + 2) * SLOT_SIZE - BUTTON_SIZE) / 2)
             .onClicked("x+", (manager, mouseX, mouseY, button) -> anchor.set(anchor.get().dx(1)));
-        add(builder, InputManager.createButton(UP_WHITE, UP_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
+        InputManager zDown = add(builder, InputManager.createButton(UP_WHITE, UP_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
             .setPosition(displaySize.getX() * SLOT_SIZE / 2 + SLOT_SIZE - BUTTON_SIZE / 2, (SLOT_SIZE - BUTTON_SIZE) / 2)
             .onClicked("z-", (manager, mouseX, mouseY, button) -> anchor.set(anchor.get().dz(-1)));
-        add(builder, InputManager.createButton(DOWN_WHITE, DOWN_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
+        InputManager zUp = add(builder, InputManager.createButton(DOWN_WHITE, DOWN_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
             .setPosition(displaySize.getX() * SLOT_SIZE / 2 + SLOT_SIZE - BUTTON_SIZE / 2,
                 this.getHeight() - SLOT_SIZE - (BUTTON_SIZE + SLOT_SIZE) / 2)
             .onClicked("z+", (manager, mouseX, mouseY, button) -> anchor.set(anchor.get().dz(1)));
@@ -141,13 +142,32 @@ public class JeiRitualStructure extends JeiCategory<RitualStructure> {
         anchor.onChanged((old, value) -> {
             if (old.getY() != value.getY()) label.refresh();
         });
-        //noinspection DataFlowIssue
+        int layerLabelY = this.getHeight() - SLOT_SIZE + 5;
         builder.addDrawable(Drawer.of((guiGraphics, xOffset, yOffset) -> guiGraphics.drawCenteredString(
-            Minecraft.getInstance().font, label.get(), this.getWidth() / 2, SLOT_SIZE * (displaySize.getZ() + 2) + BUTTON_SIZE / 2,
-            ChatFormatting.WHITE.getColor()
-        )));
+            Minecraft.getInstance().font, label.get(), xOffset, yOffset,
+            0xFFFFFFFF
+        ))).setPosition(this.getWidth() / 2, layerLabelY);
         builder.addDrawable(Drawer.of((guiGraphics, xOffset, yOffset) ->
             tooltips.forEach(drawer -> drawer.draw(guiGraphics, xOffset, yOffset))));
+        builder.addDrawable(Drawer.of((guiGraphics, xOffset, yOffset) -> drawTooltip(guiGraphics, xOffset, yOffset, yDown, Texts.translatable("gui.croparia.ritual_structure.lower"))));
+        builder.addDrawable(Drawer.of((guiGraphics, xOffset, yOffset) -> drawTooltip(guiGraphics, xOffset, yOffset, yUp, Texts.translatable("gui.croparia.ritual_structure.upper"))));
+        builder.addDrawable(Drawer.of((guiGraphics, xOffset, yOffset) -> drawTooltip(guiGraphics, xOffset, yOffset, xDown, Texts.translatable("gui.croparia.ritual_structure.west"))));
+        builder.addDrawable(Drawer.of((guiGraphics, xOffset, yOffset) -> drawTooltip(guiGraphics, xOffset, yOffset, xUp, Texts.translatable("gui.croparia.ritual_structure.east"))));
+        builder.addDrawable(Drawer.of((guiGraphics, xOffset, yOffset) -> drawTooltip(guiGraphics, xOffset, yOffset, zDown, Texts.translatable("gui.croparia.ritual_structure.north"))));
+        builder.addDrawable(Drawer.of((guiGraphics, xOffset, yOffset) -> drawTooltip(guiGraphics, xOffset, yOffset, zUp, Texts.translatable("gui.croparia.ritual_structure.south"))));
         add(builder, inputManager);
+    }
+
+    private static void drawTooltip(net.minecraft.client.gui.GuiGraphics guiGraphics, int xOffset, int yOffset, InputManager button, Component text) {
+        double mouseX = button.mouseX();
+        double mouseY = button.mouseY();
+        if (0 < mouseX && mouseX < button.getWidth() && 0 < mouseY && mouseY < button.getHeight()) {
+            guiGraphics.setTooltipForNextFrame(
+                Minecraft.getInstance().font,
+                text,
+                (int) MouseUtil.getX(),
+                (int) MouseUtil.getY()
+            );
+        }
     }
 }

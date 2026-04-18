@@ -103,8 +103,8 @@ public class Item2DWidget extends WidgetWithBounds {
     @Override
     public @NotNull List<Slot> children() {
         List<Slot> slots = new ArrayList<>(rows * cols);
-        for (int x = 0; x < rows; x++) {
-            for (int y = 0; y < cols; y++) {
+        for (int x = 0; x < cols; x++) {
+            for (int y = 0; y < rows; y++) {
                 slots.add(this.get(x, y));
             }
         }
