@@ -8,6 +8,7 @@ import cool.muyucloud.croparia.api.generator.util.TranslatableEntry;
 import cool.muyucloud.croparia.api.placeholder.Template;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -185,7 +186,7 @@ class DataGeneratorFlowNeoForgeTest {
         }
 
         @Override
-        public Identifier getKey() {
+        public @NonNull Identifier getKey() {
             return key;
         }
 
@@ -227,7 +228,7 @@ class DataGeneratorFlowNeoForgeTest {
         }
 
         @Override
-        public Identifier getKey() {
+        public @NonNull Identifier getKey() {
             return key;
         }
 

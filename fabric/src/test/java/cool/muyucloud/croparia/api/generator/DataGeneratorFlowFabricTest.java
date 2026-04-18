@@ -10,6 +10,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.Bootstrap;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -180,7 +181,7 @@ class DataGeneratorFlowFabricTest {
         }
 
         @Override
-        public Identifier getKey() {
+        public @NonNull Identifier getKey() {
             return key;
         }
 
@@ -222,7 +223,7 @@ class DataGeneratorFlowFabricTest {
         }
 
         @Override
-        public Identifier getKey() {
+        public @NonNull Identifier getKey() {
             return key;
         }
 

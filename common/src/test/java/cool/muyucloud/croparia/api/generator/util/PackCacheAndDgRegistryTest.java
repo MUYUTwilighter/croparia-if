@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.generator.util;
 
 import com.mojang.serialization.JsonOps;
 import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -50,7 +51,7 @@ class PackCacheAndDgRegistryTest {
         }
 
         @Override
-        public Identifier getKey() {
+        public @NonNull Identifier getKey() {
             return key;
         }
 
@@ -70,7 +71,7 @@ class PackCacheAndDgRegistryTest {
         }
 
         @Override
-        public Identifier getKey() {
+        public @NonNull Identifier getKey() {
             return key;
         }
 

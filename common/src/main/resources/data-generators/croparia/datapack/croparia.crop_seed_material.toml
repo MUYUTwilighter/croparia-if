@@ -4,9 +4,7 @@ template = """
 {
   "type": "croparia:infusor",
   "element": "elemental",
-  "ingredients": [
-    "${seed}"
-  ],
+  "ingredient": ${seed._qis},
   "result": {
     "id": "${material.result.id}",
     "components": ${material.result.components},

@@ -22,7 +22,7 @@ public interface DgRegistry<E extends DgEntry> extends Iterable<E> {
     }
 
     @SuppressWarnings("unused")
-    static <E extends DgEntry> DgRegistry<E> ofMap(Map<Identifier, E> map) {
+    static <E extends DgEntry> MapRegistry<E> ofMap(Map<Identifier, E> map) {
         return new MapRegistry<>(map);
     }
 

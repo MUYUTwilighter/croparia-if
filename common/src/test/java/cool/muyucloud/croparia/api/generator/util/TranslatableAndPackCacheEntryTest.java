@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.generator.util;
 
 import cool.muyucloud.croparia.api.placeholder.Template;
 import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -36,7 +37,7 @@ class TranslatableAndPackCacheEntryTest {
 
     private record DummyTranslatableEntry(Identifier key, Map<String, String> translations) implements TranslatableEntry {
         @Override
-        public Identifier getKey() {
+        public @NonNull Identifier getKey() {
             return key;
         }
 

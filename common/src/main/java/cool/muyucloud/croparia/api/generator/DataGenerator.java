@@ -43,7 +43,7 @@ public class DataGenerator implements DgListener {
      * @param <C>   the type of the codec
      * @return the codec
      */
-    public static <G extends DataGenerator, C extends MapCodec<G>> C register(Identifier id, C codec) {
+    public static <G extends DataGenerator, C extends MapCodec<? extends G>> C register(Identifier id, C codec) {
         REGISTRY.put(id, codec);
         return codec;
     }
