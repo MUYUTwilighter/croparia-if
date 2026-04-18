@@ -2,21 +2,25 @@ package cool.muyucloud.croparia.api.core.recipe;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.core.component.Text;
 import cool.muyucloud.croparia.api.core.recipe.container.RitualContainer;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemInput;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
+import cool.muyucloud.croparia.registry.CropariaComponents;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +69,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
             stacks.forEach(stack -> Texts.tooltip(stack, Constants.BLOCK_PLACE_TOOLTIP));
             return stacks;
         });
+        this.result.getDisplayStacks().forEach(this::appendResultTooltip);
     }
 
     public @NotNull ItemInput getIngredient() {
@@ -93,14 +98,43 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
 
     @Override
     public @NotNull List<List<ItemStack>> getOutputs() {
-        List<ItemStack> results = this.getResult().getDisplayStacks();
-        ItemStack stack = results.isEmpty() ? ItemStack.EMPTY : results.getFirst().copy();
+        return List.of(this.getResult().getDisplayStacks());
+    }
+
+    private void appendResultTooltip(ItemStack stack) {
         if (stack.getItem() instanceof SpawnEggItem) {
-            Texts.tooltip(stack, Texts.translatable("tooltip.croparia.spawn_egg"));
-        } else if (stack.getItem() == Items.ENCHANTED_BOOK && this.getIngredient().getAmount() == 1L) {
-            Texts.tooltip(stack, Texts.translatable("tooltip.croparia.ritual.enchant", stack.getCount()));
+            this.setResultTooltip(stack, Texts.translatable("tooltip.croparia.spawn_egg"));
+            return;
         }
-        return List.of(List.of(stack));
+        if (stack.getItem() == Items.ENCHANTED_BOOK && this.getIngredient().getAmount() == 1L) {
+            this.appendEnchantedBookTooltip(stack);
+        }
+    }
+
+    private void appendEnchantedBookTooltip(ItemStack stack) {
+        ItemEnchantments enchantments = stack.get(DataComponents.STORED_ENCHANTMENTS);
+        if (enchantments == null || enchantments.isEmpty()) return;
+
+        stack.set(
+            DataComponents.TOOLTIP_DISPLAY,
+            stack.getOrDefault(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay.DEFAULT).withHidden(DataComponents.STORED_ENCHANTMENTS, true)
+        );
+
+        Text tooltip = new Text();
+        tooltip.append(Texts.translatable("tooltip.croparia.ritual.enchant.header"));
+        for (var entry : enchantments.entrySet()) {
+            tooltip.append(Texts.translatable(
+                "tooltip.croparia.ritual.enchant.entry",
+                entry.getKey().value().description().copy(),
+                stack.getCount(),
+                entry.getIntValue()
+            ));
+        }
+        stack.set(CropariaComponents.TEXT.get(), tooltip);
+    }
+
+    private void setResultTooltip(ItemStack stack, MutableComponent tooltip) {
+        stack.set(CropariaComponents.TEXT.get(), new Text(tooltip));
     }
 
     public ItemStack assemble(RitualContainer matcher) {

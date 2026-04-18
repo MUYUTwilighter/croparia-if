@@ -205,6 +205,8 @@
   "tooltip.croparia.unknown": "Bloque desconocido",
   "tooltip.croparia.ritual": "Haz clic para ver la estructura ritual",
   "tooltip.croparia.ritual.enchant": "Mejora el objeto de entrada con el/los encantamiento(s) en %s nivel(es)",
+  "tooltip.croparia.ritual.enchant.header": "Agrega o mejora los siguientes encantamientos al objeto de entrada:",
+  "tooltip.croparia.ritual.enchant.entry": "%s + %s / Máx. %s",
   "tooltip.croparia.block_properties": "Coincide con estas propiedades:",
   "tooltip.croparia.bounded_position": "Vinculado en %s: %s, %s, %s",
   "tooltip.croparia.soak.infusor": "Coloca el infusor sobre la piedra elemental",

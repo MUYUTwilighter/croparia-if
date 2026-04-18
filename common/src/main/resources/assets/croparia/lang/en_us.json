@@ -205,6 +205,8 @@
   "tooltip.croparia.unknown": "Unknown Block",
   "tooltip.croparia.ritual": "Click to view ritual structure",
   "tooltip.croparia.ritual.enchant": "Upgrade input item with the enchantment(s) by %s level",
+  "tooltip.croparia.ritual.enchant.header": "Add/upgrade the following enchantments on the input item:",
+  "tooltip.croparia.ritual.enchant.entry": "%s + %s / Max %s",
   "tooltip.croparia.block_properties": "Match these properties:",
   "tooltip.croparia.bounded_position": "Bounded at %s: %s, %s, %s",
   "tooltip.croparia.soak.infusor": "Place infusor onto the elemental stone",
