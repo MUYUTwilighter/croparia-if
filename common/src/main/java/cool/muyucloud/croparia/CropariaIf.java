@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import cool.muyucloud.croparia.api.core.command.CommonCommandRoot;
 import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
+import cool.muyucloud.croparia.api.recipe.sync.SyncedRecipeCache;
 import cool.muyucloud.croparia.config.Config;
 import cool.muyucloud.croparia.config.ConfigFileHandler;
 import cool.muyucloud.croparia.registry.*;
@@ -63,6 +64,7 @@ public class CropariaIf {
         LifecycleEvent.SERVER_STARTED.register(server -> {
             SERVER_STARTED = true;
             OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
+            SyncedRecipeCache.syncAll(server);
             if (CONFIG.getAutoReload() >= 0) {
                 LOGGER.info("Croparia IF is performing a datapack reload to apply data generators");
                 server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "schedule function croparia:auto_reload %s".formatted(CONFIG.getAutoReload()));

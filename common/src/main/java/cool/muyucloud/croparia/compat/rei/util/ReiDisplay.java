@@ -30,10 +30,6 @@ public class ReiDisplay<R extends DisplayableRecipe<?>> implements Display {
         this.outputs = this.recipe.getOutputs().stream().map(EntryIngredients::ofItemStacks).toList();
     }
 
-    public ReiDisplay(R recipe, Identifier id, ReiCategory<R> category) {
-        this(new RecipeHolder<>(ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id), recipe), category);
-    }
-
     public R getRecipe() {
         return recipe;
     }

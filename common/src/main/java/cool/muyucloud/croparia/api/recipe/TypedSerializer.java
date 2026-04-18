@@ -5,7 +5,9 @@ import com.mojang.serialization.MapCodec;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.access.RecipeManagerAccess;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
+import cool.muyucloud.croparia.api.recipe.sync.SyncedRecipeCache;
 import cool.muyucloud.croparia.registry.Recipes;
+import dev.architectury.platform.Platform;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -25,26 +27,46 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @SuppressWarnings("unused")
 public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeType<R>, RecipeSerializer<R> {
     public static final Codec<TypedSerializer<?>> CODEC = Identifier.CODEC.xmap(Recipes::find, TypedSerializer::getId);
+    public static final Predicate<RecipeHolder<?>> REI = holder -> Platform.isModLoaded("roughlyenoughitems");
+    public static final Predicate<RecipeHolder<?>> JEI = holder -> Platform.isModLoaded("jei");
+    public static final Predicate<RecipeHolder<?>> NEVER = holder -> false;
+    public static final Predicate<RecipeHolder<?>> ALWAYS = holder -> true;
 
     private final Identifier id;
     private final List<Mappable<ItemStack>> stations;
     private final Class<? extends R> recipeClass;
     private final MapCodec<R> codec;
     private final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec;
+    private final Predicate<RecipeHolder<?>> syncFilter;
 
     @SafeVarargs
     public TypedSerializer(Identifier id, Class<? extends R> recipeClass, final MapCodec<R> codec,
                            Mappable<ItemStack>... stations) {
-        this(id, recipeClass, codec, CodecUtil.toStream(codec.codec()), stations);
+        this(id, recipeClass, codec, CodecUtil.toStream(codec.codec()), ALWAYS, stations);
+    }
+
+    @SafeVarargs
+    public TypedSerializer(Identifier id, Class<? extends R> recipeClass, final MapCodec<R> codec,
+                           Predicate<RecipeHolder<?>> syncFilter, Mappable<ItemStack>... stations) {
+        this(id, recipeClass, codec, CodecUtil.toStream(codec.codec()), syncFilter, stations);
     }
 
     @SafeVarargs
     public TypedSerializer(Identifier id, Class<? extends R> recipeClass, final MapCodec<R> codec,
                            final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec,
+                           Mappable<ItemStack>... stations) {
+        this(id, recipeClass, codec, streamCodec, ALWAYS, stations);
+    }
+
+    @SafeVarargs
+    public TypedSerializer(Identifier id, Class<? extends R> recipeClass, final MapCodec<R> codec,
+                           final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec,
+                           final Predicate<RecipeHolder<?>> syncFilter,
                            Mappable<ItemStack>... stations) {
         this.id = id;
         this.stations = new ArrayList<>();
@@ -52,6 +74,7 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
         this.recipeClass = recipeClass;
         this.codec = codec;
         this.streamCodec = streamCodec;
+        this.syncFilter = syncFilter;
     }
 
     /**
@@ -64,9 +87,8 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
         return (TypedSerializer<T>) this;
     }
 
-    @SuppressWarnings("unchecked")
     public List<R> find() {
-        return this.findHolders().stream().map(holder -> (R) holder.value()).toList();
+        return this.findHolders().stream().map(RecipeHolder::value).toList();
     }
 
     @SuppressWarnings("unchecked")
@@ -76,6 +98,10 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
             ((RecipeManagerAccess) server.getRecipeManager()).cif$byType(this.adapt())
                 .stream().map(holder -> (RecipeHolder<R>) holder).toList()
         ), () -> {
+            if (SyncedRecipeCache.usesSyncedCache(this) && SyncedRecipeCache.hasSnapshot(this)) {
+                holders.addAll(SyncedRecipeCache.getSyncedHolders(this));
+                return;
+            }
             Level level = getClientLevel();
             if (level == null) return;
             RecipeManagerAccess access = (RecipeManagerAccess) level.recipeAccess();
@@ -86,9 +112,14 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
 
     @SuppressWarnings("unchecked")
     public <I extends RecipeInput> Optional<R> find(I input, Level level) {
-        return ((RecipeManager) level.recipeAccess()).getRecipeFor(this.adapt(), input, level).map(
-            holder -> (R) holder.value()
-        );
+        if (SyncedRecipeCache.usesSyncedCache(this) && SyncedRecipeCache.hasSnapshot(this)) {
+            return SyncedRecipeCache.getSyncedHolders(this).stream()
+                .map(holder -> (DisplayableRecipe<I>) holder.value())
+                .filter(recipe -> recipe.matches(input, level))
+                .map(recipe -> (R) recipe)
+                .findFirst();
+        }
+        return ((RecipeManager) level.recipeAccess()).getRecipeFor(this.adapt(), input, level).map(holder -> (R) holder.value());
     }
 
     public List<Mappable<ItemStack>> getStations() {
@@ -101,6 +132,14 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
 
     public Class<? extends R> getRecipeClass() {
         return recipeClass;
+    }
+
+    public boolean isClientSynchronized() {
+        return this.syncFilter != NEVER;
+    }
+
+    public <I extends RecipeInput, T extends DisplayableRecipe<I>> boolean shouldSync(RecipeHolder<T> holder) {
+        return holder.value().getTypedSerializer() == this && this.syncFilter.test(holder);
     }
 
     @Override

@@ -24,6 +24,10 @@ public abstract class MinecraftServerMixin {
 
     @Inject(method = "reloadResources", at = @At("RETURN"))
     public void onReloaded(Collection<String> selectedIds, CallbackInfoReturnable<CompletableFuture<Void>> cir, @Local CompletableFuture<Void> completableFuture) {
-        completableFuture.whenComplete((v, t) -> OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis());
+        completableFuture.whenComplete((v, t) -> {
+            if (t == null) {
+                OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
+            }
+        });
     }
 }

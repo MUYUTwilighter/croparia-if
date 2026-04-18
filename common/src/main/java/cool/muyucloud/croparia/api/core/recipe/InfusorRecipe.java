@@ -45,6 +45,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
             Codec.INT.fieldOf("count").forGetter(recipe -> Math.toIntExact(recipe.getResult().getAmount()))
         ).apply(instance, (element, input, output, count) ->
             new InfusorRecipe(element, input, new ItemOutput(output.getId(), output.getComponentsPatch(), count)))),
+        TypedSerializer.NEVER,
         Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance)
     );
 

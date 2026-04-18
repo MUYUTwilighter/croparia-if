@@ -28,6 +28,9 @@
     "client": [
       "cool.muyucloud.croparia.fabric.CropariaIfClientFabric"
     ],
+    "jei_mod_plugin": [
+      "cool.muyucloud.croparia.compat.jei.JeiClient"
+    ],
     "rei_client": [
       "cool.muyucloud.croparia.compat.rei.ReiClient"
     ]

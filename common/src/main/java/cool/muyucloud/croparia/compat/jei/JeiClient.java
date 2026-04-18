@@ -46,7 +46,7 @@ public class JeiClient implements IModPlugin {
     public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
         for (JeiCategory<?> category : CATEGORIES) {
             for (Mappable<ItemStack> stack : category.getTypedSerializer().getStations()) {
-                registration.addRecipeCatalysts(category.getRecipeType(), stack.get());
+                registration.addCraftingStation(category.getRecipeType(), stack.get());
             }
         }
     }
