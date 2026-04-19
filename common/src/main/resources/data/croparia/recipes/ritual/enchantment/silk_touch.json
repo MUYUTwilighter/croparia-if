@@ -6,11 +6,12 @@
   "result": {
     "id": "minecraft:enchanted_book",
     "nbt": {
-      "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:silk_touch": 1
+      "StoredEnchantments": [
+        {
+          "id": "minecraft:silk_touch",
+          "lvl": 1
         }
-      }
+      ]
     },
     "amount": 1
   }

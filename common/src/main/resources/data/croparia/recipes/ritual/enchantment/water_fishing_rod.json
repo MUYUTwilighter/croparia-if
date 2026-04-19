@@ -11,11 +11,12 @@
   "result": {
     "id": "minecraft:enchanted_book",
     "nbt": {
-      "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:luck_of_the_sea": 3
+      "StoredEnchantments": [
+        {
+          "id": "minecraft:luck_of_the_sea",
+          "lvl": 3
         }
-      }
+      ]
     },
     "amount": 1
   }

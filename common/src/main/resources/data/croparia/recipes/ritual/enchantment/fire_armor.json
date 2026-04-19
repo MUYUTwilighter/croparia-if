@@ -11,11 +11,12 @@
   "result": {
     "id": "minecraft:enchanted_book",
     "nbt": {
-      "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:fire_protection": 4
+      "StoredEnchantments": [
+        {
+          "id": "minecraft:fire_protection",
+          "lvl": 4
         }
-      }
+      ]
     },
     "amount": 1
   }

@@ -11,11 +11,12 @@
   "result": {
     "id": "minecraft:enchanted_book",
     "nbt": {
-      "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:riptide": 3
+      "StoredEnchantments": [
+        {
+          "id": "minecraft:riptide",
+          "lvl": 3
         }
-      }
+      ]
     },
     "amount": 1
   }

@@ -11,13 +11,17 @@
   "result": {
     "id": "minecraft:enchanted_book",
     "nbt": {
-      "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:aqua_affinity": 1,
-          "minecraft:respiration": 3
+      "StoredEnchantments": [
+        {
+          "id": "minecraft:aqua_affinity",
+          "lvl": 1
+        },
+        {
+          "id": "minecraft:respiration",
+          "lvl": 3
         }
-      },
-      "minecraft:repair_cost": 1
+      ],
+      "RepairCost": 1
     },
     "amount": 1
   }

@@ -6,11 +6,12 @@
   "result": {
     "id": "minecraft:enchanted_book",
     "nbt": {
-      "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:mending": 1
+      "StoredEnchantments": [
+        {
+          "id": "minecraft:mending",
+          "lvl": 1
         }
-      }
+      ]
     },
     "amount": 1
   }

@@ -11,11 +11,12 @@
   "result": {
     "id": "minecraft:enchanted_book",
     "nbt": {
-      "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:depth_strider": 3
+      "StoredEnchantments": [
+        {
+          "id": "minecraft:depth_strider",
+          "lvl": 3
         }
-      }
+      ]
     },
     "amount": 1
   }

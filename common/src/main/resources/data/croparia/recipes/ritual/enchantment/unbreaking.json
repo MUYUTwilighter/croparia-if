@@ -6,11 +6,12 @@
   "result": {
     "id": "minecraft:enchanted_book",
     "nbt": {
-      "minecraft:stored_enchantments": {
-        "levels": {
-          "minecraft:unbreaking": 3
+      "StoredEnchantments": [
+        {
+          "id": "minecraft:unbreaking",
+          "lvl": 3
         }
-      }
+      ]
     },
     "amount": 1
   }
