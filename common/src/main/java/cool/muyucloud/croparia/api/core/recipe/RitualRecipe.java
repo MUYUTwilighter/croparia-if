@@ -12,7 +12,9 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.ItemStack;
@@ -38,6 +40,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         Mappable.of(CropariaItems.RITUAL_STAND_2, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
         Mappable.of(CropariaItems.RITUAL_STAND_3, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL))
     );
+    public static final Style ENCHANTS = Style.EMPTY.withItalic(false).withColor(ChatFormatting.WHITE);
 
     private final BlockInput ritual;
     @NotNull
@@ -65,6 +68,25 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         this.block.mapStacks(stacks -> {
             stacks.forEach(stack -> Texts.tooltip(stack, Constants.BLOCK_PLACE_TOOLTIP));
             return stacks;
+        });
+        this.result.getDisplayStacks().forEach(stack -> {
+            if (stack.getItem() instanceof SpawnEggItem) {
+                Texts.tooltip(stack, Texts.translatable("tooltip.croparia.spawn_egg"));
+            } else if (stack.getItem() == Items.ENCHANTED_BOOK && this.getIngredient().getAmount() == 1L) {
+                Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
+                if (enchants.isEmpty()) return;
+                Texts.tooltip(stack, Texts.translatable("tooltip.croparia.ritual.enchant.header").withStyle(ENCHANTS));
+                for (Map.Entry<Enchantment, Integer> entry : enchants.entrySet()) {
+                    Enchantment enchant = entry.getKey();
+                    Integer level = entry.getValue();
+                    Texts.tooltip(stack, Texts.translatable(
+                        "tooltip.croparia.ritual.enchant.entry",
+                        Texts.translatable(enchant.getDescriptionId()),
+                        stack.getCount(),
+                        level
+                    ).withStyle(ENCHANTS));
+                }
+            }
         });
     }
 
@@ -96,11 +118,6 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     public @NotNull List<List<ItemStack>> getOutputs() {
         List<ItemStack> results = this.getResult().getDisplayStacks();
         ItemStack stack = results.isEmpty() ? ItemStack.EMPTY : results.get(0).copy();
-        if (stack.getItem() instanceof SpawnEggItem) {
-            Texts.tooltip(stack, Texts.translatable("tooltip.croparia.spawn_egg"));
-        } else if (stack.getItem() == Items.ENCHANTED_BOOK && this.getIngredient().getAmount() == 1L) {
-            Texts.tooltip(stack, Texts.translatable("tooltip.croparia.ritual.enchant", stack.getCount()));
-        }
         return List.of(List.of(stack));
     }
 
@@ -108,7 +125,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         ItemStack result = this.getResult().createStack();
         // Handle enchanted book special case
         Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(result);
-        if (this.getIngredient().getAmount() == 1L && result.getItem() == Items.ENCHANTED_BOOK && enchantments != null) {
+        if (this.getIngredient().getAmount() == 1L && result.getItem() == Items.ENCHANTED_BOOK) {
             for (ItemStack stack : matcher.stacks()) {
                 if (this.getIngredient().matchType(stack)) {
                     matcher.matched().destroy();
