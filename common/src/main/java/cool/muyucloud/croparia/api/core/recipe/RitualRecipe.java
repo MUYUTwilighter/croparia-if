@@ -65,6 +65,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
             stacks.forEach(stack -> Texts.tooltip(stack, Constants.BLOCK_PLACE_TOOLTIP));
             return stacks;
         });
+        this.result.getDisplayStacks().forEach(this::appendResultTooltip);
     }
 
     public @NotNull ItemInput getIngredient() {
@@ -83,6 +84,31 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         return this.ritual;
     }
 
+    private void appendResultTooltip(ItemStack stack) {
+        if (stack.getItem() instanceof SpawnEggItem) {
+            Texts.tooltip(stack, Texts.translatable("tooltip.croparia.spawn_egg"));
+            return;
+        }
+        if (stack.getItem() == Items.ENCHANTED_BOOK && this.getIngredient().getAmount() == 1L) {
+            this.appendEnchantedBookTooltip(stack);
+        }
+    }
+
+    private void appendEnchantedBookTooltip(ItemStack stack) {
+        ItemEnchantments enchantments = stack.get(DataComponents.STORED_ENCHANTMENTS);
+        if (enchantments == null || enchantments.isEmpty()) return;
+
+        Texts.tooltip(stack, Texts.translatable("tooltip.croparia.ritual.enchant.header"));
+        for (var entry : enchantments.entrySet()) {
+            Texts.tooltip(stack, Texts.translatable(
+                "tooltip.croparia.ritual.enchant.entry",
+                entry.getKey().value().description().copy(),
+                stack.getCount(),
+                entry.getIntValue()
+            ));
+        }
+    }
+
     @Override
     public @NotNull List<List<ItemStack>> getInputs() {
         return List.of(
@@ -95,11 +121,6 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     public @NotNull List<List<ItemStack>> getOutputs() {
         List<ItemStack> results = this.getResult().getDisplayStacks();
         ItemStack stack = results.isEmpty() ? ItemStack.EMPTY : results.getFirst().copy();
-        if (stack.getItem() instanceof SpawnEggItem) {
-            Texts.tooltip(stack, Texts.translatable("tooltip.croparia.spawn_egg"));
-        } else if (stack.getItem() == Items.ENCHANTED_BOOK && this.getIngredient().getAmount() == 1L) {
-            Texts.tooltip(stack, Texts.translatable("tooltip.croparia.ritual.enchant", stack.getCount()));
-        }
         return List.of(List.of(stack));
     }
 

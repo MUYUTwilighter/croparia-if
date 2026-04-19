@@ -37,9 +37,6 @@ public class ReiClient implements REIClientPlugin {
 
     private static <R extends DisplayableRecipe<?>> void registerDisplay(DisplayRegistry registry, ReiCategory<R> category) {
         TypedSerializer<R> type = category.getRecipeType();
-        registry.registerRecipeFiller(
-            type.getRecipeClass(), type,
-            holder -> new ReiDisplay<>(holder, category)
-        );
+        type.findHolders().forEach(holder -> registry.add(new ReiDisplay<>(holder, category), holder));
     }
 }
