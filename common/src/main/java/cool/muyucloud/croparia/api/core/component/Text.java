@@ -8,6 +8,7 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public record Text(List<Component> lines) implements TooltipProvider {
     );
 
     @Override
-    public void addToTooltip(Item.TooltipContext context, Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag, DataComponentGetter componentGetter) {
+    public void addToTooltip(Item.@NonNull TooltipContext context, @NonNull Consumer<Component> tooltipAdder, @NonNull TooltipFlag tooltipFlag, @NonNull DataComponentGetter componentGetter) {
         lines.forEach(tooltipAdder);
     }
 
