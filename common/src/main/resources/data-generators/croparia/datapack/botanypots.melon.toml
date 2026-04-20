@@ -19,13 +19,13 @@ template = """
     {
         "chance": 1.00,
         "output": {
-            "item": {melon._qis}
+            "item": ${melon._qis}
         }
     },
     {
         "chance": 0.01,
         "output": {
-            "item": {seed._qis}
+            "item": ${seed._qis}
         }
     }
   ]
