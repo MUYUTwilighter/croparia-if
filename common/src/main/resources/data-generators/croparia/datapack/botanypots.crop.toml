@@ -4,7 +4,7 @@ dependencies = "botanypots"
 template = """
 {
   "type": "botanypots:crop",
-  "input": {
+  "seed": {
     "item": "${seed}"
   },
   "categories": [
@@ -17,21 +17,16 @@ template = """
   },
   "drops": [
     {
-      "type": "botanypots:items",
-      "items": [
-        {
-          "result": {
-            "id": "${seed}"
-          },
-          "chance": 0.01
-        },
-        {
-          "result": {
-            "id": "${fruit}"
-          },
-          "chance": 1.00
+        "chance": 1.00,
+        "output": {
+            "item": {fruit._qis}
         }
-      ]
+    },
+    {
+        "chance": 0.01,
+        "output": {
+            "item": {seed._qis}
+        }
     }
   ]
 }

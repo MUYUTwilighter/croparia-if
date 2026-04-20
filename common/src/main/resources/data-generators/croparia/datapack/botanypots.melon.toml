@@ -4,34 +4,29 @@ dependencies = "botanypots"
 template = """
 {
   "type": "botanypots:crop",
-  "input": {
+  "seed": {
     "item": "${seed}"
   },
   "categories": [
     "crop", "farmland"
   ],
-  "growthTicks": 600,
+  "growthTicks": 1200,
   "display": {
     "type": "botanypots:aging",
-    "block": "${stem}"
+    "block": "${crop_block}"
   },
   "drops": [
     {
-      "type": "botanypots:items",
-      "items": [
-        {
-          "result": {
-            "id": "${seed}"
-          },
-          "chance": 0.01
-        },
-        {
-          "result": {
-            "id": "${melon}"
-          },
-          "chance": 1.00
+        "chance": 1.00,
+        "output": {
+            "item": {melon._qis}
         }
-      ]
+    },
+    {
+        "chance": 0.01,
+        "output": {
+            "item": {seed._qis}
+        }
     }
   ]
 }
