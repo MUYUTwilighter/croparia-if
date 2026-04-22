@@ -31,13 +31,13 @@ public abstract class StateHolderMixin<O, S> implements StateHolderAccess<S> {
     private Map<String, Property<?>> croparia_if$properties;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void onConstruct(Object object, ImmutableMap<Property<?>, Comparable<?>> map, MapCodec<S> mapCodec, CallbackInfo ci) {
-        if (map == null) {
+    private void onConstruct(O object, ImmutableMap<Property<?>, Comparable<?>> immutableMap, MapCodec<S> mapCodec, CallbackInfo ci) {
+        if (immutableMap == null) {
             this.croparia_if$properties = ImmutableMap.of();
             return;
         }
         Map<String, Property<?>> properties = new HashMap<>();
-        for (Property<?> property : map.keySet()) {
+        for (Property<?> property : immutableMap.keySet()) {
             properties.put(property.getName(), property);
         }
         this.croparia_if$properties = ImmutableMap.copyOf(properties);
