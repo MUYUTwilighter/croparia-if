@@ -1,13 +1,16 @@
 {
   "required": true,
   "package": "cool.muyucloud.croparia.forge.mixin",
+  "refmap": "croparia-if-forge-refmap.json",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "client": [
   ],
   "mixins": [
     "ArchitecturyFluidAttributesForgeMixin",
-    "CapabilityProviderMixin"
+    "CapabilityProviderMixin",
+    "FluidPropertiesMixin",
+    "FluidTypeMixin"
   ],
   "injectors": {
     "defaultRequire": 1
