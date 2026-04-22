@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 public class CropariaFluidTypeExtension implements IClientFluidTypeExtensions {
-    private ArchitecturyFluidAttributes attr;
+    private final ArchitecturyFluidAttributes attr;
 
     public CropariaFluidTypeExtension(ArchitecturyFluidAttributes attr) {
         this.attr = attr;
@@ -49,7 +49,7 @@ public class CropariaFluidTypeExtension implements IClientFluidTypeExtensions {
         return this.attr.getFlowingTexture(state, getter, pos);
     }
 
-    public @NotNull ResourceLocation getOverlayTexture(@NotNull FluidState state, @NotNull BlockAndTintGetter getter, @NotNull BlockPos pos) {
+    public @Nullable ResourceLocation getOverlayTexture(@NotNull FluidState state, @NotNull BlockAndTintGetter getter, @NotNull BlockPos pos) {
         return this.attr.getOverlayTexture(state, getter, pos);
     }
 
@@ -69,7 +69,7 @@ public class CropariaFluidTypeExtension implements IClientFluidTypeExtensions {
         return this.attr.getFlowingTexture(this.convertSafe(stack));
     }
 
-    public @NotNull ResourceLocation getOverlayTexture(@NotNull FluidStack stack) {
+    public @Nullable ResourceLocation getOverlayTexture(@NotNull FluidStack stack) {
         return this.attr.getOverlayTexture(this.convertSafe(stack));
     }
 
