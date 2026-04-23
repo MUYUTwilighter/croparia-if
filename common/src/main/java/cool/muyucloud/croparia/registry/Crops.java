@@ -163,8 +163,7 @@ public class Crops {
     public static final Crop CHORUS = vanilla("chorus", Items.CHORUS_FRUIT, 0xaa85aa, 2, Crop.FOOD);
     public static final Crop PHANTOM = vanilla("phantom", Items.PHANTOM_MEMBRANE, 0xdcd9c0, 2, Crop.MONSTER);
     public static final Crop GLOW_INK = vanilla("glowink", Items.GLOW_INK_SAC, 0x4bdeba, 2, Crop.ANIMAL);
-    // Armadillo scute is unavailable before 1.20.5, keep the crop key but fall back to the closest vanilla scute item.
-    public static final Crop ARMADILLO = vanilla("armadillo", Items.SCUTE, 0xc48682, 2, Crop.ANIMAL);
+    public static final Crop ARMADILLO = vanilla("turtle", Items.SCUTE, 0xc48682, 2, Crop.ANIMAL);
     public static final Crop FROGSPAWN = vanilla("frogspawn", Items.FROGSPAWN, 0x7980c2, 2, Crop.ANIMAL);
 
     public static final Crop DIAMOND = vanilla("diamond", Items.DIAMOND, 0x8cf4e2, 3, Crop.CROP);
