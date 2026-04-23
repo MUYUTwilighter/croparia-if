@@ -1,6 +1,8 @@
 package cool.muyucloud.croparia.kubejs;
 
 import cool.muyucloud.croparia.api.crop.Crop;
+import cool.muyucloud.croparia.api.crop.Melon;
+import cool.muyucloud.croparia.api.crop.util.BlockMaterial;
 import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
 import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
@@ -24,7 +26,7 @@ public class CropUtil {
      * @param rawDependencies translation translationKey for the crop, used for formatting item & block names.
      * @param translations    custom translations
      */
-    public static void create(
+    public static void crop(
         @NotNull String rawId, @NotNull String material, int color, int tier, @Nullable String type,
         @Nullable Map<String, String> rawDependencies, @Nullable Map<String, String> translations
     ) {
@@ -35,7 +37,23 @@ public class CropUtil {
         DgRegistries.CROPS.register(crop);
     }
 
-    public static boolean modify() {
-        return false;
+    /**
+     * Add a melon crop.
+     *
+     * @param rawId           crop id
+     * @param material        material id which the crop grows, could be item ID or item tag
+     * @param color           int value of color
+     * @param tier            tier
+     * @param rawDependencies translation translationKey for the crop, used for formatting item & block names.
+     * @param translations    custom translations
+     */
+    public static void melon(
+        @NotNull String rawId, @NotNull String material, int color, int tier,
+        @Nullable Map<String, String> rawDependencies, @Nullable Map<String, String> translations
+    ) {
+        ResourceLocation id = ResourceLocation.parse(rawId);
+        CropDependencies dependencies = rawDependencies == null ? CropDependencies.EMPTY : new CropDependencies(rawDependencies);
+        Melon melon = new Melon(id, new BlockMaterial(material), new Color(color), tier, translations, dependencies);
+        DgRegistries.MELONS.register(melon);
     }
 }
