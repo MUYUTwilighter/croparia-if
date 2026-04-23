@@ -13,9 +13,11 @@ import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import dev.architectury.event.events.common.LifecycleEvent;
+import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.Env;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.RegistryAccess;
@@ -23,6 +25,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -64,15 +67,16 @@ public class CropariaIf {
         LifecycleEvent.SERVER_STARTED.register(server -> {
             SERVER_STARTED = true;
             OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
-            SyncedRecipeCache.syncAll(server);
             if (CONFIG.getAutoReload() >= 0) {
                 LOGGER.info("Croparia IF is performing a datapack reload to apply data generators");
                 server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "schedule function croparia:auto_reload %s".formatted(CONFIG.getAutoReload()));
             }
-            if (INSTANCE.get().getVersion().contains("a") || INSTANCE.get().getVersion().contains("alpha")) {
-                server.getPlayerList().getPlayers().forEach(player -> player.sendSystemMessage(Texts.translatable(
+        });
+        PlayerEvent.PLAYER_JOIN.register(player -> {
+            if ((INSTANCE.get().getVersion().contains("a") || INSTANCE.get().getVersion().contains("alpha")) && player.level().getServer().isSingleplayer()) {
+                player.sendSystemMessage(Texts.translatable(
                     "chat.croparia.alpha_warning", Texts.literal(INSTANCE.get().getIssueTracker().orElse(""))
-                ).withStyle(style -> style.withColor(0xFF5555).withBold(true))));
+                ).withStyle(style -> style.withColor(ChatFormatting.RED)));
             }
         });
         LifecycleEvent.SERVER_STOPPING.register(server -> {
