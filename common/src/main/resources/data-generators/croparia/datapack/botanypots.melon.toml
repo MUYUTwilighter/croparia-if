@@ -13,7 +13,7 @@ template = """
   "growthTicks": 1200,
   "display": {
     "type": "botanypots:aging",
-    "block": "${crop_block}"
+    "block": ${stem._qis}
   },
   "drops": [
     {
