@@ -38,10 +38,11 @@ dependencies {
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')
 
-    // Tomlj
-    include("org.tomlj:tomlj:$tomlj_version")
-    include("org.antlr:antlr4-runtime:$antlr_version")
-    localRuntime("org.tomlj:tomlj:$tomlj_version")
+    // JToml
+    implementation(include "io.github.wasabithumb:jtoml:$jtoml_version")
+    implementation(include "io.github.wasabithumb:jtoml-api:$jtoml_version")
+    implementation(include "io.github.wasabithumb:jtoml-internals:$jtoml_version")
+    implementation(include "io.github.wasabithumb:jtoml-serializer-gson:$jtoml_version")
 
     modImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"
     // Fabric API. This is technically optional, but you probably want it anyway.

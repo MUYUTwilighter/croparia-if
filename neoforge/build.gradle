@@ -68,19 +68,6 @@ dependencies {
     modCompileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
     modLocalRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
 
-    // Tomlj
-    include("org.tomlj:tomlj:$tomlj_version")
-    // NeoForge already has antlr runtime
-//    include("org.antlr:antlr4-runtime:$antlr_version")
-    implementation("org.tomlj:tomlj:$tomlj_version")
-    forgeRuntimeLibrary("org.tomlj:tomlj:$tomlj_version")
-
-    // EMI: waiting for update to 1.21.4
-//    modCompileOnly "dev.emi:emi-neoforge:${emi_version}:api"
-//    modRuntimeOnly "dev.emi:emi-neoforge:${emi_version}"
-    // KubeJs
-//    modApi "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
-
     testImplementation platform("org.junit:junit-bom:5.10.2")
     testImplementation "org.junit.jupiter:junit-jupiter"
     testImplementation(project(path: ':common', configuration: 'namedElements')) { transitive false }
