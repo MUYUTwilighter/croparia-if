@@ -77,6 +77,7 @@ dependencies {
     testImplementation platform("org.junit:junit-bom:5.10.2")
     testImplementation "org.junit.jupiter:junit-jupiter"
     testImplementation(project(path: ':common', configuration: 'namedElements')) { transitive false }
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
     testRuntimeOnly project(path: ':common', configuration: 'namedElements')
     testRuntimeOnly project(path: ':common', configuration: 'transformProductionNeoForge')
 }
