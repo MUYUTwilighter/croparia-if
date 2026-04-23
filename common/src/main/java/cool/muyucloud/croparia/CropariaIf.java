@@ -12,6 +12,7 @@ import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import dev.architectury.event.events.common.LifecycleEvent;
+import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
 import dev.architectury.utils.Env;
@@ -67,10 +68,14 @@ public class CropariaIf {
                 LOGGER.info("Croparia IF is performing a datapack reload to apply data generators");
                 server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "schedule function croparia:auto_reload %s".formatted(CONFIG.getAutoReload()));
             }
+        });
+        PlayerEvent.PLAYER_JOIN.register(player -> {
+
             if (INSTANCE.get().getVersion().contains("a") || INSTANCE.get().getVersion().contains("alpha")) {
-                server.getPlayerList().getPlayers().forEach(player -> player.sendSystemMessage(Texts.translatable(
-                    "chat.croparia.alpha_warning", Texts.literal(INSTANCE.get().getIssueTracker().orElse(""))
-                ).withStyle(style -> style.withColor(0xFF5555).withBold(true))));
+                player.sendSystemMessage(Texts.translatable("chat.croparia.alpha_warning", Texts.forStyles(
+                    Texts.literal(INSTANCE.get().getIssueTracker().orElse("")),
+                    Texts.openUrl(INSTANCE.get().getIssueTracker().orElse("")).withUnderlined(true)
+                )).withStyle(style -> style.withColor(0xFF5555)));
             }
         });
         LifecycleEvent.SERVER_STOPPING.register(server -> {
