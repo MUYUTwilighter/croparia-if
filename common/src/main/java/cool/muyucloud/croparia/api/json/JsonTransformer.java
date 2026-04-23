@@ -3,9 +3,11 @@ package cool.muyucloud.croparia.api.json;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import cool.muyucloud.croparia.api.generator.util.DgReader;
 import cool.muyucloud.croparia.util.FileUtil;
 import io.github.wasabithumb.jtoml.JToml;
+import io.github.wasabithumb.jtoml.except.TomlException;
 import io.github.wasabithumb.jtoml.serial.gson.GsonTomlSerializer;
 
 import java.io.File;
@@ -19,7 +21,7 @@ public interface JsonTransformer {
     Map<String, JsonTransformer> TRANSFORMERS = new HashMap<>(Map.of(
         "json", JsonParser::parseString,
         "cdg", DgReader::read,
-        "toml", raw -> GsonTomlSerializer.instance().serialize(JToml.jToml().read(new StringReader(raw)))
+        "toml", JsonTransformer::transformToml
     ));
 
     static JsonElement transform(File file) throws IOException, JsonParseException {
@@ -35,6 +37,14 @@ public interface JsonTransformer {
             throw new JsonParseException("No transformer found for extension: " + ext);
         }
         return transformer.transform(content);
+    }
+
+    static JsonElement transformToml(String raw) {
+        try {
+            return GsonTomlSerializer.instance().serialize(JToml.jToml().read(new StringReader(raw)));
+        } catch (TomlException e) {
+            throw new JsonSyntaxException("Failed to parse TOML", e);
+        }
     }
 
     JsonElement transform(String raw);
