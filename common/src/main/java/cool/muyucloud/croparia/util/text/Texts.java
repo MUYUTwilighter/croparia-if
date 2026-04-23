@@ -97,6 +97,10 @@ public class Texts {
         return Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, path));
     }
 
+    public static Style openUrl(String url) {
+        return Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
+    }
+
     public static Style hoverItem(ResourceLocation id) {
         Item item = BuiltInRegistries.ITEM.get(id);
         return hoverItem(item);

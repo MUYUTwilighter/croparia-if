@@ -10,8 +10,9 @@ loom {
 }
 
 dependencies {
-    // Tomlj
-    modApi("org.tomlj:tomlj:$tomlj_version")
+    // JToml
+    implementation "io.github.wasabithumb:jtoml:$jtoml_version"
+    implementation "io.github.wasabithumb:jtoml-serializer-gson:$jtoml_version"
 
     // We depend on Fabric Loader here to use the Fabric @Environment annotations,
     // which get remapped to the correct annotations on each platform.

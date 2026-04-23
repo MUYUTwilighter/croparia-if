@@ -20,6 +20,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
@@ -72,10 +73,13 @@ public class CropariaIf {
             }
         });
         PlayerEvent.PLAYER_JOIN.register(player -> {
-            if ((INSTANCE.get().getVersion().contains("a") || INSTANCE.get().getVersion().contains("alpha")) && Objects.requireNonNull(player.getServer()).isSingleplayer()) {
-                player.sendSystemMessage(Texts.translatable(
-                    "chat.croparia.alpha_warning", Texts.literal(INSTANCE.get().getIssueTracker().orElse(""))
-                ).withStyle(style -> style.withColor(ChatFormatting.RED)));
+            if ((INSTANCE.get().getVersion().contains("a") || INSTANCE.get().getVersion().contains("alpha")) && player.level().getServer().isSingleplayer()) {
+                player.sendSystemMessage(Texts.forStyles(
+                    Texts.translatable("chat.croparia.alpha_warning", Texts.forStyles(
+                        Texts.literal(INSTANCE.get().getIssueTracker().orElse("")),
+                        Texts.openUrl(INSTANCE.get().getIssueTracker().orElse("")).withUnderlined(true))),
+                    Style.EMPTY.withColor(ChatFormatting.RED)
+                ));
             }
         });
         LifecycleEvent.SERVER_STOPPING.register(server -> {
