@@ -164,6 +164,7 @@ public class Crops {
     public static final Crop PHANTOM = vanilla("phantom", Items.PHANTOM_MEMBRANE, 0xdcd9c0, 2, Crop.MONSTER);
     public static final Crop GLOW_INK = vanilla("glowink", Items.GLOW_INK_SAC, 0x4bdeba, 2, Crop.ANIMAL);
     public static final Crop ARMADILLO = vanilla("armadillo", Items.ARMADILLO_SCUTE, 0xc48682, 2, Crop.ANIMAL);
+    public static final Crop TURTLE_SCUTE = vanilla("turtle_scute", Items.TURTLE_SCUTE, 0xc48682, 2, Crop.ANIMAL);
     public static final Crop FROGSPAWN = vanilla("frogspawn", Items.FROGSPAWN, 0x7980c2, 2, Crop.ANIMAL);
 
     public static final Crop DIAMOND = vanilla("diamond", Items.DIAMOND, 0x8cf4e2, 3, Crop.CROP);
