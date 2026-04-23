@@ -56,9 +56,6 @@ dependencies {
 //    // JEI is not available for fabric 1.21.4
 //    compileOnly("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
 //    localRuntime("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
-    // EMI: waiting for update to 1.21.4
-//    compileOnly "dev.emi:emi-fabric:${emi_version}:api"
-//    localRuntime "dev.emi:emi-fabric:${emi_version}"
     // No kubeJs as it no longer supports fabric after 1.20.1
 
     // TSS

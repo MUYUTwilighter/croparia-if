@@ -48,13 +48,6 @@ versionRange = "*"
 ordering = "AFTER"
 side = "BOTH"
 
-[[dependencies.croparia]]
-modId = "emi"
-type = "optional"
-versionRange = "*"
-ordering = "AFTER"
-side = "BOTH"
-
 [[mixins]]
 config = "croparia-if-common.mixins.json"
 
