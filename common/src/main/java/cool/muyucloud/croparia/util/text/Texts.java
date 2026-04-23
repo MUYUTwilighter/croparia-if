@@ -13,6 +13,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.URI;
+
 @SuppressWarnings("unused")
 public class Texts {
     public static ItemStack rename(Item item, Component name) {
@@ -95,6 +97,10 @@ public class Texts {
 
     public static Style openFile(String path) {
         return Style.EMPTY.withClickEvent(new ClickEvent.OpenFile(path));
+    }
+
+    public static Style openUrl(String url) {
+        return Style.EMPTY.withClickEvent(new ClickEvent.OpenUrl(URI.create(url)));
     }
 
     public static Style hoverItem(Identifier id) {
