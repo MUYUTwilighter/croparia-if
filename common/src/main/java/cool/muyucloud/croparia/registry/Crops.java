@@ -8,7 +8,7 @@ import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
 import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
 import cool.muyucloud.croparia.api.element.Element;
-import dev.architectury.injectables.targets.ArchitecturyTarget;
+import dev.architectury.platform.Platform;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
@@ -211,18 +211,23 @@ public class Crops {
     }
 
     public static String forIngot(String name) {
-        String platform = ArchitecturyTarget.getCurrentTarget();
-        return "#c:ingots/" + name;
+        return forCommonMaterial("ingots", name);
     }
 
     public static String forGem(String name) {
-        String platform = ArchitecturyTarget.getCurrentTarget();
-        return "#c:gems/" + name;
+        return forCommonMaterial("gems", name);
     }
 
     public static String forDust(String name) {
-        String platform = ArchitecturyTarget.getCurrentTarget();
-        return "#c:dusts/" + name;
+        return forCommonMaterial("dusts", name);
+    }
+
+    private static String forCommonMaterial(String type, String name) {
+        if (Platform.isForge()) {
+            return "#forge:" + type + "/" + name;
+        } else {
+            return "#c:" + name + "_" + type;
+        }
     }
 
     public static final Crop ADAMANTITE = compat("adamantite", forIngot("adamantite"), 0xAD0E19, 2, Crop.CROP, Map.of(
@@ -365,7 +370,7 @@ public class Crops {
     public static final Crop MOLYBDENUM = compat("molybdenum", forIngot("molybdenum"), 0x708090, 2, Crop.CROP, Map.of(
         "gtceu", "material.gtceu.molybdenum"
     ));
-    public static final Crop MONAZITE = compat("monazite", "#c:dusts/monazite", 0xFCC4B3, 2, Crop.CROP, Map.of(
+    public static final Crop MONAZITE = compat("monazite", forDust("monazite"), 0xFCC4B3, 2, Crop.CROP, Map.of(
         "modern_industrialization", "item.modern_industrialization.monazite_dust"
     ));
     public static final Crop MYSTITE = compat("mystite", forIngot("mystite"), 0xB3FCC4, 2, Crop.CROP, Map.of(
@@ -447,7 +452,7 @@ public class Crops {
         "gtceu", "material.gtceu.ruthenium"
     ));
     // special
-    public static final Crop SALT = compat("salt", "#c:dusts/salt", 0x8F9E9A, 2, Crop.CROP, Map.of(
+    public static final Crop SALT = compat("salt", forDust("salt"), 0x8F9E9A, 2, Crop.CROP, Map.of(
         "modern_industrialization", "item.modern_industrialization.salt_dust"
     ));
     public static final Crop SAMARIUM = compat("samarium", forIngot("samarium"), 0xFF4500, 2, Crop.CROP, Map.of(
