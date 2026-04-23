@@ -34,8 +34,4 @@ public class CropUtil {
         Crop crop = new Crop(id, new ItemMaterial(material), new Color(color), tier, type, translations, dependencies);
         DgRegistries.CROPS.register(crop);
     }
-
-    public static boolean modify() {
-        return false;
-    }
 }

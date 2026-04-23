@@ -1,7 +1,6 @@
 package cool.muyucloud.croparia.registry;
 
 import cool.muyucloud.croparia.CropariaIf;
-import cool.muyucloud.croparia.annotation.PostReg;
 import cool.muyucloud.croparia.api.core.item.GreenhouseItem;
 import cool.muyucloud.croparia.api.core.item.Placeholder;
 import cool.muyucloud.croparia.api.core.item.RecipeWizard;
@@ -77,31 +76,24 @@ public class CropariaItems {
         "deepslate_elematilius_ore",
         properties -> new BlockItem(CropariaBlocks.DEEPSLATE_ELEMATILIUS_ORE.get(), properties.arch$tab(Tabs.MAIN))
     );
-    @PostReg
     public static final RegistrySupplier<Croparia> CROPARIA = registerItem(
         "croparia", properties -> new Croparia(1, properties.arch$tab(Tabs.MAIN))
     );
-    @PostReg
     public static final RegistrySupplier<Croparia> CROPARIA2 = registerItem(
         "croparia2", properties -> new Croparia(2, properties.arch$tab(Tabs.MAIN))
     );
-    @PostReg
     public static final RegistrySupplier<Croparia> CROPARIA3 = registerItem(
         "croparia3", properties -> new Croparia(3, properties.arch$tab(Tabs.MAIN))
     );
-    @PostReg
     public static final RegistrySupplier<Croparia> CROPARIA4 = registerItem(
         "croparia4", properties -> new Croparia(4, properties.arch$tab(Tabs.MAIN))
     );
-    @PostReg
     public static final RegistrySupplier<Croparia> CROPARIA5 = registerItem(
         "croparia5", properties -> new Croparia(5, properties.arch$tab(Tabs.MAIN))
     );
-    @PostReg
     public static final RegistrySupplier<Croparia> CROPARIA6 = registerItem(
         "croparia6", properties -> new Croparia(6, properties)
     );
-    @PostReg
     public static final RegistrySupplier<Croparia> CROPARIA7 = registerItem(
         "croparia7", properties -> new Croparia(7, properties)
     );
