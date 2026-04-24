@@ -25,7 +25,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
