@@ -70,7 +70,6 @@ public class CropariaIf {
             }
         });
         PlayerEvent.PLAYER_JOIN.register(player -> {
-
             if (INSTANCE.get().getVersion().contains("a") || INSTANCE.get().getVersion().contains("alpha")) {
                 player.sendSystemMessage(Texts.translatable("chat.croparia.alpha_warning", Texts.forStyles(
                     Texts.literal(INSTANCE.get().getIssueTracker().orElse("")),
