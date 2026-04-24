@@ -2,7 +2,6 @@ package cool.muyucloud.croparia.mixin;
 
 import cool.muyucloud.croparia.access.CropBlockAccess;
 import net.minecraft.world.level.block.BonemealableBlock;
-import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.VegetationBlock;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;

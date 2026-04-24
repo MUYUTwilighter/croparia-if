@@ -3,7 +3,6 @@ package cool.muyucloud.croparia.api.generator.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 

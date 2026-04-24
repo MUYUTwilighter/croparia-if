@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import cool.muyucloud.croparia.api.core.command.CommonCommandRoot;
 import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
-import cool.muyucloud.croparia.api.recipe.sync.SyncedRecipeCache;
 import cool.muyucloud.croparia.config.Config;
 import cool.muyucloud.croparia.config.ConfigFileHandler;
 import cool.muyucloud.croparia.registry.*;
@@ -26,7 +25,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 

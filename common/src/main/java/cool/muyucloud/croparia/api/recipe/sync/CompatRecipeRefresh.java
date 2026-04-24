@@ -3,17 +3,12 @@ package cool.muyucloud.croparia.api.recipe.sync;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.compat.jei.JeiClient;
 import cool.muyucloud.croparia.compat.jei.category.JeiCategory;
-import cool.muyucloud.croparia.registry.Recipes;
 import dev.architectury.platform.Platform;
 import net.minecraft.resources.Identifier;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 final class CompatRecipeRefresh {
     private static final Map<Identifier, List<?>> LAST_JEI_RECIPES = new HashMap<>();

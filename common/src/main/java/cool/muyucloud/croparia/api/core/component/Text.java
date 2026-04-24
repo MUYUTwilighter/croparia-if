@@ -1,7 +1,7 @@
 package cool.muyucloud.croparia.api.core.component;
 
-import com.mojang.serialization.Codec;
 import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
