@@ -1,6 +1,5 @@
 package cool.muyucloud.croparia.config;
 
-import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;

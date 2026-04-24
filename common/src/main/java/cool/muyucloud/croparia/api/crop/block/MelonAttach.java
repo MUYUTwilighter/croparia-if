@@ -4,7 +4,6 @@ import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.api.crop.Melon;
 import cool.muyucloud.croparia.api.crop.item.MelonSeed;
-import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.block.AttachedStemBlock;

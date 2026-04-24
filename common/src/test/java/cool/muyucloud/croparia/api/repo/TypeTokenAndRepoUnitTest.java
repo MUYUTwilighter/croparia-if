@@ -11,9 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static cool.muyucloud.croparia.TestSupport.getOrThrow;
-import static cool.muyucloud.croparia.TestSupport.isError;
-import static cool.muyucloud.croparia.TestSupport.rl;
+import static cool.muyucloud.croparia.TestSupport.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TypeTokenAndRepoUnitTest {

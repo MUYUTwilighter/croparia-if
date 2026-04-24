@@ -7,9 +7,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.junit.jupiter.api.Test;
 
-import static cool.muyucloud.croparia.TestSupport.first;
-import static cool.muyucloud.croparia.TestSupport.getOrThrow;
-import static cool.muyucloud.croparia.TestSupport.isError;
+import static cool.muyucloud.croparia.TestSupport.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

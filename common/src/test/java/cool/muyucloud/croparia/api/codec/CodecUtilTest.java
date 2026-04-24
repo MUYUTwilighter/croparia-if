@@ -16,9 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static cool.muyucloud.croparia.TestSupport.getOrThrow;
-import static cool.muyucloud.croparia.TestSupport.isError;
-import static cool.muyucloud.croparia.TestSupport.isSuccess;
+import static cool.muyucloud.croparia.TestSupport.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CodecUtilTest {
