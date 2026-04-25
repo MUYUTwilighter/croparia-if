@@ -68,14 +68,6 @@ dependencies {
     modCompileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
     modLocalRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
 
-    // JToml
-    include "io.github.wasabithumb:jtoml:$jtoml_version"
-    include "io.github.wasabithumb:jtoml-api:$jtoml_version"
-    include "io.github.wasabithumb:jtoml-internals:$jtoml_version"
-    include "io.github.wasabithumb:jtoml-serializer-gson:$jtoml_version"
-    implementation "io.github.wasabithumb:jtoml:$jtoml_version"
-    implementation "io.github.wasabithumb:jtoml-serializer-gson:$jtoml_version"
-
     // KubeJs
 //    modApi "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
 
