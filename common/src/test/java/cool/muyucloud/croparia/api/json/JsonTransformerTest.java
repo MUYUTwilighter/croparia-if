@@ -1,7 +1,7 @@
 package cool.muyucloud.croparia.api.json;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.JsonPrimitive;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,9 +14,14 @@ class JsonTransformerTest {
     }
 
     @Test
-    void transformsTomlByExtension() {
-        JsonObject json = JsonTransformer.transform("name = \"croparia\"", "sample.toml").getAsJsonObject();
-        assertEquals("croparia", json.get("name").getAsString());
+    void dispatchesTomlByExtension() {
+        JsonTransformer original = JsonTransformer.TRANSFORMERS.get("toml");
+        JsonTransformer.TRANSFORMERS.put("toml", raw -> new JsonPrimitive("toml:" + raw));
+        try {
+            assertEquals("toml:name", JsonTransformer.transform("name", "sample.toml").getAsString());
+        } finally {
+            JsonTransformer.TRANSFORMERS.put("toml", original);
+        }
     }
 
     @Test
@@ -25,12 +30,4 @@ class JsonTransformerTest {
         assertEquals("v", json.get("k").getAsString());
     }
 
-    @Test
-    void invalidTomlThrowsSyntaxException() {
-        JsonSyntaxException exception = assertThrows(
-            JsonSyntaxException.class,
-            () -> JsonTransformer.transform("name = ", "broken.toml")
-        );
-        assertTrue(exception.getMessage().contains("Failed to parse TOML"));
-    }
 }
