@@ -39,6 +39,10 @@ configurations {
     }
 }
 
+tasks.matching { it.name in ["runClient", "runServer"] }.configureEach {
+    classpath += configurations.architecturyTransformerRuntimeClasspath
+}
+
 repositories {
     maven {
         name = 'NeoForged'
