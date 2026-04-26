@@ -5,6 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.architectury.event.events.client.ClientCommandRegistrationEvent;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -15,10 +16,10 @@ public abstract class DelegateSource<S> implements FailureMessenger, SuccessMess
     @SuppressWarnings("unchecked")
     public static <S> DelegateSource<S> of(CommandContext<S> context) {
         S source = context.getSource();
-        if (source instanceof CommandSourceStack commonSource) {
-            return (DelegateSource<S>) new CommonDelegateSource<>(commonSource);
-        } else if (source instanceof ClientCommandRegistrationEvent.ClientCommandSourceStack clientSource) {
+        if (source instanceof ClientCommandRegistrationEvent.ClientCommandSourceStack clientSource) {
             return (DelegateSource<S>) new ClientDelegateSource<>(clientSource);
+        } else if (source instanceof CommandSourceStack commonSource) {
+            return (DelegateSource<S>) new CommonDelegateSource<>(commonSource);
         } else {
             throw new UnsupportedOperationException("Unsupported command source type: " + source.getClass());
         }
@@ -60,7 +61,8 @@ public abstract class DelegateSource<S> implements FailureMessenger, SuccessMess
 
         @Override
         public Optional<Player> getPlayer() {
-            return Optional.ofNullable(this.getSource().getPlayer());
+            Entity entity = this.getSource().getEntity();
+            return entity instanceof Player player ? Optional.of(player) : Optional.empty();
         }
 
         @Override
