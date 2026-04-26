@@ -15,10 +15,10 @@ public abstract class DelegateSource<S> implements FailureMessenger, SuccessMess
     @SuppressWarnings("unchecked")
     public static <S> DelegateSource<S> of(CommandContext<S> context) {
         S source = context.getSource();
-        if (source instanceof CommandSourceStack commonSource) {
-            return (DelegateSource<S>) new CommonDelegateSource<>(commonSource);
-        } else if (source instanceof ClientCommandRegistrationEvent.ClientCommandSourceStack clientSource) {
+        if (source instanceof ClientCommandRegistrationEvent.ClientCommandSourceStack clientSource) {
             return (DelegateSource<S>) new ClientDelegateSource<>(clientSource);
+        } else if (source instanceof CommandSourceStack commonSource) {
+            return (DelegateSource<S>) new CommonDelegateSource<>(commonSource);
         } else {
             throw new UnsupportedOperationException("Unsupported command source type: " + source.getClass());
         }
