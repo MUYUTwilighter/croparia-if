@@ -67,6 +67,7 @@
   "block.croparia.activated_shrieker": "活化尖啸体",
   "chat.croparia.alpha_warning": "警告：你正在使用非稳定版 Croparia IF，可能会遇到崩溃或错误。有问题请及时反馈到 %s",
   "chat.croparia.recipe_wizard.success": "已保存配方文件 %s",
+  "chat.croparia.error.no_level": "该指令仅在进入世界后生效",
   "commands.croparia.click2copy": "点击复制：%s",
   "commands.croparia.openFile": "[打开]",
   "commands.croparia.crop.create.invalid_color": "%s 是无效的颜色，请参照 \"0xRRGGBB\" 或 \"123456\"",

@@ -67,6 +67,7 @@
   "block.croparia.ritual_stand_3": "Atril ritual T3",
   "chat.croparia.alpha_warning": "Estás ejecutando una versión inestable de Croparia-If; espera errores y fallos. Informa de problemas en %s",
   "chat.croparia.recipe_wizard.success": "Receta guardada %s",
+  "chat.croparia.error.no_level": "This command only works in a world",
   "commands.croparia.click2copy": "Haz clic para copiar: %s",
   "commands.croparia.openFile": "[Abrir]",
   "commands.croparia.crop.create.invalid_color": "El color %s no es válido; debe ser como \"0xRRGGBB\" o \"123456\"",

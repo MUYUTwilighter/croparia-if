@@ -7,7 +7,6 @@ import io.github.wasabithumb.jtoml.serial.gson.GsonTomlSerializer;
 import net.fabricmc.api.ModInitializer;
 
 public class CropariaIfFabric implements ModInitializer {
-
     @Override
     public void onInitialize() {
         JsonTransformer.TRANSFORMERS.put("toml", raw -> GsonTomlSerializer.instance().serialize(

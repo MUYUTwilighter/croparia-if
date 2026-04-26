@@ -2,7 +2,6 @@ package cool.muyucloud.croparia.client;
 
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
-import cool.muyucloud.croparia.client.command.ClientCommandRoot;
 import cool.muyucloud.croparia.client.screen.CropTransmuterScreen;
 import cool.muyucloud.croparia.registry.CropariaBlocks;
 import cool.muyucloud.croparia.registry.DgRegistries;
@@ -21,7 +20,6 @@ public class CropariaIfClient {
 
     public static void init() {
         CropariaIf.LOGGER.info("Initializing client setup");
-        ClientCommandRoot.register();
         CropariaIf.LOGGER.debug("Registering crop color");
         DgRegistries.CROPS.forLoaded(crop -> {
             // Crop Color

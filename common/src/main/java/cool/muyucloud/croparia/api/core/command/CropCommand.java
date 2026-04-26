@@ -212,7 +212,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
 
     public <S> int reportForPlayer(DelegateSource<S> source) throws CommandSyntaxException {
         Player player = source.getPlayerOrException();
-        Level world = source.getLevel();
+        Level world = source.getLevelOrException();
         C crop = null;
         if (player.getMainHandItem().getItem() instanceof CropAccess<?> access) {
             crop = CropAccess.tryGet(access);

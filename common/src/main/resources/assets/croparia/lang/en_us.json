@@ -67,6 +67,7 @@
   "block.croparia.ritual_stand_3": "Ritual Stand T3",
   "chat.croparia.alpha_warning": "You are running an unstable version of Croparia-If, expect bugs and crashes. Report issues at %s",
   "chat.croparia.recipe_wizard.success": "Saved recipe %s",
+  "chat.croparia.error.no_level": "Debes ingresar un mundo para ejecutar este comando",
   "commands.croparia.click2copy": "Click to copy: %s",
   "commands.croparia.openFile": "[Open]",
   "commands.croparia.crop.create.invalid_color": "Color %s is invalid, it should be like \"0xRRGGBB\" or \"123456\"",
