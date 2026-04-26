@@ -3,7 +3,6 @@ package cool.muyucloud.croparia.util.text;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -14,8 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public abstract class DelegateSource<S> implements FailureMessenger, SuccessMessenger {
     public static final SimpleCommandExceptionType ERROR_NO_LEVEL = new SimpleCommandExceptionType(Texts.translatable("chat.croparia.error.no_level"));
