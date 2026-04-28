@@ -10,9 +10,7 @@ public class PackHandlerImpl {
     public static void forEachJar(BiConsumer<File, String> consumer) {
         FabricLoader.getInstance().getAllMods().forEach(mod -> {
             try {
-                mod.getOrigin().getPaths().forEach(path -> {
-                    consumer.accept(path.toFile(), mod.getMetadata().getId());
-                });
+                mod.getOrigin().getPaths().forEach(path -> consumer.accept(path.toFile(), mod.getMetadata().getId()));
             } catch (UnsupportedOperationException ignored) {
                 // JIJ does not support getOrigin().getPaths()
             }
