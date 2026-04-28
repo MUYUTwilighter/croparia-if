@@ -12,11 +12,9 @@ public class PackHandlerImpl {
         FabricLoader.getInstance().getAllMods().forEach(mod -> {
             String modId = mod.getMetadata().getId();
             try {
-                mod.getOrigin().getPaths().forEach(path -> {
-                    consumer.accept(path.toFile(), modId);
-                });
+                mod.getOrigin().getPaths().forEach(path -> consumer.accept(path.toFile(), modId));
             } catch (UnsupportedOperationException e) {
-                CropariaIf.LOGGER.error("Failed to scan generators from mod %s".formatted(modId), e);
+                CropariaIf.LOGGER.debug("Cannot scan generators from mod %s".formatted(modId), e);
             }
         });
     }
