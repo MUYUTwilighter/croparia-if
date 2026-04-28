@@ -8,6 +8,7 @@ out/
 output/
 bin/
 libs/
+logs/
 
 .classpath
 .project
@@ -24,8 +25,5 @@ classes/
 /data_process/
 /gradle/wrapper/gradle-wrapper.jar
 /flat/
-common/logs/
-fabric/logs/
 fabric/config/
-neoforge/logs/
 /.lib/
