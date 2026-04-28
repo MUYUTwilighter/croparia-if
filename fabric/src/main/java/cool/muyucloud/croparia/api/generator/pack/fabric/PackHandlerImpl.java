@@ -1,5 +1,6 @@
 package cool.muyucloud.croparia.api.generator.pack.fabric;
 
+import cool.muyucloud.croparia.CropariaIf;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.File;
@@ -9,12 +10,13 @@ import java.util.function.BiConsumer;
 public class PackHandlerImpl {
     public static void forEachJar(BiConsumer<File, String> consumer) {
         FabricLoader.getInstance().getAllMods().forEach(mod -> {
+            String modId = mod.getMetadata().getId();
             try {
                 mod.getOrigin().getPaths().forEach(path -> {
-                    consumer.accept(path.toFile(), mod.getMetadata().getId());
+                    consumer.accept(path.toFile(), modId);
                 });
-            } catch (UnsupportedOperationException ignored) {
-                // JIJ does not support getOrigin().getPaths()
+            } catch (UnsupportedOperationException e) {
+                CropariaIf.LOGGER.error("Failed to scan generators from mod %s".formatted(modId), e);
             }
         });
     }
