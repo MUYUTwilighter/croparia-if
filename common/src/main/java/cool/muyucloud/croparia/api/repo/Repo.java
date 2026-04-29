@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Abstraction of resource storage.
@@ -328,6 +329,15 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
     }
 
     /**
+     * Creates a delegate view that rejects accept operations for all storage units.
+     *
+     * @return A delegate repo with every storage unit locked for accepting.
+     */
+    default DelegateRepo<T> lockAccept() {
+        return new DelegateRepo<>(this, this.allIndexes(), Collections.emptySet());
+    }
+
+    /**
      * Creates a delegate view that rejects consume operations for the specified storage units.
      *
      * @param idx The storage unit indexes to lock for consuming.
@@ -335,5 +345,43 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
      */
     default DelegateRepo<T> lockConsume(Integer... idx) {
         return new DelegateRepo<>(this, Collections.emptySet(), List.of(idx));
+    }
+
+    /**
+     * Creates a delegate view that rejects consume operations for all storage units.
+     *
+     * @return A delegate repo with every storage unit locked for consuming.
+     */
+    default DelegateRepo<T> lockConsume() {
+        return new DelegateRepo<>(this, Collections.emptySet(), this.allIndexes());
+    }
+
+    /**
+     * Creates a delegate view that rejects both accept and consume operations for the specified storage units.
+     *
+     * @param idx The storage unit indexes to lock for both accepting and consuming.
+     * @return A delegate repo with both accept and consume locks applied.
+     */
+    default DelegateRepo<T> lock(Integer... idx) {
+        return new DelegateRepo<>(this, List.of(idx), List.of(idx));
+    }
+
+    /**
+     * Creates a delegate view that rejects both accept and consume operations for all storage units.
+     *
+     * @return A delegate repo with every storage unit locked for both accepting and consuming.
+     */
+    default DelegateRepo<T> lock() {
+        List<Integer> indexes = this.allIndexes();
+        return new DelegateRepo<>(this, indexes, indexes);
+    }
+
+    /**
+     * Collects all storage unit indexes in this repo.
+     *
+     * @return A list containing every valid storage unit index from {@code 0} inclusive to {@link #size()} exclusive.
+     */
+    private List<Integer> allIndexes() {
+        return IntStream.range(0, this.size()).boxed().toList();
     }
 }
