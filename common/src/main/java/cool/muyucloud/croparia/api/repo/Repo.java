@@ -10,17 +10,34 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Abstraction of resource storage.<br>
+ * Abstraction of resource storage.
+ * <p>
+ * A repo is an indexed collection of resource storage units. Implementations define the actual storage backend, while
+ * default methods provide common whole-repo operations by iterating over every unit.
+ * </p>
+ * <p>
+ * Lock methods are view-level filters. A locked accept unit rejects {@link #simAccept(int, TypedResource, long)} and
+ * {@link #accept(int, TypedResource, long)} calls; a locked consume unit rejects
+ * {@link #simConsume(int, TypedResource, long)} and {@link #consume(int, TypedResource, long)} calls. Capacity and amount
+ * queries remain raw storage queries and should not be changed by locks.
+ * </p>
  */
 @SuppressWarnings("unused")
 public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
     Logger LOGGER = LogUtils.getLogger();
 
     /**
-     * The amount of resource storage units
+     * The amount of resource storage units.
+     *
+     * @return The number of addressable storage units in this repo.
      */
     int size();
 
+    /**
+     * Checks whether all storage units are empty.
+     *
+     * @return {@code true} if every storage unit is empty.
+     */
     default boolean isEmpty() {
         for (int i = 0; i < size(); i++) {
             if (!isEmpty(i)) {
@@ -34,24 +51,31 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
     TypeToken<T> getType();
 
     /**
-     * Whether the specified resource storage unit is empty
+     * Checks whether the specified resource storage unit is empty.
+     *
+     * @param i The index of the resource storage unit.
+     * @return {@code true} if the specified storage unit is empty.
      */
     boolean isEmpty(int i);
 
     /**
-     * Query the resource type of the specified storage unit
+     * Queries the resource type of the specified storage unit.
+     * <p>
+     * Empty storage units may return an implementation-defined empty resource value.
+     * </p>
      *
-     * @param i The index of the resource storage unit
-     * @return The resource stored in the specified resource storage unit
+     * @param i The index of the resource storage unit.
+     * @return The resource stored in the specified resource storage unit.
      */
     T resourceFor(int i);
 
     /**
-     * Simulates consuming the specified amount of resource from the total storage.
+     * Simulates consuming the specified amount of resource from all storage units.
      *
-     * @param resource The resource to consume
-     * @param amount   The amount to consume
-     * @return The amount that can be consumed
+     * @param resource The resource to consume.
+     * @param amount   The amount to consume.
+     * @return The amount that can be consumed.
+     * @apiNote Consume-locked units should contribute {@code 0}.
      */
     default long simConsume(T resource, long amount) {
         long required = amount;
@@ -61,10 +85,24 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
         return required - amount;
     }
 
+    /**
+     * Simulates consuming from one storage unit using the resource currently stored in that unit.
+     *
+     * @param i      The index of the resource storage unit.
+     * @param amount The amount to consume.
+     * @return The amount that can be consumed.
+     */
     default long simConsume(int i, long amount) {
         return this.simConsume(i, this.resourceFor(i), amount);
     }
 
+    /**
+     * Checks whether the specified storage unit is locked for consuming.
+     *
+     * @param i The index of the resource storage unit.
+     * @return {@code true} if consume operations should be rejected for this unit.
+     * @apiNote This lock affects consume operations only; it does not affect amount or capacity queries.
+     */
     default boolean isConsumeLocked(int i) {
         return false;
     }
@@ -72,19 +110,21 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
     /**
      * Simulates consuming the specified amount of resource from the specified resource storage unit.
      *
-     * @param i        The index of the resource storage unit to consume
-     * @param resource The resource to consume
-     * @param amount   The amount to consume
-     * @return The amount that can be consumed
+     * @param i        The index of the resource storage unit to consume.
+     * @param resource The resource to consume.
+     * @param amount   The amount to consume.
+     * @return The amount that can be consumed.
+     * @apiNote Implementations or wrappers should return {@code 0} when {@link #isConsumeLocked(int)} is {@code true}.
      */
     long simConsume(int i, T resource, long amount);
 
     /**
-     * Consumes the specified amount of resource from the total storage.
+     * Consumes the specified amount of resource from all storage units.
      *
-     * @param resource The resource to consume
-     * @param amount   The amount to consume
-     * @return the amount actually consumed
+     * @param resource The resource to consume.
+     * @param amount   The amount to consume.
+     * @return The amount actually consumed.
+     * @apiNote Consume-locked units should contribute {@code 0}.
      */
     default long consume(T resource, long amount) {
         long required = amount;
@@ -94,6 +134,13 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
         return required - amount;
     }
 
+    /**
+     * Consumes from one storage unit using the resource currently stored in that unit.
+     *
+     * @param i      The index of the resource storage unit.
+     * @param amount The amount to consume.
+     * @return The amount actually consumed.
+     */
     default long consume(int i, long amount) {
         return this.consume(i, this.resourceFor(i), amount);
     }
@@ -101,20 +148,22 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
     /**
      * Consumes the specified amount of resource from the specified resource storage unit.
      *
-     * @param i        The index of the resource storage unit to consume
-     * @param resource The resource to consume
-     * @param amount   The amount to consume
-     * @return The amount actually consumed
+     * @param i        The index of the resource storage unit to consume.
+     * @param resource The resource to consume.
+     * @param amount   The amount to consume.
+     * @return The amount actually consumed.
+     * @apiNote Implementations or wrappers should return {@code 0} when {@link #isConsumeLocked(int)} is {@code true}.
      */
     long consume(int i, T resource, long amount);
 
 
     /**
-     * Simulates accepting the specified amount of resource into the total storage.
+     * Simulates accepting the specified amount of resource into all storage units.
      *
-     * @param resource The resource to accept
-     * @param amount   The amount to accept
-     * @return The amount that can be accepted
+     * @param resource The resource to accept.
+     * @param amount   The amount to accept.
+     * @return The amount that can be accepted.
+     * @apiNote Accept-locked units should contribute {@code 0}.
      */
     default long simAccept(T resource, long amount) {
         long required = amount;
@@ -124,10 +173,24 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
         return required - amount;
     }
 
+    /**
+     * Simulates accepting into one storage unit using the resource currently stored in that unit.
+     *
+     * @param i      The index of the resource storage unit.
+     * @param amount The amount to accept.
+     * @return The amount that can be accepted.
+     */
     default long simAccept(int i, long amount) {
         return this.simAccept(i, this.resourceFor(i), amount);
     }
 
+    /**
+     * Checks whether the specified storage unit is locked for accepting.
+     *
+     * @param i The index of the resource storage unit.
+     * @return {@code true} if accept operations should be rejected for this unit.
+     * @apiNote This lock affects accept operations only; it does not affect amount or capacity queries.
+     */
     default boolean isAcceptLocked(int i) {
         return false;
     }
@@ -135,19 +198,21 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
     /**
      * Simulates accepting the specified amount of resource into the specified resource storage.
      *
-     * @param i        The index of the resource storage unit to accept
-     * @param resource The resource to accept
-     * @param amount   The amount to accept
-     * @return The amount that can be accepted
+     * @param i        The index of the resource storage unit to accept.
+     * @param resource The resource to accept.
+     * @param amount   The amount to accept.
+     * @return The amount that can be accepted.
+     * @apiNote Implementations or wrappers should return {@code 0} when {@link #isAcceptLocked(int)} is {@code true}.
      */
     long simAccept(int i, T resource, long amount);
 
     /**
-     * Accepts the specified amount of resource into the total storage.
+     * Accepts the specified amount of resource into all storage units.
      *
-     * @param resource The resource to accept
-     * @param amount   The amount to accept
-     * @return the amount actually accepted
+     * @param resource The resource to accept.
+     * @param amount   The amount to accept.
+     * @return The amount actually accepted.
+     * @apiNote Accept-locked units should contribute {@code 0}.
      */
     default long accept(T resource, long amount) {
         long required = amount;
@@ -157,6 +222,13 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
         return required - amount;
     }
 
+    /**
+     * Accepts into one storage unit using the resource currently stored in that unit.
+     *
+     * @param i      The index of the resource storage unit.
+     * @param amount The amount to accept.
+     * @return The amount actually accepted.
+     */
     default long accept(int i, long amount) {
         return this.accept(i, this.resourceFor(i), amount);
     }
@@ -164,10 +236,11 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
     /**
      * Accepts the specified amount of resource into the specified resource storage unit.
      *
-     * @param i        The index of the resource storage unit to accept
-     * @param resource The resource to accept
-     * @param amount   The amount to accept
-     * @return The amount actually accepted
+     * @param i        The index of the resource storage unit to accept.
+     * @param resource The resource to accept.
+     * @param amount   The amount to accept.
+     * @return The amount actually accepted.
+     * @apiNote Implementations or wrappers should return {@code 0} when {@link #isAcceptLocked(int)} is {@code true}.
      */
     long accept(int i, T resource, long amount);
 
@@ -177,7 +250,8 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
      * @param i        The index of the resource storage unit to check
      * @param resource The resource to check
      * @return The capacity for the specified resource
-     * @apiNote This is not the room left, but the total capacity for the specified resource.
+     * @apiNote This is not the room left, but the total capacity for the specified resource. Locks should not affect this
+     * query; use {@link #isAcceptLocked(int)} when the caller needs to know whether insertion is allowed.
      */
     long capacityFor(int i, T resource);
 
@@ -186,7 +260,8 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
      *
      * @param resource The resource to check
      * @return The total capacity for the specified resource
-     * @apiNote This is not the room left, but the total capacity for the specified resource.
+     * @apiNote This is not the room left, but the total capacity for the specified resource. Locks should not affect this
+     * query.
      */
     default long capacityFor(T resource) {
         long amount = 0;
@@ -196,6 +271,12 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
         return amount;
     }
 
+    /**
+     * Calculates the capacity for the resource currently stored in the specified storage unit.
+     *
+     * @param i The index of the resource storage unit to check.
+     * @return The capacity for the currently stored resource.
+     */
     default long capacityFor(int i) {
         return this.capacityFor(i, this.resourceFor(i));
     }
@@ -203,17 +284,19 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
     /**
      * Calculates the amount of resource in the specified resource storage unit.
      *
-     * @param i        The index of the resource storage unit to check
-     * @param resource The resource to check
-     * @return The amount of resource
+     * @param i        The index of the resource storage unit to check.
+     * @param resource The resource to check.
+     * @return The amount of resource.
+     * @apiNote Locks should not affect this query.
      */
     long amountFor(int i, T resource);
 
     /**
      * Calculates the total amount of resource across all resource storage units.
      *
-     * @param resource The resource to check
-     * @return The total amount of resource
+     * @param resource The resource to check.
+     * @return The total amount of resource.
+     * @apiNote Locks should not affect this query.
      */
     default long amountFor(T resource) {
         long amount = 0;
@@ -226,17 +309,30 @@ public interface Repo<T extends TypedResource<?>> extends TypeTokenAccess {
     /**
      * Calculates the amount of whatever resource is in the specified resource storage unit.
      *
-     * @param i The index of the resource storage unit to check
-     * @return The amount of resource
+     * @param i The index of the resource storage unit to check.
+     * @return The amount of resource.
+     * @apiNote Locks should not affect this query.
      */
     default long amountFor(int i) {
         return this.amountFor(i, this.resourceFor(i));
     }
 
+    /**
+     * Creates a delegate view that rejects accept operations for the specified storage units.
+     *
+     * @param idx The storage unit indexes to lock for accepting.
+     * @return A delegate repo with the accept locks applied.
+     */
     default DelegateRepo<T> lockAccept(Integer... idx) {
         return new DelegateRepo<>(this, List.of(idx), Collections.emptySet());
     }
 
+    /**
+     * Creates a delegate view that rejects consume operations for the specified storage units.
+     *
+     * @param idx The storage unit indexes to lock for consuming.
+     * @return A delegate repo with the consume locks applied.
+     */
     default DelegateRepo<T> lockConsume(Integer... idx) {
         return new DelegateRepo<>(this, Collections.emptySet(), List.of(idx));
     }
