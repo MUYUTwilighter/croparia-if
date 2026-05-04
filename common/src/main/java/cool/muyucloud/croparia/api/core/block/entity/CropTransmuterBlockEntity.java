@@ -51,8 +51,12 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
 
     private final NonNullList<ItemStack> inventory;
     private final ContainerRepo<CropTransmuterBlockEntity> repo = new ContainerRepo<>(this);
-    private final RepoProxy<ItemSpec> inputProxy = RepoProxy.item(repo.asAcceptOnly().asLocked(OUTPUT_SLOT));
-    private final RepoProxy<ItemSpec> outputProxy = RepoProxy.item(repo.asConsumeOnly().asLocked(INPUT_SLOT));
+    private final RepoProxy<ItemSpec> inputProxy = RepoProxy.item(
+        repo.lockConsume(INPUT_SLOT, OUTPUT_SLOT).lockAccept(OUTPUT_SLOT).trim()
+    );
+    private final RepoProxy<ItemSpec> outputProxy = RepoProxy.item(
+        repo.lockAccept(INPUT_SLOT, OUTPUT_SLOT).lockConsume(INPUT_SLOT).trim()
+    );
     private int selectedIndex = 0;
     private boolean positiveRedstone = true;
 
