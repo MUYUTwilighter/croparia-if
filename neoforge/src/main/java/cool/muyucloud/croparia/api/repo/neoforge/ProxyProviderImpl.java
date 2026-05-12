@@ -16,7 +16,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.Optional;
 
-    @SuppressWarnings({"UnstableApiUsage", "unused"})
+@SuppressWarnings({"UnstableApiUsage", "unused"})
 public class ProxyProviderImpl {
     public static Optional<PlatformItemProxy> findItem(Level world, BlockPos pos, Direction direction) {
         Object handler = Capabilities.Item.BLOCK.getCapability(world, pos, null, null, direction);
@@ -29,10 +29,10 @@ public class ProxyProviderImpl {
     }
 
     public static void registerItem(ProxyProvider<ItemSpec> provider, Block... blocks) {
-        ((BlockCapabilityAccess) (Object) Capabilities.Item.BLOCK).croparia_if$registerItem(provider, blocks);
+        ((BlockCapabilityAccess) (Object) Capabilities.Item.BLOCK).cif$registerItem(provider, blocks);
     }
 
     public static void registerFluid(ProxyProvider<FluidSpec> provider, Block... blocks) {
-        ((BlockCapabilityAccess) (Object) Capabilities.Fluid.BLOCK).croparia_if$registerFluid(provider, blocks);
+        ((BlockCapabilityAccess) (Object) Capabilities.Fluid.BLOCK).cif$registerFluid(provider, blocks);
     }
 }

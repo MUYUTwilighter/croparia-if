@@ -34,7 +34,7 @@ public abstract class BlockCapabilityMixin<T, C extends @Nullable Object> extend
 
     @Override
     @Unique
-    public void croparia_if$registerItem(ProxyProvider<ItemSpec> provider, Block... blocks) {
+    public void cif$registerItem(ProxyProvider<ItemSpec> provider, Block... blocks) {
         //noinspection EqualsBetweenInconvertibleTypes
         if (!Objects.equals(this, Capabilities.Item.BLOCK)) {
             throw new UnsupportedOperationException("Calling registerItem on the wrong capability!");
@@ -49,7 +49,7 @@ public abstract class BlockCapabilityMixin<T, C extends @Nullable Object> extend
 
     @Override
     @Unique
-    public void croparia_if$registerFluid(ProxyProvider<FluidSpec> provider, Block... blocks) {
+    public void cif$registerFluid(ProxyProvider<FluidSpec> provider, Block... blocks) {
         //noinspection EqualsBetweenInconvertibleTypes
         if (!Objects.equals(this, Capabilities.Fluid.BLOCK)) {
             throw new UnsupportedOperationException("Calling registerFluid on the wrong capability!");
