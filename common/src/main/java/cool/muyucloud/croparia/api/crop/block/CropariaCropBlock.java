@@ -20,7 +20,7 @@ public class CropariaCropBlock extends CropBlock implements CropAccess<Crop> {
     private final Identifier cropId;
 
     public CropariaCropBlock(Crop crop) {
-        super(Properties.of().noCollision().sound(SoundType.CROP).setId(ResourceKey.create(Registries.BLOCK, crop.getKey())));
+        super(Properties.of().noCollision().sound(SoundType.CROP).setId(ResourceKey.create(Registries.BLOCK, crop.getBlockId())));
         this.cropId = crop.getKey();
     }
 
