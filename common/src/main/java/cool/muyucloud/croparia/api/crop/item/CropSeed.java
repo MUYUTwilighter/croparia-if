@@ -19,6 +19,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @SuppressWarnings("UnstableApiUsage")
 public class CropSeed extends BlockItem implements CropAccess<Crop> {
@@ -31,7 +32,7 @@ public class CropSeed extends BlockItem implements CropAccess<Crop> {
     }
 
     @Override
-    public @NotNull Component getName(ItemStack itemStack) {
+    public @NotNull Component getName(@NonNull ItemStack itemStack) {
         MutableComponent cropName = Texts.translatable(this.getCrop().getTranslationKey());
         return Texts.translatable("item." + CropariaIf.MOD_ID + ".crop.seed", cropName);
     }

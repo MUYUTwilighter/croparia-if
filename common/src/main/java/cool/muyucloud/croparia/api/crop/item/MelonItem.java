@@ -20,7 +20,7 @@ public class MelonItem extends BlockItem implements AbstractFruit<Melon> {
     public MelonItem(Melon melon) {
         super(
             melon.getMelon().get(),
-            new Properties().arch$tab(Tabs.MELONS).setId(ResourceKey.create(Registries.ITEM, melon.getMelon().getId()))
+            new Properties().arch$tab(Tabs.MELONS).setId(ResourceKey.create(Registries.ITEM, melon.getMelonItem().getId()))
         );
         this.melon = melon;
     }

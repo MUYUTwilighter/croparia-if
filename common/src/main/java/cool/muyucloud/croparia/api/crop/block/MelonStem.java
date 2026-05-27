@@ -33,7 +33,7 @@ public class MelonStem extends StemBlock implements CropAccess<Melon> {
             melon.getMelon().adaptKey(),
             melon.getAttach().adaptKey(),
             melon.getSeed().adaptKey(),
-            Properties.ofFullCopy(Blocks.PUMPKIN_STEM).setId(ResourceKey.create(Registries.BLOCK, melon.getKey()))
+            Properties.ofFullCopy(Blocks.PUMPKIN_STEM).setId(ResourceKey.create(Registries.BLOCK, melon.getStem().getId()))
         );
         this.melon = melon;
     }

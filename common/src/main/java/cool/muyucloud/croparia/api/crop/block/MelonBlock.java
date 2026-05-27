@@ -17,7 +17,7 @@ public class MelonBlock extends Block implements CropAccess<Melon> {
     private final Melon melon;
 
     public MelonBlock(Melon melon) {
-        super(Properties.ofFullCopy(Blocks.PUMPKIN).setId(ResourceKey.create(Registries.BLOCK, melon.getKey())));
+        super(Properties.ofFullCopy(Blocks.PUMPKIN).setId(ResourceKey.create(Registries.BLOCK, melon.getMelon().getId())));
         this.melon = melon;
     }
 
