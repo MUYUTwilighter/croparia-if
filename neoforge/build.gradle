@@ -111,7 +111,7 @@ modrinth {
     projectId = "croparia-if"
     versionName = "$archives_name-neoforge-$mod_version"
     versionNumber = mod_version
-    versionType = mod_version.endsWith("a") || mod_version.endsWith("alpha") ? "alpha" : mod_version.endsWith("pre") ? "beta" : "release"
+    versionType = release_state
     uploadFile = remapJar
     gameVersions = [minecraft_version]
     loaders = ["neoforge"]
@@ -130,7 +130,7 @@ tasks.register('curseforge', TaskPublishCurseForge) {
     group = 'publishing'
     def mainFile = upload('971004', remapJar)
     mainFile.displayName = "$archives_name-neoforge-$mod_version"
-    mainFile.releaseType = mod_version.endsWith("a") || mod_version.endsWith("alpha") ? "alpha" : mod_version.endsWith("pre") ? "beta" : "release"
+    mainFile.releaseType = release_state
     File changelogFile = rootProject.file("changelog.md")
     if (changelogFile.exists()) {
         mainFile.changelog = changelogFile.text
