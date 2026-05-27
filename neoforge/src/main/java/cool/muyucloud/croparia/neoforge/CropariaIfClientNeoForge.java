@@ -21,52 +21,13 @@ import java.util.Map;
 
 @EventBusSubscriber(modid = CropariaIf.MOD_ID, value = Dist.CLIENT)
 public class CropariaIfClientNeoForge {
-    @SuppressWarnings("unchecked")
-    public static final LazySupplier<Map<ArchitecturyFluidAttributes, FluidType>> FLUID_TYPES = CifUtil.forField(
-        ArchitecturyFlowingFluid.class,
-        "FLUID_TYPE_MAP"
-    ).map(field -> {
-        try {
-            return (Map<ArchitecturyFluidAttributes, FluidType>) field.get(null);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    });
-    public static final LazySupplier<Constructor<FluidType>> FORGE_FLUID_ATTR_CONST = CifUtil.forConstructor(
-        "dev.architectury.core.fluid.ArchitecturyFluidAttributesForge",
-        FluidType.Properties.class, Fluid.class, ArchitecturyFluidAttributes.class
-    );
-
-    @SubscribeEvent()
+    @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         CropariaIfClient.init();
     }
-
-//    @SubscribeEvent
-//    public static void onRegisterClientExtensions(RegisterClientExtensionsEvent event) {
-//        for (Element element : Element.values()) {
-//            if (element.shouldLoad()) registerFluidClientExtensions(event, element.getFluidAttr());
-//        }
-//    }
 
     @SubscribeEvent
     public static void onRegisterScreens(RegisterMenuScreensEvent event) {
         event.register(MenuTypes.CROP_TRANSMUTER.get(), CropTransmuterScreen::new);
     }
-
-//    private static void registerFluidClientExtensions(
-//        RegisterClientExtensionsEvent event,
-//        ArchitecturyFluidAttributes attributes
-//    ) {
-//        FluidType type = FLUID_TYPES.get().computeIfAbsent(attributes, attr -> {
-//            try {
-//                return FORGE_FLUID_ATTR_CONST.get().newInstance(FluidType.Properties.create(), attributes.getSourceFluid(), attributes);
-//            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-//                throw new RuntimeException(e);
-//            }
-//        });
-//        if (type instanceof ArchitecturyFluidAttributesForgeAccess access) {
-//            event.registerFluidType(access.cif$getExtension(), type);
-//        }
-//    }
 }
