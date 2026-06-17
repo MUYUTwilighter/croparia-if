@@ -4,77 +4,72 @@ import cool.muyucloud.croparia.api.repo.Repo;
 import cool.muyucloud.croparia.api.repo.RepoProxy;
 import cool.muyucloud.croparia.api.resource.neoforge.ForgeFluidSpec;
 import cool.muyucloud.croparia.api.resource.type.FluidSpec;
-import cool.muyucloud.croparia.util.CifUtil;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import org.jetbrains.annotations.NotNull;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.TransferPreconditions;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.RootCommitJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.jspecify.annotations.NonNull;
 
-public class FluidRepoProxy extends RepoProxy<FluidSpec> implements IFluidHandler {
+import java.util.Objects;
+
+public class FluidRepoProxy extends RepoProxy<FluidSpec> implements ResourceHandler<FluidResource> {
     public FluidRepoProxy(Repo<FluidSpec> repo) {
         super(repo);
     }
 
     @Override
-    public int getTanks() {
-        return this.get().size();
+    public @NonNull FluidResource getResource(int index) {
+        Objects.checkIndex(index, this.size());
+        return FluidResource.of(ForgeFluidSpec.of(this.resourceFor(index), ForgeFluidSpec.toInternalAmount(FluidType.BUCKET_VOLUME)));
     }
 
     @Override
-    public @NotNull FluidStack getFluidInTank(int i) {
-        FluidSpec fluidSpec = this.resourceFor(i);
-        return ForgeFluidSpec.of(fluidSpec, this.amountFor(i, fluidSpec));
+    public long getAmountAsLong(int index) {
+        Objects.checkIndex(index, this.size());
+        return ForgeFluidSpec.toNeoAmount(this.amountFor(index, this.resourceFor(index)));
     }
 
     @Override
-    public int getTankCapacity(int i) {
-        return CifUtil.toIntSafe(this.capacityFor(i) / ForgeFluidSpec.NEO_TO_INTERNAL_RATIO);
+    public long getCapacityAsLong(int index, FluidResource resource) {
+        Objects.checkIndex(index, this.size());
+        FluidSpec fluid = resource.isEmpty() ? this.resourceFor(index) : ForgeFluidSpec.from(resource.toStack(FluidType.BUCKET_VOLUME));
+        return ForgeFluidSpec.toNeoAmount(this.capacityFor(index, fluid));
     }
 
     @Override
-    public boolean isFluidValid(int i, @NotNull FluidStack input) {
-        FluidSpec fluid = ForgeFluidSpec.from(input);
-        long amount = ForgeFluidSpec.toInternalAmount(input.getAmount());
-        return this.simAccept(i, fluid, amount) >= amount;
+    public boolean isValid(int index, @NonNull FluidResource resource) {
+        Objects.checkIndex(index, this.size());
+        TransferPreconditions.checkNonEmpty(resource);
+        return this.capacityFor(index, ForgeFluidSpec.from(resource.toStack(FluidType.BUCKET_VOLUME))) > 0;
     }
 
     @Override
-    public int fill(@NotNull FluidStack input, FluidAction fluidAction) {
-        FluidSpec fluid = ForgeFluidSpec.from(input);
-        if (fluidAction.simulate()) {
-            return CifUtil.toIntSafe(this.simAccept(fluid, ForgeFluidSpec.toInternalAmount(input.getAmount())) / ForgeFluidSpec.NEO_TO_INTERNAL_RATIO);
-        } else if (fluidAction.execute()) {
-            return CifUtil.toIntSafe(this.accept(fluid, ForgeFluidSpec.toInternalAmount(input.getAmount())) / ForgeFluidSpec.NEO_TO_INTERNAL_RATIO);
-        } else {
-            return 0;
+    public int insert(int index, @NonNull FluidResource resource, int amount, @NonNull TransactionContext transaction) {
+        Objects.checkIndex(index, this.size());
+        TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+        FluidSpec fluid = ForgeFluidSpec.from(resource.toStack(FluidType.BUCKET_VOLUME));
+        int inserted = ForgeFluidSpec.toNeoAmount(this.simAccept(index, fluid, ForgeFluidSpec.toInternalAmount(amount)));
+        if (inserted > 0) {
+            this.scheduleCommit(transaction, () -> this.accept(index, fluid, ForgeFluidSpec.toInternalAmount(inserted)));
         }
+        return inserted;
     }
 
     @Override
-    public @NotNull FluidStack drain(@NotNull FluidStack input, FluidAction fluidAction) {
-        FluidSpec fluid = ForgeFluidSpec.from(input);
-        if (fluidAction.simulate()) {
-            long consumed = this.simConsume(ForgeFluidSpec.from(input), ForgeFluidSpec.toInternalAmount(input.getAmount()));
-            return ForgeFluidSpec.of(fluid, consumed);
-        } else if (fluidAction.execute()) {
-            long consumed = this.consume(ForgeFluidSpec.from(input), ForgeFluidSpec.toInternalAmount(input.getAmount()));
-            return ForgeFluidSpec.of(fluid, consumed);
-        } else {
-            return FluidStack.EMPTY;
+    public int extract(int index, @NonNull FluidResource resource, int amount, @NonNull TransactionContext transaction) {
+        Objects.checkIndex(index, this.size());
+        TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+        FluidSpec fluid = ForgeFluidSpec.from(resource.toStack(FluidType.BUCKET_VOLUME));
+        int extracted = ForgeFluidSpec.toNeoAmount(this.simConsume(index, fluid, ForgeFluidSpec.toInternalAmount(amount)));
+        if (extracted > 0) {
+            this.scheduleCommit(transaction, () -> this.consume(index, fluid, ForgeFluidSpec.toInternalAmount(extracted)));
         }
+        return extracted;
     }
 
-    @Override
-    public @NotNull FluidStack drain(int amount, @NotNull FluidAction fluidAction) {
-        if (this.size() < 1) return FluidStack.EMPTY;
-        FluidSpec fluid = this.resourceFor(0);
-        if (fluidAction.simulate()) {
-            long consumed = this.simConsume(fluid, ForgeFluidSpec.toInternalAmount(amount));
-            return ForgeFluidSpec.of(fluid, consumed);
-        } else if (fluidAction.execute()) {
-            long consumed = this.consume(fluid, ForgeFluidSpec.toInternalAmount(amount));
-            return ForgeFluidSpec.of(fluid, consumed);
-        } else {
-            return FluidStack.EMPTY;
-        }
+    private void scheduleCommit(TransactionContext transaction, Runnable action) {
+        new RootCommitJournal(action).updateSnapshots(transaction);
     }
 }

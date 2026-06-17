@@ -4,124 +4,142 @@ import cool.muyucloud.croparia.api.repo.Repo;
 import cool.muyucloud.croparia.api.repo.platform.PlatformFluidProxy;
 import cool.muyucloud.croparia.api.resource.neoforge.ForgeFluidSpec;
 import cool.muyucloud.croparia.api.resource.type.FluidSpec;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import java.util.Optional;
 
 public class PlatformFluidProxyImpl implements PlatformFluidProxy {
-    public static PlatformFluidProxyImpl of(IFluidHandler handler) {
+    public static PlatformFluidProxyImpl of(ResourceHandler<FluidResource> handler) {
         return new PlatformFluidProxyImpl(handler);
     }
 
-    private final IFluidHandler handler;
+    private final ResourceHandler<FluidResource> resourceHandler;
 
-    public PlatformFluidProxyImpl(IFluidHandler handler) {
-        this.handler = handler;
+    public PlatformFluidProxyImpl(ResourceHandler<FluidResource> handler) {
+        this.resourceHandler = handler;
     }
 
-    public IFluidHandler get() {
-        return this.handler;
+    public ResourceHandler<FluidResource> getResourceHandler() {
+        return this.resourceHandler;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Optional<Repo<FluidSpec>> peel() {
-        return this.get() instanceof Repo<?> repo ? Optional.of((Repo<FluidSpec>) repo) : Optional.empty();
+        return this.getResourceHandler() instanceof Repo<?> repo ? Optional.of((Repo<FluidSpec>) repo) : Optional.empty();
     }
 
     @Override
     public int size() {
-        return this.get().getTanks();
+        return this.getResourceHandler().size();
     }
 
     @Override
     public boolean isEmpty(int i) {
-        return this.get().getFluidInTank(i).isEmpty();
+        return this.getResourceHandler().getResource(i).isEmpty() || this.getResourceHandler().getAmountAsLong(i) <= 0;
     }
 
     @Override
     public long simConsume(FluidSpec fluid, long amount) {
-        return ForgeFluidSpec.toInternalAmount(this.get().drain(ForgeFluidSpec.of(fluid, amount), IFluidHandler.FluidAction.SIMULATE).getAmount());
+        return this.extractResource(fluid, amount, false);
     }
 
     @Override
     public long simConsume(int i, FluidSpec resource, long amount) {
-        FluidStack stored = this.get().getFluidInTank(i);
-        FluidStack wanted = ForgeFluidSpec.of(resource, Math.min(stored.getAmount(), amount));
-        if (ForgeFluidSpec.matches(resource, stored)) {
-            return ForgeFluidSpec.toInternalAmount(this.get().drain(wanted, IFluidHandler.FluidAction.SIMULATE).getAmount());
-        }
-        return 0;
+        return this.extractResource(i, resource, amount, false);
     }
 
     @Override
     public long consume(FluidSpec resource, long amount) {
-        return ForgeFluidSpec.toInternalAmount(this.get().drain(ForgeFluidSpec.of(resource, amount), IFluidHandler.FluidAction.EXECUTE).getAmount());
+        return this.extractResource(resource, amount, true);
     }
 
     @Override
     public long consume(int i, FluidSpec resource, long amount) {
-        FluidStack stored = this.get().getFluidInTank(i);
-        FluidStack wanted = ForgeFluidSpec.of(resource, amount);
-        if (FluidStack.isSameFluidSameComponents(stored, wanted) && stored.getAmount() >= wanted.getAmount()) {
-            return this.consume(resource, Math.min(amount, ForgeFluidSpec.toInternalAmount(stored.getAmount())));
-        }
-        return 0;
+        return this.extractResource(i, resource, amount, true);
     }
 
     @Override
     public long simAccept(FluidSpec resource, long amount) {
-        return ForgeFluidSpec.toInternalAmount(this.get().fill(ForgeFluidSpec.of(resource, amount), IFluidHandler.FluidAction.SIMULATE));
+        return this.insertResource(resource, amount, false);
     }
 
     @Override
     public long simAccept(int i, FluidSpec resource, long amount) {
-        FluidStack stored = this.get().getFluidInTank(i);
-        int capacity = this.get().getTankCapacity(i);
-        FluidStack wanted = ForgeFluidSpec.of(resource, Math.min(capacity - stored.getAmount(), amount / ForgeFluidSpec.NEO_TO_INTERNAL_RATIO));
-        if (ForgeFluidSpec.matches(resource, stored) || stored.isEmpty()) {
-            return ForgeFluidSpec.toInternalAmount(this.get().fill(wanted, IFluidHandler.FluidAction.SIMULATE));
-        } else {
-            return 0;
-        }
+        return this.insertResource(i, resource, amount, false);
     }
 
     @Override
     public long accept(FluidSpec fluid, long amount) {
-        return ForgeFluidSpec.toInternalAmount(this.get().fill(ForgeFluidSpec.of(fluid, amount), IFluidHandler.FluidAction.EXECUTE));
+        return this.insertResource(fluid, amount, true);
     }
 
     @Override
     public long accept(int i, FluidSpec fluid, long amount) {
-        FluidStack stored = this.get().getFluidInTank(i);
-        int capacity = this.get().getTankCapacity(i);
-        FluidStack wanted = ForgeFluidSpec.of(fluid, Math.min(capacity - stored.getAmount(), amount / ForgeFluidSpec.NEO_TO_INTERNAL_RATIO));
-        if (ForgeFluidSpec.matches(fluid, stored) || stored.isEmpty()) {
-            return ForgeFluidSpec.toInternalAmount(this.get().fill(wanted, IFluidHandler.FluidAction.EXECUTE));
-        } else {
-            return 0;
-        }
+        return this.insertResource(i, fluid, amount, true);
     }
 
     @Override
     public long capacityFor(int i, FluidSpec fluid) {
-        FluidStack stored = this.get().getFluidInTank(i);
-        if (stored.isEmpty() && this.get().isFluidValid(i, ForgeFluidSpec.of(fluid, 1))) {
-            return ForgeFluidSpec.toInternalAmount(this.get().getTankCapacity(i));
-        } else {
-            return ForgeFluidSpec.matches(fluid, stored) ? ForgeFluidSpec.toInternalAmount(this.get().getTankCapacity(i)) : 0;
-        }
+        return ForgeFluidSpec.toInternalAmount(this.getResourceHandler().getCapacityAsLong(i, FluidResource.of(ForgeFluidSpec.of(fluid, ForgeFluidSpec.toInternalAmount(FluidType.BUCKET_VOLUME)))));
     }
 
     @Override
     public long amountFor(int i, FluidSpec fluid) {
-        FluidStack stack = this.get().getFluidInTank(i);
-        return ForgeFluidSpec.matches(fluid, stack) ? ForgeFluidSpec.toInternalAmount(stack.getAmount()) : 0;
+        ResourceHandler<FluidResource> handler = this.getResourceHandler();
+        FluidResource resource = handler.getResource(i);
+        return resource.equals(FluidResource.of(ForgeFluidSpec.of(fluid, ForgeFluidSpec.toInternalAmount(FluidType.BUCKET_VOLUME))))
+            ? ForgeFluidSpec.toInternalAmount(handler.getAmountAsLong(i)) : 0;
     }
 
     @Override
     public FluidSpec resourceFor(int i) {
-        return ForgeFluidSpec.from(this.get().getFluidInTank(i));
+        return ForgeFluidSpec.from(this.getResourceHandler().getResource(i).toStack(FluidType.BUCKET_VOLUME));
+    }
+
+    private long insertResource(FluidSpec fluid, long amount, boolean commit) {
+        ResourceHandler<FluidResource> handler = this.getResourceHandler();
+        try (Transaction transaction = this.openTransaction()) {
+            int inserted = handler.insert(FluidResource.of(ForgeFluidSpec.of(fluid, ForgeFluidSpec.toInternalAmount(FluidType.BUCKET_VOLUME))), ForgeFluidSpec.toNeoAmount(amount), transaction);
+            if (commit) transaction.commit();
+            return ForgeFluidSpec.toInternalAmount(inserted);
+        }
+    }
+
+    private long insertResource(int i, FluidSpec fluid, long amount, boolean commit) {
+        ResourceHandler<FluidResource> handler = this.getResourceHandler();
+        try (Transaction transaction = this.openTransaction()) {
+            int inserted = handler.insert(i, FluidResource.of(ForgeFluidSpec.of(fluid, ForgeFluidSpec.toInternalAmount(FluidType.BUCKET_VOLUME))), ForgeFluidSpec.toNeoAmount(amount), transaction);
+            if (commit) transaction.commit();
+            return ForgeFluidSpec.toInternalAmount(inserted);
+        }
+    }
+
+    private long extractResource(FluidSpec fluid, long amount, boolean commit) {
+        ResourceHandler<FluidResource> handler = this.getResourceHandler();
+        try (Transaction transaction = this.openTransaction()) {
+            int extracted = handler.extract(FluidResource.of(ForgeFluidSpec.of(fluid, ForgeFluidSpec.toInternalAmount(FluidType.BUCKET_VOLUME))), ForgeFluidSpec.toNeoAmount(amount), transaction);
+            if (commit) transaction.commit();
+            return ForgeFluidSpec.toInternalAmount(extracted);
+        }
+    }
+
+    private long extractResource(int i, FluidSpec fluid, long amount, boolean commit) {
+        ResourceHandler<FluidResource> handler = this.getResourceHandler();
+        try (Transaction transaction = this.openTransaction()) {
+            int extracted = handler.extract(i, FluidResource.of(ForgeFluidSpec.of(fluid, ForgeFluidSpec.toInternalAmount(FluidType.BUCKET_VOLUME))), ForgeFluidSpec.toNeoAmount(amount), transaction);
+            if (commit) transaction.commit();
+            return ForgeFluidSpec.toInternalAmount(extracted);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private Transaction openTransaction() {
+        TransactionContext parent = Transaction.getCurrentOpenedTransaction();
+        return parent == null ? Transaction.openRoot() : Transaction.open(parent);
     }
 }

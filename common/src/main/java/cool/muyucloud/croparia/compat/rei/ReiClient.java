@@ -37,6 +37,6 @@ public class ReiClient implements REIClientPlugin {
     private static <R extends DisplayableRecipe<?>> void registerDisplays(DisplayRegistry registry, ReiCategory<R> category) {
         var holders = category.getRecipeType().findHolders();
         CropariaIf.LOGGER.info("Registering {} REI displays for {}", holders.size(), category.getRecipeType().getId());
-        holders.forEach(holder -> registry.add(new ReiDisplay<R>(holder, category)));
+        holders.forEach(holder -> registry.add(new ReiDisplay<>(holder, category)));
     }
 }
