@@ -23,9 +23,9 @@ public class JeiSoakRecipe extends JeiCategory<SoakRecipe> {
     @Override
     public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull SoakRecipe recipe, @NotNull IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 40).addItemStacks(recipe.craftingStation().getDisplayStacks());
-        builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 8).addItemStack(Texts.tooltip(CropariaItems.INFUSOR.get().getDefaultInstance(), Constants.SOAK_INFUSOR));
+        builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 8).add(Texts.tooltip(CropariaItems.INFUSOR.get().getDefaultInstance(), Constants.SOAK_INFUSOR));
         builder.addInputSlot(40, 40).addItemStacks(recipe.getInput().getDisplayStacks());
-        builder.addInputSlot(40, 8).addItemStack(recipe.getPotion());
+        builder.addInputSlot(40, 8).add(recipe.getPotion());
         builder.addOutputSlot(114, 40).addItemStacks(recipe.getOutput().getDisplayStacks());
     }
 

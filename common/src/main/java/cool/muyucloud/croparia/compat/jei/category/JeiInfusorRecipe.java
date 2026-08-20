@@ -20,7 +20,7 @@ public class JeiInfusorRecipe extends JeiCategory<InfusorRecipe> {
     public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull InfusorRecipe recipe, @NotNull IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 40).addItemStacks(recipe.craftingStation().getDisplayStacks());
         builder.addInputSlot(72, 8).addItemStacks(recipe.getIngredient().getDisplayStacks());
-        builder.addInputSlot(40, 40).addItemStack(recipe.getPotion());
+        builder.addInputSlot(40, 40).add(recipe.getPotion());
         builder.addOutputSlot(114, 40).addItemStacks(recipe.getResult().getDisplayStacks());
     }
 

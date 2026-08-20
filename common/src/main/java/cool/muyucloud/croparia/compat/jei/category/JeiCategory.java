@@ -9,12 +9,12 @@ import cool.muyucloud.croparia.util.text.Texts;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.common.Internal;
 import mezz.jei.common.gui.elements.DrawableIngredient;
 import mezz.jei.common.gui.elements.DrawableResource;
-import mezz.jei.library.ingredients.TypedIngredient;
+import mezz.jei.common.ingredients.TypedIngredient;
 import mezz.jei.library.render.ItemStackRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -28,7 +28,7 @@ import java.util.Objects;
 
 @SuppressWarnings("unused")
 public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeInput>> implements IRecipeCategory<R> {
-    private final RecipeType<R> recipeType = RecipeType.create(
+    private final IRecipeType<R> recipeType = IRecipeType.create(
         this.getTypedSerializer().getId().getNamespace(),
         this.getTypedSerializer().getId().getPath(),
         this.getTypedSerializer().getRecipeClass()
@@ -42,7 +42,7 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
     public abstract TypedSerializer<R> getTypedSerializer();
 
     @Override
-    public @NotNull RecipeType<R> getRecipeType() {
+    public @NotNull IRecipeType<R> getRecipeType() {
         return this.recipeType;
     }
 
