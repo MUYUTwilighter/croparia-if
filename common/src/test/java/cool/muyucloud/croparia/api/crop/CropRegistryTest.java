@@ -8,6 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -143,17 +144,17 @@ class CropRegistryTest {
 
         private static final Material<Object> MATERIAL = new Material<>("minecraft:air", 1) {
             @Override
-            public List<Object> candidates() {
+            public @NonNull List<Object> candidates() {
                 return List.of();
             }
 
             @Override
-            public ItemStack asItem() {
+            public @NonNull ItemStack asItem() {
                 return null;
             }
 
             @Override
-            public List<ItemStack> asItems() {
+            public @NonNull List<ItemStack> asItems() {
                 return List.of();
             }
         };
