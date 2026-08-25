@@ -5,7 +5,7 @@ template = """
   "type": "minecraft:crafting_shaped",
   "key": {
     "C": ${croparia._qis},
-    "M": ${material._qis},
+    "M": ${material.name._qis},
     "S": "#croparia:seed_ingredient"
   },
   "pattern": [
