@@ -346,10 +346,10 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
                 crop.withStyle(Texts.runCommand(CommonCommandRoot.commandRoot(client), "melon", id.toString()))
                     .withStyle(Texts.inlineMouseBehavior());
                 MutableComponent rename = Texts.translatable("commands.croparia.crop.create.duplicated.rename")
-                    .withStyle(Texts.suggestCommand(CommonCommandRoot.commandRoot(client), "melon", "create", color.toString(), id + "_"))
+                    .withStyle(Texts.suggestCommand(CommonCommandRoot.commandRoot(client), "melon", "create", "0x" + color.toHexString(), id + "_"))
                     .withStyle(Texts.inlineMouseBehavior());
                 MutableComponent replace = Texts.translatable("commands.croparia.crop.create.duplicated.replace")
-                    .withStyle(Texts.suggestCommand(CommonCommandRoot.commandRoot(client), "melon", "create", color.toString(), id.toString(), "replace"))
+                    .withStyle(Texts.suggestCommand(CommonCommandRoot.commandRoot(client), "melon", "create", "0x" + color.toHexString(), id.toString(), "replace"))
                     .withStyle(Texts.inlineMouseBehavior());
                 MutableComponent duplication = Texts.translatable("commands.croparia.crop.create.duplicated", crop, rename, replace);
                 source.failure(duplication);
@@ -391,10 +391,10 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
                 crop.withStyle(Texts.runCommand(CommonCommandRoot.commandRoot(client), "crop", id.toString()))
                     .withStyle(Texts.inlineMouseBehavior());
                 MutableComponent rename = Texts.translatable("commands.croparia.crop.create.duplicated.rename")
-                    .withStyle(Texts.suggestCommand(CommonCommandRoot.commandRoot(client), "crop", "create", color.toString(), type, id + "_"))
+                    .withStyle(Texts.suggestCommand(CommonCommandRoot.commandRoot(client), "crop", "create", "0x" + color.toHexString(), type, id + "_"))
                     .withStyle(Texts.inlineMouseBehavior());
                 MutableComponent replace = Texts.translatable("commands.croparia.crop.create.duplicated.replace")
-                    .withStyle(Texts.suggestCommand(CommonCommandRoot.commandRoot(client), "crop", "create", color.toString(), type, id.toString(), "replace"))
+                    .withStyle(Texts.suggestCommand(CommonCommandRoot.commandRoot(client), "crop", "create", "0x" + color.toHexString(), type, id.toString(), "replace"))
                     .withStyle(Texts.inlineMouseBehavior());
                 MutableComponent duplication = Texts.translatable("commands.croparia.crop.create.duplicated", crop, rename, replace);
                 source.failure(duplication);

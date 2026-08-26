@@ -94,7 +94,7 @@ public abstract class JeiCategory<R extends DisplayableRecipe<?>> implements IRe
     public static DrawableIngredient<ItemStack> toDrawable(ItemStack stack) {
         return new DrawableIngredient<>(TypedIngredient.createAndFilterInvalid(
             Internal.getJeiRuntime().getIngredientManager(), VanillaTypes.ITEM_STACK, stack, true
-        ).orElseThrow(), new ItemStackRenderer());
+        ), new ItemStackRenderer());
     }
 
     public static <T extends AbstractInputManager<T>> T add(IRecipeExtrasBuilder builder, T manager) {
