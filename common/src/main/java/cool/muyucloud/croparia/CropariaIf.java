@@ -59,7 +59,6 @@ public class CropariaIf {
         Recipes.register();
         Tabs.register();
         CommonCommandRoot.register();
-        PlacedFeatures.register();
         LOGGER.info("Croparia IF event registration");
         LifecycleEvent.SERVER_BEFORE_START.register(server -> SERVER = server);
         LifecycleEvent.SERVER_STARTING.register(server -> ConfigFileHandler.reload(CONFIG));

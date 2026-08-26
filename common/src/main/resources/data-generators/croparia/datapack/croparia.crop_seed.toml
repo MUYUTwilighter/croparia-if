@@ -8,7 +8,7 @@ template = """
       "item": "${croparia}"
     },
     "M": {
-      "${material.type}": "${material.id}"
+      "${material.type}": "${material.name}"
     },
     "S": {
       "tag": "croparia:seed_ingredient"

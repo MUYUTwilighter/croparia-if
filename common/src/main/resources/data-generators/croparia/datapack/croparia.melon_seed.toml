@@ -5,7 +5,7 @@ template = """
   "type": "croparia:ritual",
   "ritual": "#croparia:ritual_stands",
   "ingredient": ${croparia._qis},
-  "block": ${material._qis},
+  "block": ${material.name._qis},
   "result": ${seed._qis}
 }
 """

@@ -143,17 +143,17 @@ class CropRegistryTest {
 
         private static final Material<Object> MATERIAL = new Material<>("minecraft:air", 1) {
             @Override
-            public List<Object> candidates() {
+            public @NotNull List<Object> candidates() {
                 return List.of();
             }
 
             @Override
-            public ItemStack asItem() {
+            public @NotNull ItemStack asItem() {
                 return null;
             }
 
             @Override
-            public List<ItemStack> asItems() {
+            public @NotNull List<ItemStack> asItems() {
                 return List.of();
             }
         };
