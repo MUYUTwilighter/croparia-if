@@ -1,16 +1,13 @@
 package cool.muyucloud.croparia.compat.jei.drawable;
 
+import cool.muyucloud.croparia.compat.jei.JeiClient;
 import cool.muyucloud.croparia.compat.jei.category.JeiCategory;
 import cool.muyucloud.croparia.compat.jei.util.MouseKeyHandler;
 import cool.muyucloud.croparia.compat.jei.util.MouseMoveHandler;
 import cool.muyucloud.croparia.util.CifUtil;
-import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.recipe.IFocus;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.common.Internal;
-import mezz.jei.common.gui.elements.DrawableIngredient;
-import mezz.jei.library.focus.Focus;
-import mezz.jei.library.ingredients.TypedIngredient;
-import mezz.jei.library.render.ItemStackRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.ItemStack;
@@ -20,16 +17,18 @@ import java.util.function.Function;
 
 public class DynamicSlot extends AbstractInputManager<DynamicSlot> {
     public static final MouseKeyHandler.NoReturn<DynamicSlot> SHOW_RECIPE = (manager, mouseX, mouseY, button) ->
-        Internal.getJeiRuntime().getRecipesGui().show(new Focus<>(RecipeIngredientRole.OUTPUT,
-            TypedIngredient.createUnvalidated(VanillaTypes.ITEM_STACK, manager.getCurrentStack())));
+        JeiClient.getRuntime().getRecipesGui().show(focusStack(RecipeIngredientRole.OUTPUT, manager.getCurrentStack()));
     public static final MouseKeyHandler.NoReturn<DynamicSlot> SHOW_USAGE = (manager, mouseX, mouseY, button) ->
-        Internal.getJeiRuntime().getRecipesGui().show(new Focus<>(RecipeIngredientRole.INPUT,
-            TypedIngredient.createUnvalidated(VanillaTypes.ITEM_STACK, manager.getCurrentStack())));
+        JeiClient.getRuntime().getRecipesGui().show(focusStack(RecipeIngredientRole.INPUT, manager.getCurrentStack()));
     public static final MouseMoveHandler.NoReturn<DynamicSlot> HIGHLIGHT = (manager, a, b) -> manager.addDrawable(
         "highlight", (guiGraphics, xOffset, yOffset) -> guiGraphics.fill(
             RenderType.guiOverlay(), xOffset + 1, yOffset + 1, xOffset + JeiCategory.SLOT_SIZE_HIGHLIGHT,
             yOffset + JeiCategory.SLOT_SIZE_HIGHLIGHT, 1, 0x80FFFFFF));
     public static final MouseMoveHandler.NoReturn<DynamicSlot> CLEAR = (manager, a, b) -> manager.removeDrawable("highlight");
+
+    public static IFocus<ItemStack> focusStack(RecipeIngredientRole role, ItemStack stack) {
+        return JeiClient.getRuntime().getJeiHelpers().getFocusFactory().createFocus(role, JeiCategory.toIngredient(stack));
+    }
 
     private final Function<DynamicSlot, List<ItemStack>> stacks;
 
@@ -37,7 +36,7 @@ public class DynamicSlot extends AbstractInputManager<DynamicSlot> {
         this.stacks = stacks;
         this.setSize(JeiCategory.SLOT_SIZE, JeiCategory.SLOT_SIZE);
         this.addDrawable("background", (guiGraphics, xOffset, yOffset, mouseX, mouseY) ->
-            Internal.getJeiRuntime().getJeiHelpers().getGuiHelper().getSlotDrawable().draw(guiGraphics, xOffset, yOffset));
+            JeiClient.getRuntime().getJeiHelpers().getGuiHelper().getSlotDrawable().draw(guiGraphics, xOffset, yOffset));
         this.addDrawable("item", (guiGraphics, xOffset, yOffset, mouseX, mouseY) ->
             this.getCurrentIngredient().draw(guiGraphics, xOffset + 1, yOffset + 1));
         this.onLeftClicked("showRecipe", SHOW_RECIPE);
@@ -63,8 +62,8 @@ public class DynamicSlot extends AbstractInputManager<DynamicSlot> {
         else return items.get(CifUtil.toIntSafe((System.currentTimeMillis() / 1000) % items.size()));
     }
 
-    public DrawableIngredient<ItemStack> getCurrentIngredient() {
-        return new DrawableIngredient<>(TypedIngredient.createUnvalidated(VanillaTypes.ITEM_STACK, this.getCurrentStack()), new ItemStackRenderer());
+    public IDrawable getCurrentIngredient() {
+        return JeiCategory.toDrawable(this.getCurrentStack());
     }
 
     @Override
