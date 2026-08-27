@@ -2,20 +2,17 @@ package cool.muyucloud.croparia.compat.jei.category;
 
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
+import cool.muyucloud.croparia.compat.jei.JeiClient;
 import cool.muyucloud.croparia.compat.jei.drawable.AbstractInputManager;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
-import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
+import mezz.jei.api.ingredients.ITypedIngredient;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import mezz.jei.common.Internal;
-import mezz.jei.common.gui.elements.DrawableIngredient;
 import mezz.jei.common.gui.elements.DrawableResource;
-import mezz.jei.library.ingredients.TypedIngredient;
-import mezz.jei.library.render.ItemStackRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -52,7 +49,8 @@ public abstract class JeiCategory<R extends DisplayableRecipe<?>> implements IRe
     @Override
     public @Nullable IDrawable getIcon() {
         List<Mappable<ItemStack>> stations = this.getTypedSerializer().getStations();
-        if (stations.isEmpty()) throw new RuntimeException("Override is required if no stations are provided for " + this.getTypedSerializer().getId());
+        if (stations.isEmpty())
+            throw new RuntimeException("Override is required if no stations are provided for " + this.getTypedSerializer().getId());
         else return toDrawable(stations.get(0).get());
     }
 
@@ -91,10 +89,12 @@ public abstract class JeiCategory<R extends DisplayableRecipe<?>> implements IRe
     public static final DrawableResource UP_WHITE = new DrawableResource(Constants.UP_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
     public static final DrawableResource DOWN_WHITE = new DrawableResource(Constants.DOWN_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
 
-    public static DrawableIngredient<ItemStack> toDrawable(ItemStack stack) {
-        return new DrawableIngredient<>(TypedIngredient.createAndFilterInvalid(
-            Internal.getJeiRuntime().getIngredientManager(), VanillaTypes.ITEM_STACK, stack, true
-        ), new ItemStackRenderer());
+    public static IDrawable toDrawable(ItemStack stack) {
+        return JeiClient.jeiRuntime().getJeiHelpers().getGuiHelper().createDrawableItemStack(stack);
+    }
+
+    public static ITypedIngredient<ItemStack> toTypedIngredient(ItemStack stack) {
+        return JeiClient.jeiRuntime().getJeiHelpers().getIngredientManager().createTypedIngredient(stack).orElseThrow();
     }
 
     public static <T extends AbstractInputManager<T>> T add(IRecipeExtrasBuilder builder, T manager) {
