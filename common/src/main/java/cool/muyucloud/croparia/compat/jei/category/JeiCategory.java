@@ -2,20 +2,16 @@ package cool.muyucloud.croparia.compat.jei.category;
 
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
+import cool.muyucloud.croparia.compat.jei.JeiClient;
 import cool.muyucloud.croparia.compat.jei.drawable.AbstractInputManager;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
-import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.types.IRecipeType;
-import mezz.jei.common.Internal;
-import mezz.jei.common.gui.elements.DrawableIngredient;
 import mezz.jei.common.gui.elements.DrawableResource;
-import mezz.jei.common.ingredients.TypedIngredient;
-import mezz.jei.library.render.ItemStackRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -24,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
 
 @SuppressWarnings("unused")
 public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeInput>> implements IRecipeCategory<R> {
@@ -93,10 +88,8 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
     public static final DrawableResource UP_WHITE = new DrawableResource(Constants.UP_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
     public static final DrawableResource DOWN_WHITE = new DrawableResource(Constants.DOWN_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
 
-    public static DrawableIngredient<ItemStack> toDrawable(ItemStack stack) {
-        return new DrawableIngredient<>(Objects.requireNonNull(TypedIngredient.createAndFilterInvalid(
-            Internal.getJeiRuntime().getIngredientManager(), VanillaTypes.ITEM_STACK, stack, true
-        )), new ItemStackRenderer());
+    public static IDrawable toDrawable(ItemStack stack) {
+        return JeiClient.getRuntime().getJeiHelpers().getGuiHelper().createDrawableItemStack(stack);
     }
 
     public static <T extends AbstractInputManager<T>> T add(IRecipeExtrasBuilder builder, T manager) {

@@ -9,9 +9,12 @@ import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.runtime.IJeiRuntime;
+import mezz.jei.common.Internal;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
@@ -24,6 +27,26 @@ public class JeiClient implements IModPlugin {
         JeiRitualStructure.INSTANCE,
         JeiSoakRecipe.INSTANCE
     );
+
+    private static IJeiRuntime runtime;
+
+    public static IJeiRuntime getRuntime() {
+        if (runtime == null) {
+            CropariaIf.LOGGER.warn("Usage of JEI Runtime while plugin unavailable");
+            return Internal.getJeiRuntime();
+        }
+        return runtime;
+    }
+
+    @Override
+    public void onRuntimeAvailable(@NonNull IJeiRuntime jeiRuntime) {
+        runtime = jeiRuntime;
+    }
+
+    @Override
+    public void onRuntimeUnavailable() {
+        runtime = null;
+    }
 
     @Override
     public @NotNull Identifier getPluginUid() {
