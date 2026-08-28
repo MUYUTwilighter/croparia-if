@@ -5,18 +5,22 @@
 
 package cool.muyucloud.croparia.api.core.block.entity;
 
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.access.CropBlockAccess;
 import cool.muyucloud.croparia.api.repo.ContainerRepo;
 import cool.muyucloud.croparia.api.repo.RepoProxy;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
 import cool.muyucloud.croparia.registry.BlockEntities;
+import cool.muyucloud.croparia.util.TagUtil;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
@@ -38,6 +42,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, Container {
+    public static TagKey<Block> UNHARVESTABLE = TagKey.create(BuiltInRegistries.BLOCK.key(), CropariaIf.of("greenhouse_unharvestable"));
+
     private final NonNullList<ItemStack> inventory;
     private final RepoProxy<ItemSpec> proxy = RepoProxy.item(new ContainerRepo<>(this));
 
@@ -46,13 +52,15 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         this.inventory = NonNullList.withSize(9, ItemStack.EMPTY);
     }
 
-    public void tryHarvest(ServerLevel level, BlockState crop, BlockPos cropPos) {
-        Block belowBlock = crop.getBlock();
-        if (belowBlock instanceof AttachedStemBlock) {
-            tryHarvestMelon(level, crop, cropPos);
-        } else if (belowBlock instanceof CropBlock) {
-            tryHarvestCrop(level, crop, cropPos);
-        }
+    public void tryHarvest() {
+        if (!(this.getLevel() instanceof ServerLevel level)) return;
+        BlockPos gPos = this.getBlockPos();
+        BlockPos cPos = gPos.below();
+        BlockState cState = level.getBlockState(cPos);
+        Block cBlock = cState.getBlock();
+        if (TagUtil.isIn(UNHARVESTABLE, cBlock)) return;
+        if (cBlock instanceof CropBlock) tryHarvestCrop(level, cState, cPos);
+        else if (cBlock instanceof AttachedStemBlock) tryHarvestMelon(level, cState, cPos);
     }
 
     /**
@@ -100,6 +108,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean tryDeposit(List<ItemStack> droppedStacks) {
+        if (droppedStacks.isEmpty()) return false;
         boolean doAccept = false;
         for (ItemStack stack : droppedStacks) {
             if (!stack.isEmpty()) this.setChanged();
@@ -115,6 +124,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     public void load(CompoundTag nbt) {
         super.load(nbt);
         ContainerHelper.loadAllItems(nbt, this.inventory);
+        this.tryHarvest();
     }
 
     @Override
@@ -140,6 +150,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         if (!removed.isEmpty()) {
             this.setChanged();
         }
+        this.tryHarvest();
         return removed;
     }
 
@@ -172,6 +183,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         if (this.inventory.isEmpty()) return;
         this.setChanged();
         this.inventory.clear();
+        this.tryHarvest();
     }
 
     @Override
