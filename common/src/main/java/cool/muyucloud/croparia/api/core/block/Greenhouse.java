@@ -11,10 +11,7 @@ import cool.muyucloud.croparia.api.repo.ProxyProvider;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
@@ -39,7 +36,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class Greenhouse extends BaseEntityBlock {
     public static final MapCodec<Greenhouse> CODEC = simpleCodec(Greenhouse::new);
-    public static TagKey<Block> UNHARVESTABLE = TagKey.create(BuiltInRegistries.BLOCK.key(), ResourceLocation.tryParse("croparia:greenhouse_unharvestable"));
     protected final VoxelShape SHAPE = Block.box(1.0, 1.0, 0.0, 15.0, 3.0, 15.0);
 
     public Greenhouse(Properties settings) {
@@ -53,31 +49,34 @@ public class Greenhouse extends BaseEntityBlock {
         }, this);
     }
 
+    public static void tryHarvest(LevelAccessor level, BlockPos pos) {
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof GreenhouseBlockEntity gbe) gbe.tryHarvest();
+    }
+
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
-        this.updateShape(state, Direction.DOWN, state, level, pos, pos);
+        tryHarvest(level, pos);
     }
 
     @Override
     protected @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         super.updateShape(state, direction, neighborState, level, pos, neighborPos);
-        // Filter client level
-        if (!(level instanceof ServerLevel serverLevel)) return state;
-        // Filter unharvestable blocks
-        BlockPos belowPos = pos.below();
-        BlockState belowState = level.getBlockState(belowPos);
-        // Filter block entity
-        BlockEntity be = level.getBlockEntity(pos);
-        if (!(be instanceof GreenhouseBlockEntity gbe)) return state;
-        // Do harvest
-        gbe.tryHarvest(serverLevel, belowState, belowPos);
+        tryHarvest(level, pos);
         return state;
+    }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
+        tryHarvest(level, pos);
     }
 
     @Override
     public void randomTick(@Nullable BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
         world.getBlockState(pos.below()).randomTick(world, pos.below(), random);
+        tryHarvest(world, pos);
     }
 
     @Override
@@ -87,6 +86,7 @@ public class Greenhouse extends BaseEntityBlock {
             if (screenHandlerFactory != null) {
                 player.openMenu(screenHandlerFactory);
             }
+            tryHarvest(world, pos);
         }
         return ItemInteractionResult.SUCCESS;
     }
