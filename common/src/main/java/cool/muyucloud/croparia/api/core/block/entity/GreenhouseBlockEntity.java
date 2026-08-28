@@ -1,21 +1,20 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package cool.muyucloud.croparia.api.core.block.entity;
 
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.access.CropBlockAccess;
 import cool.muyucloud.croparia.api.repo.ContainerRepo;
 import cool.muyucloud.croparia.api.repo.RepoProxy;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
 import cool.muyucloud.croparia.registry.BlockEntities;
+import cool.muyucloud.croparia.util.TagUtil;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
@@ -40,6 +39,8 @@ import org.jspecify.annotations.NonNull;
 import java.util.List;
 
 public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, Container {
+    public static TagKey<Block> UNHARVESTABLE = TagKey.create(BuiltInRegistries.BLOCK.key(), CropariaIf.of("greenhouse_unharvestable"));
+
     private final NonNullList<ItemStack> inventory;
     private final RepoProxy<ItemSpec> proxy = RepoProxy.item(new ContainerRepo<>(this));
 
@@ -48,12 +49,17 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         this.inventory = NonNullList.withSize(9, ItemStack.EMPTY);
     }
 
-    public void tryHarvest(ServerLevel level, BlockState crop, BlockPos cropPos) {
+    public void tryHarvest() {
+        if (!(this.getLevel() instanceof ServerLevel sLevel)) return;
+        BlockPos gPos = this.getBlockPos();
+        BlockPos cPos = gPos.below();
+        BlockState crop = sLevel.getBlockState(cPos);
         Block belowBlock = crop.getBlock();
+        if (TagUtil.isIn(UNHARVESTABLE, belowBlock)) return;
         if (belowBlock instanceof AttachedStemBlock) {
-            tryHarvestMelon(level, crop, cropPos);
+            this.tryHarvestMelon(sLevel, crop, cPos);
         } else if (belowBlock instanceof CropBlock) {
-            tryHarvestCrop(level, crop, cropPos);
+            this.tryHarvestCrop(sLevel, crop, cPos);
         }
     }
 
@@ -102,6 +108,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean tryDeposit(List<ItemStack> droppedStacks) {
+        if (droppedStacks.isEmpty()) return true;
         boolean doAccept = false;
         for (ItemStack stack : droppedStacks) {
             if (!stack.isEmpty()) this.setChanged();
@@ -117,6 +124,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     protected void loadAdditional(@NonNull ValueInput input) {
         super.loadAdditional(input);
         ContainerHelper.loadAllItems(input, this.inventory);
+        this.tryHarvest();
     }
 
     @Override
@@ -146,6 +154,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         if (!removed.isEmpty()) {
             this.setChanged();
         }
+        this.tryHarvest();
         return removed;
     }
 
@@ -155,7 +164,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    public void setItem(int slot, ItemStack stack) {
+    public void setItem(int slot, @NonNull ItemStack stack) {
         ItemStack stored = this.getItem(slot);
         if (ItemStack.isSameItemSameComponents(stored, stack) && stored.getCount() == stack.getCount()) {
             return;
@@ -165,7 +174,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    public boolean stillValid(Player player) {
+    public boolean stillValid(@NonNull Player player) {
         if (this.level == null || this.level.getBlockEntity(this.worldPosition) != this) {
             return false;
         } else {
@@ -186,7 +195,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
+    public AbstractContainerMenu createMenu(int syncId, @NonNull Inventory inv, @NonNull Player player) {
         return new DispenserMenu(syncId, inv, this);
     }
 

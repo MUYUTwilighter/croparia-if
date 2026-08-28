@@ -74,7 +74,7 @@
   "commands.croparia.crop.create.invalid_croparia": "副手未持有基础魔种",
   "commands.croparia.crop.create.no_material": "主手未持有材料",
   "commands.croparia.crop.create.namespace": "不可用\"minecraft\"作为命名空间",
-  "commands.croparia.crop.create.success": "成功创建作物至 %s，重启游戏以生效",
+  "commands.croparia.crop.create.success": "成功创建作物，重启游戏以生效",
   "commands.croparia.crop.create.duplicated": "已存在作物: %s [%s] [%s]",
   "commands.croparia.crop.create.duplicated.rename": "重命名",
   "commands.croparia.crop.create.duplicated.replace": "覆盖",
