@@ -28,7 +28,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -61,7 +60,7 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         super.updateShape(state, direction, neighborState, level, pos, neighborPos);
         // Filter client level
         if (!(level instanceof ServerLevel serverLevel)) return state;
@@ -78,9 +77,7 @@ public class Greenhouse extends BaseEntityBlock {
 
     @Override
     public void randomTick(@Nullable BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
-        if (world.getBlockState(pos.below()).getBlock() instanceof CropBlock) {
-            world.getBlockState(pos.below()).randomTick(world, pos.below(), random);
-        }
+        world.getBlockState(pos.below()).randomTick(world, pos.below(), random);
     }
 
     @Override
