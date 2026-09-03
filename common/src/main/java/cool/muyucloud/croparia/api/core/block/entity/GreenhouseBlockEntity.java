@@ -34,6 +34,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.AttachedStemBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.SweetBerryBushBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -44,6 +45,7 @@ import java.util.List;
 
 public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, Container {
     public static TagKey<Block> UNHARVESTABLE = TagKey.create(BuiltInRegistries.BLOCK.key(), CropariaIf.of("greenhouse_unharvestable"));
+    public static TagKey<Block> BREAKABLE = TagKey.create(BuiltInRegistries.BLOCK.key(), CropariaIf.of("greenhouse_breakable"));
 
     private final NonNullList<ItemStack> inventory;
     private final RepoProxy<ItemSpec> proxy = RepoProxy.item(new ContainerRepo<>(this));
@@ -62,6 +64,8 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         if (TagUtil.isIn(UNHARVESTABLE, cBlock)) return;
         if (cBlock instanceof AttachedStemBlock) tryHarvestMelon(level, cState, cPos);
         else if (cBlock instanceof CropBlock) tryHarvestCrop(level, cState, cPos);
+        else if (cBlock instanceof SweetBerryBushBlock) tryHarvestBerry(level, cState, cPos);
+        else if (TagUtil.isIn(BREAKABLE, cBlock)) tryHarvestCrop(level, cState, cPos);
     }
 
     /**
@@ -105,6 +109,23 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         if (!this.tryDeposit(droppedStacks)) return;    // Not enough space, abort
         // Remove melon
         level.removeBlock(melonPos, false);
+    }
+
+    public void tryHarvestBerry(ServerLevel level, BlockState berry, BlockPos berryPos) {
+        SweetBerryBushBlock berryBlock = (SweetBerryBushBlock) berry.getBlock();
+        // Age Check
+        if (berry.getValue(SweetBerryBushBlock.AGE) != SweetBerryBushBlock.MAX_AGE) return;
+        // Deposit
+        ItemStack drop = new ItemStack(berryBlock.asItem(), level.random.nextInt(2) + 1);
+        if (!this.tryDeposit(List.of(drop))) return;    // Not enough space, abort
+        // Age update
+        level.setBlockAndUpdate(berryPos, berry.setValue(SweetBerryBushBlock.AGE, SweetBerryBushBlock.MAX_AGE / 2));
+    }
+
+    public void tryHarvestBreakable(ServerLevel level, BlockState breakable, BlockPos breakablePos) {
+        List<ItemStack> droppedStacks = Block.getDrops(breakable, level, breakablePos, level.getBlockEntity(breakablePos));
+        if (!this.tryDeposit(droppedStacks)) return;    // Not enough space, abort
+        level.removeBlock(breakablePos, false);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
