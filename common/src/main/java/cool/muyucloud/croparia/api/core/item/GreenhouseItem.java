@@ -8,10 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.AttachedStemBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.level.block.StemBlock;
+import net.minecraft.world.level.block.*;
 import org.jetbrains.annotations.NotNull;
 
 public class GreenhouseItem extends BlockItem {
@@ -23,27 +20,16 @@ public class GreenhouseItem extends BlockItem {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         ItemStack stack = context.getItemInHand();
-        if (!world.isClientSide() && !stack.isEmpty()) {
-            if (world.isEmptyBlock(pos.above()) && (world.getBlockState(pos).getBlock() instanceof CropBlock
-                || world.getBlockState(pos).getBlock() instanceof StemBlock || world.getBlockState(pos).getBlock() instanceof AttachedStemBlock)) {
-                world.setBlockAndUpdate(pos.above(), this.getBlock().defaultBlockState());
-                Player player = context.getPlayer();
-                if (player != null) {
+        if (world.isClientSide() || stack.isEmpty()) return InteractionResult.PASS;
+        pos = shouldFloat(world.getBlockState(pos).getBlock()) ? pos.above(2) : pos.above();
+        world.setBlockAndUpdate(pos, this.getBlock().defaultBlockState());
+        Player player = context.getPlayer();
+        if (player == null || player.getAbilities().instabuild) return InteractionResult.SUCCESS;
+        stack.shrink(1);
+        return InteractionResult.CONSUME;
+    }
 
-                }
-                if (context.getPlayer() != null && !context.getPlayer().getAbilities().instabuild) {
-                    stack.shrink(1);
-                }
-                return InteractionResult.SUCCESS;
-            }
-            if (world.isEmptyBlock(pos.above(2)) && world.isEmptyBlock(pos.above())) {
-                world.setBlockAndUpdate(pos.above(2), this.getBlock().defaultBlockState());
-                if (context.getPlayer() != null && !context.getPlayer().getAbilities().instabuild) {
-                    stack.shrink(1);
-                }
-                return InteractionResult.SUCCESS;
-            }
-        }
-        return InteractionResult.FAIL;
+    public static boolean shouldFloat(Block below) {
+        return !(below instanceof CropBlock || below instanceof StemBlock || below instanceof AttachedStemBlock || below instanceof SweetBerryBushBlock);
     }
 }
