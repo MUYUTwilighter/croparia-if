@@ -107,7 +107,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         // Deposit
         if (!this.tryDeposit(droppedStacks)) return;    // Not enough space, abort
         // Remove melon
-        level.removeBlock(melonPos, false);
+        level.destroyBlock(melonPos, false);
     }
 
     public void tryHarvestBerry(ServerLevel level, BlockState berry, BlockPos berryPos) {
@@ -124,7 +124,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     public void tryHarvestBreakable(ServerLevel level, BlockState breakable, BlockPos breakablePos) {
         List<ItemStack> droppedStacks = Block.getDrops(breakable, level, breakablePos, level.getBlockEntity(breakablePos));
         if (!this.tryDeposit(droppedStacks)) return;    // Not enough space, abort
-        level.removeBlock(breakablePos, false);
+        level.destroyBlock(breakablePos, false);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
