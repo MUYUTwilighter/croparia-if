@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "minecraft:cactus",
+    "minecraft:cactus_flower",
     "minecraft:sugar_cane",
     "minecraft:bamboo",
     "minecraft:chorus_flower"
