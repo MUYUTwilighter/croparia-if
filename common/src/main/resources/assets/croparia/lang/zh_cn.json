@@ -102,6 +102,7 @@
   "commands.croparia.config.fruitUse": "启用果实右键: %s",
   "commands.croparia.config.infusor": "启用注魔台: %s",
   "commands.croparia.config.override": "覆盖生成: %s",
+  "commands.croparia.config.breakEffect": "温室破坏效果: %s",
   "commands.croparia.config.reset.warn": "设置将被重置并立即写入文件，是否继续？",
   "commands.croparia.config.reset.confirm": "[确认]",
   "commands.croparia.config.reset.success": "设置已重置",

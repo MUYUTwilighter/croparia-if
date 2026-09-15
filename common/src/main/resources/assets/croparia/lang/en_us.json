@@ -105,6 +105,7 @@
   "commands.croparia.config.infusor": "Infusor Status: %s",
   "commands.croparia.config.ritual": "Ritual Status: %s",
   "commands.croparia.config.fruitUse": "Fruit-Use: %s",
+  "commands.croparia.config.breakEffect": "Greenhouse Break Effect: %s",
   "commands.croparia.config.autoReload": "Auto Reload: %s",
   "commands.croparia.config.soakAttempts": "Soak Attempts: %s",
   "commands.croparia.config.override": "Override: %s",
