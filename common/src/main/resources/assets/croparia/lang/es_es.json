@@ -108,7 +108,7 @@
   "commands.croparia.config.autoReload": "Recarga automática: %s",
   "commands.croparia.config.soakAttempts": "Intentos de remojo: %s",
   "commands.croparia.config.override": "Sobrescritura: %s",
-  "commands.croparia.config.breakEffect": "",
+  "commands.croparia.config.breakEffect": "Efecto de rotura del invernadero: %s",
   "commands.croparia.generator.badPack": "No se encontró el pack",
   "commands.croparia.generator.badGenerator": "No se encontró el generador",
   "commands.croparia.generator.clearBuiltin.fail": "Se produjo un error durante la limpieza",
