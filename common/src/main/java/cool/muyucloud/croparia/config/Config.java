@@ -52,6 +52,8 @@ public class Config {
     @NotNull
     private Boolean fruitUse;
     @NotNull
+    private Boolean breakEffect;
+    @NotNull
     private Integer autoReload;
     @NotNull
     private Integer soakAttempts;
@@ -74,6 +76,7 @@ public class Config {
         this.fruitUse = true;
         this.infusor = true;
         this.ritual = true;
+        this.breakEffect = true;
         this.soakAttempts = 1;
         this.cropYield = 2;
         this.melonYield = 2;
@@ -92,6 +95,7 @@ public class Config {
         this.fruitUse = raw.fruitUse() != null ? raw.fruitUse() : true;
         this.infusor = raw.infusor() != null ? raw.infusor() : true;
         this.ritual = raw.ritual() != null ? raw.ritual() : true;
+        this.breakEffect = raw.breakEffect() != null ? raw.breakEffect() : true;
         this.soakAttempts = raw.soakAttempts() != null ? raw.soakAttempts() : 1;
         this.cropYield = raw.cropYield() != null && raw.cropYield() > 0 ? raw.cropYield() : 2;
         this.melonYield = raw.melonYield() != null && raw.melonYield() > 0 ? raw.melonYield() : 2;
@@ -102,7 +106,7 @@ public class Config {
     }
 
     public RawConfig toRaw() {
-        return new RawConfig(resolvePath(filePath), resolvePath(recipeWizard), override, infusor, ritual, fruitUse, autoReload, soakAttempts, cropYield, melonYield, this.getBlacklist());
+        return new RawConfig(resolvePath(filePath), resolvePath(recipeWizard), override, infusor, ritual, fruitUse, breakEffect, autoReload, soakAttempts, cropYield, melonYield, this.getBlacklist());
     }
 
     public @NotNull Integer getCropYield() {
@@ -159,6 +163,14 @@ public class Config {
 
     public void setFruitUse(@NotNull Boolean fruitUse) {
         this.fruitUse = fruitUse;
+    }
+
+    public @NotNull Boolean getBreakEffect() {
+        return breakEffect;
+    }
+
+    public void setBreakEffect(@NotNull Boolean breakEffect) {
+        this.breakEffect = breakEffect;
     }
 
     public @NotNull Boolean getInfusor() {

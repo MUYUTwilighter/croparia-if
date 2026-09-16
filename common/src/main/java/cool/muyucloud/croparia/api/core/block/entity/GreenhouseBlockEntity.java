@@ -92,9 +92,9 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         IntegerProperty property = CropBlockAccess.of(cropBlock).cif$getAgeProperty();
         int maxAge = cropBlock.getMaxAge();
         if (maxAge == 0) {
-            level.destroyBlock(worldPosition.below(), false);
+            this.breakBlock(level, cropPos);
         } else {
-            level.setBlockAndUpdate(worldPosition.below(), cropBlock.defaultBlockState().setValue(property, maxAge / 2));
+            level.setBlockAndUpdate(cropPos, cropBlock.defaultBlockState().setValue(property, maxAge / 2));
         }
     }
 
@@ -108,7 +108,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
         // Deposit
         if (!this.tryDeposit(droppedStacks)) return;    // Not enough space, abort
         // Remove melon
-        level.destroyBlock(melonPos, false);
+        this.breakBlock(level, stemPos);
     }
 
     public void tryHarvestBerry(ServerLevel level, BlockState berry, BlockPos berryPos) {
@@ -125,7 +125,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     public void tryHarvestBreakable(ServerLevel level, BlockState breakable, BlockPos breakablePos) {
         List<ItemStack> droppedStacks = Block.getDrops(breakable, level, breakablePos, level.getBlockEntity(breakablePos));
         if (!this.tryDeposit(droppedStacks)) return;    // Not enough space, abort
-        level.destroyBlock(breakablePos, false);
+        this.breakBlock(level, breakablePos);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -140,6 +140,11 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
             }
         }
         return doAccept;
+    }
+
+    public void breakBlock(ServerLevel level, BlockPos pos) {
+        if (CropariaIf.CONFIG.getBreakEffect()) level.destroyBlock(pos, false);
+        else level.removeBlock(pos, false);
     }
 
     @Override

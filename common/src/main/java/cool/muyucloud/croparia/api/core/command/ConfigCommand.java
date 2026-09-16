@@ -104,6 +104,16 @@ public class ConfigCommand {
         source.success(Texts.translatable("commands.croparia.config.override", CropariaIf.CONFIG.getOverride().toString()), false);
         return 1;
     }));
+    private static final LiteralArgumentBuilder<CommandSourceStack> BREAK_EFFECT = Commands.literal("breakEffect").executes(context -> {
+        DelegateSource<CommandSourceStack> source = DelegateSource.of(context);
+        source.success(Texts.translatable("commands.croparia.config.breakEffect", CropariaIf.CONFIG.getBreakEffect().toString()), false);
+        return 1;
+    }).then(Commands.argument("value", BoolArgumentType.bool()).executes(context -> {
+        CropariaIf.CONFIG.setBreakEffect(BoolArgumentType.getBool(context, "value"));
+        DelegateSource<CommandSourceStack> source = DelegateSource.of(context);
+        source.success(Texts.translatable("commands.croparia.config.breakEffect", CropariaIf.CONFIG.getBreakEffect().toString()), false);
+        return 1;
+    }));
     private static final LiteralArgumentBuilder<CommandSourceStack> RESET = Commands.literal("reset").executes(context -> {
         DelegateSource<CommandSourceStack> source = DelegateSource.of(context);
         source.success(Texts.translatable("commands.croparia.config.reset.warn")
