@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.function.Supplier;
 
 public class ConfigFileHandler {
@@ -30,15 +29,6 @@ public class ConfigFileHandler {
 
     private static Path configPath() {
         return gameFolder().resolve("config/croparia.json");
-    }
-
-    private static Config defaultConfig() {
-        Path gameFolder = gameFolder();
-        return new Config(new RawConfig(
-            gameFolder.resolve("croparia").toString(),
-            gameFolder.resolve("croparia/recipe_wizard/dump").toString(),
-            true, true, true, true, 20, 1, 2, 2, List.of()
-        ));
     }
 
     static void setGameFolderSupplierForTest(Supplier<Path> supplier) {
@@ -72,7 +62,7 @@ public class ConfigFileHandler {
             config = new Config(GSON.fromJson(reader, RawConfig.class));
         } catch (Exception e) {
             LOGGER.warn("Config file not found or could not be read, creating a new one");
-            config = defaultConfig();
+            config = new Config();
         }
         save(config);
         return config;

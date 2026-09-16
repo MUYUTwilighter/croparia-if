@@ -109,6 +109,7 @@
   "commands.croparia.config.autoReload": "Auto Reload: %s",
   "commands.croparia.config.soakAttempts": "Soak Attempts: %s",
   "commands.croparia.config.override": "Override: %s",
+  "commands.croparia.config.breakEffect": "Greenhouse Break Effect: %s",
   "commands.croparia.generator.badPack": "Pack not found",
   "commands.croparia.generator.badGenerator": "Generator not found",
   "commands.croparia.generator.clearBuiltin.fail": "Error occurred during clearing",
