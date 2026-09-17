@@ -161,6 +161,10 @@ public class ConfigCommand {
         return OVERRIDE;
     }
 
+    public static ArgumentBuilder<CommandSourceStack, ?> buildBreakEffect() {
+        return BREAK_EFFECT;
+    }
+
     public static ArgumentBuilder<CommandSourceStack, ?> buildReset() {
         return RESET;
     }
