@@ -109,7 +109,7 @@ public class ConfigCommand {
         source.success(Texts.translatable("commands.croparia.config.breakEffect", CropariaIf.CONFIG.getBreakEffect().toString()), false);
         return 1;
     }).then(Commands.argument("value", BoolArgumentType.bool()).executes(context -> {
-        CropariaIf.CONFIG.setOverride(BoolArgumentType.getBool(context, "value"));
+        CropariaIf.CONFIG.setBreakEffect(BoolArgumentType.getBool(context, "value"));
         DelegateSource<CommandSourceStack> source = DelegateSource.of(context);
         source.success(Texts.translatable("commands.croparia.config.breakEffect", CropariaIf.CONFIG.getBreakEffect().toString()), false);
         return 1;
