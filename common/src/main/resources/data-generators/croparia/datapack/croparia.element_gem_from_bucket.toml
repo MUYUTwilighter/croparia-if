@@ -10,7 +10,8 @@ template = """
     }
   ],
   "result": {
-    "item": "${gem}"
+    "item": "${gem}",
+    "count": 4
   }
 }
 """
