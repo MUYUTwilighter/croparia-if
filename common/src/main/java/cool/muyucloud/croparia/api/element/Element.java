@@ -115,7 +115,7 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
             ));
         this.bucket = CropariaItems.registerItem(parseId("bucket_%s"), properties -> new ElementalBucket(
             this, this.getFluidSource(),
-            properties.stacksTo(1).arch$tab(Tabs.MAIN).craftRemainder(Items.GLASS_BOTTLE)
+            properties.stacksTo(1).arch$tab(Tabs.MAIN).craftRemainder(Items.BUCKET)
         ));
         this.potion = CropariaItems.registerItem(parseId("potion_%s"), properties -> new ElementalPotion(
             this, properties.arch$tab(Tabs.MAIN).craftRemainder(Items.GLASS_BOTTLE)
