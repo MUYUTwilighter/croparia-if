@@ -42,7 +42,7 @@ class ConfigFileHandlerTest {
         Config source = new Config(new RawConfig(
             tempDir.resolve("custom/data").toString(),
             tempDir.resolve("custom/wizard").toString(),
-            false, true, false, true, 33, 6, 2, 2,
+            false, true, false, true, true, 33, 6, 2, 2,
             List.of("minecraft:wheat", "@fabric.*")
         ));
 
@@ -66,12 +66,12 @@ class ConfigFileHandlerTest {
         Config target = new Config(new RawConfig(
             tempDir.resolve("old/data").toString(),
             tempDir.resolve("old/wizard").toString(),
-            true, true, true, true, 20, 1, 2, 2, List.of()
+            true, true, true, true, true, 20, 1, 2, 2, List.of()
         ));
         Config source = new Config(new RawConfig(
             tempDir.resolve("new/data").toString(),
             tempDir.resolve("new/wizard").toString(),
-            false, false, false, false, 9, 2, 2, 2, List.of("minecraft:carrot", "@neo.*")
+            false, false, false, false, true, 9, 2, 2, 2, List.of("minecraft:carrot", "@neo.*")
         ));
         ConfigFileHandler.save(source);
 
