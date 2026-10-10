@@ -106,7 +106,7 @@ public class Config {
     }
 
     public RawConfig toRaw() {
-        return new RawConfig(resolvePath(filePath), resolvePath(recipeWizard), override, infusor, ritual, fruitUse, autoReload, soakAttempts, cropYield, melonYield, this.getBlacklist());
+        return new RawConfig(resolvePath(filePath), resolvePath(recipeWizard), override, infusor, ritual, fruitUse, breakEffect, autoReload, soakAttempts, cropYield, melonYield, this.getBlacklist());
     }
 
     public @NotNull Integer getCropYield() {
