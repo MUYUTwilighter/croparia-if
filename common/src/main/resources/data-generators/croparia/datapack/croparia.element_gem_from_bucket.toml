@@ -8,7 +8,8 @@ template = """
     "${bucket}"
   ],
   "result": {
-    "id": "${gem}"
+    "id": "${gem}",
+    "count": 4
   }
 }
 """

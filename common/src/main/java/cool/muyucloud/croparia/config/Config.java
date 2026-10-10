@@ -52,6 +52,8 @@ public class Config {
     @NotNull
     private Boolean fruitUse;
     @NotNull
+    private Boolean breakEffect;
+    @NotNull
     private Integer autoReload;
     @NotNull
     private Integer soakAttempts;
@@ -74,6 +76,7 @@ public class Config {
         this.fruitUse = true;
         this.infusor = true;
         this.ritual = true;
+        this.breakEffect = true;
         this.soakAttempts = 1;
         this.cropYield = 2;
         this.melonYield = 2;
@@ -92,6 +95,7 @@ public class Config {
         this.fruitUse = raw.fruitUse() != null ? raw.fruitUse() : true;
         this.infusor = raw.infusor() != null ? raw.infusor() : true;
         this.ritual = raw.ritual() != null ? raw.ritual() : true;
+        this.breakEffect = raw.breakEffect() != null ? raw.breakEffect() : true;
         this.soakAttempts = raw.soakAttempts() != null ? raw.soakAttempts() : 1;
         this.cropYield = raw.cropYield() != null && raw.cropYield() > 0 ? raw.cropYield() : 2;
         this.melonYield = raw.melonYield() != null && raw.melonYield() > 0 ? raw.melonYield() : 2;
@@ -183,6 +187,14 @@ public class Config {
 
     public void setRitual(@NotNull Boolean ritual) {
         this.ritual = ritual;
+    }
+
+    public @NotNull Boolean getBreakEffect() {
+        return breakEffect;
+    }
+
+    public void setBreakEffect(@NotNull Boolean breakEffect) {
+        this.breakEffect = breakEffect;
     }
 
     public @NotNull List<Identifier> getCropBlackList() {
