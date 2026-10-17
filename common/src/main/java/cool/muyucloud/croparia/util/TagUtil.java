@@ -7,7 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,11 +39,11 @@ public class TagUtil {
         return forEntries(TagKey.create(registry, id));
     }
 
-    public static <T> boolean isIn(ResourceKey<? extends Registry<T>> registry, Identifier id, @NotNull T entry) {
+    public static <T> boolean isIn(ResourceKey<? extends Registry<T>> registry, Identifier id, @NonNull T entry) {
         return isIn(TagKey.create(registry, id), entry);
     }
 
-    public static <T> boolean isIn(@NotNull TagKey<T> tagKey, @NotNull T entry) {
+    public static <T> boolean isIn(@NonNull TagKey<T> tagKey, @NonNull T entry) {
         Optional<Registry<T>> maybeRegistry = getRegistry(tagKey.registry());
         if (maybeRegistry.isEmpty()) return false;
         Registry<T> registry = maybeRegistry.get();

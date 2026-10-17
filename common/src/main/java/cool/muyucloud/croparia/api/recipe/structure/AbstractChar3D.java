@@ -1,7 +1,7 @@
 package cool.muyucloud.croparia.api.recipe.structure;
 
 import net.minecraft.core.Vec3i;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,7 +32,7 @@ public abstract class AbstractChar3D<T extends AbstractChar3D<T>> {
     @SuppressWarnings("unused")
     public abstract void forEachChar(BiConsumer<Character, Integer> consumer);
 
-    public abstract @NotNull Optional<Vec3i> find(char c);
+    public abstract @NonNull Optional<Vec3i> find(char c);
 
     public abstract boolean contains(char c);
 }

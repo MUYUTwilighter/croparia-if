@@ -4,11 +4,8 @@ import com.mojang.logging.LogUtils;
 import cool.muyucloud.croparia.api.recipe.entry.SlotDisplay;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.PlacementInfo;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeBookCategory;
-import net.minecraft.world.item.crafting.RecipeInput;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.item.crafting.*;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -23,26 +20,26 @@ public interface DisplayableRecipe<C extends RecipeInput> extends Recipe<C> {
     /**
      * Get the crafting station apply to this recipe
      */
-    @NotNull SlotDisplay craftingStation();
+    @NonNull SlotDisplay craftingStation();
 
     TypedSerializer<? extends DisplayableRecipe<C>> getTypedSerializer();
 
-    default @NotNull List<List<ItemStack>> getInputs() {
+    default @NonNull List<List<ItemStack>> getInputs() {
         return List.of();
     }
 
-    default @NotNull List<List<ItemStack>> getOutputs() {
+    default @NonNull List<List<ItemStack>> getOutputs() {
         return List.of();
     }
 
     @Override
-    default @NotNull TypedSerializer<? extends DisplayableRecipe<C>> getType() {
+    default @NonNull TypedSerializer<? extends DisplayableRecipe<C>> getType() {
         return getTypedSerializer();
     }
 
     @Override
-    default @NotNull TypedSerializer<? extends DisplayableRecipe<C>> getSerializer() {
-        return getTypedSerializer();
+    default @NonNull RecipeSerializer<? extends DisplayableRecipe<C>> getSerializer() {
+        return getTypedSerializer().getSerializer();
     }
 
     @Override
@@ -59,7 +56,7 @@ public interface DisplayableRecipe<C extends RecipeInput> extends Recipe<C> {
         return true;
     }
 
-    default @NotNull ItemStack getResultItem(HolderLookup.Provider registries) {
+    default @NonNull ItemStack getResultItem(HolderLookup.Provider registries) {
         List<List<ItemStack>> outputs = getOutputs();
         if (outputs.isEmpty() || outputs.getFirst().isEmpty()) {
             return ItemStack.EMPTY;
@@ -68,12 +65,22 @@ public interface DisplayableRecipe<C extends RecipeInput> extends Recipe<C> {
     }
 
     @Override
-    default @NotNull PlacementInfo placementInfo() {
+    default @NonNull PlacementInfo placementInfo() {
         return PlacementInfo.NOT_PLACEABLE;
     }
 
     @Override
-    default @NotNull RecipeBookCategory recipeBookCategory() {
+    default boolean showNotification() {
+        return false;
+    }
+
+    @Override
+    default @NonNull String group() {
+        return this.getType().getId().toString();
+    }
+
+    @Override
+    default @NonNull RecipeBookCategory recipeBookCategory() {
         return new RecipeBookCategory();
     }
 }

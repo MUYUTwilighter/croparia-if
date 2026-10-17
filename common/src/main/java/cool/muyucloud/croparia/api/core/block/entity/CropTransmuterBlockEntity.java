@@ -35,8 +35,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -152,7 +152,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public @NotNull CompoundTag getUpdateTag(HolderLookup.Provider provider) {
+    public @NonNull CompoundTag getUpdateTag(HolderLookup.Provider provider) {
         return this.saveWithoutMetadata(provider);
     }
 
@@ -172,12 +172,12 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public @NotNull ItemStack getItem(int slot) {
+    public @NonNull ItemStack getItem(int slot) {
         return this.inventory.get(slot);
     }
 
     @Override
-    public @NotNull ItemStack removeItem(int slot, int amount) {
+    public @NonNull ItemStack removeItem(int slot, int amount) {
         ItemStack removed = ContainerHelper.removeItem(this.inventory, slot, amount);
         if (!removed.isEmpty()) {
             this.setChanged();
@@ -186,7 +186,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public @NotNull ItemStack removeItemNoUpdate(int slot) {
+    public @NonNull ItemStack removeItemNoUpdate(int slot) {
         return ContainerHelper.takeItem(this.inventory, slot);
     }
 
@@ -206,7 +206,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public int @NotNull [] getSlotsForFace(@NotNull Direction side) {
+    public int @NonNull [] getSlotsForFace(@NonNull Direction side) {
         if (side == Direction.DOWN) {
             return new int[]{OUTPUT_SLOT};
         }
@@ -214,12 +214,12 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public boolean canPlaceItemThroughFace(int slot, @NotNull ItemStack stack, @Nullable Direction direction) {
+    public boolean canPlaceItemThroughFace(int slot, @NonNull ItemStack stack, @Nullable Direction direction) {
         return direction != Direction.DOWN && slot == INPUT_SLOT && stack.getItem() instanceof AbstractFruit<?>;
     }
 
     @Override
-    public boolean canTakeItemThroughFace(int slot, @NotNull ItemStack stack, @NotNull Direction direction) {
+    public boolean canTakeItemThroughFace(int slot, @NonNull ItemStack stack, @NonNull Direction direction) {
         return direction == Direction.DOWN && slot == OUTPUT_SLOT;
     }
 
@@ -243,7 +243,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public @NotNull Component getDisplayName() {
+    public @NonNull Component getDisplayName() {
         return Texts.translatable("container.croparia.crop_transmuter");
     }
 

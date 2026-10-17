@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.api.codec;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -56,7 +56,7 @@ public class MultiFieldCodec<T> extends MapCodec<T> implements Iterable<Map.Entr
     }
 
     @Override
-    public @NotNull Iterator<Map.Entry<String, TestedCodec<? extends T>>> iterator() {
+    public @NonNull Iterator<Map.Entry<String, TestedCodec<? extends T>>> iterator() {
         return this.codecs.entrySet().iterator();
     }
 }

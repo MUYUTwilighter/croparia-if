@@ -39,8 +39,8 @@ import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.OptionalInt;
@@ -64,11 +64,11 @@ public class ActivatedShriekerBlockEntity extends BlockEntity implements GameEve
         super(BlockEntities.ACTIVATED_SHRIEKER.get(), blockPos, blockState);
     }
 
-    public VibrationSystem.@NotNull Data getVibrationData() {
+    public VibrationSystem.@NonNull Data getVibrationData() {
         return this.vibrationData;
     }
 
-    public VibrationSystem.@NotNull User getVibrationUser() {
+    public VibrationSystem.@NonNull User getVibrationUser() {
         return this.vibrationUser;
     }
 
@@ -166,7 +166,7 @@ public class ActivatedShriekerBlockEntity extends BlockEntity implements GameEve
         return SpawnUtil.trySpawnMob(EntityType.WARDEN, EntitySpawnReason.TRIGGERED, serverLevel, this.getBlockPos(), 20, 5, 6, SpawnUtil.Strategy.ON_TOP_OF_COLLIDER, false).isPresent();
     }
 
-    public VibrationSystem.@NotNull Listener getListener() {
+    public VibrationSystem.@NonNull Listener getListener() {
         return this.vibrationListener;
     }
 
@@ -182,11 +182,11 @@ public class ActivatedShriekerBlockEntity extends BlockEntity implements GameEve
             return LISTENER_RADIUS;
         }
 
-        public @NotNull PositionSource getPositionSource() {
+        public @NonNull PositionSource getPositionSource() {
             return this.positionSource;
         }
 
-        public @NotNull TagKey<GameEvent> getListenableEvents() {
+        public @NonNull TagKey<GameEvent> getListenableEvents() {
             return GameEventTags.SHRIEKER_CAN_LISTEN;
         }
 

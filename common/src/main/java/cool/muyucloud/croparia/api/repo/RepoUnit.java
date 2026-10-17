@@ -7,7 +7,7 @@ import cool.muyucloud.croparia.api.resource.TypedResource;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.GsonHelper;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Predicate;
 
@@ -74,11 +74,11 @@ public class RepoUnit<T extends TypedResource<?>> implements Repo<T> {
         nbt.putBoolean("locked", this.isLocked());
     }
 
-    public @NotNull T getResource() {
+    public @NonNull T getResource() {
         return this.resource;
     }
 
-    public void setResource(@NotNull T resource) {
+    public void setResource(@NonNull T resource) {
         this.resource = resource;
     }
 

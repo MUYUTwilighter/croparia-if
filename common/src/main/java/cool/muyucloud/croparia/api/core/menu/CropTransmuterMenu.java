@@ -11,7 +11,7 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class CropTransmuterMenu extends AbstractContainerMenu {
     private final CropTransmuterBlockEntity blockEntity;
@@ -52,7 +52,7 @@ public class CropTransmuterMenu extends AbstractContainerMenu {
         this.addSlot(new Slot(this.getBlockEntity(), CropTransmuterBlockEntity.INPUT_SLOT, 20, 35));
         this.addSlot(new Slot(this.getBlockEntity(), CropTransmuterBlockEntity.OUTPUT_SLOT, 138, 35) {
             @Override
-            public boolean mayPlace(@NotNull ItemStack stack) {
+            public boolean mayPlace(@NonNull ItemStack stack) {
                 return false;
             }
         });
@@ -97,7 +97,7 @@ public class CropTransmuterMenu extends AbstractContainerMenu {
     }
 
     @Override
-    public @NotNull ItemStack quickMoveStack(Player player, int index) {
+    public @NonNull ItemStack quickMoveStack(Player player, int index) {
         ItemStack itemStack;
         Slot slot = this.slots.get(index);
         if (!slot.hasItem()) {

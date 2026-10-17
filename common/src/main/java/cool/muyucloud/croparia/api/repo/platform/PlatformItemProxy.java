@@ -5,7 +5,7 @@ import cool.muyucloud.croparia.api.repo.annotation.Unreliable;
 import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 

@@ -18,7 +18,7 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.function.Function;
@@ -120,18 +120,18 @@ public class CropariaItems {
         RITUAL_STAND, RITUAL_STAND_2, RITUAL_STAND_3
     );
 
-    @NotNull
+    @NonNull
     public static <T extends Item> RegistrySupplier<T> registerItem(
-        @NotNull String name, @NotNull Function<Item.Properties, T> supplier
+        @NonNull String name, @NonNull Function<Item.Properties, T> supplier
     ) {
         return ITEMS.register(name, () -> supplier.apply(
             new Item.Properties().setId(ResourceKey.create(Registries.ITEM, CropariaIf.of(name)))
         ));
     }
 
-    @NotNull
+    @NonNull
     public static <T extends Item> RegistrySupplier<T> registerItem(
-        @NotNull Identifier id, @NotNull Function<Item.Properties, T> supplier
+        @NonNull Identifier id, @NonNull Function<Item.Properties, T> supplier
     ) {
         return ITEMS.register(id, () -> supplier.apply(
             new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))
@@ -143,7 +143,7 @@ public class CropariaItems {
         ITEMS.register();
     }
 
-    public static @NotNull RegistrySupplier<Croparia> getCroparia(int tier) {
+    public static @NonNull RegistrySupplier<Croparia> getCroparia(int tier) {
         return CROPARIAS.get(tier - 1);
     }
 
@@ -155,7 +155,7 @@ public class CropariaItems {
         return CROPARIAS.size();
     }
 
-    public static @NotNull RegistrySupplier<BlockItem> getRitualStand(int tier) {
+    public static @NonNull RegistrySupplier<BlockItem> getRitualStand(int tier) {
         return RITUAL_STANDS.get(tier - 1);
     }
 }

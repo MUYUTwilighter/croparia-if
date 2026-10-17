@@ -1,7 +1,7 @@
 package cool.muyucloud.croparia.api.resource;
 
 import com.mojang.serialization.MapCodec;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface TypedResource<R> extends TypeTokenAccess {
     default boolean isEmpty() {

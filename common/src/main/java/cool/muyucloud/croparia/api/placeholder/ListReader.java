@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.api.placeholder;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -27,7 +27,7 @@ public interface ListReader<E> extends Iterable<E> {
     E get(int index);
 
     @Override
-    default @NotNull Iterator<E> iterator() {
+    default @NonNull Iterator<E> iterator() {
         return new Iterator<>() {
             private int index = 0;
 
@@ -68,7 +68,7 @@ public interface ListReader<E> extends Iterable<E> {
         }
 
         @Override
-        public @NotNull Iterator<JsonElement> iterator() {
+        public @NonNull Iterator<JsonElement> iterator() {
             return this.get().iterator();
         }
     }
@@ -96,7 +96,7 @@ public interface ListReader<E> extends Iterable<E> {
         }
 
         @Override
-        public @NotNull Iterator<E> iterator() {
+        public @NonNull Iterator<E> iterator() {
             return this.get().iterator();
         }
     }
@@ -124,7 +124,7 @@ public interface ListReader<E> extends Iterable<E> {
         }
 
         @Override
-        public @NotNull Iterator<E> iterator() {
+        public @NonNull Iterator<E> iterator() {
             return Stream.of(this.get()).iterator();
         }
     }

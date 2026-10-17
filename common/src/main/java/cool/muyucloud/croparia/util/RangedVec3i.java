@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.util;
 
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import oshi.annotation.concurrent.Immutable;
 
 import java.util.Objects;
@@ -63,17 +63,17 @@ public class RangedVec3i extends Vec3i {
     }
 
     @Override
-    public @NotNull RangedVec3i multiply(int scalar) {
+    public @NonNull RangedVec3i multiply(int scalar) {
         return scalar == 0 ? this : new RangedVec3i(minX, minY, minZ, maxX, maxY, maxZ, getX() * scalar, getY() * scalar, getZ() * scalar);
     }
 
     @Override
-    public @NotNull RangedVec3i relative(@NotNull Direction direction, int distance) {
+    public @NonNull RangedVec3i relative(@NonNull Direction direction, int distance) {
         return distance == 0 ? this : this.offset(direction.getStepX() * distance, direction.getStepY() * distance, direction.getStepZ() * distance);
     }
 
     @Override
-    public @NotNull RangedVec3i relative(@NotNull Direction.Axis axis, int amount) {
+    public @NonNull RangedVec3i relative(@NonNull Direction.Axis axis, int amount) {
         if (amount == 0) return this;
         switch (axis) {
             case X -> {
@@ -90,7 +90,7 @@ public class RangedVec3i extends Vec3i {
     }
 
     @Override
-    public @NotNull RangedVec3i cross(@NotNull Vec3i vector) {
+    public @NonNull RangedVec3i cross(@NonNull Vec3i vector) {
         return new RangedVec3i(minX, minY, minZ, maxX, maxY, maxZ, this.getY() * vector.getZ() - this.getZ() * vector.getY(), this.getZ() * vector.getX() - this.getX() * vector.getZ(), this.getX() * vector.getY() - this.getY() * vector.getX());
     }
 
@@ -98,7 +98,7 @@ public class RangedVec3i extends Vec3i {
         return new RangedVec3i(minX, minY, minZ, maxX, maxY, maxZ, getX(), getY(), getZ());
     }
 
-    public RangedVec3i min(@NotNull Vec3i min) {
+    public RangedVec3i min(@NonNull Vec3i min) {
         return min(min.getX(), min.getY(), min.getZ());
     }
 
@@ -118,7 +118,7 @@ public class RangedVec3i extends Vec3i {
         return new RangedVec3i(minX, minY, minZ, maxX, maxY, maxZ, getX(), getY(), getZ());
     }
 
-    public RangedVec3i max(@NotNull Vec3i max) {
+    public RangedVec3i max(@NonNull Vec3i max) {
         return max(max.getX(), max.getY(), max.getZ());
     }
 
@@ -135,7 +135,7 @@ public class RangedVec3i extends Vec3i {
     }
 
     @Override
-    public @NotNull RangedVec3i offset(int dx, int dy, int dz) {
+    public @NonNull RangedVec3i offset(int dx, int dy, int dz) {
         return this.rebuild(getX() + dx, getY() + dy, getZ() + dz);
     }
 
@@ -148,7 +148,7 @@ public class RangedVec3i extends Vec3i {
         }
     }
 
-    public RangedVec3i rebuild(@NotNull Vec3i vec) {
+    public RangedVec3i rebuild(@NonNull Vec3i vec) {
         return rebuild(vec.getX(), vec.getY(), vec.getZ());
     }
 
@@ -213,62 +213,62 @@ public class RangedVec3i extends Vec3i {
     }
 
     @Override
-    public @NotNull RangedVec3i above() {
+    public @NonNull RangedVec3i above() {
         return above(1);
     }
 
     @Override
-    public @NotNull RangedVec3i above(int distance) {
+    public @NonNull RangedVec3i above(int distance) {
         return relative(Direction.UP, distance);
     }
 
     @Override
-    public @NotNull RangedVec3i below() {
+    public @NonNull RangedVec3i below() {
         return below(1);
     }
 
     @Override
-    public @NotNull RangedVec3i below(int distance) {
+    public @NonNull RangedVec3i below(int distance) {
         return relative(Direction.DOWN, distance);
     }
 
     @Override
-    public @NotNull RangedVec3i north() {
+    public @NonNull RangedVec3i north() {
         return north(1);
     }
 
     @Override
-    public @NotNull RangedVec3i north(int distance) {
+    public @NonNull RangedVec3i north(int distance) {
         return relative(Direction.NORTH, distance);
     }
 
     @Override
-    public @NotNull RangedVec3i south() {
+    public @NonNull RangedVec3i south() {
         return south(1);
     }
 
     @Override
-    public @NotNull RangedVec3i south(int distance) {
+    public @NonNull RangedVec3i south(int distance) {
         return relative(Direction.SOUTH, distance);
     }
 
     @Override
-    public @NotNull RangedVec3i west() {
+    public @NonNull RangedVec3i west() {
         return west(1);
     }
 
     @Override
-    public @NotNull RangedVec3i west(int distance) {
+    public @NonNull RangedVec3i west(int distance) {
         return relative(Direction.WEST, distance);
     }
 
     @Override
-    public @NotNull RangedVec3i east() {
+    public @NonNull RangedVec3i east() {
         return east(1);
     }
 
     @Override
-    public @NotNull RangedVec3i east(int distance) {
+    public @NonNull RangedVec3i east(int distance) {
         return relative(Direction.EAST, distance);
     }
 

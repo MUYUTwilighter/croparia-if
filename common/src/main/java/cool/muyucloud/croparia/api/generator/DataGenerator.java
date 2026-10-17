@@ -17,7 +17,7 @@ import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.api.placeholder.Template;
 import cool.muyucloud.croparia.util.Dependencies;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
@@ -77,7 +77,7 @@ public class DataGenerator implements DgListener {
         Codec.BOOL.optionalFieldOf("startup").forGetter(DataGenerator::optionalStartup),
         Identifier.CODEC.listOf().optionalFieldOf("whitelist").forGetter(DataGenerator::optionalWhitelist),
         Template.CODEC.fieldOf("path").forGetter(DataGenerator::getPath),
-        DgRegistry.CODEC.fieldOf("registry").forGetter(DataGenerator::getRegistry),
+        DgRegistry.CODEC_BY_NAME.fieldOf("registry").forGetter(DataGenerator::getRegistry),
         Template.CODEC.optionalFieldOf("template", Template.EMPTY).forGetter(DataGenerator::getTemplate)
     ).apply(instance, (enabled, startup, whitelist, path, registry, template) -> new DataGenerator(
         enabled.orElse(true), startup.orElse(false), whitelist.orElse(List.of()), path, registry, template

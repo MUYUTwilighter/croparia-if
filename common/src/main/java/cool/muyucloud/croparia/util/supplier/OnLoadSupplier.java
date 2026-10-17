@@ -1,6 +1,6 @@
 package cool.muyucloud.croparia.util.supplier;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -17,7 +17,7 @@ public class OnLoadSupplier<T> extends LazySupplier<T> {
 
     private long lastCreate = 0L;
 
-    public OnLoadSupplier(@NotNull Supplier<T> creator) {
+    public OnLoadSupplier(@NonNull Supplier<T> creator) {
         super(creator);
     }
 

@@ -16,12 +16,11 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -53,7 +52,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     protected final ItemInput ingredient;
     protected final ItemOutput result;
 
-    public InfusorRecipe(@NotNull Element element, @NotNull ItemInput ingredient, @NotNull ItemOutput result) {
+    public InfusorRecipe(@NonNull Element element, @NonNull ItemInput ingredient, @NonNull ItemOutput result) {
         if (element == Element.EMPTY) throw new IllegalArgumentException("Element cannot be EMPTY");
         this.element = element;
         this.ingredient = ingredient;
@@ -80,7 +79,8 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
         return container.getElement() == getElement() && getIngredient().matches(container);
     }
 
-    public @NotNull ItemStack assemble(@NotNull InfusorContainer container) {
+    @Override
+    public @NonNull ItemStack assemble(@NonNull InfusorContainer container) {
         if (matches(container)) {
             this.getIngredient().consume(container);
             return getResult().createStack();
@@ -94,34 +94,29 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     }
 
     @Override
-    public @NotNull List<List<ItemStack>> getInputs() {
+    public @NonNull List<List<ItemStack>> getInputs() {
         return List.of(
             this.getIngredient().getDisplayStacks(),
             List.of(this.getPotion())
         );
     }
 
-    public @NotNull List<List<ItemStack>> getOutputs() {
+    public @NonNull List<List<ItemStack>> getOutputs() {
         return List.of(this.getResult().getDisplayStacks());
     }
 
     @Override
-    public boolean matches(@NotNull InfusorContainer container, @Nullable Level level) {
+    public boolean matches(@NonNull InfusorContainer container, @Nullable Level level) {
         return matches(container);
     }
 
-    @Override
-    public @NotNull ItemStack assemble(InfusorContainer recipeInput, HolderLookup.Provider provider) {
-        return assemble(recipeInput);
-    }
-
-    @NotNull
+    @NonNull
     public ItemOutput result() {
         return this.getResult();
     }
 
     @Override
-    @NotNull
+    @NonNull
     public SlotDisplay craftingStation() {
         return new ItemOutput(CropariaItems.INFUSOR.get().getDefaultInstance());
     }

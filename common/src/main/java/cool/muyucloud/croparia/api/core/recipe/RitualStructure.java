@@ -19,14 +19,13 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -48,9 +47,9 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     });
 
     private final BlockInput ritual;
-    @NotNull
+    @NonNull
     private final ImmutableMap<Character, BlockInput> keys;
-    @NotNull
+    @NonNull
     private final MarkedTransformableChar3D patterns;
     private final transient LazySupplier<List<List<ItemStack>>> inputsCache = LazySupplier.of(() -> {
         ImmutableList.Builder<List<ItemStack>> builder = ImmutableList.builder();
@@ -67,7 +66,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
         return builder.build();
     });
 
-    public RitualStructure(BlockInput ritual, @NotNull Map<Character, BlockInput> keyDeclarations, Char3D rawPattern) {
+    public RitualStructure(BlockInput ritual, @NonNull Map<Character, BlockInput> keyDeclarations, Char3D rawPattern) {
         this.ritual = ritual;
         // Validate key declarations
         Map<Character, BlockInput> keys = new HashMap<>();
@@ -93,16 +92,16 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     }
 
     @Override
-    public @NotNull List<List<ItemStack>> getInputs() {
+    public @NonNull List<List<ItemStack>> getInputs() {
         return this.inputsCache.get();
     }
 
     @Override
-    public @NotNull List<List<ItemStack>> getOutputs() {
+    public @NonNull List<List<ItemStack>> getOutputs() {
         return List.of(this.getRitual().getDisplayStacks());
     }
 
-    public @NotNull Result matchTransformed(BlockPos origin, Level level, MarkedChar3D pattern, BlockState ritualBlock) {
+    public @NonNull Result matchTransformed(BlockPos origin, Level level, MarkedChar3D pattern, BlockState ritualBlock) {
         origin = pattern.getOriginInWorld(origin);
         List<BlockPos> inputPositions = new ArrayList<>();
         List<BlockState> inputBlocks = new ArrayList<>();
@@ -147,7 +146,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
         return Result.FAIL;
     }
 
-    public @NotNull Map<Character, BlockInput> getKeys() {
+    public @NonNull Map<Character, BlockInput> getKeys() {
         return this.keys;
     }
 
@@ -198,7 +197,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     }
 
     @Override
-    public @NotNull SlotDisplay craftingStation() {
+    public @NonNull SlotDisplay craftingStation() {
         return null;
     }
 
@@ -214,11 +213,11 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
 
     @Override
     @Deprecated
-    public @NotNull ItemStack assemble(RitualStructureContainer recipeInput, HolderLookup.Provider provider) {
+    public @NonNull ItemStack assemble(@NonNull RitualStructureContainer recipeInput) {
         return ItemStack.EMPTY;
     }
 
-    public static Result result(List<BlockState> states, @NotNull Runnable destroyAction) {
+    public static Result result(List<BlockState> states, @NonNull Runnable destroyAction) {
         return new Result(states, destroyAction);
     }
 
@@ -226,17 +225,17 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
         public static final Result FAIL = new Result(List.of(), () -> {
         });
 
-        @NotNull
+        @NonNull
         private final List<BlockState> states;
-        @NotNull
+        @NonNull
         private final Runnable destroyAction;
 
-        public Result(@NotNull List<BlockState> states, @NotNull Runnable destroyAction) {
+        public Result(@NonNull List<BlockState> states, @NonNull Runnable destroyAction) {
             this.states = states;
             this.destroyAction = destroyAction;
         }
 
-        @NotNull
+        @NonNull
         public List<BlockState> getStates() {
             return states;
         }

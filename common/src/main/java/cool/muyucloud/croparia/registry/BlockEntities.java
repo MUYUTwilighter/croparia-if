@@ -10,7 +10,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Constructor;
 import java.util.Set;
@@ -36,11 +36,11 @@ public class BlockEntities {
         Set.of(CropariaBlocks.ACTIVATED_SHRIEKER)
     );
 
-    @NotNull
+    @NonNull
     public static <T extends BlockEntity> RegistrySupplier<BlockEntityType<T>> register(
-        @NotNull String name,
-        @NotNull BlockEntityType.BlockEntitySupplier<? extends T> factory,
-        @NotNull Set<? extends Supplier<? extends Block>> validBlocks
+        @NonNull String name,
+        @NonNull BlockEntityType.BlockEntitySupplier<? extends T> factory,
+        @NonNull Set<? extends Supplier<? extends Block>> validBlocks
         ) {
         return BLOCK_ENTITIES.register(name, () -> createType(
             factory,

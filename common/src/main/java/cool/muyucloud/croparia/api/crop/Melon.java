@@ -25,8 +25,8 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -131,7 +131,7 @@ public class Melon extends AbstractCrop<Block> {
     }
 
     @Override
-    public @NotNull BlockMaterial getMaterial() {
+    public @NonNull BlockMaterial getMaterial() {
         return this.material;
     }
 
@@ -173,7 +173,7 @@ public class Melon extends AbstractCrop<Block> {
     }
 
     @Override
-    public @NotNull Identifier getKey() {
+    public @NonNull Identifier getKey() {
         return this.id;
     }
 

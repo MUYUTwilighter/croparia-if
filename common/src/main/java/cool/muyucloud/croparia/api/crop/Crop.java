@@ -24,8 +24,8 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -72,24 +72,24 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return "crop.%s.%s".formatted(id.getNamespace(), id.getPath());
     }
 
-    @NotNull
+    @NonNull
     private final Identifier id;
-    @NotNull
+    @NonNull
     private final ItemMaterial material;
-    @NotNull
+    @NonNull
     private final Color color;
     private final int tier;
-    @NotNull
+    @NonNull
     private final String type;
-    @NotNull
+    @NonNull
     private final ImmutableMap<String, String> translations;
-    @NotNull
+    @NonNull
     private final CropDependencies dependencies;
-    @NotNull
+    @NonNull
     private final transient HolderSupplier<CropariaCropBlock> block;
-    @NotNull
+    @NonNull
     private final transient HolderSupplier<CropSeed> seed;
-    @NotNull
+    @NonNull
     private final transient HolderSupplier<CropFruit> fruit;
     private transient final String defaultTranslation;
     private transient final String defaultTranslationKey;
@@ -98,8 +98,8 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
     );
 
     public Crop(
-        @NotNull Identifier id, @NotNull ItemMaterial material, @NotNull Color color, int tier, @Nullable String type,
-        @Nullable Map<String, String> translations, @NotNull CropDependencies dependencies
+        @NonNull Identifier id, @NonNull ItemMaterial material, @NonNull Color color, int tier, @Nullable String type,
+        @Nullable Map<String, String> translations, @NonNull CropDependencies dependencies
     ) {
         this.id = id;
         this.material = material;
@@ -119,12 +119,12 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
     }
 
     @Override
-    public @NotNull Identifier getKey() {
+    public @NonNull Identifier getKey() {
         return this.id;
     }
 
     @Override
-    public @NotNull ItemMaterial getMaterial() {
+    public @NonNull ItemMaterial getMaterial() {
         return material;
     }
 
@@ -132,7 +132,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return this.getMaterial().getComponents();
     }
 
-    public @NotNull Color getColor() {
+    public @NonNull Color getColor() {
         return color;
     }
 
@@ -150,7 +150,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return this.getTranslations().keySet();
     }
 
-    public @NotNull String getTranslationKey() {
+    public @NonNull String getTranslationKey() {
         return dependencies.getChosen();
     }
 
@@ -163,7 +163,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
     }
 
     @Override
-    public @NotNull ImmutableMap<String, String> getTranslations() {
+    public @NonNull ImmutableMap<String, String> getTranslations() {
         return translations;
     }
 
@@ -182,7 +182,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         }
     }
 
-    public @NotNull String getType() {
+    public @NonNull String getType() {
         return type;
     }
 
@@ -190,11 +190,11 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return this.getType().equals(DEFAULT_TYPE) ? Optional.empty() : Optional.of(this.getType());
     }
 
-    public @NotNull CropDependencies getDependencies() {
+    public @NonNull CropDependencies getDependencies() {
         return this.dependencies;
     }
 
-    public @NotNull Identifier getBlockId() {
+    public @NonNull Identifier getBlockId() {
         return block.getId();
     }
 
@@ -202,7 +202,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return block.toOptional();
     }
 
-    public @NotNull Identifier getSeedId() {
+    public @NonNull Identifier getSeedId() {
         return seed.getId();
     }
 
@@ -210,7 +210,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return seed.toOptional();
     }
 
-    public @NotNull Identifier getFruitId() {
+    public @NonNull Identifier getFruitId() {
         return fruit.getId();
     }
 

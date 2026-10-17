@@ -20,7 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -47,17 +47,17 @@ public class BlockOutput implements SlotDisplay {
         STACK_AIR.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.air"));
     }
 
-    @NotNull
+    @NonNull
     private final Identifier id;
-    @NotNull
+    @NonNull
     private final BlockProperties properties;
     private final transient ItemStack displayStack;
 
-    public static BlockOutput create(@NotNull Identifier id) {
+    public static BlockOutput create(@NonNull Identifier id) {
         return create(id, BlockProperties.EMPTY);
     }
 
-    protected static BlockOutput create(@NotNull Identifier id, @NotNull BlockProperties properties) {
+    protected static BlockOutput create(@NonNull Identifier id, @NonNull BlockProperties properties) {
         return new BlockOutput(id, properties);
     }
 
@@ -65,7 +65,7 @@ public class BlockOutput implements SlotDisplay {
         return create(Objects.requireNonNull(state.getBlock().arch$registryName()), BlockProperties.extract(state));
     }
 
-    protected BlockOutput(@NotNull Identifier id, @NotNull BlockProperties properties) {
+    protected BlockOutput(@NonNull Identifier id, @NonNull BlockProperties properties) {
         this.id = id;
         this.properties = properties;
         this.displayStack = BuiltInRegistries.BLOCK.getOptional(this.getId()).map(block -> {
@@ -75,7 +75,7 @@ public class BlockOutput implements SlotDisplay {
         }).orElseThrow(() -> new IllegalArgumentException("Unknown block: " + id));
     }
 
-    public @NotNull Identifier getId() {
+    public @NonNull Identifier getId() {
         return id;
     }
 
@@ -83,21 +83,21 @@ public class BlockOutput implements SlotDisplay {
         return BuiltInRegistries.BLOCK.getOptional(this.getId()).orElse(null);
     }
 
-    @NotNull
+    @NonNull
     public BlockProperties getProperties() {
         return properties;
     }
 
-    @NotNull
+    @NonNull
     public List<ItemStack> getDisplayStacks() {
         return List.of(displayStack);
     }
 
-    public boolean matches(@NotNull Block block) {
+    public boolean matches(@NonNull Block block) {
         return Objects.equals(block.arch$registryName(), this.getId());
     }
 
-    public boolean matches(@NotNull BlockState state) {
+    public boolean matches(@NonNull BlockState state) {
         return this.matches(state.getBlock()) && this.getProperties().isSubsetOf(state);
     }
 

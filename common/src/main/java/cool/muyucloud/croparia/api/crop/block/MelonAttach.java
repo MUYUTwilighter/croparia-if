@@ -11,7 +11,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.AttachedStemBlock;
 import net.minecraft.world.level.block.Blocks;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class MelonAttach extends AttachedStemBlock implements CropAccess<Melon> {
     private final Melon melon;
@@ -32,13 +32,13 @@ public class MelonAttach extends AttachedStemBlock implements CropAccess<Melon> 
     }
 
     @Override
-    public @NotNull MutableComponent getName() {
+    public @NonNull MutableComponent getName() {
         MutableComponent cropName = Texts.translatable(this.getCrop().getTranslationKey());
         return Texts.translatable("block." + CropariaIf.MOD_ID + ".melon.attach", cropName);
     }
 
     @Override
-    public @NotNull MelonSeed asItem() {
+    public @NonNull MelonSeed asItem() {
         return this.getCrop().getSeed().get();
     }
 }

@@ -4,7 +4,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @ApiStatus.Experimental
 public class RitualStructureContainer implements RecipeInput {
@@ -19,7 +19,7 @@ public class RitualStructureContainer implements RecipeInput {
     }
 
     @Override
-    public @NotNull ItemStack getItem(int i) {
+    public @NonNull ItemStack getItem(int i) {
         return ItemStack.EMPTY;
     }
 

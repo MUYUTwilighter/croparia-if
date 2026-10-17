@@ -3,7 +3,7 @@ package cool.muyucloud.croparia.api.recipe.structure;
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.util.Vec2i;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -138,7 +138,7 @@ public class Char2D implements Iterable<char[]> {
     }
 
     @Override
-    public @NotNull Iterator<char[]> iterator() {
+    public @NonNull Iterator<char[]> iterator() {
         return Arrays.stream(chars).iterator();
     }
 

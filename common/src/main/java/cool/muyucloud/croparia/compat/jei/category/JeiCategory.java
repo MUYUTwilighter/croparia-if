@@ -16,8 +16,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -37,12 +37,12 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
     public abstract TypedSerializer<R> getTypedSerializer();
 
     @Override
-    public @NotNull IRecipeType<R> getRecipeType() {
+    public @NonNull IRecipeType<R> getRecipeType() {
         return this.recipeType;
     }
 
     @Override
-    public @NotNull Component getTitle() {
+    public @NonNull Component getTitle() {
         return Texts.translatable("gui.%s.%s.title".formatted(this.getUid().getNamespace(), this.getUid().getPath()));
     }
 
@@ -53,11 +53,11 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
         else return toDrawable(stations.getFirst().get());
     }
 
-    public @NotNull Identifier getUid() {
+    public @NonNull Identifier getUid() {
         return this.getTypedSerializer().getId();
     }
 
-    public @NotNull Class<? extends R> getRecipeClass() {
+    public @NonNull Class<? extends R> getRecipeClass() {
         return this.getTypedSerializer().getRecipeClass();
     }
 

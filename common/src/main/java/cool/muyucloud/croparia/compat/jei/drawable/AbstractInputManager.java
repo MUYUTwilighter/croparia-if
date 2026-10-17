@@ -8,7 +8,7 @@ import mezz.jei.common.util.ImmutableRect2i;
 import mezz.jei.gui.input.MouseUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -407,12 +407,12 @@ public abstract class AbstractInputManager<T extends AbstractInputManager<T>> im
     }
 
     @Override
-    public @NotNull ScreenRectangle getArea() {
+    public @NonNull ScreenRectangle getArea() {
         return area.toScreenRectangle();
     }
 
     @Override
-    public @NotNull T setPosition(int x, int y) {
+    public @NonNull T setPosition(int x, int y) {
         area = area.setPosition(x, y);
         return this.getSelf();
     }
@@ -433,7 +433,7 @@ public abstract class AbstractInputManager<T extends AbstractInputManager<T>> im
         return absoluteY;
     }
 
-    public @NotNull T setSize(int width, int height) {
+    public @NonNull T setSize(int width, int height) {
         area = new ImmutableRect2i(area.x(), area.y(), width, height);
         return this.getSelf();
     }
@@ -449,7 +449,7 @@ public abstract class AbstractInputManager<T extends AbstractInputManager<T>> im
     }
 
     @Override
-    public void draw(@NotNull GuiGraphics guiGraphics, int xOffset, int yOffset) {
+    public void draw(@NonNull GuiGraphics guiGraphics, int xOffset, int yOffset) {
         double mouseX = mouseX();
         double mouseY = mouseY();
         if (0 < mouseX && mouseX < area.getWidth() && 0 < mouseY && mouseY < area.getHeight()) {

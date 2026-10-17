@@ -14,7 +14,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.SoundType;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class CropariaCropBlock extends CropBlock implements CropAccess<Crop> {
     private final Identifier cropId;
@@ -25,12 +25,12 @@ public class CropariaCropBlock extends CropBlock implements CropAccess<Crop> {
     }
 
     @Override
-    protected @NotNull ItemLike getBaseSeedId() {
+    protected @NonNull ItemLike getBaseSeedId() {
         return this.asItem();
     }
 
     @Override
-    public @NotNull MutableComponent getName() {
+    public @NonNull MutableComponent getName() {
         MutableComponent cropName = Texts.translatable(this.getCrop().getTranslationKey());
         return Texts.translatable("block." + CropariaIf.MOD_ID + ".crop.block", cropName);
     }
@@ -40,7 +40,7 @@ public class CropariaCropBlock extends CropBlock implements CropAccess<Crop> {
     }
 
     @Override
-    public @NotNull Item asItem() {
+    public @NonNull Item asItem() {
         if (this.getCrop().getCropSeed().isEmpty()) return Items.AIR;
         return this.getCrop().getCropSeed().get();
     }

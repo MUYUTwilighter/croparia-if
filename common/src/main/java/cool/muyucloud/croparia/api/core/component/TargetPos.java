@@ -19,7 +19,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -32,53 +32,53 @@ public class TargetPos implements TooltipProvider {
     ).apply(instance, TargetPos::new));
     public static final DataComponentType<TargetPos> TYPE = DataComponentType.<TargetPos>builder().persistent(CODEC.codec()).build();
 
-    @NotNull
+    @NonNull
     private transient final MutableComponent dimName;
-    @NotNull
+    @NonNull
     private transient final ResourceKey<Level> dimKey;
-    @NotNull
+    @NonNull
     private final BlockPos pos;
     private transient final MutableComponent tooltip;
 
-    public TargetPos(@NotNull Entity entity) {
+    public TargetPos(@NonNull Entity entity) {
         this(entity.level(), entity.blockPosition());
     }
 
-    public TargetPos(@NotNull Level level, @NotNull BlockPos pos) {
+    public TargetPos(@NonNull Level level, @NonNull BlockPos pos) {
         this(level.dimension(), pos);
     }
 
-    public TargetPos(@NotNull ResourceKey<Level> dim, @NotNull BlockPos pos) {
+    public TargetPos(@NonNull ResourceKey<Level> dim, @NonNull BlockPos pos) {
         this.pos = pos;
         this.dimKey = dim;
         this.dimName = Texts.literal(dim.identifier().toString());
         this.tooltip = Texts.translatable("tooltip.croparia.bounded_position", this.getDimName(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
     }
 
-    public TargetPos(@NotNull Identifier dim, @NotNull BlockPos pos) {
+    public TargetPos(@NonNull Identifier dim, @NonNull BlockPos pos) {
         this(ResourceKey.create(Registries.DIMENSION, dim), pos);
     }
 
-    @NotNull
+    @NonNull
     public Identifier getDim() {
         return dimKey.identifier();
     }
 
-    @NotNull
+    @NonNull
     public MutableComponent getDimName() {
         return dimName;
     }
 
-    @NotNull
+    @NonNull
     public ResourceKey<Level> getDimKey() {
         return dimKey;
     }
 
-    public Optional<ServerLevel> getLevel(@NotNull MinecraftServer server) {
+    public Optional<ServerLevel> getLevel(@NonNull MinecraftServer server) {
         return Optional.ofNullable(server.getLevel(this.getDimKey()));
     }
 
-    @NotNull
+    @NonNull
     public BlockPos getPos() {
         return pos;
     }
@@ -88,11 +88,11 @@ public class TargetPos implements TooltipProvider {
     }
 
     @Override
-    public void addToTooltip(Item.TooltipContext tooltipContext, @NotNull Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter componentGetter) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, @NonNull Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter componentGetter) {
         consumer.accept(getTooltip());
     }
 
-    public void teleport(@NotNull Entity entity, @NotNull MinecraftServer server) {
+    public void teleport(@NonNull Entity entity, @NonNull MinecraftServer server) {
         this.getLevel(server).ifPresent(level -> entity.teleportTo(level, getPos().getX(), getPos().getY(), getPos().getZ(), Relative.ROTATION, 0, 0, false));
     }
 

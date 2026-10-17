@@ -28,9 +28,8 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class Greenhouse extends BaseEntityBlock {
     public static final MapCodec<Greenhouse> CODEC = simpleCodec(Greenhouse::new);
@@ -88,7 +87,7 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
-    protected @NotNull InteractionResult useItemOn(
+    protected @NonNull InteractionResult useItemOn(
         @NonNull ItemStack itemStack, @NonNull BlockState state, Level world, @NonNull BlockPos pos,
         @NonNull Player player, @NonNull InteractionHand interactionHand, @NonNull BlockHitResult blockHitResult
     ) {
@@ -103,17 +102,17 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
-    protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
+    protected @NonNull MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
 
     @Override
-    public @NotNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
+    public @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
         return this.SHAPE;
     }
 
     @Override
-    public @NotNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
+    public @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
         return this.SHAPE;
     }
 
@@ -128,12 +127,12 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
-    public @NotNull RenderShape getRenderShape(@NonNull BlockState state) {
+    public @NonNull RenderShape getRenderShape(@NonNull BlockState state) {
         return RenderShape.MODEL;
     }
 
     @Override
-    public @NotNull Item asItem() {
+    public @NonNull Item asItem() {
         return CropariaItems.GREENHOUSE.get();
     }
 }

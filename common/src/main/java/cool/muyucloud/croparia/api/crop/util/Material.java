@@ -10,8 +10,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,11 +26,11 @@ public abstract class Material<T> {
         .then(PatternKey.literal("id"), TypeMapper.of(Material::getId), Placeholder.ID));
 
     protected final boolean tag;
-    @NotNull
+    @NonNull
     protected final Identifier id;
     protected final int count;
 
-    public Material(@NotNull String name, int count) {
+    public Material(@NonNull String name, int count) {
         this.count = count;
         if (name.startsWith("#")) {
             this.tag = true;
@@ -45,7 +45,7 @@ public abstract class Material<T> {
         return tag;
     }
 
-    public @NotNull Identifier getId() {
+    public @NonNull Identifier getId() {
         return id;
     }
 
@@ -96,9 +96,9 @@ public abstract class Material<T> {
      *
      * @see #rawCandidates(Identifier)
      */
-    public abstract @NotNull List<T> candidates();
+    public abstract @NonNull List<T> candidates();
 
-    public abstract @NotNull List<ItemStack> asItems();
+    public abstract @NonNull List<ItemStack> asItems();
 
-    public abstract @NotNull ItemStack asItem();
+    public abstract @NonNull ItemStack asItem();
 }

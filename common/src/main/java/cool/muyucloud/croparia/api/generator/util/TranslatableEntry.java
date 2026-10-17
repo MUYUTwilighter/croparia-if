@@ -3,7 +3,7 @@ package cool.muyucloud.croparia.api.generator.util;
 import cool.muyucloud.croparia.api.placeholder.MapReader;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.TypeMapper;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;

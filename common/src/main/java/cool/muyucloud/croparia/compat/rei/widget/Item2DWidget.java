@@ -10,7 +10,7 @@ import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,33 +29,33 @@ public class Item2DWidget extends WidgetWithBounds {
         (x, y) -> EntryIngredients.of(ItemStack.EMPTY);
     private transient Slot[][] slots = new Slot[0][0];
 
-    @NotNull
+    @NonNull
     public Item2DWidget x(int x) {
         this.x = x;
         return this;
     }
 
-    @NotNull
+    @NonNull
     public Item2DWidget y(int y) {
         this.y = y;
         return this;
     }
 
-    @NotNull
-    public Item2DWidget items(@NotNull BiFunction<Integer, Integer, Collection<? extends EntryStack<?>>> itemProvider) {
+    @NonNull
+    public Item2DWidget items(@NonNull BiFunction<Integer, Integer, Collection<? extends EntryStack<?>>> itemProvider) {
         this.itemProvider = itemProvider;
         this.slots = new Slot[this.rows][this.cols];
         return this;
     }
 
-    @NotNull
+    @NonNull
     public Item2DWidget cols(int cols) {
         this.cols = cols;
         this.slots = new Slot[this.rows][this.cols];
         return this;
     }
 
-    @NotNull
+    @NonNull
     public Item2DWidget rows(int rows) {
         this.rows = rows;
         this.slots = new Slot[this.rows][this.cols];
@@ -81,7 +81,7 @@ public class Item2DWidget extends WidgetWithBounds {
         return (this.rows + 2) * SLOT_SIZE;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public Rectangle getBounds() {
         return new Rectangle(x, y, width(), height());
@@ -101,7 +101,7 @@ public class Item2DWidget extends WidgetWithBounds {
     }
 
     @Override
-    public @NotNull List<Slot> children() {
+    public @NonNull List<Slot> children() {
         List<Slot> slots = new ArrayList<>(rows * cols);
         for (int x = 0; x < cols; x++) {
             for (int y = 0; y < rows; y++) {

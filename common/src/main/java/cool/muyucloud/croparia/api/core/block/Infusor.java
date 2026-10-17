@@ -33,8 +33,8 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class Infusor extends Block implements ItemPlaceable {
     protected final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
@@ -46,7 +46,7 @@ public class Infusor extends Block implements ItemPlaceable {
     }
 
     @Override
-    protected @NotNull InteractionResult useItemOn(
+    protected @NonNull InteractionResult useItemOn(
         ItemStack itemStack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
         BlockHitResult blockHitResult
     ) {
@@ -68,7 +68,7 @@ public class Infusor extends Block implements ItemPlaceable {
         return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
-    public boolean tryInfuse(Level world, BlockPos pos, ElementalPotion potion, @NotNull ItemStack stack, @Nullable Player player) {
+    public boolean tryInfuse(Level world, BlockPos pos, ElementalPotion potion, @NonNull ItemStack stack, @Nullable Player player) {
         BlockState state = world.getBlockState(pos);
         if (state.getValue(ELEMENT) == Element.EMPTY) {
             world.setBlockAndUpdate(pos, CropariaBlocks.INFUSOR.get().defaultBlockState().setValue(ELEMENT, potion.getElement()));
@@ -146,11 +146,11 @@ public class Infusor extends Block implements ItemPlaceable {
         }
     }
 
-    public @NotNull VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public @NonNull VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return this.SHAPE;
     }
 
-    public @NotNull VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public @NonNull VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return this.SHAPE;
     }
 
@@ -159,7 +159,7 @@ public class Infusor extends Block implements ItemPlaceable {
     }
 
     @Override
-    public @NotNull Item asItem() {
+    public @NonNull Item asItem() {
         return CropariaItems.INFUSOR.get();
     }
 }

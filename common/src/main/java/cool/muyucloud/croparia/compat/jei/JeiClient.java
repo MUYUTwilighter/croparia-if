@@ -13,7 +13,6 @@ import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.common.Internal;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -49,24 +48,24 @@ public class JeiClient implements IModPlugin {
     }
 
     @Override
-    public @NotNull Identifier getPluginUid() {
+    public @NonNull Identifier getPluginUid() {
         return CropariaIf.of("jei");
     }
 
     @Override
-    public void registerCategories(@NotNull IRecipeCategoryRegistration registration) {
+    public void registerCategories(@NonNull IRecipeCategoryRegistration registration) {
         for (JeiCategory<?> category : CATEGORIES) {
             registration.addRecipeCategories(category);
         }
     }
 
     @Override
-    public void registerRecipes(@NotNull IRecipeRegistration registration) {
+    public void registerRecipes(@NonNull IRecipeRegistration registration) {
         CATEGORIES.forEach(category -> registerRecipes(registration, category));
     }
 
     @Override
-    public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
+    public void registerRecipeCatalysts(@NonNull IRecipeCatalystRegistration registration) {
         for (JeiCategory<?> category : CATEGORIES) {
             for (Mappable<ItemStack> stack : category.getTypedSerializer().getStations()) {
                 registration.addCraftingStation(category.getRecipeType(), stack.get());
@@ -74,7 +73,7 @@ public class JeiClient implements IModPlugin {
         }
     }
 
-    private static <R extends DisplayableRecipe<?>> void registerRecipes(@NotNull IRecipeRegistration registration, JeiCategory<R> category) {
+    private static <R extends DisplayableRecipe<?>> void registerRecipes(@NonNull IRecipeRegistration registration, JeiCategory<R> category) {
         registration.addRecipes(category.getRecipeType(), category.getTypedSerializer().find());
     }
 }

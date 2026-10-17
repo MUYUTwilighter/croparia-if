@@ -18,7 +18,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -60,30 +60,30 @@ public class BlockMaterial extends Material<Block> {
         }
     }
 
-    public BlockMaterial(@NotNull ItemStack stack) {
+    public BlockMaterial(@NonNull ItemStack stack) {
         super(parse(stack).toString(), stack.getCount());
     }
 
-    public BlockMaterial(@NotNull String name) {
+    public BlockMaterial(@NonNull String name) {
         super(name, 2);
     }
 
-    public BlockMaterial(@NotNull String name, int count) {
+    public BlockMaterial(@NonNull String name, int count) {
         super(name, count);
     }
 
     @Override
-    public @NotNull List<Block> candidates() {
+    public @NonNull List<Block> candidates() {
         return blocks.get();
     }
 
     @Override
-    public @NotNull List<ItemStack> asItems() {
+    public @NonNull List<ItemStack> asItems() {
         return stacks.get();
     }
 
     @Override
-    public @NotNull ItemStack asItem() {
+    public @NonNull ItemStack asItem() {
         List<Block> candidates = this.candidates();
         if (candidates.isEmpty()) {
             return ItemStack.EMPTY;

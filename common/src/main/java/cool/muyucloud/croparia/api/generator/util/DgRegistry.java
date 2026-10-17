@@ -2,14 +2,14 @@ package cool.muyucloud.croparia.api.generator.util;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
 public interface DgRegistry<E extends DgEntry> extends Iterable<E> {
     Map<Identifier, DgRegistry<?>> REGISTRY = new HashMap<>();
     Map<DgRegistry<? extends DgEntry>, Identifier> BY_INSTANCE = new HashMap<>();
-    Codec<DgRegistry<? extends DgEntry>> CODEC = Identifier.CODEC.xmap(REGISTRY::get, BY_INSTANCE::get);
+    Codec<DgRegistry<? extends DgEntry>> CODEC_BY_NAME = Identifier.CODEC.xmap(REGISTRY::get, BY_INSTANCE::get);
 
     static <E extends DgEntry, T extends DgRegistry<E>> T register(Identifier id, T registry) {
         REGISTRY.put(id, registry);
@@ -45,7 +45,7 @@ public interface DgRegistry<E extends DgEntry> extends Iterable<E> {
         }
 
         @Override
-        public @NotNull Iterator<E> iterator() {
+        public @NonNull Iterator<E> iterator() {
             return this.map.values().iterator();
         }
 
@@ -66,7 +66,7 @@ public interface DgRegistry<E extends DgEntry> extends Iterable<E> {
         }
 
         @Override
-        public @NotNull Iterator<E> iterator() {
+        public @NonNull Iterator<E> iterator() {
             return this.map.values().iterator();
         }
 

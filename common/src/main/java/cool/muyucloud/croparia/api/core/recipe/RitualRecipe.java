@@ -14,7 +14,6 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +22,7 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -43,15 +42,15 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     );
 
     private final BlockInput ritual;
-    @NotNull
+    @NonNull
     private final BlockInput block;
-    @NotNull
+    @NonNull
     private final ItemInput ingredient;
-    @NotNull
+    @NonNull
     private final ItemOutput result;
 
     public RitualRecipe(
-        BlockInput ritual, @NotNull BlockInput state, @NotNull ItemInput ingredient, @NotNull ItemOutput result
+        BlockInput ritual, @NonNull BlockInput state, @NonNull ItemInput ingredient, @NonNull ItemOutput result
     ) {
         this.ritual = ritual;
         this.block = state;
@@ -72,24 +71,24 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         this.result.getDisplayStacks().forEach(this::appendResultTooltip);
     }
 
-    public @NotNull ItemInput getIngredient() {
+    public @NonNull ItemInput getIngredient() {
         return ingredient;
     }
 
-    public @NotNull ItemOutput getResult() {
+    public @NonNull ItemOutput getResult() {
         return result;
     }
 
-    public @NotNull BlockInput getBlock() {
+    public @NonNull BlockInput getBlock() {
         return block;
     }
 
-    public @NotNull BlockInput getRitual() {
+    public @NonNull BlockInput getRitual() {
         return this.ritual;
     }
 
     @Override
-    public @NotNull List<List<ItemStack>> getInputs() {
+    public @NonNull List<List<ItemStack>> getInputs() {
         return List.of(
             this.getIngredient().getDisplayStacks(),
             this.getBlock().getDisplayStacks()
@@ -97,7 +96,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     }
 
     @Override
-    public @NotNull List<List<ItemStack>> getOutputs() {
+    public @NonNull List<List<ItemStack>> getOutputs() {
         return List.of(this.getResult().getDisplayStacks());
     }
 
@@ -115,10 +114,9 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         ItemEnchantments enchantments = stack.get(DataComponents.STORED_ENCHANTMENTS);
         if (enchantments == null || enchantments.isEmpty()) return;
 
-        stack.set(
-            DataComponents.TOOLTIP_DISPLAY,
-            stack.getOrDefault(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay.DEFAULT).withHidden(DataComponents.STORED_ENCHANTMENTS, true)
-        );
+        stack.set(DataComponents.TOOLTIP_DISPLAY, stack.getOrDefault(
+            DataComponents.TOOLTIP_DISPLAY, TooltipDisplay.DEFAULT
+        ).withHidden(DataComponents.STORED_ENCHANTMENTS, true));
 
         Text tooltip = new Text();
         tooltip.append(Texts.translatable("tooltip.croparia.ritual.enchant.header"));
@@ -137,7 +135,8 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         stack.set(CropariaComponents.TEXT.get(), new Text(tooltip));
     }
 
-    public ItemStack assemble(RitualContainer matcher) {
+    @Override
+    public @NonNull ItemStack assemble(@NonNull RitualContainer matcher) {
         ItemStack result = this.getResult().createStack();
         // Handle enchanted book special case
         ItemEnchantments enchantments = result.get(DataComponents.STORED_ENCHANTMENTS);
@@ -196,12 +195,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     }
 
     @Override
-    public @NotNull ItemStack assemble(RitualContainer recipeInput, HolderLookup.Provider provider) {
-        return assemble(recipeInput);
-    }
-
-    @Override
-    public @NotNull BlockInput craftingStation() {
+    public @NonNull BlockInput craftingStation() {
         return this.getRitual();
     }
 

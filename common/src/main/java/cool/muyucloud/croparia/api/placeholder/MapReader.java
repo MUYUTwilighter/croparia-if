@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.api.placeholder;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.AbstractMap;
 import java.util.Collection;
@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 public interface MapReader<K, V> extends Iterable<Map.Entry<K, V>> {
-    static <K, V> MapReader<K, V> map(@NotNull Map<K, V> map) {
+    static <K, V> MapReader<K, V> map(@NonNull Map<K, V> map) {
         return new MapReaderImpl<>(map);
     }
 
-    static JsonObjectReader json(@NotNull JsonObject object) {
+    static JsonObjectReader json(@NonNull JsonObject object) {
         return new JsonObjectReader(object);
     }
 
@@ -37,11 +37,11 @@ public interface MapReader<K, V> extends Iterable<Map.Entry<K, V>> {
     }
 
     @Override
-    default @NotNull Iterator<Map.Entry<K, V>> iterator() {
+    default @NonNull Iterator<Map.Entry<K, V>> iterator() {
         return entries().iterator();
     }
 
-    default <K2, V2> Mapped<K, V, K2, V2> map(@NotNull Function<K, K2> keyMapper, @NotNull Function<K2, V2> getter) {
+    default <K2, V2> Mapped<K, V, K2, V2> map(@NonNull Function<K, K2> keyMapper, @NonNull Function<K2, V2> getter) {
         return new Mapped<>(this, keyMapper, getter);
     }
     
@@ -77,9 +77,9 @@ public interface MapReader<K, V> extends Iterable<Map.Entry<K, V>> {
         }
     }
 
-    record Mapped<KF, VF, K, V>(@NotNull MapReader<KF, VF> from,
-                                @NotNull Function<KF, K> keyMapper,
-                                @NotNull Function<K, V> getter) implements MapReader<K, V> {
+    record Mapped<KF, VF, K, V>(@NonNull MapReader<KF, VF> from,
+                                @NonNull Function<KF, K> keyMapper,
+                                @NonNull Function<K, V> getter) implements MapReader<K, V> {
         @Override
         public V get(K key) {
             return getter().apply(key);
@@ -108,7 +108,7 @@ public interface MapReader<K, V> extends Iterable<Map.Entry<K, V>> {
         }
 
         @Override
-        public @NotNull Iterator<Map.Entry<K, V>> iterator() {
+        public @NonNull Iterator<Map.Entry<K, V>> iterator() {
             return this.from().entries().stream().map(e -> (Map.Entry<K, V>) new AbstractMap.SimpleEntry<>(
                 keyMapper.apply(e.getKey()), this.get(keyMapper().apply(e.getKey()))
             )).iterator();
@@ -116,14 +116,14 @@ public interface MapReader<K, V> extends Iterable<Map.Entry<K, V>> {
     }
 
     class MapReaderImpl<K, V> implements MapReader<K, V> {
-        @NotNull
+        @NonNull
         private final Map<K, V> map;
 
-        public MapReaderImpl(@NotNull Map<K, V> map) {
+        public MapReaderImpl(@NonNull Map<K, V> map) {
             this.map = map;
         }
 
-        public @NotNull Map<K, V> get() {
+        public @NonNull Map<K, V> get() {
             return map;
         }
 

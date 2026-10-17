@@ -1,7 +1,7 @@
 package cool.muyucloud.croparia.api.recipe.structure;
 
 import net.minecraft.core.Vec3i;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -31,7 +31,7 @@ public class MarkedTransformableChar3D implements Iterable<MarkedChar3D> {
         return transformed[0];
     }
 
-    @NotNull
+    @NonNull
     @Override
     public Iterator<MarkedChar3D> iterator() {
         return Arrays.stream(transformed).iterator();

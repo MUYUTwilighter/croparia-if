@@ -9,7 +9,7 @@ import cool.muyucloud.croparia.api.element.item.ElementalBucket;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -24,7 +24,7 @@ public class ItemDgRegistry implements DgRegistry<ItemDgEntry> {
     }
 
     @Override
-    public @NotNull Iterator<ItemDgEntry> iterator() {
+    public @NonNull Iterator<ItemDgEntry> iterator() {
         return BuiltInRegistries.ITEM
             .keySet()
             .stream()

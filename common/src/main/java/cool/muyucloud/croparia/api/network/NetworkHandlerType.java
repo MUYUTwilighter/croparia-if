@@ -6,64 +6,64 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
 @SuppressWarnings("unused")
 public class NetworkHandlerType<H extends NetworkHandler> {
-    public static <T extends NetworkHandler> NetworkHandlerType<T> ofS2C(@NotNull Identifier id, @NotNull StreamCodec<RegistryFriendlyByteBuf, T> codec) {
+    public static <T extends NetworkHandler> NetworkHandlerType<T> ofS2C(@NonNull Identifier id, @NonNull StreamCodec<RegistryFriendlyByteBuf, T> codec) {
         return new NetworkHandlerType<>(id, NetworkManager.Side.S2C, codec);
     }
 
-    public static <T extends NetworkHandler> NetworkHandlerType<T> ofS2C(@NotNull Identifier id,
-                                                                          @NotNull StreamCodec<RegistryFriendlyByteBuf, T> codec,
-                                                                          @NotNull List<PacketTransformer> packetTransformers) {
+    public static <T extends NetworkHandler> NetworkHandlerType<T> ofS2C(@NonNull Identifier id,
+                                                                          @NonNull StreamCodec<RegistryFriendlyByteBuf, T> codec,
+                                                                          @NonNull List<PacketTransformer> packetTransformers) {
         return new NetworkHandlerType<>(id, NetworkManager.Side.S2C, codec, packetTransformers);
     }
 
-    public static <T extends NetworkHandler> NetworkHandlerType<T> ofC2S(@NotNull Identifier id, @NotNull StreamCodec<RegistryFriendlyByteBuf, T> codec) {
+    public static <T extends NetworkHandler> NetworkHandlerType<T> ofC2S(@NonNull Identifier id, @NonNull StreamCodec<RegistryFriendlyByteBuf, T> codec) {
         return new NetworkHandlerType<>(id, NetworkManager.Side.C2S, codec);
     }
 
-    @NotNull
+    @NonNull
     private final CustomPacketPayload.Type<H> type;
-    @NotNull
+    @NonNull
     private final StreamCodec<RegistryFriendlyByteBuf, H> codec;
-    @NotNull
+    @NonNull
     private final NetworkManager.Side side;
-    @NotNull
+    @NonNull
     private final List<PacketTransformer> packetTransformers;
 
-    public NetworkHandlerType(@NotNull Identifier id, @NotNull NetworkManager.Side side, @NotNull StreamCodec<RegistryFriendlyByteBuf, H> codec) {
+    public NetworkHandlerType(@NonNull Identifier id, @NonNull NetworkManager.Side side, @NonNull StreamCodec<RegistryFriendlyByteBuf, H> codec) {
         this(id, side, codec, List.of());
     }
 
-    public NetworkHandlerType(@NotNull Identifier id, @NotNull NetworkManager.Side side,
-                              @NotNull StreamCodec<RegistryFriendlyByteBuf, H> codec,
-                              @NotNull List<PacketTransformer> packetTransformers) {
+    public NetworkHandlerType(@NonNull Identifier id, @NonNull NetworkManager.Side side,
+                              @NonNull StreamCodec<RegistryFriendlyByteBuf, H> codec,
+                              @NonNull List<PacketTransformer> packetTransformers) {
         this.type = new CustomPacketPayload.Type<>(id);
         this.side = side;
         this.codec = codec;
         this.packetTransformers = List.copyOf(packetTransformers);
     }
 
-    @NotNull
+    @NonNull
     public CustomPacketPayload.Type<H> type() {
         return this.type;
     }
 
-    @NotNull
+    @NonNull
     public NetworkManager.Side side() {
         return side;
     }
 
-    @NotNull
+    @NonNull
     public StreamCodec<RegistryFriendlyByteBuf, H> codec() {
         return codec;
     }
 
-    @NotNull
+    @NonNull
     public List<PacketTransformer> packetTransformers() {
         return packetTransformers;
     }

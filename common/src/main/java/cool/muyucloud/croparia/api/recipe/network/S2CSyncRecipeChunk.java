@@ -19,7 +19,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public record S2CSyncRecipeChunk(UUID syncId, Identifier recipeType, int chunkIn
     }
 
     @Override
-    public @NotNull NetworkHandlerType<?> handlerType() {
+    public @NonNull NetworkHandlerType<?> handlerType() {
         return TYPE;
     }
 

@@ -7,7 +7,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 
@@ -24,14 +24,14 @@ public abstract class DelegateSource<S> implements FailureMessenger, SuccessMess
         }
     }
 
-    @NotNull
+    @NonNull
     private final S source;
 
-    public DelegateSource(@NotNull S source) {
+    public DelegateSource(@NonNull S source) {
         this.source = source;
     }
 
-    public @NotNull S getSource() {
+    public @NonNull S getSource() {
         return source;
     }
 

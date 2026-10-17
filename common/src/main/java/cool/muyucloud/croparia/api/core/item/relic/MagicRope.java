@@ -13,15 +13,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class MagicRope extends Item {
     public MagicRope(Properties properties) {
         super(properties);
     }
 
-    public @NotNull InteractionResult useOn(UseOnContext context) {
+    public @NonNull InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         if (!level.isClientSide() && context.getPlayer() instanceof ServerPlayer player && player.level().getServer() != null) {
             MinecraftServer server = player.level().getServer();

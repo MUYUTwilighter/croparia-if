@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.util;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Vec3i;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +27,7 @@ public record Vec2i(int x, int z)  implements Comparable<Vec2i> {
     }
 
     @Override
-    public int compareTo(@NotNull Vec2i o) {
+    public int compareTo(@NonNull Vec2i o) {
         return this.x != o.x ? Integer.compare(this.x, o.x) : Integer.compare(this.z, o.z);
     }
 

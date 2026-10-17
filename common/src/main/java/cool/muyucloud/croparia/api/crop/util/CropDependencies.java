@@ -7,8 +7,8 @@ import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import dev.architectury.platform.Platform;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -88,7 +88,7 @@ public class CropDependencies implements Iterable<Map.Entry<String, String>> {
         return this.candidates.isEmpty();
     }
 
-    @NotNull
+    @NonNull
     @Override
     public Iterator<Map.Entry<String, String>> iterator() {
         return this.candidates.entrySet().iterator();

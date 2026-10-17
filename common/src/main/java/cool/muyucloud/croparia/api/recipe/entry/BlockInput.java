@@ -33,8 +33,8 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -84,7 +84,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
         }
     }
 
-    protected static BlockInput create(@Nullable Identifier id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties) {
+    protected static BlockInput create(@Nullable Identifier id, @Nullable TagKey<Block> tag, @NonNull BlockProperties properties) {
         BlockInput blockInput = new BlockInput(id, tag, properties);
         if (blockInput.isAny()) return ANY;
         else return blockInput;
@@ -106,19 +106,19 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
         return new BlockInput(null, tag, properties);
     }
 
-    public static BlockInput of(@NotNull Identifier id) {
+    public static BlockInput of(@NonNull Identifier id) {
         return of(id, BlockProperties.EMPTY);
     }
 
-    public static BlockInput of(@NotNull Identifier id, BlockProperties properties) {
+    public static BlockInput of(@NonNull Identifier id, BlockProperties properties) {
         return new BlockInput(id, null, properties);
     }
 
-    public static BlockInput of(@NotNull Block block) {
+    public static BlockInput of(@NonNull Block block) {
         return of(Objects.requireNonNull(block.arch$registryName()));
     }
 
-    public static BlockInput of(@NotNull BlockState state) {
+    public static BlockInput of(@NonNull BlockState state) {
         return new BlockInput(Objects.requireNonNull(state.getBlock().arch$registryName()), null, BlockProperties.extract(state));
     }
 
@@ -126,12 +126,12 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     private final Identifier id;
     @Nullable
     private final TagKey<Block> tag;
-    @NotNull
+    @NonNull
     private final BlockProperties properties;
     private transient OnLoadSupplier<ImmutableList<ItemStack>> displayStacks;
     private boolean virtualRender = false;
 
-    protected BlockInput(@Nullable Identifier id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties) {
+    protected BlockInput(@Nullable Identifier id, @Nullable TagKey<Block> tag, @NonNull BlockProperties properties) {
         this.id = id;
         this.tag = tag;
         if (this.id != null && this.tag != null)
@@ -195,7 +195,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
         return Optional.ofNullable(tag);
     }
 
-    @NotNull
+    @NonNull
     protected BlockProperties getProperties() {
         return properties;
     }
@@ -217,7 +217,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
         return StateHolderAccess.apply(state, this.getProperties());
     }
 
-    @NotNull
+    @NonNull
     public ImmutableList<ItemStack> getDisplayStacks() {
         return displayStacks.get();
     }
@@ -247,13 +247,13 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
         return Objects.equals(stacks.getFirst().getItem(), Items.BEDROCK) && this.isVirtualRender();
     }
 
-    public boolean matches(@NotNull Block block) {
+    public boolean matches(@NonNull Block block) {
         if (this.getId().isPresent()) return Objects.equals(block.arch$registryName(), this.getId().get());
         else if (this.getTag().isPresent()) return TagUtil.isIn(this.getTag().get(), block);
         else return true;
     }
 
-    public boolean matches(@NotNull BlockState state) {
+    public boolean matches(@NonNull BlockState state) {
         return this.matches(state.getBlock()) && this.getProperties().isSubsetOf(state);
     }
 
@@ -269,7 +269,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     }
 
     @Override
-    public @NotNull LootItemConditionType getType() {
+    public @NonNull LootItemConditionType getType() {
         return CONDITION_TYPE;
     }
 

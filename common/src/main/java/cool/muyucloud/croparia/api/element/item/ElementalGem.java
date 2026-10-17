@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,26 +16,26 @@ import java.util.Optional;
 
 public class ElementalGem extends Item implements ElementAccess {
     private static final Map<Element, ElementalGem> ELEMATILIUS_MAP = new HashMap<>();
-    @NotNull
+    @NonNull
     private final Element element;
 
-    public ElementalGem(@NotNull Element element, @NotNull Properties properties) {
+    public ElementalGem(@NonNull Element element, @NonNull Properties properties) {
         super(properties);
         this.element = this.assertEmpty(element);
         ELEMATILIUS_MAP.put(element, this);
     }
 
     @Override
-    public @NotNull Element getElement() {
+    public @NonNull Element getElement() {
         return this.element;
     }
 
-    public static Optional<ElementalGem> getElement(@NotNull Element element) {
+    public static Optional<ElementalGem> getElement(@NonNull Element element) {
         return Optional.ofNullable(ELEMATILIUS_MAP.get(element));
     }
 
     @Override
-    public @NotNull Component getName(ItemStack itemStack) {
+    public @NonNull Component getName(ItemStack itemStack) {
         MutableComponent elemName = Texts.translatable(this.getElement().getTranslationKey());
         return Texts.translatable("item." + CropariaIf.MOD_ID + ".element.gem", elemName);
     }

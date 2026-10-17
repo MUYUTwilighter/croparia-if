@@ -13,8 +13,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -27,81 +27,81 @@ public class FluidSpec implements TypedResource<Fluid>, DataComponentHolder {
     public static final FluidSpec EMPTY = FluidSpec.of(Fluids.EMPTY);
     public static final TypeToken<FluidSpec> TYPE = TypeToken.register(CropariaIf.of("fluid_spec"), EMPTY, CODEC).orElseThrow();
 
-    @NotNull
-    public static FluidSpec of(@NotNull Fluid fluid) {
+    @NonNull
+    public static FluidSpec of(@NonNull Fluid fluid) {
         return new FluidSpec(fluid, DataComponentMap.EMPTY);
     }
 
-    @NotNull
-    public static FluidSpec of(@NotNull Fluid fluid, @Nullable DataComponentMap nbt) {
+    @NonNull
+    public static FluidSpec of(@NonNull Fluid fluid, @Nullable DataComponentMap nbt) {
         return new FluidSpec(fluid, nbt == null ? DataComponentMap.EMPTY : nbt);
     }
 
-    @NotNull
+    @NonNull
     private final Fluid resource;
-    @NotNull
+    @NonNull
     private final PatchedDataComponentMap components;
 
-    public FluidSpec(@NotNull Fluid fluid) {
+    public FluidSpec(@NonNull Fluid fluid) {
         this(fluid, DataComponentPatch.EMPTY);
     }
 
-    public FluidSpec(@NotNull Fluid fluid, @NotNull DataComponentPatch components) {
+    public FluidSpec(@NonNull Fluid fluid, @NonNull DataComponentPatch components) {
         this.resource = fluid;
         this.components = PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, components);
     }
 
-    public FluidSpec(@NotNull Fluid fluid, @NotNull DataComponentMap components) {
+    public FluidSpec(@NonNull Fluid fluid, @NonNull DataComponentMap components) {
         this.resource = fluid;
         this.components = new PatchedDataComponentMap(components);
     }
 
-    @NotNull
+    @NonNull
     public FluidSpec copy() {
         return new FluidSpec(this.getResource(), this.getComponentsPatch());
     }
 
-    @NotNull
-    public FluidSpec with(@NotNull Fluid fluid) {
+    @NonNull
+    public FluidSpec with(@NonNull Fluid fluid) {
         return new FluidSpec(fluid, this.getComponents());
     }
 
-    @NotNull
-    public FluidSpec with(@NotNull DataComponentPatch components) {
+    @NonNull
+    public FluidSpec with(@NonNull DataComponentPatch components) {
         PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
         patched.applyPatch(components);
         return new FluidSpec(this.getResource(), patched);
     }
 
-    @NotNull
-    public FluidSpec with(@NotNull DataComponentMap components) {
+    @NonNull
+    public FluidSpec with(@NonNull DataComponentMap components) {
         PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
         patched.setAll(components);
         return new FluidSpec(this.getResource(), patched);
     }
 
-    @NotNull
-    public FluidSpec with(@NotNull TypedDataComponent<?> component) {
+    @NonNull
+    public FluidSpec with(@NonNull TypedDataComponent<?> component) {
         PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
         component.applyTo(patched);
         return new FluidSpec(this.getResource(), patched);
     }
 
-    @NotNull
-    public <T> FluidSpec with(@NotNull DataComponentType<T> type, @NotNull T value) {
+    @NonNull
+    public <T> FluidSpec with(@NonNull DataComponentType<T> type, @NonNull T value) {
         return this.with(new TypedDataComponent<>(type, value));
     }
 
-    @NotNull
-    public FluidSpec replaceComponents(@NotNull DataComponentMap components) {
+    @NonNull
+    public FluidSpec replaceComponents(@NonNull DataComponentMap components) {
         return new FluidSpec(this.getResource(), components);
     }
 
-    public boolean is(@NotNull FluidSpec spec) {
+    public boolean is(@NonNull FluidSpec spec) {
         return this.getResource() == spec.getResource() && this.getComponents().equals(spec.getComponents());
     }
 
-    public boolean is(@NotNull Identifier tag) {
+    public boolean is(@NonNull Identifier tag) {
         return TagUtil.isIn(Registries.FLUID, tag, this.getResource());
     }
 
@@ -120,18 +120,18 @@ public class FluidSpec implements TypedResource<Fluid>, DataComponentHolder {
     }
 
     @Override
-    @NotNull
+    @NonNull
     public Fluid getResource() {
         return this.resource;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public DataComponentMap getComponents() {
         return this.components;
     }
 
-    @NotNull
+    @NonNull
     public DataComponentPatch getComponentsPatch() {
         return this.components.asPatch();
     }

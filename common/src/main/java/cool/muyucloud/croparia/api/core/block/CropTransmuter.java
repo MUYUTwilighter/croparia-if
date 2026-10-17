@@ -29,8 +29,8 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class CropTransmuter extends BaseEntityBlock {
     public static final MapCodec<CropTransmuter> CODEC = simpleCodec(CropTransmuter::new);
@@ -49,7 +49,7 @@ public class CropTransmuter extends BaseEntityBlock {
     }
 
     @Override
-    protected @NotNull InteractionResult useItemOn(
+    protected @NonNull InteractionResult useItemOn(
         ItemStack itemStack,
         BlockState state,
         Level world,
@@ -100,17 +100,17 @@ public class CropTransmuter extends BaseEntityBlock {
     }
 
     @Override
-    protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
+    protected @NonNull MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
 
     @Override
-    public @NotNull VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public @NonNull VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    public @NotNull VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public @NonNull VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
@@ -125,12 +125,12 @@ public class CropTransmuter extends BaseEntityBlock {
     }
 
     @Override
-    public @NotNull RenderShape getRenderShape(BlockState state) {
+    public @NonNull RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
     @Override
-    public @NotNull Item asItem() {
+    public @NonNull Item asItem() {
         return CropariaItems.CROP_TRANSMUTER.get();
     }
 

@@ -26,8 +26,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -134,7 +134,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         return crop;
     }
 
-    private static @NotNull MutableComponent reportFruit(Identifier fruit) {
+    private static @NonNull MutableComponent reportFruit(Identifier fruit) {
         return Texts.translatable(
             "commands.croparia.crop.query.fruit",
             Texts.literal(fruit.toString(),
@@ -230,7 +230,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
 
     public abstract MutableComponent buildReport(C crop);
 
-    private static @NotNull MutableComponent reportSeed(Identifier seed) {
+    private static @NonNull MutableComponent reportSeed(Identifier seed) {
         return Texts.translatable(
             "commands.croparia.crop.query.seed",
             Texts.literal(seed.toString(),
@@ -240,14 +240,14 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         );
     }
 
-    private static @NotNull MutableComponent reportColor(Color color) {
+    private static @NonNull MutableComponent reportColor(Color color) {
         return Texts.translatable(
             "commands.croparia.crop.query.color",
             Texts.literal(color.toString(), Texts.copyText(color.toString())).withColor(color.getValue())
         );
     }
 
-    private static @NotNull MutableComponent reportTier(int tier) {
+    private static @NonNull MutableComponent reportTier(int tier) {
         return Texts.forStyles(Texts.translatable(
             "commands.croparia.crop.query.tier", Texts.literal(tier + "",
                 Texts.suggestCommand("give @s", CropariaItems.getCroparia(tier).getId().toString()),
@@ -256,7 +256,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         ));
     }
 
-    private static @NotNull <T> MutableComponent reportMaterial(AbstractCrop<T> crop) {
+    private static @NonNull <T> MutableComponent reportMaterial(AbstractCrop<T> crop) {
         Material<T> material = crop.getMaterial();
         MutableComponent name = Texts.literal(material.getName(), Texts.copyText(material.getName()), Texts.inlineMouseBehavior());
         if (material.isEmpty()) {
@@ -269,7 +269,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         }
     }
 
-    private static @NotNull MutableComponent reportTranslation(AbstractCrop<?> crop) {
+    private static @NonNull MutableComponent reportTranslation(AbstractCrop<?> crop) {
         @Nullable
         String key = crop.getTranslationKey();
         MutableComponent keyComp;
@@ -280,11 +280,11 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         return Texts.translatable("commands.croparia.crop.query.translationKey", keyComp);
     }
 
-    private static @NotNull MutableComponent reportName(AbstractCrop<?> crop) {
+    private static @NonNull MutableComponent reportName(AbstractCrop<?> crop) {
         return Texts.translatable("commands.croparia.crop.query.id", crop.getKey().toString());
     }
 
-    public static MutableComponent diagnose(@NotNull AbstractCrop<?> crop) {
+    public static MutableComponent diagnose(@NonNull AbstractCrop<?> crop) {
         if (!crop.shouldLoad()) {
             return Texts.translatable("commands.croparia.crop.query.status.unavailable").withStyle(ChatFormatting.YELLOW);
         }

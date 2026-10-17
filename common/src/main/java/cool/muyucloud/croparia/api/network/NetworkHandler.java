@@ -4,11 +4,11 @@ import cool.muyucloud.croparia.CropariaIf;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public interface NetworkHandler extends CustomPacketPayload {
     @Override
-    default @NotNull Type<? extends CustomPacketPayload> type() {
+    default @NonNull Type<? extends CustomPacketPayload> type() {
         return this.handlerType().type();
     }
 
@@ -34,7 +34,7 @@ public interface NetworkHandler extends CustomPacketPayload {
         }
     }
 
-    @NotNull NetworkHandlerType<?> handlerType();
+    @NonNull NetworkHandlerType<?> handlerType();
 
     void handle(NetworkManager.PacketContext context);
 }

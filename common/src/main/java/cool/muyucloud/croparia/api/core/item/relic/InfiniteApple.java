@@ -5,14 +5,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class InfiniteApple extends Item {
     public InfiniteApple(Properties properties) {
         super(properties);
     }
 
-    public @NotNull ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
+    public @NonNull ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
         if (user instanceof Player player) {
             boolean old = player.getAbilities().instabuild;
             player.getAbilities().instabuild = true;

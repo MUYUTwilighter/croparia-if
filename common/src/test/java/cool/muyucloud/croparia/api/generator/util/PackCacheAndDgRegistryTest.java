@@ -32,8 +32,8 @@ class PackCacheAndDgRegistryTest {
         DgRegistry<DummyEntry> registry = DgRegistry.ofMap(Map.of());
         DgRegistry.register(id, registry);
 
-        var encoded = DgRegistry.CODEC.encodeStart(JsonOps.INSTANCE, registry).getOrThrow();
-        DgRegistry<? extends DgEntry> decoded = DgRegistry.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+        var encoded = DgRegistry.CODEC_BY_NAME.encodeStart(JsonOps.INSTANCE, registry).getOrThrow();
+        DgRegistry<? extends DgEntry> decoded = DgRegistry.CODEC_BY_NAME.parse(JsonOps.INSTANCE, encoded).getOrThrow();
         assertSame(registry, decoded);
     }
 

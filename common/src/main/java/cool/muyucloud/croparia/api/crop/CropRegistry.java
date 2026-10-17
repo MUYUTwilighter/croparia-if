@@ -8,7 +8,7 @@ import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.util.FileUtil;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
         return path;
     }
 
-    public Codec<C> getCodec() {
+    public Codec<C> getCropCodec() {
         return codec;
     }
 
@@ -70,7 +70,7 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
     protected void readCrop(File file) {
         if (!file.getName().endsWith(".json")) return;
         try {
-            CodecUtil.readJson(file, this.getCodec()).ifSuccess(this::register);
+            CodecUtil.readJson(file, this.getCropCodec()).ifSuccess(this::register);
         } catch (IOException | RuntimeException e) {
             CropariaIf.LOGGER.error("Failed to read crop from file \"%s\"".formatted(file), e);
         }
@@ -80,10 +80,10 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
         all.values().forEach(this::dumpCrop);
     }
 
-    public Path dumpCrop(@NotNull C crop) {
+    public Path dumpCrop(@NonNull C crop) {
         Path cropPath = this.getPath().resolve(crop.getKey().toString().replace(":", "/") + ".json");
         StringWriter result = new StringWriter();
-        CodecUtil.encodeJson(crop, this.getCodec()).mapOrElse(json -> {
+        CodecUtil.encodeJson(crop, this.getCropCodec()).mapOrElse(json -> {
             try (JsonWriter writer = new JsonWriter(result)) {
                 writer.setIndent("  ");
                 GSON.toJson(json, writer);
@@ -103,7 +103,7 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
         return all.containsKey(name);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public Iterator<C> iterator() {
         return this.all.values().iterator();

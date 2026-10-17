@@ -25,8 +25,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.Objects;
@@ -78,7 +78,7 @@ public class ItemInput implements SlotDisplay {
     private final Identifier id;
     @Nullable
     private final TagKey<Item> tag;
-    @NotNull
+    @NonNull
     private final DataComponentPatch componentsPatch;
     private final long amount;
     private transient OnLoadSupplier<ImmutableList<ItemStack>> displayStacks;
@@ -89,16 +89,16 @@ public class ItemInput implements SlotDisplay {
             DataComponentPatch.EMPTY, amount);
     }
 
-    public ItemInput(@NotNull Identifier id, int amount) {
+    public ItemInput(@NonNull Identifier id, int amount) {
         this(id, null, DataComponentPatch.EMPTY, amount);
     }
 
-    public ItemInput(@NotNull ItemStack stack) {
+    public ItemInput(@NonNull ItemStack stack) {
         this(stack.getItem().arch$registryName(), null, CifUtil.extractPatch(stack.getComponentsPatch()), stack.getCount());
     }
 
     public ItemInput(@Nullable Identifier id, @Nullable TagKey<Item> tag,
-                     @NotNull DataComponentPatch componentsPatch, long amount) {
+                     @NonNull DataComponentPatch componentsPatch, long amount) {
         this.id = id;
         this.tag = tag;
         if (this.id != null && this.tag != null)
@@ -153,7 +153,7 @@ public class ItemInput implements SlotDisplay {
         return Optional.ofNullable(tag);
     }
 
-    @NotNull
+    @NonNull
     public DataComponentPatch getComponentsPatch() {
         return this.componentsPatch;
     }
@@ -207,7 +207,7 @@ public class ItemInput implements SlotDisplay {
         return false;
     }
 
-    public boolean matches(@NotNull Item item) {
+    public boolean matches(@NonNull Item item) {
         if (this.getId().isPresent()) {
             return this.getId().get().equals(item.arch$registryName());
         } else if (this.getTag().isPresent()) {
@@ -216,7 +216,7 @@ public class ItemInput implements SlotDisplay {
         return true;
     }
 
-    public boolean matches(@NotNull DataComponentMap components) {
+    public boolean matches(@NonNull DataComponentMap components) {
         return this.getComponentsPatch().equals(DataComponentPatch.EMPTY) || components.equals(this.getComponentsPatch().split().added());
     }
 
@@ -226,14 +226,14 @@ public class ItemInput implements SlotDisplay {
      * @param item The item to match
      * @return {@code true} if the specified and components item matches
      */
-    public boolean matches(@NotNull ItemSpec item) {
+    public boolean matches(@NonNull ItemSpec item) {
         return this.matches(item.getResource()) && this.matches(item.getComponents());
     }
 
     /**
      * Whether the specified item stack matches the input, considering the type of the item, components and amount
      */
-    public boolean matches(@NotNull ItemStack stack) {
+    public boolean matches(@NonNull ItemStack stack) {
         return this.matchType(stack) && this.getAmount() <= stack.getCount();
     }
 
@@ -241,11 +241,11 @@ public class ItemInput implements SlotDisplay {
      * Whether the specified item stack matches the input, considering the type of the item, components
      *
      */
-    public boolean matchType(@NotNull ItemStack stack) {
+    public boolean matchType(@NonNull ItemStack stack) {
         return this.matches(stack.getItem()) && this.matches(stack.getComponents());
     }
 
-    public boolean matches(@NotNull ItemSpec item, long amount) {
+    public boolean matches(@NonNull ItemSpec item, long amount) {
         return this.matches(item) && this.getAmount() <= amount;
     }
 

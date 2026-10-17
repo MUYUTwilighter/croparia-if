@@ -14,7 +14,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -26,7 +25,7 @@ public class CropFruit extends Item implements AbstractFruit<Crop> {
         this.crop = crop;
     }
 
-    public @NotNull InteractionResult useOn(@NotNull UseOnContext context) {
+    public @NonNull InteractionResult useOn(@NonNull UseOnContext context) {
         if (!CropariaIf.CONFIG.getFruitUse()) {
             return InteractionResult.PASS;
         }
@@ -46,7 +45,7 @@ public class CropFruit extends Item implements AbstractFruit<Crop> {
     }
 
     @Override
-    public @NotNull Component getName(@NonNull ItemStack itemStack) {
+    public @NonNull Component getName(@NonNull ItemStack itemStack) {
         MutableComponent cropName = Texts.translatable(this.getCrop().getTranslationKey());
         return Texts.translatable("item." + CropariaIf.MOD_ID + ".crop.fruit", cropName);
     }

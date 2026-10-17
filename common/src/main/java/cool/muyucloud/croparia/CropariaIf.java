@@ -84,10 +84,10 @@ public class CropariaIf {
         LifecycleEvent.SERVER_STOPPING.register(server -> {
             SERVER_STARTED = false;
             ConfigFileHandler.save(CONFIG);
+            PackHandler.forEach(pack -> pack.onServerStopping(server));
         });
         LifecycleEvent.SERVER_STOPPED.register(server -> {
             SERVER = null;
-            PackHandler.forEach(pack -> pack.onServerStopping(server));
         });
         CropariaIf.LOGGER.info("=== Croparia common setup done ===");
     }

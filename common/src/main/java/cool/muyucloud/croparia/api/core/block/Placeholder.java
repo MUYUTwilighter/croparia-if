@@ -3,7 +3,7 @@ package cool.muyucloud.croparia.api.core.block;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class Placeholder extends Block {
     public Placeholder(Properties properties) {
@@ -11,7 +11,7 @@ public class Placeholder extends Block {
     }
 
     @Override
-    public @NotNull Item asItem() {
+    public @NonNull Item asItem() {
         return CropariaItems.PLACEHOLDER_BLOCK.get();
     }
 }

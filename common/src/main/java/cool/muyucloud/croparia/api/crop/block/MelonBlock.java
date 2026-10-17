@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class MelonBlock extends Block implements CropAccess<Melon> {
     private final Melon melon;
@@ -27,13 +27,13 @@ public class MelonBlock extends Block implements CropAccess<Melon> {
     }
 
     @Override
-    public @NotNull MutableComponent getName() {
+    public @NonNull MutableComponent getName() {
         MutableComponent cropName = Texts.translatable(this.getCrop().getTranslationKey());
         return Texts.translatable("block." + CropariaIf.MOD_ID + ".melon.block", cropName);
     }
 
     @Override
-    public @NotNull Item asItem() {
+    public @NonNull Item asItem() {
         return this.getCrop().getMelonItem().get();
     }
 }

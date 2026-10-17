@@ -1,6 +1,6 @@
 package cool.muyucloud.croparia.api.crop;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface CropAccess<C extends AbstractCrop<?>> {
     C getCrop();

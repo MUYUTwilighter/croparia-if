@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.api.placeholder;
 
 import com.google.gson.JsonElement;
 import cool.muyucloud.croparia.api.json.JsonBuilder;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -29,9 +29,9 @@ public interface RegexParser<T> {
      * @return The processed JsonElement, or Optional.empty() if the placeholder is not recognized.
      * @throws PlaceholderException If any error occurs during processing.
      */
-    Optional<JsonElement> parse(T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws PlaceholderException;
+    Optional<JsonElement> parse(T entry, @NonNull String placeholder, @NonNull Matcher matcher) throws PlaceholderException;
 
-    static String forward(@NotNull String placeholder) {
+    static String forward(@NonNull String placeholder) {
         int i = placeholder.indexOf('.');
         if (i == -1) {
             return "";
@@ -40,7 +40,7 @@ public interface RegexParser<T> {
         }
     }
 
-    static String next(@NotNull String placeholder) {
+    static String next(@NonNull String placeholder) {
         int i = placeholder.indexOf('.');
         if (i == -1) {
             return placeholder;
@@ -50,7 +50,7 @@ public interface RegexParser<T> {
     }
 
     interface Direct<T> {
-        Object process(@NotNull T entry) throws PlaceholderException;
+        Object process(@NonNull T entry) throws PlaceholderException;
 
         default RegexParser<T> asNode() {
             return (entry, placeholder, matcher) -> Optional.ofNullable(JsonBuilder.parse(this.process(entry)));
@@ -58,7 +58,7 @@ public interface RegexParser<T> {
     }
 
     interface Pass<T> {
-        Object process(@NotNull T entry, @NotNull String placeholder) throws PlaceholderException;
+        Object process(@NonNull T entry, @NonNull String placeholder) throws PlaceholderException;
 
         default RegexParser<T> asNode() {
             return (entry, placeholder, matcher) -> Optional.ofNullable(JsonBuilder.parse(this.process(entry, placeholder)));

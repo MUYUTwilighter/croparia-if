@@ -6,7 +6,7 @@ import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.TypedResource;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -44,7 +44,7 @@ public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<
     private final TypeToken<T> type;
 
     @SafeVarargs
-    public RepoBatch(@NotNull TypeToken<T> type, @NotNull RepoUnit<T>... units) {
+    public RepoBatch(@NonNull TypeToken<T> type, @NonNull RepoUnit<T>... units) {
         this.units.addAll(List.of(units));
         this.units.trimToSize();
         this.type = type;
@@ -55,7 +55,7 @@ public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<
         return type;
     }
 
-    public void load(@NotNull JsonArray json) {
+    public void load(@NonNull JsonArray json) {
         if (json.size() != units.size()) {
             Repo.LOGGER.error("Tried to load a RepoBatch with a JSON array of size {} but the batch size is {}", json.size(), units.size());
             return;
@@ -66,7 +66,7 @@ public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<
         }
     }
 
-    public void load(@NotNull ListTag nbt) {
+    public void load(@NonNull ListTag nbt) {
         if (nbt.size() != units.size()) {
             Repo.LOGGER.error("Tried to load a RepoBatch with a NBT array of size {} but the batch size is {}", nbt.size(), units.size());
             return;
@@ -77,7 +77,7 @@ public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<
         }
     }
 
-    public void save(@NotNull JsonArray json) {
+    public void save(@NonNull JsonArray json) {
         while (!json.isEmpty()) json.remove(0);
         for (RepoUnit<T> tRepoUnit : units) {
             JsonObject unit = new JsonObject();
@@ -86,7 +86,7 @@ public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<
         }
     }
 
-    public void save(@NotNull ListTag nbt) {
+    public void save(@NonNull ListTag nbt) {
         nbt.clear();
         for (RepoUnit<T> tRepoUnit : units) {
             CompoundTag unit = new CompoundTag();
@@ -173,7 +173,7 @@ public class RepoBatch<T extends TypedResource<?>> implements Repo<T>, Iterable<
         return units.get(i).amountFor(0, resource);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public Iterator<RepoUnit<T>> iterator() {
         return units.iterator();

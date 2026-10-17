@@ -16,8 +16,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 
 import java.util.Collections;
@@ -143,7 +143,7 @@ public class Placeholder<T> implements RegexParser<T> {
      * If no matching sub-node is found, it throws a PlaceholderException.
      */
     @Override
-    public Optional<JsonElement> parse(@NotNull T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws PlaceholderException {
+    public Optional<JsonElement> parse(@NonNull T entry, @NonNull String placeholder, @NonNull Matcher matcher) throws PlaceholderException {
         String forwarded = RegexParser.forward(placeholder);
         String next = RegexParser.next(placeholder);
         for (Map.Entry<PatternKey, RegexParser<T>> subEntry : subNodes.entrySet()) {
@@ -187,7 +187,7 @@ public class Placeholder<T> implements RegexParser<T> {
         }
 
         @Override
-        public Optional<JsonElement> parse(@NotNull T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws PlaceholderException {
+        public Optional<JsonElement> parse(@NonNull T entry, @NonNull String placeholder, @NonNull Matcher matcher) throws PlaceholderException {
             return this.delegate().parse(entry, placeholder, matcher);
         }
 

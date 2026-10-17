@@ -8,8 +8,8 @@ import cool.muyucloud.croparia.api.crop.util.CropDependencies;
 import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
 import cool.muyucloud.croparia.registry.DgRegistries;
 import net.minecraft.resources.Identifier;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Map;
 
@@ -27,7 +27,7 @@ public class CropUtil {
      * @param translations    custom translations
      */
     public static void crop(
-        @NotNull String rawId, @NotNull String material, int color, int tier, @Nullable String type,
+        @NonNull String rawId, @NonNull String material, int color, int tier, @Nullable String type,
         @Nullable Map<String, String> rawDependencies, @Nullable Map<String, String> translations
     ) {
         type = type == null ? Crop.DEFAULT_TYPE : type;
@@ -48,7 +48,7 @@ public class CropUtil {
      * @param translations    custom translations
      */
     public static void melon(
-        @NotNull String rawId, @NotNull String material, int color, int tier,
+        @NonNull String rawId, @NonNull String material, int color, int tier,
         @Nullable Map<String, String> rawDependencies, @Nullable Map<String, String> translations
     ) {
         Identifier id = Identifier.parse(rawId);

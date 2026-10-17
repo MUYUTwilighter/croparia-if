@@ -13,7 +13,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ public class FakePlayer extends Player {
     private static final Map<ServerLevel, FakePlayer> FAKE_PLAYERS = new HashMap<>();
     private static final int MAX_USES = 64;
 
-    public static ArrayList<ItemStack> useAllItemsOn(@NotNull ServerLevel world, @NotNull BlockPos pos, @NotNull ItemStack item) {
+    public static ArrayList<ItemStack> useAllItemsOn(@NonNull ServerLevel world, @NonNull BlockPos pos, @NonNull ItemStack item) {
         int uses = MAX_USES;
         ArrayList<ItemStack> remainders = new ArrayList<>();
         while (!item.isEmpty() && uses > 0) {
@@ -43,28 +43,28 @@ public class FakePlayer extends Player {
         return remainders;
     }
 
-    public static FakePlayer getPlayer(@NotNull ServerLevel world) {
+    public static FakePlayer getPlayer(@NonNull ServerLevel world) {
         FakePlayer fakePlayer = FAKE_PLAYERS.getOrDefault(world, new FakePlayer(world));
         FAKE_PLAYERS.put(world, fakePlayer);
         return fakePlayer;
     }
 
-    public static InteractionResult useItemOn(@NotNull ServerLevel world, @NotNull BlockPos pos, @NotNull ItemStack item) {
+    public static InteractionResult useItemOn(@NonNull ServerLevel world, @NonNull BlockPos pos, @NonNull ItemStack item) {
         return getPlayer(world).useItemOn(pos, item);
     }
 
-    public static ItemStack finishUseItem(@NotNull ItemStack item, @NotNull ServerLevel world) {
+    public static ItemStack finishUseItem(@NonNull ItemStack item, @NonNull ServerLevel world) {
         FakePlayer fakePlayer = getPlayer(world);
         return item.finishUsingItem(world, fakePlayer);
     }
 
-    public FakePlayer(@NotNull Level level) {
+    public FakePlayer(@NonNull Level level) {
         super(level, new GameProfile(UUID.randomUUID(), "FakePlayer"));
         this.snapTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), 90.0F);
         CropariaIf.LOGGER.debug("Created fake player for {}", level.dimension().identifier());
     }
 
-    public InteractionResult useItemOn(@NotNull BlockPos pos, @NotNull ItemStack item) {
+    public InteractionResult useItemOn(@NonNull BlockPos pos, @NonNull ItemStack item) {
         this.teleportTo(pos.getX(), pos.getY() + 1, pos.getZ());
         BlockHitResult hit = new BlockHitResult(pos.getCenter(), Direction.UP, pos, false);
         this.setItemInHand(InteractionHand.MAIN_HAND, item);
@@ -83,7 +83,7 @@ public class FakePlayer extends Player {
     }
 
     @Override
-    public @NotNull GameType gameMode() {
+    public @NonNull GameType gameMode() {
         return GameType.SURVIVAL;
     }
 }

@@ -1,6 +1,6 @@
 package cool.muyucloud.croparia.api.placeholder;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -29,7 +29,7 @@ public record PatternKey(Pattern pattern) {
     }
 
     @Override
-    public @NotNull String toString() {
+    public @NonNull String toString() {
         return pattern.toString();
     }
 

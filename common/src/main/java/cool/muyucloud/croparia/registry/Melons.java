@@ -7,7 +7,7 @@ import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
@@ -21,8 +21,8 @@ public class Melons {
      * @param color    int value of color
      * @param tier     tier
      */
-    public static @NotNull Melon vanilla(
-        @NotNull String name, Block material, int color, int tier
+    public static @NonNull Melon vanilla(
+        @NonNull String name, Block material, int color, int tier
     ) {
         Melon melon = new Melon(
             CropariaIf.of(name), new BlockMaterial(Objects.requireNonNull(material.arch$registryName()).toString(), CropariaIf.CONFIG.getMelonYield()),

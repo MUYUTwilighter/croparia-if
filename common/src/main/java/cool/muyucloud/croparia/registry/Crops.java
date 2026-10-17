@@ -13,7 +13,7 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 import java.util.Objects;
@@ -39,9 +39,9 @@ public class Crops {
      * @param type           crop type that specifies the textures. See also {@link Crop#PRESET_TYPES}
      * @param translationKey translation key for the crop, used for formatting item & block names.
      */
-    protected static @NotNull Crop croparia(
-        @NotNull String name, @NotNull RegistrySupplier<? extends Item> material, int color, int tier, @NotNull String type,
-        @NotNull String translationKey
+    protected static @NonNull Crop croparia(
+        @NonNull String name, @NonNull RegistrySupplier<? extends Item> material, int color, int tier, @NonNull String type,
+        @NonNull String translationKey
     ) {
         Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material.getId().toString(), DataComponentPatch.EMPTY, CropariaIf.CONFIG.getCropYield()), new Color(color), tier, type, null, new CropDependencies("croparia", translationKey));
         DgRegistries.CROPS.register(crop);
@@ -63,8 +63,8 @@ public class Crops {
      * @param tier     tier
      * @param type     crop type that specifies the textures. See also {@link Crop}
      */
-    public static @NotNull Crop vanilla(
-        @NotNull String name, Item material, int color, int tier, @NotNull String type
+    public static @NonNull Crop vanilla(
+        @NonNull String name, Item material, int color, int tier, @NonNull String type
     ) {
         Crop crop = new Crop(
             CropariaIf.of(name), new ItemMaterial(Objects.requireNonNull(material.arch$registryName()).toString(), DataComponentPatch.EMPTY, CropariaIf.CONFIG.getCropYield()),
@@ -200,8 +200,8 @@ public class Crops {
      *                        The translation key for the first available mod dependency will be used.
      * @return the intermediate data entity of the crop
      */
-    public static @NotNull Crop compat(
-        String name, String material, int color, int tier, String type, @NotNull Map<String, String> translationKeys
+    public static @NonNull Crop compat(
+        String name, String material, int color, int tier, String type, @NonNull Map<String, String> translationKeys
     ) {
         Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material, DataComponentPatch.EMPTY, CropariaIf.CONFIG.getCropYield()), new Color(color), tier, type, null, new CropDependencies(translationKeys));
         DgRegistries.CROPS.register(crop);

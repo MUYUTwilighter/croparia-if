@@ -6,7 +6,7 @@ import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class JeiInfusorRecipe extends JeiCategory<InfusorRecipe> {
     public static final JeiInfusorRecipe INSTANCE = new JeiInfusorRecipe();
@@ -17,7 +17,7 @@ public class JeiInfusorRecipe extends JeiCategory<InfusorRecipe> {
     }
 
     @Override
-    public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull InfusorRecipe recipe, @NotNull IFocusGroup focuses) {
+    public void setRecipe(@NonNull IRecipeLayoutBuilder builder, @NonNull InfusorRecipe recipe, @NonNull IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 40).addItemStacks(recipe.craftingStation().getDisplayStacks());
         builder.addInputSlot(72, 8).addItemStacks(recipe.getIngredient().getDisplayStacks());
         builder.addInputSlot(40, 40).add(recipe.getPotion());
@@ -25,7 +25,7 @@ public class JeiInfusorRecipe extends JeiCategory<InfusorRecipe> {
     }
 
     @Override
-    public void createRecipeExtras(@NotNull IRecipeExtrasBuilder builder, @NotNull InfusorRecipe recipe, @NotNull IFocusGroup focuses) {
+    public void createRecipeExtras(@NonNull IRecipeExtrasBuilder builder, @NonNull InfusorRecipe recipe, @NonNull IFocusGroup focuses) {
         builder.addDrawable(ITEM_DROP, 72, 24);
         builder.addDrawable(BLOCK_PLACE, 56, 40);
         builder.addRecipeArrow().setPosition(88, 40);

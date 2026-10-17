@@ -15,8 +15,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unused")
-public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeType<R>, RecipeSerializer<R> {
+public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeType<R> {
     public static final Codec<TypedSerializer<?>> CODEC = Identifier.CODEC.xmap(Recipes::find, TypedSerializer::getId);
     public static final Predicate<RecipeHolder<?>> REI = holder -> Platform.isModLoaded("roughlyenoughitems");
     public static final Predicate<RecipeHolder<?>> JEI = holder -> Platform.isModLoaded("jei");
@@ -36,10 +36,12 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
     private final Identifier id;
     private final List<Mappable<ItemStack>> stations;
     private final Class<? extends R> recipeClass;
-    private final MapCodec<R> codec;
-    private final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec;
+    private final RecipeSerializer<R> serializer;
     private final Predicate<RecipeHolder<?>> syncFilter;
 
+    /**
+     *
+     */
     @SafeVarargs
     public TypedSerializer(Identifier id, Class<? extends R> recipeClass, final MapCodec<R> codec,
                            Mappable<ItemStack>... stations) {
@@ -64,12 +66,26 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
                            final StreamCodec<RegistryFriendlyByteBuf, R> streamCodec,
                            final Predicate<RecipeHolder<?>> syncFilter,
                            Mappable<ItemStack>... stations) {
+        this(id, recipeClass, new RecipeSerializer<>(codec, streamCodec), syncFilter, stations);
+    }
+
+    /**
+     * Create a TypedSerializer with full direct arguments.
+     *
+     * @param id          Identifier of the recipe type
+     * @param recipeClass Class object of the recipe
+     * @param serializer  Serializer of the recipe holding the {@link Codec} & {@link StreamCodec}
+     * @param syncFilter  A predicate that determines which recipes will be synced to client
+     * @param stations    Stations where the recipe would work on
+     */
+    public TypedSerializer(Identifier id, Class<? extends R> recipeClass, final RecipeSerializer<R> serializer,
+                           final Predicate<RecipeHolder<?>> syncFilter,
+                           Mappable<ItemStack>... stations) {
         this.id = id;
         this.stations = new ArrayList<>();
         this.stations.addAll(Arrays.asList(stations));
         this.recipeClass = recipeClass;
-        this.codec = codec;
-        this.streamCodec = streamCodec;
+        this.serializer = serializer;
         this.syncFilter = syncFilter;
     }
 
@@ -138,16 +154,18 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> implements RecipeTy
         return holder.value().getTypedSerializer() == this && this.syncFilter.test(holder);
     }
 
-    @Override
-    public @NotNull MapCodec<R> codec() {
-        return codec;
+    public @NonNull RecipeSerializer<R> getSerializer() {
+        return this.serializer;
     }
 
-    @Override
-    @NotNull
+    public @NonNull MapCodec<R> codec() {
+        return this.getSerializer().codec();
+    }
+
+    @NonNull
     @SuppressWarnings("deprecation")
     public StreamCodec<RegistryFriendlyByteBuf, R> streamCodec() {
-        return streamCodec;
+        return this.getSerializer().streamCodec();
     }
 
     public Identifier getId() {

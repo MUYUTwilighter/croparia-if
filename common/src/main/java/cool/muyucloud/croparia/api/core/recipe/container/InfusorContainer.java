@@ -3,32 +3,32 @@ package cool.muyucloud.croparia.api.core.recipe.container;
 import cool.muyucloud.croparia.api.element.Element;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class InfusorContainer implements RecipeInput, Iterable<ItemStack> {
-    @NotNull
+    @NonNull
     private final Element element;
-    @NotNull
+    @NonNull
     private final List<ItemStack> items;
 
     public static InfusorContainer of(Element element, List<ItemStack> items) {
         return new InfusorContainer(element, items);
     }
 
-    public InfusorContainer(@NotNull Element element, @NotNull List<ItemStack> items) {
+    public InfusorContainer(@NonNull Element element, @NonNull List<ItemStack> items) {
         this.element = element;
         this.items = items;
     }
 
-    public @NotNull Element getElement() {
+    public @NonNull Element getElement() {
         return element;
     }
 
     @Override
-    public @NotNull ItemStack getItem(int i) {
+    public @NonNull ItemStack getItem(int i) {
         return i >= this.size() ? ItemStack.EMPTY : this.items.get(i);
     }
 
@@ -43,7 +43,7 @@ public class InfusorContainer implements RecipeInput, Iterable<ItemStack> {
     }
 
     @Override
-    public @NotNull Iterator<ItemStack> iterator() {
+    public @NonNull Iterator<ItemStack> iterator() {
         return this.items.iterator();
     }
 }

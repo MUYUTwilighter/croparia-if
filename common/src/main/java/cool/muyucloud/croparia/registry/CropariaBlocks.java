@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.DropExperienceBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -77,7 +77,7 @@ public class CropariaBlocks {
     );
 
     public static <T extends Block> RegistrySupplier<T> registerBlock(
-        @NotNull String name, @NotNull Function<BlockBehaviour.Properties, T> supplier
+        @NonNull String name, @NonNull Function<BlockBehaviour.Properties, T> supplier
     ) {
         return BLOCKS.register(name, () -> supplier.apply(
             BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, CropariaIf.of(name)))
@@ -85,7 +85,7 @@ public class CropariaBlocks {
     }
 
     public static <T extends Block> RegistrySupplier<T> registerBlock(
-        @NotNull Identifier id, @NotNull Function<BlockBehaviour.Properties, T> supplier
+        @NonNull Identifier id, @NonNull Function<BlockBehaviour.Properties, T> supplier
     ) {
         return BLOCKS.register(id, () -> supplier.apply(
             BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, id))

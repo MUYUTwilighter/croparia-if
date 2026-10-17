@@ -4,14 +4,14 @@ import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Iterator;
 import java.util.List;
 
-public record RitualContainer(BlockState ritual, @NotNull List<ItemStack> stacks,
-                              @NotNull RitualStructure.Result matched) implements RecipeInput, Iterable<ItemStack> {
-    public static RitualContainer of(BlockState ritual, @NotNull List<ItemStack> items, @NotNull RitualStructure.Result matched) {
+public record RitualContainer(BlockState ritual, @NonNull List<ItemStack> stacks,
+                              @NonNull RitualStructure.Result matched) implements RecipeInput, Iterable<ItemStack> {
+    public static RitualContainer of(BlockState ritual, @NonNull List<ItemStack> items, @NonNull RitualStructure.Result matched) {
         return new RitualContainer(ritual, items, matched);
     }
 
@@ -21,7 +21,7 @@ public record RitualContainer(BlockState ritual, @NotNull List<ItemStack> stacks
     }
 
     @Override
-    public @NotNull ItemStack getItem(int i) {
+    public @NonNull ItemStack getItem(int i) {
         return i < stacks.size() ? stacks.get(i) : ItemStack.EMPTY;
     }
 
@@ -31,7 +31,7 @@ public record RitualContainer(BlockState ritual, @NotNull List<ItemStack> stacks
     }
 
     @Override
-    public @NotNull Iterator<ItemStack> iterator() {
+    public @NonNull Iterator<ItemStack> iterator() {
         return this.stacks.iterator();
     }
 }

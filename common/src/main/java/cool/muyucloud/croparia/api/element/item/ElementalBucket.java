@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Supplier;
 
@@ -22,12 +22,12 @@ public class ElementalBucket extends ArchitecturyBucketItem implements ElementAc
     }
 
     @Override
-    public @NotNull Element getElement() {
+    public @NonNull Element getElement() {
         return element;
     }
 
     @Override
-    public @NotNull Component getName(ItemStack itemStack) {
+    public @NonNull Component getName(ItemStack itemStack) {
         MutableComponent elemName = Texts.translatable(this.getElement().getTranslationKey());
         return Texts.translatable("item." + CropariaIf.MOD_ID + ".element.bucket", elemName);
     }

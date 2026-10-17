@@ -4,7 +4,7 @@ import cool.muyucloud.croparia.api.element.Element;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class SoakContainer implements RecipeInput {
     private final BlockState state;
@@ -30,7 +30,7 @@ public class SoakContainer implements RecipeInput {
     }
 
     @Override
-    public @NotNull ItemStack getItem(int i) {
+    public @NonNull ItemStack getItem(int i) {
         return ItemStack.EMPTY;
     }
 

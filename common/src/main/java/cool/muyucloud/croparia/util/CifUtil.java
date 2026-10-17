@@ -19,8 +19,8 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -61,7 +61,7 @@ public class CifUtil {
      * @param player The player whose line of sight is being checked.
      * @return The block position that the player is looking at.
      */
-    public static BlockPos lookingAt(@NotNull Player player) {
+    public static BlockPos lookingAt(@NonNull Player player) {
         Level world = player.level();
         ClipContext context = new ClipContext(player.getEyePosition(), player.getEyePosition().add(player.getLookAngle().multiply(5, 5, 5)), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player);
         BlockHitResult result = world.clip(context);

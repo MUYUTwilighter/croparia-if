@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Supplier;
 
@@ -129,6 +129,6 @@ public class TestedCodec<T> implements Codec<T> {
         }
     }
 
-    public record TestResult(boolean success, @NotNull Supplier<String> msg) {
+    public record TestResult(boolean success, @NonNull Supplier<String> msg) {
     }
 }

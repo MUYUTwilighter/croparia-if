@@ -16,7 +16,7 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +40,7 @@ public class ItemMaterial extends Material<Item> {
         .then(PatternKey.literal("components"), TypeMapper.of(ItemMaterial::getComponents), Placeholder.DATA_COMPONENTS)
         .concat(Material.PLACEHOLDER, TypeMapper.of(material -> material)));
 
-    @NotNull
+    @NonNull
     private final DataComponentPatch components;
     private transient final OnLoadSupplier<List<Item>> items = OnLoadSupplier.of(
         () -> this.rawCandidates(BuiltInRegistries.ITEM.key().identifier()).stream().filter(
@@ -60,31 +60,31 @@ public class ItemMaterial extends Material<Item> {
         this(String.valueOf(stack.getItem().arch$registryName()), stack.getComponentsPatch(), stack.getCount());
     }
 
-    public ItemMaterial(@NotNull String name) {
+    public ItemMaterial(@NonNull String name) {
         this(name, DataComponentPatch.EMPTY, 2);
     }
 
-    public ItemMaterial(@NotNull String name, @NotNull DataComponentPatch components, int count) {
+    public ItemMaterial(@NonNull String name, @NonNull DataComponentPatch components, int count) {
         super(name, count);
         this.components = components;
     }
 
-    public @NotNull DataComponentPatch getComponents() {
+    public @NonNull DataComponentPatch getComponents() {
         return components;
     }
 
     @Override
-    public @NotNull List<ItemStack> asItems() {
+    public @NonNull List<ItemStack> asItems() {
         return this.stacks.get();
     }
 
     @Override
-    public @NotNull ItemStack asItem() {
+    public @NonNull ItemStack asItem() {
         return this.asItems().isEmpty() ? ItemStack.EMPTY : this.asItems().getFirst();
     }
 
     @Override
-    public @NotNull List<Item> candidates() {
+    public @NonNull List<Item> candidates() {
         return this.items.get();
     }
 }

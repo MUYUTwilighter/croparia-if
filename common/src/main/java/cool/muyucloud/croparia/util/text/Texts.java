@@ -11,7 +11,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.net.URI;
 
@@ -49,22 +49,22 @@ public class Texts {
         return Component.translatable(key, args);
     }
 
-    public static MutableComponent forStyles(@NotNull MutableComponent component, Style... styles) {
+    public static MutableComponent forStyles(@NonNull MutableComponent component, Style... styles) {
         for (Style style : styles) {
             component.withStyle(style);
         }
         return component;
     }
 
-    public static void chat(@NotNull Player player, Component message) {
+    public static void chat(@NonNull Player player, Component message) {
         player.displayClientMessage(message, false);
     }
 
-    public static void chat(@NotNull CommandSourceStack source, Component msg) {
+    public static void chat(@NonNull CommandSourceStack source, Component msg) {
         source.sendSystemMessage(msg);
     }
 
-    public static void overlay(@NotNull Player player, Component message) {
+    public static void overlay(@NonNull Player player, Component message) {
         player.displayClientMessage(message, true);
     }
 

@@ -16,11 +16,10 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -75,17 +74,17 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
     }
 
     @Override
-    public @NotNull List<List<ItemStack>> getInputs() {
+    public @NonNull List<List<ItemStack>> getInputs() {
         return List.of(this.getInput().getDisplayStacks(), List.of(this.getPotion()));
     }
 
     @Override
-    public @NotNull List<List<ItemStack>> getOutputs() {
+    public @NonNull List<List<ItemStack>> getOutputs() {
         return List.of(this.getOutput().getDisplayStacks());
     }
 
     @Override
-    public boolean matches(SoakContainer input, Level level) {
+    public boolean matches(SoakContainer input, @NonNull Level level) {
         return this.getInput().matches(input.getState()) && this.getElement() == input.getElement() && input.getRandom() < this.getProbability();
     }
 
@@ -96,12 +95,12 @@ public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
 
     @Override
     @Deprecated
-    public @NotNull ItemStack assemble(SoakContainer recipeInput, HolderLookup.Provider provider) {
+    public @NonNull ItemStack assemble(@NonNull SoakContainer recipeInput) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public @NotNull SlotDisplay craftingStation() {
+    public @NonNull SlotDisplay craftingStation() {
         return ItemOutput.of(CropariaItems.ELEMENTAL_STONE.get().getDefaultInstance());
     }
 

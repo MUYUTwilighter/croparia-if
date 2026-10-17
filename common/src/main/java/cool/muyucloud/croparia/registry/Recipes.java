@@ -1,13 +1,11 @@
 package cool.muyucloud.croparia.registry;
 
 import cool.muyucloud.croparia.CropariaIf;
-import cool.muyucloud.croparia.api.core.recipe.InfusorRecipe;
-import cool.muyucloud.croparia.api.core.recipe.RitualRecipe;
-import cool.muyucloud.croparia.api.core.recipe.RitualStructure;
-import cool.muyucloud.croparia.api.core.recipe.SoakRecipe;
+import cool.muyucloud.croparia.api.core.recipe.*;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import dev.architectury.registry.registries.DeferredRegister;
+import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -30,10 +28,12 @@ public class Recipes {
     @SuppressWarnings("unused")
     public static final TypedSerializer<SoakRecipe> SOAK = register(SoakRecipe.TYPED_SERIALIZER);
 
+    public static final RegistrySupplier<RecipeSerializer<?>> CROP_MATERIAL = RECIPE_SERIALIZERS.register(CropariaIf.of("crop_material"), () -> CropMaterialRecipe.SERIALIZER);
+
     public static <R extends DisplayableRecipe<?>> TypedSerializer<R> register(TypedSerializer<R> typedSerializer) {
         TYPES.put(typedSerializer.getId(), typedSerializer);
         RECIPE_TYPES.register(typedSerializer.getId(), () -> typedSerializer);
-        RECIPE_SERIALIZERS.register(typedSerializer.getId(), () -> typedSerializer);
+        RECIPE_SERIALIZERS.register(typedSerializer.getId(), typedSerializer::getSerializer);
         return typedSerializer;
     }
 

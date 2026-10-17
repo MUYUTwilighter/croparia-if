@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.util.Vec2i;
 import net.minecraft.core.Vec3i;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -105,7 +105,7 @@ public class Char3D extends AbstractChar3D<Char3D> implements Iterable<Char2D> {
     }
 
     @Override
-    public @NotNull Optional<Vec3i> find(char c) {
+    public @NonNull Optional<Vec3i> find(char c) {
         if (this.contains(c)) {
             for (int y = 0; y < ySize(); y++) {
                 Optional<Vec2i> result = pattern.get(y).find(c);
@@ -124,7 +124,7 @@ public class Char3D extends AbstractChar3D<Char3D> implements Iterable<Char2D> {
     }
 
     @Override
-    public @NotNull Iterator<Char2D> iterator() {
+    public @NonNull Iterator<Char2D> iterator() {
         return this.pattern.iterator();
     }
 

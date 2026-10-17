@@ -11,7 +11,7 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
@@ -22,7 +22,7 @@ public class HornPlenty extends Item {
         super(properties);
     }
 
-    public @NotNull InteractionResult useOn(UseOnContext context) {
+    public @NonNull InteractionResult useOn(UseOnContext context) {
         Player player = context.getPlayer();
         if (player == null) {
             return InteractionResult.PASS;

@@ -29,7 +29,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -167,12 +167,12 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
     }
 
     @Override
-    public @NotNull String getSerializedName() {
+    public @NonNull String getSerializedName() {
         return this.getKey().getPath();
     }
 
     @Override
-    public @NotNull Identifier getKey() {
+    public @NonNull Identifier getKey() {
         return this.id;
     }
 

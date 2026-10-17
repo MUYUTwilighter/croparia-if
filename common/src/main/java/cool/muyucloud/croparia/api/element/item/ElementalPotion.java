@@ -17,7 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class ElementalPotion extends Item implements ElementAccess {
     private static final Map<Element, ElementalPotion> POTIONS = new HashMap<>();
     private final Element element;
 
-    public ElementalPotion(@NotNull Element element, @NotNull Properties properties) {
+    public ElementalPotion(@NonNull Element element, @NonNull Properties properties) {
         super(properties);
         if (element == Element.EMPTY) {
             throw new IllegalArgumentException("ElementalPotion cannot be empty element");
@@ -56,7 +56,7 @@ public class ElementalPotion extends Item implements ElementAccess {
     }
 
     @Override
-    public @NotNull Element getElement() {
+    public @NonNull Element getElement() {
         return this.element;
     }
 
@@ -65,7 +65,7 @@ public class ElementalPotion extends Item implements ElementAccess {
     }
 
     @Override
-    public @NotNull Component getName(ItemStack itemStack) {
+    public @NonNull Component getName(ItemStack itemStack) {
         MutableComponent elemName = Texts.translatable(this.getElement().getTranslationKey());
         return Texts.translatable("item." + CropariaIf.MOD_ID + ".element.potion", elemName);
     }

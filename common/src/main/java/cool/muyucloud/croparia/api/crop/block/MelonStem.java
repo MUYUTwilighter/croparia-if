@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.StemBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 
@@ -71,13 +71,13 @@ public class MelonStem extends StemBlock implements CropAccess<Melon> {
     }
 
     @Override
-    public @NotNull MutableComponent getName() {
+    public @NonNull MutableComponent getName() {
         MutableComponent cropName = Texts.translatable(this.getCrop().getTranslationKey());
         return Texts.translatable("block." + CropariaIf.MOD_ID + ".melon.stem", cropName);
     }
 
     @Override
-    public @NotNull MelonSeed asItem() {
+    public @NonNull MelonSeed asItem() {
         return this.getCrop().getSeed().get();
     }
 }

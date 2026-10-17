@@ -6,7 +6,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
@@ -15,8 +15,8 @@ import java.util.Optional;
 
 @ApiStatus.Experimental
 @SuppressWarnings("unused")
-public record TypeToken<T extends TypedResource<?>>(@NotNull Identifier id, @NotNull T empty,
-                                                    @NotNull MapCodec<T> codec) {
+public record TypeToken<T extends TypedResource<?>>(@NonNull Identifier id, @NonNull T empty,
+                                                    @NonNull MapCodec<T> codec) {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final Codec<TypeToken<?>> CODEC = Identifier.CODEC.comapFlatMap(id -> {

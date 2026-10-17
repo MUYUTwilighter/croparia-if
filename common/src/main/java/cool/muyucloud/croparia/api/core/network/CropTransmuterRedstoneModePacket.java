@@ -11,7 +11,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public record CropTransmuterRedstoneModePacket(BlockPos pos) implements NetworkHandler {
     public static final StreamCodec<RegistryFriendlyByteBuf, CropTransmuterRedstoneModePacket> STREAM_CODEC = StreamCodec.of(
@@ -22,7 +22,7 @@ public record CropTransmuterRedstoneModePacket(BlockPos pos) implements NetworkH
         NetworkHandlerType.ofC2S(CropariaIf.of("crop_transmuter_redstone_mode"), STREAM_CODEC);
 
     @Override
-    public @NotNull NetworkHandlerType<?> handlerType() {
+    public @NonNull NetworkHandlerType<?> handlerType() {
         return TYPE;
     }
 

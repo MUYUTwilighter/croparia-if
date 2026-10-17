@@ -22,15 +22,15 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class MidasHand extends Item {
     public MidasHand(Properties properties) {
         super(properties);
     }
 
-    public @NotNull InteractionResult useOn(UseOnContext context) {
+    public @NonNull InteractionResult useOn(UseOnContext context) {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockState block = world.getBlockState(pos);
@@ -56,7 +56,7 @@ public class MidasHand extends Item {
         }
     }
 
-    public @NotNull InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
+    public @NonNull InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
         if (entity.level().isClientSide()) return super.interactLivingEntity(stack, player, entity, hand);
         if (player.getCooldowns().isOnCooldown(stack)) return super.interactLivingEntity(stack, player, entity, hand);
         int xpConsume;

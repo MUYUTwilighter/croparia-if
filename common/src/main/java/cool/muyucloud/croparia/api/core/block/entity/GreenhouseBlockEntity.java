@@ -33,9 +33,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -167,12 +166,12 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    public @NotNull ItemStack getItem(int slot) {
+    public @NonNull ItemStack getItem(int slot) {
         return this.inventory.get(slot);
     }
 
     @Override
-    public @NotNull ItemStack removeItem(int slot, int amount) {
+    public @NonNull ItemStack removeItem(int slot, int amount) {
         ItemStack removed = ContainerHelper.removeItem(this.inventory, slot, amount);
         if (!removed.isEmpty()) {
             this.setChanged();
@@ -182,7 +181,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    public @NotNull ItemStack removeItemNoUpdate(int slot) {
+    public @NonNull ItemStack removeItemNoUpdate(int slot) {
         return ContainerHelper.takeItem(this.inventory, slot);
     }
 
@@ -213,7 +212,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    public @NotNull Component getDisplayName() {
+    public @NonNull Component getDisplayName() {
         return Texts.translatable("container.croparia.greenhouse");
     }
 

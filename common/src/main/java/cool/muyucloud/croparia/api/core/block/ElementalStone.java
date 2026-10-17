@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class ElementalStone extends Block {
     public ElementalStone(Properties properties) {
@@ -54,7 +54,7 @@ public class ElementalStone extends Block {
     }
 
     @Override
-    protected @NotNull InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected @NonNull InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (stack.getItem() instanceof RecipeWizard && player.isCrouching()) {
             level.setBlock(pos.above(), CropariaBlocks.INFUSOR.get().defaultBlockState(), Block.UPDATE_ALL);
             return InteractionResult.SUCCESS;

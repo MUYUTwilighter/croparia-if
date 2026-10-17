@@ -19,7 +19,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
@@ -40,94 +40,94 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
     public static final ItemSpec EMPTY = ItemSpec.of(Items.AIR);
     public static final TypeToken<ItemSpec> TYPE = TypeToken.register(CropariaIf.of("item_spec"), EMPTY, CODEC_COMP).orElseThrow();
 
-    @NotNull
+    @NonNull
     private final Item resource;
-    @NotNull
+    @NonNull
     private final PatchedDataComponentMap components;
 
-    @NotNull
-    public static ItemSpec of(@NotNull ItemStack stack) {
+    @NonNull
+    public static ItemSpec of(@NonNull ItemStack stack) {
         return new ItemSpec(stack.getItem(), stack.getComponentsPatch());
     }
 
-    @NotNull
-    public static ItemSpec of(@NotNull Item item) {
+    @NonNull
+    public static ItemSpec of(@NonNull Item item) {
         return new ItemSpec(item, DataComponentPatch.EMPTY);
     }
 
-    public ItemSpec(@NotNull Item item) {
+    public ItemSpec(@NonNull Item item) {
         this(item, DataComponentPatch.EMPTY);
     }
 
-    public ItemSpec(@NotNull Item item, @NotNull DataComponentPatch components) {
+    public ItemSpec(@NonNull Item item, @NonNull DataComponentPatch components) {
         this.resource = item;
         this.components = PatchedDataComponentMap.fromPatch(item.components(), components);
     }
 
-    public ItemSpec(@NotNull Item item, @NotNull DataComponentMap components) {
+    public ItemSpec(@NonNull Item item, @NonNull DataComponentMap components) {
         this.resource = item;
         this.components = new PatchedDataComponentMap(item.components());
         components.forEach(typed -> typed.applyTo(this.components));
     }
 
-    @NotNull
+    @NonNull
     public ItemSpec copy() {
         return new ItemSpec(this.getResource(), this.getComponentsPatch());
     }
 
-    @NotNull
-    public ItemSpec with(@NotNull Item item) {
+    @NonNull
+    public ItemSpec with(@NonNull Item item) {
         return new ItemSpec(item, this.getComponents());
     }
 
-    @NotNull
-    public ItemSpec with(@NotNull DataComponentPatch components) {
+    @NonNull
+    public ItemSpec with(@NonNull DataComponentPatch components) {
         PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
         patched.applyPatch(components);
         return new ItemSpec(this.getResource(), patched);
     }
 
-    @NotNull
-    public ItemSpec with(@NotNull DataComponentMap components) {
+    @NonNull
+    public ItemSpec with(@NonNull DataComponentMap components) {
         PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
         patched.setAll(components);
         return new ItemSpec(this.getResource(), patched);
     }
 
-    @NotNull
-    public ItemSpec with(@NotNull TypedDataComponent<?> component) {
+    @NonNull
+    public ItemSpec with(@NonNull TypedDataComponent<?> component) {
         PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
         component.applyTo(patched);
         return new ItemSpec(this.getResource(), patched);
     }
 
-    @NotNull
-    public <T> ItemSpec with(@NotNull DataComponentType<T> type, @NotNull T value) {
+    @NonNull
+    public <T> ItemSpec with(@NonNull DataComponentType<T> type, @NonNull T value) {
         return this.with(new TypedDataComponent<>(type, value));
     }
 
-    @NotNull
-    public ItemSpec replaceComponents(@NotNull DataComponentMap nbt) {
+    @NonNull
+    public ItemSpec replaceComponents(@NonNull DataComponentMap nbt) {
         return new ItemSpec(this.getResource(), nbt);
     }
 
-    @NotNull
+    @NonNull
     public ItemStack createStack(long amount) {
         return new ItemStack(Holder.direct(this.getResource()), CifUtil.toIntSafe(amount), this.getComponentsPatch());
     }
 
-    @NotNull
+    @NonNull
     public ItemStack createStack() {
         ItemStack stack = this.getResource().getDefaultInstance();
         stack.applyComponents(this.getComponents());
         return stack;
     }
 
-    public boolean is(@NotNull ItemStack stack) {
+    public boolean is(@NonNull ItemStack stack) {
         return ItemStack.isSameItemSameComponents(stack, this.createStack());
     }
 
-    public boolean is(@NotNull Identifier tag) {
+    public boolean is(@NonNull Identifier tag) {
         return TagUtil.isIn(Registries.ITEM, tag, this.getResource());
     }
 
@@ -142,18 +142,18 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
     }
 
     @Override
-    @NotNull
+    @NonNull
     public Item getResource() {
         return this.resource;
     }
 
     @Override
-    @NotNull
+    @NonNull
     public DataComponentMap getComponents() {
         return this.components;
     }
 
-    @NotNull
+    @NonNull
     public DataComponentPatch getComponentsPatch() {
         return this.components.asPatch();
     }
