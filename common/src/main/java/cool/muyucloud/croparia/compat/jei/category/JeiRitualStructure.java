@@ -25,7 +25,6 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class JeiRitualStructure extends JeiCategory<RitualStructure> {
@@ -93,27 +92,26 @@ public class JeiRitualStructure extends JeiCategory<RitualStructure> {
         }).onKeyPressed("x+", InputConstants.KEY_D, (manager, mouseX, mouseY, keyCode, scanCode, modifiers) -> {
             return anchor.mapAndCompare(RangedVec3i::east);
         });
-        add(builder, InputManager.createButton(LEFT_WHITE, LEFT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
+        add(builder, InputManager.createButton(Icons.LEFT_WHITE, Icons.LEFT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
             .setPosition(SLOT_SIZE, this.getHeight() - (BUTTON_SIZE + SLOT_SIZE) / 2)
             .onLeftClicked("y-", (manager, mouseX, mouseY, button) -> anchor.set(anchor.get().dy(-1)));
-        add(builder, InputManager.createButton(RIGHT_WHITE, RIGHT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
+        add(builder, InputManager.createButton(Icons.RIGHT_WHITE, Icons.RIGHT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
             .setPosition(this.getWidth() - SLOT_SIZE - BUTTON_SIZE, this.getHeight() - (BUTTON_SIZE + SLOT_SIZE) / 2)
             .onClicked("y+", (manager, mouseX, mouseY, button) -> anchor.set(anchor.get().dy(1)));
-        add(builder, InputManager.createButton(LEFT_WHITE, LEFT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
+        add(builder, InputManager.createButton(Icons.LEFT_WHITE, Icons.LEFT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
             .setPosition((SLOT_SIZE - BUTTON_SIZE) / 2, displaySize.getZ() * SLOT_SIZE / 2 + SLOT_SIZE - BUTTON_SIZE / 2)
             .onClicked("x-", (manager, mouseX, mouseY, button) -> anchor.set(anchor.get().dx(-1)));
-        add(builder, InputManager.createButton(RIGHT_WHITE, RIGHT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
+        add(builder, InputManager.createButton(Icons.RIGHT_WHITE, Icons.RIGHT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
             .setPosition(displaySize.getX() * SLOT_SIZE + SLOT_SIZE + (SLOT_SIZE - BUTTON_SIZE) / 2,
                 ((displaySize.getZ() + 2) * SLOT_SIZE - BUTTON_SIZE) / 2)
             .onClicked("x+", (manager, mouseX, mouseY, button) -> anchor.set(anchor.get().dx(1)));
-        add(builder, InputManager.createButton(UP_WHITE, UP_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
+        add(builder, InputManager.createButton(Icons.UP_WHITE, Icons.UP_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
             .setPosition(displaySize.getX() * SLOT_SIZE / 2 + SLOT_SIZE - BUTTON_SIZE / 2, (SLOT_SIZE - BUTTON_SIZE) / 2)
             .onClicked("z-", (manager, mouseX, mouseY, button) -> anchor.set(anchor.get().dz(-1)));
-        add(builder, InputManager.createButton(DOWN_WHITE, DOWN_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
+        add(builder, InputManager.createButton(Icons.DOWN_WHITE, Icons.DOWN_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)
             .setPosition(displaySize.getX() * SLOT_SIZE / 2 + SLOT_SIZE - BUTTON_SIZE / 2,
                 this.getHeight() - SLOT_SIZE - (BUTTON_SIZE + SLOT_SIZE) / 2)
             .onClicked("z+", (manager, mouseX, mouseY, button) -> anchor.set(anchor.get().dz(1)));
-        List<Drawer> tooltips = new ArrayList<>();
         for (int x = 0; x < displaySize.getX(); x++) {
             for (int z = 0; z < displaySize.getZ(); z++) {
                 int finalX = x;
@@ -130,7 +128,6 @@ public class JeiRitualStructure extends JeiCategory<RitualStructure> {
                     }
                     return dynamicStacks.get();
                 }).setPosition(SLOT_SIZE * (x + 1), SLOT_SIZE * (z + 1));
-                tooltips.add(slot.tooltipDrawer());
                 add(builder, slot);
                 anchor.onChanged((old, value) -> {
                     if (!old.equals(value)) dynamicStacks.refresh();
@@ -142,12 +139,10 @@ public class JeiRitualStructure extends JeiCategory<RitualStructure> {
             if (old.getY() != value.getY()) label.refresh();
         });
         //noinspection DataFlowIssue
-        builder.addDrawable(Drawer.of((guiGraphics, xOffset, yOffset) -> guiGraphics.drawCenteredString(
+        builder.addDrawableWidget(Drawer.of((guiGraphics, xOffset, yOffset) -> guiGraphics.drawCenteredString(
             Minecraft.getInstance().font, label.get(), this.getWidth() / 2, SLOT_SIZE * (displaySize.getZ() + 2) + BUTTON_SIZE / 2,
             ChatFormatting.WHITE.getColor()
         )));
-        builder.addDrawable(Drawer.of((guiGraphics, xOffset, yOffset) ->
-            tooltips.forEach(drawer -> drawer.draw(guiGraphics, xOffset, yOffset))));
         add(builder, inputManager);
     }
 }

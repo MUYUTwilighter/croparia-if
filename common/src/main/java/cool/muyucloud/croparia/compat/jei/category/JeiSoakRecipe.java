@@ -31,11 +31,10 @@ public class JeiSoakRecipe extends JeiCategory<SoakRecipe> {
 
     @Override
     public void createRecipeExtras(@NotNull IRecipeExtrasBuilder builder, @NotNull SoakRecipe recipe, @NotNull IFocusGroup focuses) {
-        builder.addRecipeArrow().setPosition(88, 40);
-        builder.addDrawable(BLOCK_PLACE_UPON, 72, 24);
-        builder.addDrawable(BLOCK_PLACE, 56, 40);
-        builder.addDrawable(ELEM_INFUSE, 56, 8);
-        builder.addRecipeArrow().setPosition(88, 40);
+        builder.addRecipeArrowWidget().setPosition(88, 40);
+        builder.addDrawableWidget(Icons.BLOCK_PLACE_UPON).setPosition(72, 24);
+        builder.addDrawableWidget(Icons.BLOCK_PLACE).setPosition(56, 40);
+        builder.addDrawableWidget(Icons.ELEM_INFUSE).setPosition(56, 8);
         builder.addText(FormattedText.of("%3.2f %%".formatted(recipe.getProbability() * 100)), 64, 16).setPosition(112, 24);
     }
 }

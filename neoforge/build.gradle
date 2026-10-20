@@ -65,8 +65,8 @@ dependencies {
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:$rei_version"
 
     // JEI
-    modCompileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
-    modLocalRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
+    compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
+    localRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
 
     // KubeJs
 //    modApi "dev.latvian.mods:kubejs-neoforge:${kubejs_version}"
