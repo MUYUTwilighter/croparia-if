@@ -34,8 +34,8 @@ public class JeiRitualRecipe extends JeiCategory<RitualRecipe> {
 
     @Override
     public void createRecipeExtras(@NotNull IRecipeExtrasBuilder builder, @NotNull RitualRecipe recipe, @NotNull IFocusGroup focuses) {
-        builder.addDrawable(ITEM_DROP, 72, 24);
-        builder.addDrawable(ELEM_INFUSE, 56, 40);
-        builder.addRecipeArrow().setPosition(88, 40);
+        builder.addDrawableWidget(Icons.ITEM_DROP).setPosition(72, 24);
+        builder.addDrawableWidget(Icons.ELEM_INFUSE).setPosition(56, 40);
+        builder.addRecipeArrowWidget().setPosition(88, 40);
     }
 }

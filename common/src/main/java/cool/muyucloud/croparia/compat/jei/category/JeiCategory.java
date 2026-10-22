@@ -8,10 +8,10 @@ import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import cool.muyucloud.croparia.util.text.Texts;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.types.IRecipeType;
-import mezz.jei.common.gui.elements.DrawableResource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -75,18 +75,39 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
     public static final int SLOT_SIZE_COMPAT = 16;
     public static final int SLOT_SIZE = 18;
     public static final int BUTTON_SIZE = 12;
-    public static final DrawableResource ITEM_DROP = new DrawableResource(Constants.ITEM_DROP, 0, 0, 16, 16, 0, 0, 0, 0, 16, 16);
-    public static final DrawableResource ELEM_INFUSE = new DrawableResource(Constants.ELEM_INFUSE, 0, 0, 16, 16, 0, 0, 0, 0, 16, 16);
-    public static final DrawableResource BLOCK_PLACE = new DrawableResource(Constants.BLOCK_PLACE, 0, 0, 16, 16, 0, 0, 0, 0, 16, 16);
-    public static final DrawableResource BLOCK_PLACE_UPON = new DrawableResource(Constants.BLOCK_PLACE_UPON, 0, 0, 16, 16, 0, 0, 0, 0, 16, 16);
-    public static final DrawableResource LEFT_DARK = new DrawableResource(Constants.LEFT_DARK, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource RIGHT_DARK = new DrawableResource(Constants.RIGHT_DARK, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource UP_DARK = new DrawableResource(Constants.UP_DARK, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource DOWN_DARK = new DrawableResource(Constants.DOWN_DARK, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource LEFT_WHITE = new DrawableResource(Constants.LEFT_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource RIGHT_WHITE = new DrawableResource(Constants.RIGHT_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource UP_WHITE = new DrawableResource(Constants.UP_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource DOWN_WHITE = new DrawableResource(Constants.DOWN_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
+
+    /**
+     * Built lazily: JEI's runtime only exists after {@code onRuntimeAvailable}, which is later than this class' static init.
+     */
+    static final class Icons {
+        static final IDrawableStatic ITEM_DROP = icon(Constants.ITEM_DROP);
+        static final IDrawableStatic ELEM_INFUSE = icon(Constants.ELEM_INFUSE);
+        static final IDrawableStatic BLOCK_PLACE = icon(Constants.BLOCK_PLACE);
+        static final IDrawableStatic BLOCK_PLACE_UPON = icon(Constants.BLOCK_PLACE_UPON);
+        static final IDrawableStatic LEFT_DARK = button(Constants.LEFT_DARK);
+        static final IDrawableStatic RIGHT_DARK = button(Constants.RIGHT_DARK);
+        static final IDrawableStatic UP_DARK = button(Constants.UP_DARK);
+        static final IDrawableStatic DOWN_DARK = button(Constants.DOWN_DARK);
+        static final IDrawableStatic LEFT_WHITE = button(Constants.LEFT_WHITE);
+        static final IDrawableStatic RIGHT_WHITE = button(Constants.RIGHT_WHITE);
+        static final IDrawableStatic UP_WHITE = button(Constants.UP_WHITE);
+        static final IDrawableStatic DOWN_WHITE = button(Constants.DOWN_WHITE);
+
+        private static IDrawableStatic icon(Identifier texture) {
+            return drawable(texture, 16);
+        }
+
+        private static IDrawableStatic button(Identifier texture) {
+            return drawable(texture, 12);
+        }
+
+        private static IDrawableStatic drawable(Identifier texture, int size) {
+            return JeiClient.getRuntime().getJeiHelpers().getGuiHelper()
+                .drawableBuilder(texture, 0, 0, size, size)
+                .setTextureSize(size, size)
+                .build();
+        }
+    }
 
     public static IDrawable toDrawable(ItemStack stack) {
         return JeiClient.getRuntime().getJeiHelpers().getGuiHelper().createDrawableItemStack(stack);
@@ -94,7 +115,7 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
 
     public static <T extends AbstractInputManager<T>> T add(IRecipeExtrasBuilder builder, T manager) {
         builder.addGuiEventListener(manager);
-        builder.addDrawable(manager);
+        builder.addWidget(manager);
         manager.onBuild();
         return manager;
     }

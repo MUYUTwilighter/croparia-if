@@ -56,8 +56,8 @@ dependencies {
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version"
 
     // JEI
-    modCompileOnly("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
-    modRuntimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
+    compileOnly("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
+    runtimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
 
     // TSS
 //    modCompileOnly("flat:toms_storage_fabric-1.21.4:2.3.2")
