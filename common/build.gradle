@@ -26,9 +26,6 @@ dependencies {
 
     // JEI
     modCompileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
-    modCompileOnly("mezz.jei:jei-${minecraft_version}-common:${jei_version}")
-    modCompileOnly("mezz.jei:jei-${minecraft_version}-lib:${jei_version}")
-    modCompileOnly("mezz.jei:jei-${minecraft_version}-gui:${jei_version}")
 
     testImplementation platform("org.junit:junit-bom:5.10.2")
     testImplementation "org.junit.jupiter:junit-jupiter"

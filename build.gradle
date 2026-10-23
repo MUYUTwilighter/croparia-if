@@ -92,6 +92,13 @@ subprojects {
     tasks.withType(JavaCompile).configureEach {
         it.options.release = 17
     }
+    // MC 1.20.1 dev runs must use Java 17: Forge 1.20.1 (securejarhandler 10.0.9) breaks on newer JDKs.
+    tasks.withType(net.fabricmc.loom.task.RunGameTask).configureEach {
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = org.gradle.jvm.toolchain.JavaLanguageVersion.of(17)
+        }
+    }
+
 
     tasks.withType(Test).configureEach {
         useJUnitPlatform()

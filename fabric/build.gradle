@@ -56,8 +56,9 @@ dependencies {
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version"
     // JEI
-    compileOnly("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
+    modCompileOnly("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
     modLocalRuntime("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
+    modLocalRuntime("net.mezzdev.config:mezz_config-${minecraft_version}-fabric:${mezz_config}")
     // No kubeJs on this branch for now
 
     // TSS

@@ -9,7 +9,6 @@ import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -417,7 +416,7 @@ public abstract class AbstractInputManager<T extends AbstractInputManager<T>> im
     }
 
     @Override
-    public @NonNull ScreenPosition getPosition() {
+    public @NotNull ScreenPosition getPosition() {
         return area.position();
     }
 
