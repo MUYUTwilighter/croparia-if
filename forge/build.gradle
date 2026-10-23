@@ -54,7 +54,14 @@ dependencies {
     // JEI
     modCompileOnly("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
     modCompileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+    // JEI dev runtime, it might not work properly in dev environment, comment it out for debugging
     modLocalRuntime("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
+//    modLocalRuntime("net.mezzdev.config:mezz_config-${minecraft_version}-forge:${mezz_config}")
+//    // JEI shades this library at build time, but the dev-remapped jar keeps unrelocated references.
+//    // Architectury's transformer classpath comes from compileClasspath, so this must be compileOnly too.
+//    modLocalRuntime("net.mezzdev:deduplicating-runner:0.1.0")
+//    compileOnly("net.mezzdev:deduplicating-runner:0.1.0")
+
 
     // KubeJs
 //    modApi "dev.latvian.mods:kubejs-forge:${kubejs_version}"
