@@ -26,8 +26,8 @@ public class JeiInfusorRecipe extends JeiCategory<InfusorRecipe> {
 
     @Override
     public void createRecipeExtras(@NotNull IRecipeExtrasBuilder builder, @NotNull InfusorRecipe recipe, @NotNull IFocusGroup focuses) {
-        builder.addDrawable(ITEM_DROP, 72, 24);
-        builder.addDrawable(BLOCK_PLACE, 56, 40);
-        builder.addRecipeArrow().setPosition(88, 40);
+        builder.addDrawableWidget(Icons.ITEM_DROP).setPosition(72, 24);
+        builder.addDrawableWidget(Icons.BLOCK_PLACE).setPosition(56, 40);
+        builder.addRecipeArrowWidget().setPosition(88, 40);
     }
 }

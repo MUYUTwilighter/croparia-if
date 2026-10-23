@@ -10,7 +10,6 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
-import mezz.jei.common.Internal;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +30,7 @@ public class JeiClient implements IModPlugin {
     public static IJeiRuntime jeiRuntime() {
         if (jeiRuntime == null) {
             CropariaIf.LOGGER.warn("Usage of JEI Runtime while plugin unavailable");
-            return Internal.getJeiRuntime();
+            throw new IllegalStateException("JEI runtime is not available yet");
         } else {
             return jeiRuntime;
         }
