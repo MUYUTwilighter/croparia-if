@@ -3,10 +3,9 @@ package cool.muyucloud.croparia.compat.jei.drawable;
 import cool.muyucloud.croparia.compat.jei.util.*;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.inputs.IJeiGuiEventListener;
-import mezz.jei.api.gui.placement.IPlaceable;
-import mezz.jei.common.util.ImmutableRect2i;
-import mezz.jei.gui.input.MouseUtil;
-import net.minecraft.client.gui.GuiGraphics;
+import mezz.jei.api.gui.widgets.IRecipeWidget;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import org.jspecify.annotations.NonNull;
 
@@ -15,8 +14,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"UnusedReturnValue", "unused"})
-public abstract class AbstractInputManager<T extends AbstractInputManager<T>> implements IJeiGuiEventListener, IPlaceable<T>, IDrawable {
-    private ImmutableRect2i area = ImmutableRect2i.EMPTY;
+public abstract class AbstractInputManager<T extends AbstractInputManager<T>> implements IJeiGuiEventListener, IRecipeWidget {
+    private ScreenRectangle area = ScreenRectangle.empty();
     private final Map<String, MousedDrawer> drawables = new LinkedHashMap<>();
     private final Map<String, MouseScrollHandler<T>> onMouseScroll = new LinkedHashMap<>();
     private final Map<String, MouseKeyHandler<T>> onMouseClicked = new LinkedHashMap<>();
@@ -26,7 +25,6 @@ public abstract class AbstractInputManager<T extends AbstractInputManager<T>> im
     private final Map<String, MouseMoveHandler<T>> onMouseEntered = new LinkedHashMap<>();
     private final Map<String, MouseMoveHandler<T>> onMouseExited = new LinkedHashMap<>();
     private final Map<String, KeyboardHandler<T>> onKeyPressed = new LinkedHashMap<>();
-    private double absoluteX = 0, absoluteY = 0;
     private boolean hovered = false;
 
     @SuppressWarnings("unchecked")
@@ -70,22 +68,6 @@ public abstract class AbstractInputManager<T extends AbstractInputManager<T>> im
 
     public Stream<Map.Entry<String, MousedDrawer>> streamDrawables() {
         return this.drawables.entrySet().stream();
-    }
-
-    public double mouseX() {
-        return MouseUtil.getX() - absoluteX();
-    }
-
-    public double parentMouseX() {
-        return mouseX() + x();
-    }
-
-    public double mouseY() {
-        return MouseUtil.getY() - absoluteY();
-    }
-
-    public double parentMouseY() {
-        return mouseY() + y();
     }
 
     @Override
@@ -308,8 +290,6 @@ public abstract class AbstractInputManager<T extends AbstractInputManager<T>> im
 
     @Override
     public void mouseMoved(double mouseX, double mouseY) {
-        this.absoluteX = MouseUtil.getX() - mouseX;
-        this.absoluteY = MouseUtil.getY() - mouseY;
         //noinspection ResultOfMethodCallIgnored
         onMouseMoved.values().stream().anyMatch(handler -> handler.handle(this.getSelf(), mouseX, mouseY));
     }
@@ -408,65 +388,62 @@ public abstract class AbstractInputManager<T extends AbstractInputManager<T>> im
 
     @Override
     public @NonNull ScreenRectangle getArea() {
-        return area.toScreenRectangle();
+        return area;
     }
 
     @Override
+    public @NonNull ScreenPosition getPosition() {
+        return area.position();
+    }
+
+    @Override
+    public @NonNull ScreenRectangle getScreenRectangle() {
+        return area;
+    }
+
     public @NonNull T setPosition(int x, int y) {
-        area = area.setPosition(x, y);
+        area = new ScreenRectangle(x, y, area.width(), area.height());
         return this.getSelf();
     }
 
     public int x() {
-        return area.x();
-    }
-
-    public double absoluteX() {
-        return absoluteX;
+        return area.left();
     }
 
     public int y() {
-        return area.y();
-    }
-
-    public double absoluteY() {
-        return absoluteY;
+        return area.top();
     }
 
     public @NonNull T setSize(int width, int height) {
-        area = new ImmutableRect2i(area.x(), area.y(), width, height);
+        area = new ScreenRectangle(area.left(), area.top(), width, height);
         return this.getSelf();
     }
 
-    @Override
     public int getWidth() {
-        return area.getWidth();
+        return area.width();
     }
 
-    @Override
     public int getHeight() {
-        return area.getHeight();
+        return area.height();
+    }
+
+    protected boolean containsLocal(double mouseX, double mouseY) {
+        return 0 < mouseX && mouseX < getWidth() && 0 < mouseY && mouseY < getHeight();
     }
 
     @Override
-    public void draw(@NonNull GuiGraphics guiGraphics, int xOffset, int yOffset) {
-        double mouseX = mouseX();
-        double mouseY = mouseY();
-        if (0 < mouseX && mouseX < area.getWidth() && 0 < mouseY && mouseY < area.getHeight()) {
+    public void drawWidget(@NonNull GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+        if (containsLocal(mouseX, mouseY)) {
             if (!hovered) {
                 hovered = true;
                 //noinspection ResultOfMethodCallIgnored
                 onMouseEntered.values().stream().anyMatch(handler -> handler.handle(this.getSelf(), mouseX, mouseY));
             }
-        } else {
-            if (hovered) {
-                hovered = false;
-                //noinspection ResultOfMethodCallIgnored
-                onMouseExited.values().stream().anyMatch(handler -> handler.handle(this.getSelf(), mouseX, mouseY));
-            }
+        } else if (hovered) {
+            hovered = false;
+            //noinspection ResultOfMethodCallIgnored
+            onMouseExited.values().stream().anyMatch(handler -> handler.handle(this.getSelf(), mouseX, mouseY));
         }
-        this.drawables.values().forEach(drawer -> drawer.draw(
-            guiGraphics, xOffset + x(), yOffset + y(), mouseX + xOffset + x(), mouseY + yOffset + y()
-        ));
+        this.drawables.values().forEach(drawer -> drawer.draw(guiGraphics, 0, 0, mouseX, mouseY));
     }
 }

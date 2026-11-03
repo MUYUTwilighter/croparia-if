@@ -4,9 +4,11 @@ import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.compat.jei.JeiClient;
 import cool.muyucloud.croparia.compat.jei.category.JeiCategory;
 import dev.architectury.platform.Platform;
+import mezz.jei.api.recipe.IRecipeManager;
+import mezz.jei.api.recipe.types.IRecipeType;
+import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.resources.Identifier;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -29,41 +31,39 @@ final class CompatRecipeRefresh {
             return;
         }
 
-        try {
-            Class<?> internalClass = Class.forName("mezz.jei.common.Internal");
-            Method getRuntime = internalClass.getMethod("getJeiRuntime");
-            Object runtime;
-            try {
-                runtime = getRuntime.invoke(null);
-            } catch (InvocationTargetException e) {
-                return;
-            }
-
-            Method getRecipeManager = runtime.getClass().getMethod("getRecipeManager");
-            Object recipeManager = getRecipeManager.invoke(runtime);
-            Method addRecipes = recipeManager.getClass().getMethod("addRecipes", Class.forName("mezz.jei.api.recipe.types.IRecipeType"), List.class);
-            Method hideRecipes = recipeManager.getClass().getMethod("hideRecipes", Class.forName("mezz.jei.api.recipe.types.IRecipeType"), Collection.class);
-
-            for (JeiCategory<?> category : JeiClient.CATEGORIES) {
-                Identifier id = category.getTypedSerializer().getId();
-                if (!updatedTypes.contains(id)) {
-                    continue;
-                }
-
-                List<?> previous = LAST_JEI_RECIPES.get(id);
-                if (previous != null && !previous.isEmpty()) {
-                    hideRecipes.invoke(recipeManager, category.getRecipeType(), previous);
-                }
-
-                List<?> current = new ArrayList<>(category.getTypedSerializer().find());
-                if (!current.isEmpty()) {
-                    addRecipes.invoke(recipeManager, category.getRecipeType(), current);
-                }
-                LAST_JEI_RECIPES.put(id, current);
-            }
-        } catch (ReflectiveOperationException e) {
-            CropariaIf.LOGGER.debug("Failed to refresh JEI synced recipes", e);
+        IJeiRuntime runtime = JeiClient.getRuntimeOrNull();
+        if (runtime == null) {
+            return;
         }
+        IRecipeManager recipeManager = runtime.getRecipeManager();
+
+        for (JeiCategory<?> category : JeiClient.CATEGORIES) {
+            Identifier id = category.getTypedSerializer().getId();
+            if (!updatedTypes.contains(id)) {
+                continue;
+            }
+
+            List<?> previous = LAST_JEI_RECIPES.get(id);
+            if (previous != null && !previous.isEmpty()) {
+                hideRecipes(recipeManager, category, previous);
+            }
+
+            List<?> current = new ArrayList<>(category.getTypedSerializer().find());
+            if (!current.isEmpty()) {
+                addRecipes(recipeManager, category, current);
+            }
+            LAST_JEI_RECIPES.put(id, current);
+        }
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void hideRecipes(IRecipeManager recipeManager, JeiCategory<?> category, List<?> recipes) {
+        recipeManager.hideRecipes((IRecipeType) category.getRecipeType(), (Collection) recipes);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void addRecipes(IRecipeManager recipeManager, JeiCategory<?> category, List<?> recipes) {
+        recipeManager.addRecipes((IRecipeType) category.getRecipeType(), (List) recipes);
     }
 
     private static void refreshRei() {

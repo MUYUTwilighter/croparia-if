@@ -11,7 +11,7 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.types.IRecipeType;
-import mezz.jei.common.gui.elements.DrawableResource;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -75,18 +75,18 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
     public static final int SLOT_SIZE_COMPAT = 16;
     public static final int SLOT_SIZE = 18;
     public static final int BUTTON_SIZE = 12;
-    public static final DrawableResource ITEM_DROP = new DrawableResource(Constants.ITEM_DROP, 0, 0, 16, 16, 0, 0, 0, 0, 16, 16);
-    public static final DrawableResource ELEM_INFUSE = new DrawableResource(Constants.ELEM_INFUSE, 0, 0, 16, 16, 0, 0, 0, 0, 16, 16);
-    public static final DrawableResource BLOCK_PLACE = new DrawableResource(Constants.BLOCK_PLACE, 0, 0, 16, 16, 0, 0, 0, 0, 16, 16);
-    public static final DrawableResource BLOCK_PLACE_UPON = new DrawableResource(Constants.BLOCK_PLACE_UPON, 0, 0, 16, 16, 0, 0, 0, 0, 16, 16);
-    public static final DrawableResource LEFT_DARK = new DrawableResource(Constants.LEFT_DARK, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource RIGHT_DARK = new DrawableResource(Constants.RIGHT_DARK, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource UP_DARK = new DrawableResource(Constants.UP_DARK, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource DOWN_DARK = new DrawableResource(Constants.DOWN_DARK, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource LEFT_WHITE = new DrawableResource(Constants.LEFT_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource RIGHT_WHITE = new DrawableResource(Constants.RIGHT_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource UP_WHITE = new DrawableResource(Constants.UP_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
-    public static final DrawableResource DOWN_WHITE = new DrawableResource(Constants.DOWN_WHITE, 0, 0, 12, 12, 0, 0, 0, 0, 12, 12);
+    public static final Sprite ITEM_DROP = new Sprite(Constants.ITEM_DROP, 16, 16);
+    public static final Sprite ELEM_INFUSE = new Sprite(Constants.ELEM_INFUSE, 16, 16);
+    public static final Sprite BLOCK_PLACE = new Sprite(Constants.BLOCK_PLACE, 16, 16);
+    public static final Sprite BLOCK_PLACE_UPON = new Sprite(Constants.BLOCK_PLACE_UPON, 16, 16);
+    public static final Sprite LEFT_DARK = new Sprite(Constants.LEFT_DARK, 12, 12);
+    public static final Sprite RIGHT_DARK = new Sprite(Constants.RIGHT_DARK, 12, 12);
+    public static final Sprite UP_DARK = new Sprite(Constants.UP_DARK, 12, 12);
+    public static final Sprite DOWN_DARK = new Sprite(Constants.DOWN_DARK, 12, 12);
+    public static final Sprite LEFT_WHITE = new Sprite(Constants.LEFT_WHITE, 12, 12);
+    public static final Sprite RIGHT_WHITE = new Sprite(Constants.RIGHT_WHITE, 12, 12);
+    public static final Sprite UP_WHITE = new Sprite(Constants.UP_WHITE, 12, 12);
+    public static final Sprite DOWN_WHITE = new Sprite(Constants.DOWN_WHITE, 12, 12);
 
     public static IDrawable toDrawable(ItemStack stack) {
         return JeiClient.getRuntime().getJeiHelpers().getGuiHelper().createDrawableItemStack(stack);
@@ -94,8 +94,50 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
 
     public static <T extends AbstractInputManager<T>> T add(IRecipeExtrasBuilder builder, T manager) {
         builder.addGuiEventListener(manager);
-        builder.addDrawable(manager);
+        builder.addWidget(manager);
         manager.onBuild();
         return manager;
+    }
+
+    /**
+     * Texture sprite that is resolved through {@link mezz.jei.api.helpers.IGuiHelper} on first use,
+     * so it can be declared statically before the JEI runtime is available.
+     */
+    public static final class Sprite implements IDrawable {
+        private final Identifier id;
+        private final int width;
+        private final int height;
+        private @Nullable IDrawable delegate;
+
+        public Sprite(@NonNull Identifier id, int width, int height) {
+            this.id = id;
+            this.width = width;
+            this.height = height;
+        }
+
+        private @NonNull IDrawable delegate() {
+            IDrawable resolved = this.delegate;
+            if (resolved == null) {
+                resolved = JeiClient.getRuntime().getJeiHelpers().getGuiHelper()
+                    .createDrawable(this.id, 0, 0, this.width, this.height);
+                this.delegate = resolved;
+            }
+            return resolved;
+        }
+
+        @Override
+        public int getWidth() {
+            return this.width;
+        }
+
+        @Override
+        public int getHeight() {
+            return this.height;
+        }
+
+        @Override
+        public void draw(@NonNull GuiGraphicsExtractor guiGraphics, int xOffset, int yOffset) {
+            this.delegate().draw(guiGraphics, xOffset, yOffset);
+        }
     }
 }

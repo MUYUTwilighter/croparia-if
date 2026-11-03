@@ -1,6 +1,6 @@
 package cool.muyucloud.croparia.compat.jei.util;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public interface MousedDrawer {
     /**
@@ -12,5 +12,5 @@ public interface MousedDrawer {
      * @param guiMouseX   The x position of the mouse relative to the recipe GUI.
      * @param guiMouseY   The y position of the mouse relative to the recipe GUI.
      */
-    void draw(GuiGraphics guiGraphics, int guiOffsetX, int guiOffsetY, double guiMouseX, double guiMouseY);
+    void draw(GuiGraphicsExtractor guiGraphics, int guiOffsetX, int guiOffsetY, double guiMouseX, double guiMouseY);
 }
