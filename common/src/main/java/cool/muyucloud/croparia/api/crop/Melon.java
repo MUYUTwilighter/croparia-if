@@ -24,6 +24,7 @@ import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -120,6 +121,11 @@ public class Melon extends AbstractCrop<Block> {
 
     public HolderSupplier<MelonItem> getMelonItem() {
         return melonItem;
+    }
+
+    @Override
+    public Item getFruitItem() {
+        return this.getMelonItem().get();
     }
 
     public String getDefaultTranslation() {

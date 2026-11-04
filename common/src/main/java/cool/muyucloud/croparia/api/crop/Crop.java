@@ -214,6 +214,11 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return fruit.getId();
     }
 
+    @Override
+    public Item getFruitItem() {
+        return this.fruit.get();
+    }
+
     public Optional<CropFruit> getCropFruit() {
         return fruit.toOptional();
     }

@@ -28,18 +28,22 @@ import java.util.List;
 import java.util.Objects;
 
 public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
-    public static final TypedSerializer<RitualRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
-        CropariaIf.of("ritual"), RitualRecipe.class,
-        RecordCodecBuilder.mapCodec(instance -> instance.group(
+    public static final TypedSerializer<RitualRecipe> TYPED_SERIALIZER = TypedSerializer.<RitualRecipe>builder()
+        .id(CropariaIf.of("ritual"))
+        .recipeClass(RitualRecipe.class)
+        .serializer(RecordCodecBuilder.mapCodec(instance -> instance.group(
             BlockInput.CODEC.fieldOf("ritual").forGetter(RitualRecipe::getRitual),
             BlockInput.CODEC.fieldOf("block").forGetter(RitualRecipe::getBlock),
             ItemInput.CODEC.fieldOf("ingredient").forGetter(RitualRecipe::getIngredient),
             ItemOutput.CODEC.fieldOf("result").forGetter(RitualRecipe::getResult)
-        ).apply(instance, RitualRecipe::new)),
-        Mappable.of(CropariaItems.RITUAL_STAND, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
-        Mappable.of(CropariaItems.RITUAL_STAND_2, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
-        Mappable.of(CropariaItems.RITUAL_STAND_3, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL))
-    );
+        ).apply(instance, RitualRecipe::new)))
+        .recipeType()
+        .withWorkStations(
+            Mappable.of(CropariaItems.RITUAL_STAND, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
+            Mappable.of(CropariaItems.RITUAL_STAND_2, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL)),
+            Mappable.of(CropariaItems.RITUAL_STAND_3, item -> Texts.tooltip(item.getDefaultInstance(), Constants.TOOLTIP_RITUAL))
+        )
+        .build();
 
     private final BlockInput ritual;
     @NonNull

@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.api.crop;
 import cool.muyucloud.croparia.api.crop.util.Material;
 import cool.muyucloud.croparia.api.generator.util.TranslatableEntry;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import org.jspecify.annotations.NonNull;
 
 public abstract class AbstractCrop<T> implements TranslatableEntry {
@@ -19,4 +20,6 @@ public abstract class AbstractCrop<T> implements TranslatableEntry {
     public abstract @NonNull Material<T> getMaterial();
 
     public abstract void onRegister();
+
+    public abstract Item getFruitItem();
 }

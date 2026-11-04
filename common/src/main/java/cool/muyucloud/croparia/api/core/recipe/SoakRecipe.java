@@ -25,16 +25,18 @@ import java.util.List;
 import java.util.Objects;
 
 public class SoakRecipe implements DisplayableRecipe<SoakContainer> {
-    public static final TypedSerializer<SoakRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
-        CropariaIf.of("soak"), SoakRecipe.class,
-        RecordCodecBuilder.mapCodec(instance -> instance.group(
+    public static final TypedSerializer<SoakRecipe> TYPED_SERIALIZER = TypedSerializer.<SoakRecipe>builder()
+        .id(CropariaIf.of("soak"))
+        .recipeClass(SoakRecipe.class)
+        .serializer(RecordCodecBuilder.mapCodec(instance -> instance.group(
             ElementAccess.CODEC.fieldOf("element").forGetter(SoakRecipe::getElement),
             Codec.FLOAT.fieldOf("probability").forGetter(SoakRecipe::getProbability),
             BlockInput.CODEC.fieldOf("input").forGetter(SoakRecipe::getInput),
             BlockOutput.CODEC.fieldOf("output").forGetter(SoakRecipe::getOutput)
-        ).apply(instance, SoakRecipe::new)),
-        Mappable.of(CropariaItems.ELEMENTAL_STONE, Item::getDefaultInstance)
-    );
+        ).apply(instance, SoakRecipe::new)))
+        .recipeType()
+        .withWorkStations(Mappable.of(CropariaItems.ELEMENTAL_STONE, Item::getDefaultInstance))
+        .build();
 
     private final Element element;
     private final float probability;

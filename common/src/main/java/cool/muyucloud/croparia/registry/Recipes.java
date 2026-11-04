@@ -32,12 +32,14 @@ public class Recipes {
 
     public static <R extends DisplayableRecipe<?>> TypedSerializer<R> register(TypedSerializer<R> typedSerializer) {
         TYPES.put(typedSerializer.getId(), typedSerializer);
-        RECIPE_TYPES.register(typedSerializer.getId(), () -> typedSerializer);
+        if (typedSerializer.shouldRegisterType()) {
+            RECIPE_TYPES.register(typedSerializer.getId(), typedSerializer::getRecipeType);
+        }
         RECIPE_SERIALIZERS.register(typedSerializer.getId(), typedSerializer::getSerializer);
         return typedSerializer;
     }
 
-    public static void forEach(Consumer<TypedSerializer<?>> consumer) {
+    public static void forEach(Consumer<TypedSerializer<? extends DisplayableRecipe<?>>> consumer) {
         TYPES.forEach((id, supplier) -> consumer.accept(supplier));
     }
 

@@ -2,17 +2,19 @@ package cool.muyucloud.croparia.api.core.recipe;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.crop.AbstractCrop;
 import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.api.crop.CropRegistry;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
+import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
+import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.ItemOutput;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -20,13 +22,23 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class CropMaterialRecipe extends CustomRecipe {
+public class CropMaterialRecipe extends CustomRecipe implements DisplayableRecipe<CraftingInput> {
     public static final MapCodec<CropMaterialRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
         Identifier.CODEC.fieldOf("registry").forGetter(CropMaterialRecipe::getRegistryId),
         Identifier.CODEC.fieldOf("crop").forGetter(CropMaterialRecipe::getCropId),
         ItemOutput.CODEC.optionalFieldOf("output").forGetter(CropMaterialRecipe::getOutput)
     ).apply(instance, (registry, crop, output) -> new CropMaterialRecipe(registry, crop, output.orElse(null))));
     public static final RecipeSerializer<CropMaterialRecipe> SERIALIZER = new RecipeSerializer<>(CODEC, CodecUtil.toStream(CODEC.codec()));
+
+    public static final TypedSerializer<CropMaterialRecipe> TYPED_SERIALIZER = TypedSerializer.<CropMaterialRecipe>builder()
+        .id(CropariaIf.of("crop_material"))
+        .serializer(CODEC)
+        .recipeClass(CropMaterialRecipe.class)
+        .recipeType(RecipeType.CRAFTING)
+        .syncFilter(TypedSerializer.JEI).orSyncFilter(TypedSerializer.REI)
+        .withWorkStations(Items.CRAFTING_TABLE::getDefaultInstance)
+        .cancelRegisterType()
+        .build();
 
     public static Optional<AbstractCrop<?>> readCrop(CraftingInput input) {
         final Optional<AbstractCrop<?>> empty = Optional.empty();
@@ -96,7 +108,29 @@ public class CropMaterialRecipe extends CustomRecipe {
     }
 
     @Override
+    public TypedSerializer<? extends DisplayableRecipe<CraftingInput>> getTypedSerializer() {
+        return TYPED_SERIALIZER;
+    }
+
+    @Override
+    public @NonNull PlacementInfo placementInfo() {
+        return PlacementInfo.create(Ingredient.of(crop.getFruitItem()));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public @NonNull RecipeType<CraftingRecipe> getType() {
+        return (RecipeType<CraftingRecipe>) DisplayableRecipe.super.getType();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public @NonNull RecipeSerializer<CropMaterialRecipe> getSerializer() {
-        return SERIALIZER;
+        return (RecipeSerializer<CropMaterialRecipe>) DisplayableRecipe.super.getSerializer();
+    }
+
+    @Override
+    public @NonNull RecipeBookCategory recipeBookCategory() {
+        return RecipeBookCategories.CRAFTING_MISC;
     }
 }

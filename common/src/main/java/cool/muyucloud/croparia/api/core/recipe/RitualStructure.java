@@ -32,14 +32,16 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public class RitualStructure implements DisplayableRecipe<RitualStructureContainer> {
-    public static final TypedSerializer<RitualStructure> TYPED_SERIALIZER = new TypedSerializer<>(
-        CropariaIf.of("ritual_structure"), RitualStructure.class,
-        RecordCodecBuilder.mapCodec(instance -> instance.group(
+    public static final TypedSerializer<RitualStructure> TYPED_SERIALIZER = TypedSerializer.<RitualStructure>builder()
+        .id(CropariaIf.of("ritual_structure"))
+        .recipeClass(RitualStructure.class)
+        .serializer(RecordCodecBuilder.mapCodec(instance -> instance.group(
             BlockInput.CODEC.fieldOf("ritual").forGetter(RitualStructure::getRitual),
             Codec.unboundedMap(CodecUtil.CHAR, BlockInput.CODEC).fieldOf("keys").forGetter(RitualStructure::getKeys),
             Char3D.CODEC.fieldOf("pattern").forGetter(RitualStructure::getPattern)
-        ).apply(instance, RitualStructure::new))
-    );
+        ).apply(instance, RitualStructure::new)))
+        .recipeType()
+        .build();
     public static final LazySupplier<ItemStack> STACK_INPUT = LazySupplier.of(() -> {
         ItemStack stack = CropariaItems.PLACEHOLDER.get().getDefaultInstance();
         stack.set(DataComponents.CUSTOM_NAME, Constants.INPUT_BLOCK);

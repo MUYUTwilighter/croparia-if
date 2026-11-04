@@ -26,27 +26,31 @@ import java.util.List;
 import java.util.Objects;
 
 public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
-    public static final TypedSerializer<InfusorRecipe> TYPED_SERIALIZER = new TypedSerializer<>(
-        CropariaIf.of("infusor"), InfusorRecipe.class,
-        RecordCodecBuilder.mapCodec(instance -> instance.group(
+    public static final TypedSerializer<InfusorRecipe> TYPED_SERIALIZER = TypedSerializer.<InfusorRecipe>builder()
+        .id(CropariaIf.of("infusor"))
+        .recipeClass(InfusorRecipe.class)
+        .serializer(RecordCodecBuilder.mapCodec(instance -> instance.group(
             ElementAccess.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
             ItemInput.CODEC.fieldOf("ingredient").forGetter(InfusorRecipe::getIngredient),
             ItemOutput.CODEC.fieldOf("result").forGetter(InfusorRecipe::getResult)
-        ).apply(instance, InfusorRecipe::new)),
-        Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance)
-    );
-    public static final TypedSerializer<InfusorRecipe> OLD_TYPED_SERIALIZER = new TypedSerializer<>(
-        CropariaIf.of("infusor_type"), InfusorRecipe.class,
-        RecordCodecBuilder.mapCodec(instance -> instance.group(
+        ).apply(instance, InfusorRecipe::new)))
+        .recipeType()
+        .withWorkStations(Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance))
+        .build();
+    public static final TypedSerializer<InfusorRecipe> OLD_TYPED_SERIALIZER = TypedSerializer.<InfusorRecipe>builder()
+        .id(CropariaIf.of("infusor_type"))
+        .recipeClass(InfusorRecipe.class)
+        .serializer(RecordCodecBuilder.mapCodec(instance -> instance.group(
             ElementAccess.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
             ItemInput.CODEC.fieldOf("input").forGetter(InfusorRecipe::getIngredient),
             ItemOutput.CODEC.fieldOf("output").forGetter(InfusorRecipe::getResult),
             Codec.INT.fieldOf("count").forGetter(recipe -> Math.toIntExact(recipe.getResult().getAmount()))
         ).apply(instance, (element, input, output, count) ->
-            new InfusorRecipe(element, input, new ItemOutput(output.getId(), output.getComponentsPatch(), count)))),
-        TypedSerializer.NEVER,
-        Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance)
-    );
+            new InfusorRecipe(element, input, new ItemOutput(output.getId(), output.getComponentsPatch(), count)))))
+        .recipeType()
+        .syncFilter(TypedSerializer.NEVER)
+        .withWorkStations(Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance))
+        .build();
 
     protected final Element element;
     protected final ItemInput ingredient;

@@ -2,7 +2,6 @@ package cool.muyucloud.croparia.client;
 
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.generator.pack.PackHandler;
-import cool.muyucloud.croparia.api.recipe.sync.SyncedRecipeCache;
 import cool.muyucloud.croparia.client.command.ClientCommandRoot;
 import cool.muyucloud.croparia.client.screen.CropTransmuterScreen;
 import cool.muyucloud.croparia.registry.CropariaBlocks;
@@ -69,7 +68,6 @@ public class CropariaIfClient {
         RenderTypeRegistry.register(ChunkSectionLayer.CUTOUT, CropariaBlocks.GREENHOUSE.get());
         RenderTypeRegistry.register(ChunkSectionLayer.CUTOUT, CropariaBlocks.ACTIVATED_SHRIEKER.get());
         MenuScreenRegistry.registerScreenFactory(MenuTypes.CROP_TRANSMUTER.get(), CropTransmuterScreen::new);
-        ClientPlayerEvent.CLIENT_PLAYER_QUIT.register(player -> SyncedRecipeCache.clearClient());
         ClientLifecycleEvent.CLIENT_STOPPING.register(client -> PackHandler.forEach(
             pack -> pack.onClientStopping(Ref.of(client))
         ));
