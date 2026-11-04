@@ -14,10 +14,18 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public class ReiUtil {
-    public static EntryIngredient toIngredient(Item input, Consumer<EntryStack<ItemStack>> processor) {
-        EntryStack<ItemStack> stack = EntryStack.of(VanillaEntryTypes.ITEM, input.getDefaultInstance());
+    public static EntryIngredient toIngredient(ItemStack input) {
+        return toIngredient(input, stack -> {});
+    }
+
+    public static EntryIngredient toIngredient(ItemStack input, Consumer<EntryStack<ItemStack>> processor) {
+        EntryStack<ItemStack> stack = EntryStack.of(VanillaEntryTypes.ITEM, input);
         processor.accept(stack);
         return EntryIngredient.of(stack);
+    }
+
+    public static EntryIngredient toIngredient(Item input, Consumer<EntryStack<ItemStack>> processor) {
+        return toIngredient(input.getDefaultInstance(), processor);
     }
 
     public static EntryIngredient toIngredient(Item input) {

@@ -5,7 +5,6 @@ import cool.muyucloud.croparia.api.core.recipe.*;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import dev.architectury.registry.registries.DeferredRegister;
-import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -21,14 +20,12 @@ public class Recipes {
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(CropariaIf.MOD_ID, Registries.RECIPE_SERIALIZER);
 
     public static final TypedSerializer<InfusorRecipe> INFUSOR = register(InfusorRecipe.TYPED_SERIALIZER);
-    @SuppressWarnings("unused")
-    public static final TypedSerializer<InfusorRecipe> INFUSOR_OLD = register(InfusorRecipe.OLD_TYPED_SERIALIZER);
     public static final TypedSerializer<RitualRecipe> RITUAL = register(RitualRecipe.TYPED_SERIALIZER);
     public static final TypedSerializer<RitualStructure> RITUAL_STRUCTURE = register(RitualStructure.TYPED_SERIALIZER);
     @SuppressWarnings("unused")
     public static final TypedSerializer<SoakRecipe> SOAK = register(SoakRecipe.TYPED_SERIALIZER);
-
-    public static final RegistrySupplier<RecipeSerializer<?>> CROP_MATERIAL = RECIPE_SERIALIZERS.register(CropariaIf.of("crop_material"), () -> CropMaterialRecipe.SERIALIZER);
+    @SuppressWarnings("unused")
+    public static final TypedSerializer<CropMaterialRecipe> CROP_MATERIAL = register(CropMaterialRecipe.TYPED_SERIALIZER);
 
     public static <R extends DisplayableRecipe<?>> TypedSerializer<R> register(TypedSerializer<R> typedSerializer) {
         TYPES.put(typedSerializer.getId(), typedSerializer);
@@ -40,7 +37,7 @@ public class Recipes {
     }
 
     public static void forEach(Consumer<TypedSerializer<? extends DisplayableRecipe<?>>> consumer) {
-        TYPES.forEach((id, supplier) -> consumer.accept(supplier));
+        TYPES.forEach((_, supplier) -> consumer.accept(supplier));
     }
 
     public static TypedSerializer<?> find(Identifier id) {

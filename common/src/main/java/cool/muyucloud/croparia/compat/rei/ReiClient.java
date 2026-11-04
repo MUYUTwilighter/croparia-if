@@ -18,6 +18,7 @@ public class ReiClient implements REIClientPlugin {
         CATEGORIES.add(new ReiRitualRecipe());
         CATEGORIES.add(new ReiRitualStructure());
         CATEGORIES.add(new ReiSoakRecipe());
+        CATEGORIES.add(new ReiCropMaterial());
     }
 
     public void registerCategories(CategoryRegistry registry) {

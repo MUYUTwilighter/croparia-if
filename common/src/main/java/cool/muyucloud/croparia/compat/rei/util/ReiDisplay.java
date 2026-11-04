@@ -58,7 +58,11 @@ public class ReiDisplay<R extends DisplayableRecipe<?>> implements Display {
         return Optional.of(getId().identifier());
     }
 
+    /**
+     * ReiDisplay is constructed locally with the recipe. No need to sync.
+     */
     @Override
+    @Deprecated
     public DisplaySerializer<? extends Display> getSerializer() {
         return null;
     }

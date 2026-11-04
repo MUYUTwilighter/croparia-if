@@ -1,14 +1,17 @@
 package cool.muyucloud.croparia.compat.jei;
 
 import cool.muyucloud.croparia.CropariaIf;
+import cool.muyucloud.croparia.api.core.recipe.CropMaterialRecipe;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.compat.jei.category.*;
+import cool.muyucloud.croparia.compat.jei.extension.CropMaterialCategoryExtension;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.registration.IVanillaCategoryExtensionRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -71,6 +74,10 @@ public class JeiClient implements IModPlugin {
         CATEGORIES.forEach(category -> registerRecipes(registration, category));
     }
 
+    private static <R extends DisplayableRecipe<?>> void registerRecipes(@NonNull IRecipeRegistration registration, JeiCategory<R> category) {
+        registration.addRecipes(category.getRecipeType(), category.getTypedSerializer().find());
+    }
+
     @Override
     public void registerRecipeCatalysts(@NonNull IRecipeCatalystRegistration registration) {
         for (JeiCategory<?> category : CATEGORIES) {
@@ -80,7 +87,8 @@ public class JeiClient implements IModPlugin {
         }
     }
 
-    private static <R extends DisplayableRecipe<?>> void registerRecipes(@NonNull IRecipeRegistration registration, JeiCategory<R> category) {
-        registration.addRecipes(category.getRecipeType(), category.getTypedSerializer().find());
+    @Override
+    public void registerVanillaCategoryExtensions(IVanillaCategoryExtensionRegistration registration) {
+        registration.getCraftingCategory().addExtension(CropMaterialRecipe.class, new CropMaterialCategoryExtension());
     }
 }

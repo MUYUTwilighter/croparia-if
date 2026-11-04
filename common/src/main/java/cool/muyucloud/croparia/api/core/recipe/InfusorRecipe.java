@@ -1,6 +1,5 @@
 package cool.muyucloud.croparia.api.core.recipe;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.recipe.container.InfusorContainer;
@@ -35,20 +34,6 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
             ItemOutput.CODEC.fieldOf("result").forGetter(InfusorRecipe::getResult)
         ).apply(instance, InfusorRecipe::new)))
         .recipeType()
-        .withWorkStations(Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance))
-        .build();
-    public static final TypedSerializer<InfusorRecipe> OLD_TYPED_SERIALIZER = TypedSerializer.<InfusorRecipe>builder()
-        .id(CropariaIf.of("infusor_type"))
-        .recipeClass(InfusorRecipe.class)
-        .serializer(RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ElementAccess.CODEC.fieldOf("element").forGetter(InfusorRecipe::getElement),
-            ItemInput.CODEC.fieldOf("input").forGetter(InfusorRecipe::getIngredient),
-            ItemOutput.CODEC.fieldOf("output").forGetter(InfusorRecipe::getResult),
-            Codec.INT.fieldOf("count").forGetter(recipe -> Math.toIntExact(recipe.getResult().getAmount()))
-        ).apply(instance, (element, input, output, count) ->
-            new InfusorRecipe(element, input, new ItemOutput(output.getId(), output.getComponentsPatch(), count)))))
-        .recipeType()
-        .syncFilter(TypedSerializer.NEVER)
         .withWorkStations(Mappable.of(CropariaItems.INFUSOR, Item::getDefaultInstance))
         .build();
 
