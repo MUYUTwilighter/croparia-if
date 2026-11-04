@@ -23,12 +23,10 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.item.crafting.RecipeMap;
 import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class CropariaIf {
     public static final LazySupplier<Mod> INSTANCE = LazySupplier.of(() -> Platform.getMod("croparia"));

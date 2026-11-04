@@ -6,13 +6,9 @@ import cool.muyucloud.croparia.client.CropariaIfClient;
 import cool.muyucloud.croparia.registry.Recipes;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.recipe.v1.sync.ClientRecipeSynchronizedEvent;
-import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
 import net.fabricmc.fabric.api.recipe.v1.sync.SynchronizedRecipes;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeType;
-
-import java.util.Collection;
 
 public class CropariaIfClientFabric implements ClientModInitializer {
     @Override

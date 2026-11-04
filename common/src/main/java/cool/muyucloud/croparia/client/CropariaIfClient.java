@@ -9,7 +9,6 @@ import cool.muyucloud.croparia.registry.DgRegistries;
 import cool.muyucloud.croparia.registry.MenuTypes;
 import cool.muyucloud.croparia.util.Ref;
 import dev.architectury.event.events.client.ClientLifecycleEvent;
-import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.registry.client.gui.MenuScreenRegistry;
 import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
