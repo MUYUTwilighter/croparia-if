@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "croparia:block/attached_stem" },
+    "facing=east": { "model": "croparia:block/attached_stem", "y": 90 },
+    "facing=south": { "model": "croparia:block/attached_stem", "y": 180 },
+    "facing=west": { "model": "croparia:block/attached_stem", "y": 270 }
+  }
+}

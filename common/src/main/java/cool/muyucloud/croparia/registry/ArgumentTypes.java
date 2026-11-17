@@ -3,7 +3,7 @@ package cool.muyucloud.croparia.registry;
 import com.mojang.brigadier.arguments.ArgumentType;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.mixin.ArgumentTypeInfosMixin;
-import cool.muyucloud.croparia.util.ResourceLocationArgument;
+import cool.muyucloud.croparia.util.IdentifierArgument;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
@@ -14,8 +14,8 @@ public class ArgumentTypes {
     public static final DeferredRegister<ArgumentTypeInfo<?, ?>> REGISTRY = DeferredRegister.create("croparia", Registries.COMMAND_ARGUMENT_TYPE);
 
     @SuppressWarnings("unused")
-    public static final RegistrySupplier<SingletonArgumentInfo<ResourceLocationArgument>> RESOURCE_LOCATION = register(
-        "resource_location", ResourceLocationArgument.class, SingletonArgumentInfo.contextFree(ResourceLocationArgument::id)
+    public static final RegistrySupplier<SingletonArgumentInfo<IdentifierArgument>> RESOURCE_LOCATION = register(
+        "resource_location", IdentifierArgument.class, SingletonArgumentInfo.contextFree(IdentifierArgument::id)
     );
 
     public static <

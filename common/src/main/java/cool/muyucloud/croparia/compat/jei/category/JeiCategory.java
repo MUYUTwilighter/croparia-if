@@ -16,8 +16,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -37,12 +37,12 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
     public abstract TypedSerializer<R> getTypedSerializer();
 
     @Override
-    public @NonNull IRecipeType<R> getRecipeType() {
+    public @NotNull IRecipeType<R> getRecipeType() {
         return this.recipeType;
     }
 
     @Override
-    public @NonNull Component getTitle() {
+    public @NotNull Component getTitle() {
         return Texts.translatable("gui.%s.%s.title".formatted(this.getUid().getNamespace(), this.getUid().getPath()));
     }
 
@@ -53,11 +53,11 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
         else return toDrawable(stations.getFirst().get());
     }
 
-    public @NonNull Identifier getUid() {
+    public @NotNull Identifier getUid() {
         return this.getTypedSerializer().getId();
     }
 
-    public @NonNull Class<? extends R> getRecipeClass() {
+    public @NotNull Class<? extends R> getRecipeClass() {
         return this.getTypedSerializer().getRecipeClass();
     }
 
@@ -109,13 +109,13 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
         private final int height;
         private @Nullable IDrawable delegate;
 
-        public Sprite(@NonNull Identifier id, int width, int height) {
+        public Sprite(@NotNull Identifier id, int width, int height) {
             this.id = id;
             this.width = width;
             this.height = height;
         }
 
-        private @NonNull IDrawable delegate() {
+        private @NotNull IDrawable delegate() {
             IDrawable resolved = this.delegate;
             if (resolved == null) {
                 resolved = JeiClient.getRuntime().getJeiHelpers().getGuiHelper()
@@ -136,7 +136,7 @@ public abstract class JeiCategory<R extends DisplayableRecipe<? extends RecipeIn
         }
 
         @Override
-        public void draw(@NonNull GuiGraphicsExtractor guiGraphics, int xOffset, int yOffset) {
+        public void draw(@NotNull GuiGraphicsExtractor guiGraphics, int xOffset, int yOffset) {
             this.delegate().draw(guiGraphics, xOffset, yOffset);
         }
     }

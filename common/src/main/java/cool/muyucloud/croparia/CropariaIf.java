@@ -44,10 +44,7 @@ public class CropariaIf {
         DataGenerators.register();
         PackHandlers.register();
         Element.EMPTY.name();
-        Crops.register();
-        Melons.register();
         LOGGER.info("Croparia IF vanilla registration");
-        LootConditions.register();
         ArgumentTypes.register();
         NetworkHandlers.register();
         CropariaComponents.register();
@@ -61,8 +58,14 @@ public class CropariaIf {
         CommonCommandRoot.register();
         PlacedFeatures.register();
         LOGGER.info("Croparia IF event registration");
+        LifecycleEvent.SETUP.register(() -> {
+            DgRegistries.CROPS.loadCrops();
+            DgRegistries.MELONS.loadCrops();
+        });
         LifecycleEvent.SERVER_BEFORE_START.register(server -> SERVER = server);
-        LifecycleEvent.SERVER_STARTING.register(server -> ConfigFileHandler.reload(CONFIG));
+        LifecycleEvent.SERVER_STARTING.register(_ -> {
+            ConfigFileHandler.reload(CONFIG);
+        });
         LifecycleEvent.SERVER_STARTED.register(server -> {
             SERVER_STARTED = true;
             OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
@@ -86,9 +89,7 @@ public class CropariaIf {
             ConfigFileHandler.save(CONFIG);
             PackHandler.forEach(pack -> pack.onServerStopping(server));
         });
-        LifecycleEvent.SERVER_STOPPED.register(server -> {
-            SERVER = null;
-        });
+        LifecycleEvent.SERVER_STOPPED.register(_ -> SERVER = null);
         CropariaIf.LOGGER.info("=== Croparia common setup done ===");
     }
 

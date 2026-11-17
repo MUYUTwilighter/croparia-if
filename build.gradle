@@ -4,6 +4,10 @@ plugins {
     id 'com.gradleup.shadow' version '9.4.3' apply false
 }
 
+if (!(tooltip_mod in ['jade', 'wthit', 'none'])) {
+    throw new GradleException("Invalid tooltip_mod '${tooltip_mod}'; expected jade, wthit or none.")
+}
+
 archives_name = "$archives_name-$minecraft_version"
 
 architectury {
@@ -31,6 +35,19 @@ subprojects {
         // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
         // See https://docs.gradle.org/current/userguide/declaring_repositories.html
         // for more information about repositories.
+        maven {
+            url "https://api.modrinth.com/maven"
+            content {
+                includeGroup "maven.modrinth"
+            }
+        }
+        maven {
+            url "https://maven2.bai.lol"
+            content {
+                includeGroup "mcp.mobius.waila"
+                includeGroup "lol.bai"
+            }
+        }
         maven {
             url "https://maven.muyucloud.cool/repository/maven-public/"
         }

@@ -55,6 +55,9 @@ dependencies {
     // Architectury API. This is optional, and you can comment it out if you don't need it.
     implementation "dev.architectury:architectury-neoforge:$architectury_api_version"
 
+    // JetBrains annotations (type-use nullability)
+    compileOnly "org.jetbrains:annotations:26.1.0"
+
     common(project(path: ':common', configuration: 'runtimeElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
 
@@ -66,6 +69,13 @@ dependencies {
     // JEI
     compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
     localRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
+
+    // Select one overlay for development; WTHIT brings Bad Packets transitively.
+    if (tooltip_mod == 'jade') {
+        localRuntime "maven.modrinth:jade:$jade_neoforge_version"
+    } else if (tooltip_mod == 'wthit') {
+        localRuntime "mcp.mobius.waila:wthit:neo-$wthit_version"
+    }
 
     // JToml
     include "io.github.wasabithumb:jtoml:$jtoml_version"

@@ -6,7 +6,7 @@ import cool.muyucloud.croparia.api.recipe.entry.SlotDisplay;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public interface DisplayableRecipe<I extends RecipeInput> extends Recipe<I> {
     /**
      * Get the crafting station apply to this recipe
      */
-    default @NonNull SlotDisplay craftingStation() {
+    default @NotNull SlotDisplay craftingStation() {
         List<Mappable<ItemStack>> stations = this.getTypedSerializer().getStations();
         if (stations.isEmpty()) {
             throw new IllegalStateException("No stations found!");
@@ -37,11 +37,11 @@ public interface DisplayableRecipe<I extends RecipeInput> extends Recipe<I> {
 
     TypedSerializer<? extends DisplayableRecipe<I>> getTypedSerializer();
 
-    default @NonNull List<List<ItemStack>> getInputs() {
+    default @NotNull List<List<ItemStack>> getInputs() {
         return List.of();
     }
 
-    default @NonNull List<List<ItemStack>> getOutputs() {
+    default @NotNull List<List<ItemStack>> getOutputs() {
         return List.of();
     }
 
@@ -50,7 +50,7 @@ public interface DisplayableRecipe<I extends RecipeInput> extends Recipe<I> {
      * @see #getTypedSerializer()
      */
     @Override
-    default @NonNull RecipeType<? extends Recipe<I>> getType() {
+    default @NotNull RecipeType<? extends Recipe<I>> getType() {
         return (RecipeType<? extends Recipe<I>>) getTypedSerializer().getRecipeType();
     }
 
@@ -59,7 +59,7 @@ public interface DisplayableRecipe<I extends RecipeInput> extends Recipe<I> {
      * @see #getTypedSerializer()
      */
     @Override
-    default @NonNull RecipeSerializer<? extends Recipe<I>> getSerializer() {
+    default @NotNull RecipeSerializer<? extends Recipe<I>> getSerializer() {
         return getTypedSerializer().getSerializer();
     }
 
@@ -69,7 +69,7 @@ public interface DisplayableRecipe<I extends RecipeInput> extends Recipe<I> {
     }
 
     @Override
-    default @NonNull PlacementInfo placementInfo() {
+    default @NotNull PlacementInfo placementInfo() {
         return PlacementInfo.NOT_PLACEABLE;
     }
 
@@ -79,12 +79,12 @@ public interface DisplayableRecipe<I extends RecipeInput> extends Recipe<I> {
     }
 
     @Override
-    default @NonNull String group() {
+    default @NotNull String group() {
         return this.getTypedSerializer().getId().toString();
     }
 
     @Override
-    default @NonNull RecipeBookCategory recipeBookCategory() {
+    default @NotNull RecipeBookCategory recipeBookCategory() {
         return EMPTY_CAT;
     }
 }

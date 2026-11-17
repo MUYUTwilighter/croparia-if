@@ -14,8 +14,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<Stri
         TYPE = builder.build();
     }
 
-    public static BlockProperties extract(@NonNull BlockState state) {
+    public static BlockProperties extract(@NotNull BlockState state) {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         var defaults = ((StateHolderAccess<?>) state.getBlock().defaultBlockState()).cif$getProperties();
         var access = (StateHolderAccess<?>) state;
@@ -46,12 +46,12 @@ public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<Stri
         return of(builder.build());
     }
 
-    public static BlockProperties of(@NonNull BlockState state) {
+    public static BlockProperties of(@NotNull BlockState state) {
         return of(((StateHolderAccess<?>) state).cif$getProperties());
     }
 
-    @NonNull
-    public static BlockProperties of(@NonNull Map<String, String> properties) {
+    @NotNull
+    public static BlockProperties of(@NotNull Map<String, String> properties) {
         return properties.isEmpty() ? EMPTY : new BlockProperties(properties);
     }
 
@@ -62,7 +62,7 @@ public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<Stri
         this.properties = properties;
     }
 
-    @NonNull
+    @NotNull
     public Map<String, String> getProperties() {
         return properties;
     }
@@ -81,9 +81,9 @@ public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<Stri
     public boolean isSubsetOf(BlockState state) {
         var access = (StateHolderAccess<?>) state;
         for (Map.Entry<String, String> entry : this.getProperties().entrySet()) {
-            @NonNull String key = entry.getKey();
+            @NotNull String key = entry.getKey();
             @Nullable String value = entry.getValue();
-            @Nullable String blockVal = access.cif$getValue(key);
+            @Nullable String blockVal = access.cif$getValue(key).orElse(null);
             if (value == null && blockVal != null) {
                 continue;
             }
@@ -106,7 +106,7 @@ public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<Stri
         return Objects.hashCode(properties);
     }
 
-    @NonNull
+    @NotNull
     @Override
     public Iterator<Map.Entry<String, String>> iterator() {
         return this.getProperties().entrySet().iterator();

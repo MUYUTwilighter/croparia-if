@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    "#croparia:seeds/crops",
-    "#croparia:seeds/melons"
+    "croparia:crop_seed",
+    "croparia:melon_seed"
   ]
 }

@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.api.element;
 
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.access.SimpleArchitecturyFluidAttributesAccess;
-import cool.muyucloud.croparia.api.crop.util.Color;
+import cool.muyucloud.croparia.api.crop.asset.Color;
 import cool.muyucloud.croparia.api.element.block.ElementalLiquidBlock;
 import cool.muyucloud.croparia.api.element.fluid.ElementalFlowing;
 import cool.muyucloud.croparia.api.element.fluid.ElementalSource;
@@ -29,7 +29,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -167,12 +167,12 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
     }
 
     @Override
-    public @NonNull String getSerializedName() {
+    public @NotNull String getSerializedName() {
         return this.getKey().getPath();
     }
 
     @Override
-    public @NonNull Identifier getKey() {
+    public @NotNull Identifier getKey() {
         return this.id;
     }
 

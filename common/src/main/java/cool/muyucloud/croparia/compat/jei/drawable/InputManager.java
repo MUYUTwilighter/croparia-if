@@ -3,7 +3,7 @@ package cool.muyucloud.croparia.compat.jei.drawable;
 import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import net.minecraft.network.chat.Component;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("UnusedReturnValue")
 public class InputManager extends AbstractInputManager<InputManager> {

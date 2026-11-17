@@ -1,8 +1,0 @@
-registry = "croparia:crops"
-path = "${id.namespace}/models/item/${seed.path}.json"
-startup = true
-template = """
-{
-  "parent": "croparia:item/template_seed"
-}
-"""

@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.api.generator.util;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -26,7 +26,7 @@ public interface DgRegistry<E extends DgEntry> extends Iterable<E> {
         return new MapRegistry<>(map);
     }
 
-    default Optional<E> forName(Identifier id) {
+    default Optional<E> getById(Identifier id) {
         for (E e : this) {
             if (e.getKey().equals(id)) return Optional.of(e);
         }
@@ -45,12 +45,12 @@ public interface DgRegistry<E extends DgEntry> extends Iterable<E> {
         }
 
         @Override
-        public @NonNull Iterator<E> iterator() {
+        public @NotNull Iterator<E> iterator() {
             return this.map.values().iterator();
         }
 
         @Override
-        public Optional<E> forName(Identifier name) {
+        public Optional<E> getById(Identifier name) {
             return Optional.ofNullable(this.map.get(name));
         }
     }
@@ -66,12 +66,12 @@ public interface DgRegistry<E extends DgEntry> extends Iterable<E> {
         }
 
         @Override
-        public @NonNull Iterator<E> iterator() {
+        public @NotNull Iterator<E> iterator() {
             return this.map.values().iterator();
         }
 
         @Override
-        public Optional<E> forName(Identifier id) {
+        public Optional<E> getById(Identifier id) {
             return Optional.ofNullable(this.map.get(id));
         }
     }

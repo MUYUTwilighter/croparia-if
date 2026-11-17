@@ -9,7 +9,7 @@ import net.neoforged.neoforge.transfer.TransferPreconditions;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.RootCommitJournal;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -19,7 +19,7 @@ public class ItemRepoProxy extends RepoProxy<ItemSpec> implements ResourceHandle
     }
 
     @Override
-    public @NonNull ItemResource getResource(int index) {
+    public @NotNull ItemResource getResource(int index) {
         Objects.checkIndex(index, this.size());
         return ItemResource.of(this.resourceFor(index).createStack());
     }
@@ -37,14 +37,14 @@ public class ItemRepoProxy extends RepoProxy<ItemSpec> implements ResourceHandle
     }
 
     @Override
-    public boolean isValid(int index, @NonNull ItemResource resource) {
+    public boolean isValid(int index, @NotNull ItemResource resource) {
         Objects.checkIndex(index, this.size());
         TransferPreconditions.checkNonEmpty(resource);
         return this.capacityFor(index, ItemSpec.of(resource.toStack())) > 0;
     }
 
     @Override
-    public int insert(int index, @NonNull ItemResource resource, int amount, @NonNull TransactionContext transaction) {
+    public int insert(int index, @NotNull ItemResource resource, int amount, @NotNull TransactionContext transaction) {
         Objects.checkIndex(index, this.size());
         TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
         ItemSpec item = ItemSpec.of(resource.toStack());
@@ -56,7 +56,7 @@ public class ItemRepoProxy extends RepoProxy<ItemSpec> implements ResourceHandle
     }
 
     @Override
-    public int extract(int index, @NonNull ItemResource resource, int amount, @NonNull TransactionContext transaction) {
+    public int extract(int index, @NotNull ItemResource resource, int amount, @NotNull TransactionContext transaction) {
         Objects.checkIndex(index, this.size());
         TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
         ItemSpec item = ItemSpec.of(resource.toStack());

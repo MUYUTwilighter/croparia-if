@@ -1,7 +1,7 @@
 package cool.muyucloud.croparia.fabric.mixin;
 
 import cool.muyucloud.croparia.access.SimpleArchitecturyFluidAttributesAccess;
-import cool.muyucloud.croparia.api.crop.util.Color;
+import cool.muyucloud.croparia.api.crop.asset.Color;
 import cool.muyucloud.croparia.api.element.block.ElementalLiquidBlock;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;

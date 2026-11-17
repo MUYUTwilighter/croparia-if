@@ -24,7 +24,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jspecify.annotations.NonNull;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -66,8 +67,8 @@ public class RecipeWizard extends Item {
             // Build Ritual Structure
             BlockInput.ofTag(TagKey.create(Registries.BLOCK, Identifier.parse("croparia:ritual_stands"))),
             context -> {
-                BlockState state = context.getLevel().getBlockState(context.getClickedPos());
-                Optional<RitualStructure> structure = RitualStructure.TYPED_SERIALIZER.find(new RitualStructureContainer(state), context.getLevel());
+                BlockInWorld block = new BlockInWorld(context.getLevel(), context.getClickedPos(), false);
+                Optional<RitualStructure> structure = RitualStructure.TYPED_SERIALIZER.find(new RitualStructureContainer(block), context.getLevel());
                 if (structure.isEmpty()) {
                     return InteractionResult.PASS;
                 }
@@ -101,7 +102,7 @@ public class RecipeWizard extends Item {
     }
 
     @Override
-    public @NonNull InteractionResult useOn(UseOnContext context) {
+    public @NotNull InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         Player player = context.getPlayer();
         if (player == null || context.getHand() != InteractionHand.MAIN_HAND) {
@@ -109,7 +110,7 @@ public class RecipeWizard extends Item {
         }
         if (player.isCrouching()) {
             for (var entry : OPERATIONS.entrySet()) {
-                if (entry.getKey().matches(level.getBlockState(context.getClickedPos()))) {
+                if (entry.getKey().matches(level, context.getClickedPos())) {
                     InteractionResult result = entry.getValue().apply(context);
                     if (result != InteractionResult.PASS) {
                         return result;
@@ -121,7 +122,7 @@ public class RecipeWizard extends Item {
         if (!level.isClientSide() || !player.isLocalPlayer()) {
             return InteractionResult.PASS;
         }
-        BlockState target = context.getLevel().getBlockState(context.getClickedPos());
+        BlockInWorld target = new BlockInWorld(level, context.getClickedPos(), false);
         for (RecipeWizardGenerator generator : GENERATORS.get()) {
             if (generator.matches(target)) {
                 generator.handle(context);

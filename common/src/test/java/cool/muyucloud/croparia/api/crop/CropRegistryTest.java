@@ -8,7 +8,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -43,7 +42,7 @@ class CropRegistryTest {
         assertEquals(1, firstLoaded.registeredCount());
         assertEquals(0, secondLoaded.registeredCount());
         assertEquals(1, loadedAgain.registeredCount());
-        assertSame(loadedAgain, registry.forName(id).orElseThrow());
+        assertSame(loadedAgain, registry.getById(id).orElseThrow());
 
         List<DummyCrop> loaded = registryLoaded(registry);
         assertEquals(1, loaded.size());
@@ -130,7 +129,7 @@ class CropRegistryTest {
 
     private static List<DummyCrop> registryLoaded(CropRegistry<DummyCrop> registry) {
         java.util.ArrayList<DummyCrop> loaded = new java.util.ArrayList<>();
-        registry.forLoaded(loaded::add);
+        registry.forActive(loaded::add);
         return loaded;
     }
 
@@ -144,17 +143,17 @@ class CropRegistryTest {
 
         private static final Material<Object> MATERIAL = new Material<>("minecraft:air", 1) {
             @Override
-            public @NonNull List<Object> candidates() {
+            public @NotNull List<Object> candidates() {
                 return List.of();
             }
 
             @Override
-            public @NonNull ItemStack asItem() {
+            public @NotNull ItemStack asItem() {
                 return null;
             }
 
             @Override
-            public @NonNull List<ItemStack> asItems() {
+            public @NotNull List<ItemStack> asItems() {
                 return List.of();
             }
         };

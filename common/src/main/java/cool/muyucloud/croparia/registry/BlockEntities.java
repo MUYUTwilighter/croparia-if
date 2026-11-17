@@ -4,13 +4,16 @@ import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.block.entity.ActivatedShriekerBlockEntity;
 import cool.muyucloud.croparia.api.core.block.entity.CropTransmuterBlockEntity;
 import cool.muyucloud.croparia.api.core.block.entity.GreenhouseBlockEntity;
+import cool.muyucloud.croparia.api.crop.Crop;
+import cool.muyucloud.croparia.api.crop.Melon;
+import cool.muyucloud.croparia.api.crop.block.entity.CropEntity;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 import java.util.Set;
@@ -35,13 +38,18 @@ public class BlockEntities {
         ActivatedShriekerBlockEntity::new,
         Set.of(CropariaBlocks.ACTIVATED_SHRIEKER)
     );
+    public static final RegistrySupplier<BlockEntityType<CropEntity<Crop>>> CROP = register("crop", (pos, state) ->
+        new CropEntity<>(BlockEntities.CROP.get(), pos, state, DgRegistries.CROPS), Set.of(CropariaBlocks.CROP_BLOCK));
+    public static final RegistrySupplier<BlockEntityType<CropEntity<Melon>>> MELON = register("melon", (pos, state) ->
+        new CropEntity<>(BlockEntities.MELON.get(), pos, state, DgRegistries.MELONS), Set.of(CropariaBlocks.MELON_BLOCK, CropariaBlocks.MELON_ATTACH, CropariaBlocks.MELON_STEM));
 
-    @NonNull
+    @NotNull
+
     public static <T extends BlockEntity> RegistrySupplier<BlockEntityType<T>> register(
-        @NonNull String name,
-        @NonNull BlockEntityType.BlockEntitySupplier<? extends T> factory,
-        @NonNull Set<? extends Supplier<? extends Block>> validBlocks
-        ) {
+        @NotNull String name,
+        BlockEntityType.@NotNull BlockEntitySupplier<? extends T> factory,
+        @NotNull Set<? extends Supplier<? extends Block>> validBlocks
+    ) {
         return BLOCK_ENTITIES.register(name, () -> createType(
             factory,
             validBlocks.stream().map(Supplier::get).collect(Collectors.toSet())

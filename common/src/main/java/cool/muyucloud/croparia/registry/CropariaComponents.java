@@ -9,6 +9,7 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -28,6 +29,12 @@ public class CropariaComponents {
     public static final RegistrySupplier<DataComponentType<Text>> TEXT = register("text", () -> {
         DataComponentType.Builder<Text> builder = DataComponentType.builder();
         builder.persistent(Text.CODEC).networkSynchronized(CodecUtil.toStream(Text.CODEC));
+        return builder.build();
+    });
+    public static final RegistrySupplier<DataComponentType<Identifier>> CROP_ID = register("crop", () -> {
+        DataComponentType.Builder<Identifier> builder = DataComponentType.builder();
+        builder.persistent(Identifier.CODEC);
+        builder.networkSynchronized(Identifier.STREAM_CODEC);
         return builder.build();
     });
 

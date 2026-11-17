@@ -1,44 +1,68 @@
 package cool.muyucloud.croparia.api.crop.block;
 
-import cool.muyucloud.croparia.CropariaIf;
-import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.api.crop.Melon;
-import cool.muyucloud.croparia.api.crop.item.MelonSeed;
-import cool.muyucloud.croparia.util.CifUtil;
+import cool.muyucloud.croparia.api.crop.block.entity.CropEntity;
+import cool.muyucloud.croparia.registry.BlockEntities;
+import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.AttachedStemBlock;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootParams;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
-public class MelonAttach extends AttachedStemBlock implements CropAccess<Melon> {
-    private final Melon melon;
+import java.util.List;
+import java.util.Objects;
 
-    public MelonAttach(Melon melon) {
-        super(
-            CifUtil.castUnsafe(melon.getStem().getKey()),
-            CifUtil.castUnsafe(melon.getMelon().getKey()),
-            CifUtil.castUnsafe(melon.getSeed().getKey()),
-            Properties.ofFullCopy(Blocks.ATTACHED_PUMPKIN_STEM).setId(ResourceKey.create(Registries.BLOCK, melon.getAttach().getId()))
-        );
-        this.melon = melon;
+public class MelonAttach extends AttachedStemBlock implements CropEntityBlock<Melon> {
+    @SuppressWarnings("unchecked")
+    public MelonAttach(ResourceKey<? extends Block> stem, ResourceKey<? extends Block> melon, ResourceKey<? extends Item> seed, TagKey<Block> stemBase, Properties properties) {
+        super((ResourceKey<Block>) stem, (ResourceKey<Block>) melon, (ResourceKey<Item>) seed, stemBase, properties);
     }
 
     @Override
-    public Melon getCrop() {
-        return this.melon;
+    public @NotNull Item asItem() {
+        return CropariaItems.MELON_SEED.get();
+    }
+
+    @Override
+    public BlockEntityType<CropEntity<Melon>> getBlockEntityType() {
+        return BlockEntities.MELON.get();
+    }
+
+    @Override
+    public @NotNull Identifier getId() {
+        return Objects.requireNonNull(this.arch$registryName());
+    }
+
+    @Override
+    protected @NotNull ItemStack getCloneItemStack(@NotNull LevelReader level, @NotNull BlockPos pos, @NotNull BlockState state, boolean includeData) {
+        ItemStack stack = super.getCloneItemStack(level, pos, state, includeData);
+        return this.appendCropId(level, pos, stack);
+    }
+
+    @Override
+    protected @NotNull List<ItemStack> getDrops(@NotNull BlockState state, LootParams.@NotNull Builder builder) {
+        return this.getCropDrops(state, builder, () -> super.getDrops(state, builder));
+    }
+
+    @Override
+    protected boolean shouldChangedStateKeepBlockEntity(@NotNull BlockState oldState) {
+        return this.getBlockEntityType().isValid(oldState);
     }
 
     @Override
     public @NonNull MutableComponent getName() {
-        MutableComponent cropName = Texts.translatable(this.getCrop().getTranslationKey());
-        return Texts.translatable("block." + CropariaIf.MOD_ID + ".melon.attach", cropName);
-    }
-
-    @Override
-    public @NonNull MelonSeed asItem() {
-        return this.getCrop().getSeed().get();
+        return Texts.translatable("block.croparia.melon_attach", Texts.translatable("melon.croparia.unknown"));
     }
 }

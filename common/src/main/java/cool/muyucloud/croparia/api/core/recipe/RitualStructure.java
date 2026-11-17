@@ -25,7 +25,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jspecify.annotations.NonNull;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -49,9 +50,9 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     });
 
     private final BlockInput ritual;
-    @NonNull
+    @NotNull
     private final ImmutableMap<Character, BlockInput> keys;
-    @NonNull
+    @NotNull
     private final MarkedTransformableChar3D patterns;
     private final transient LazySupplier<List<List<ItemStack>>> inputsCache = LazySupplier.of(() -> {
         ImmutableList.Builder<List<ItemStack>> builder = ImmutableList.builder();
@@ -68,7 +69,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
         return builder.build();
     });
 
-    public RitualStructure(BlockInput ritual, @NonNull Map<Character, BlockInput> keyDeclarations, Char3D rawPattern) {
+    public RitualStructure(BlockInput ritual, @NotNull Map<Character, BlockInput> keyDeclarations, Char3D rawPattern) {
         this.ritual = ritual;
         // Validate key declarations
         Map<Character, BlockInput> keys = new HashMap<>();
@@ -94,19 +95,19 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     }
 
     @Override
-    public @NonNull List<List<ItemStack>> getInputs() {
+    public @NotNull List<List<ItemStack>> getInputs() {
         return this.inputsCache.get();
     }
 
     @Override
-    public @NonNull List<List<ItemStack>> getOutputs() {
+    public @NotNull List<List<ItemStack>> getOutputs() {
         return List.of(this.getRitual().getDisplayStacks());
     }
 
-    public @NonNull Result matchTransformed(BlockPos origin, Level level, MarkedChar3D pattern, BlockState ritualBlock) {
+    public @NotNull Result matchTransformed(BlockPos origin, Level level, MarkedChar3D pattern, BlockState ritualBlock) {
         origin = pattern.getOriginInWorld(origin);
         List<BlockPos> inputPositions = new ArrayList<>();
-        List<BlockState> inputBlocks = new ArrayList<>();
+        List<BlockInWorld> inputBlocks = new ArrayList<>();
         for (int x = 0; x < pattern.xSize(); x++) {
             for (int y = 0; y < pattern.ySize(); y++) {
                 for (int z = 0; z < pattern.zSize(); z++) {
@@ -115,9 +116,9 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
                     char key = pattern.get(x, y, z);
                     if (key == '$') {
                         inputPositions.add(pos);
-                        inputBlocks.add(state);
+                        inputBlocks.add(new BlockInWorld(level, pos, false));
                     } else if (key == '*') {
-                        if (!state.equals(ritualBlock)) {
+                        if (!state.equals(ritualBlock) || !this.getRitual().matches(level, pos)) {
                             return Result.FAIL;
                         }
                     } else if (key == '.') {
@@ -126,7 +127,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
                         }
                     } else if (key != ' ') {
                         BlockInput input = this.keys.get(key);
-                        if (input == null || !input.matches(state)) {
+                        if (input == null || !input.matches(level, pos)) {
                             return Result.FAIL;
                         }
                     }
@@ -148,7 +149,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
         return Result.FAIL;
     }
 
-    public @NonNull Map<Character, BlockInput> getKeys() {
+    public @NotNull Map<Character, BlockInput> getKeys() {
         return this.keys;
     }
 
@@ -187,7 +188,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
                     } else if (key == '$') {
                         level.setBlockAndUpdate(origin.offset(x, y, z), CropariaBlocks.PLACEHOLDER.get().defaultBlockState());
                     } else if (key != ' ' && key != '*') {
-                        level.setBlockAndUpdate(origin.offset(x, y, z), this.getKeys().get(key).getExampleState());
+                        this.getKeys().get(key).placeExample(level, origin.offset(x, y, z));
                     }
                 }
             }
@@ -199,7 +200,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     }
 
     @Override
-    public @NonNull SlotDisplay craftingStation() {
+    public @NotNull SlotDisplay craftingStation() {
         return null;
     }
 
@@ -210,36 +211,41 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
 
     @Override
     public boolean matches(RitualStructureContainer matcher, Level level) {
-        return this.getRitual().matches(matcher.getState());
+        return this.getRitual().matches(matcher.getBlock());
     }
 
     @Override
     @Deprecated
-    public @NonNull ItemStack assemble(@NonNull RitualStructureContainer recipeInput) {
+    public @NotNull ItemStack assemble(@NotNull RitualStructureContainer recipeInput) {
         return ItemStack.EMPTY;
     }
 
-    public static Result result(List<BlockState> states, @NonNull Runnable destroyAction) {
-        return new Result(states, destroyAction);
+    public static Result result(List<BlockInWorld> blocks, @NotNull Runnable destroyAction) {
+        return new Result(blocks, destroyAction);
     }
 
     public static class Result {
         public static final Result FAIL = new Result(List.of(), () -> {
         });
 
-        @NonNull
-        private final List<BlockState> states;
-        @NonNull
+        @NotNull
+        private final List<BlockInWorld> blocks;
+        @NotNull
         private final Runnable destroyAction;
 
-        public Result(@NonNull List<BlockState> states, @NonNull Runnable destroyAction) {
-            this.states = states;
+        public Result(@NotNull List<BlockInWorld> blocks, @NotNull Runnable destroyAction) {
+            this.blocks = List.copyOf(blocks);
             this.destroyAction = destroyAction;
         }
 
-        @NonNull
+        @NotNull
+        public List<BlockInWorld> getBlocks() {
+            return blocks;
+        }
+
+        @NotNull
         public List<BlockState> getStates() {
-            return states;
+            return blocks.stream().map(BlockInWorld::getState).toList();
         }
 
         public void destroy() {
@@ -247,7 +253,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
         }
 
         public void ifSuccessOrElse(Consumer<Result> state, Runnable onFail) {
-            if (this.getStates().isEmpty()) {
+            if (this.getBlocks().isEmpty()) {
                 onFail.run();
             } else {
                 state.accept(this);

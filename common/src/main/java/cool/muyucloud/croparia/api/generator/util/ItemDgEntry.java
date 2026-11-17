@@ -1,16 +1,16 @@
 package cool.muyucloud.croparia.api.generator.util;
 
 import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
-public record ItemDgEntry(@NonNull Identifier key) implements DgEntry {
+public record ItemDgEntry(@NotNull Identifier key) implements DgEntry {
     @Override
     public boolean shouldLoad() {
         return true;
     }
 
     @Override
-    public @NonNull Identifier getKey() {
+    public @NotNull Identifier getKey() {
         return this.key;
     }
 }

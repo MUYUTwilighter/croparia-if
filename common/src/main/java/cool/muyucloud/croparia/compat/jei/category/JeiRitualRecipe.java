@@ -8,8 +8,8 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class JeiRitualRecipe extends JeiCategory<RitualRecipe> {
     public static final JeiRitualRecipe INSTANCE = new JeiRitualRecipe();
@@ -25,7 +25,7 @@ public class JeiRitualRecipe extends JeiCategory<RitualRecipe> {
     }
 
     @Override
-    public void setRecipe(@NonNull IRecipeLayoutBuilder builder, @NonNull RitualRecipe recipe, @NonNull IFocusGroup focuses) {
+    public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull RitualRecipe recipe, @NotNull IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 40).addItemStacks(recipe.craftingStation().getDisplayStacks());
         builder.addInputSlot(72, 8).addItemStacks(recipe.getIngredient().getDisplayStacks());
         builder.addInputSlot(40, 40).addItemStacks(recipe.getBlock().getDisplayStacks());
@@ -33,7 +33,7 @@ public class JeiRitualRecipe extends JeiCategory<RitualRecipe> {
     }
 
     @Override
-    public void createRecipeExtras(@NonNull IRecipeExtrasBuilder builder, @NonNull RitualRecipe recipe, @NonNull IFocusGroup focuses) {
+    public void createRecipeExtras(@NotNull IRecipeExtrasBuilder builder, @NotNull RitualRecipe recipe, @NotNull IFocusGroup focuses) {
         builder.addDrawableWidget(ITEM_DROP).setPosition(72, 24);
         builder.addDrawableWidget(ELEM_INFUSE).setPosition(56, 40);
         builder.addRecipeArrowWidget().setPosition(88, 40);

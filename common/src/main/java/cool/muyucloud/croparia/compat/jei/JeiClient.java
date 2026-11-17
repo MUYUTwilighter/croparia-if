@@ -5,17 +5,17 @@ import cool.muyucloud.croparia.api.core.recipe.CropMaterialRecipe;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.compat.jei.category.*;
 import cool.muyucloud.croparia.compat.jei.extension.CropMaterialCategoryExtension;
+import cool.muyucloud.croparia.registry.CropariaComponents;
+import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.supplier.Mappable;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
-import mezz.jei.api.registration.IRecipeCatalystRegistration;
-import mezz.jei.api.registration.IRecipeCategoryRegistration;
-import mezz.jei.api.registration.IRecipeRegistration;
-import mezz.jei.api.registration.IVanillaCategoryExtensionRegistration;
+import mezz.jei.api.registration.*;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class JeiClient implements IModPlugin {
         JeiSoakRecipe.INSTANCE
     );
 
-    private static IJeiRuntime runtime;
+    private static @Nullable IJeiRuntime runtime;
 
     public static IJeiRuntime getRuntime() {
         IJeiRuntime available = runtime;
@@ -48,7 +48,7 @@ public class JeiClient implements IModPlugin {
     }
 
     @Override
-    public void onRuntimeAvailable(@NonNull IJeiRuntime jeiRuntime) {
+    public void onRuntimeAvailable(@NotNull IJeiRuntime jeiRuntime) {
         runtime = jeiRuntime;
     }
 
@@ -58,28 +58,28 @@ public class JeiClient implements IModPlugin {
     }
 
     @Override
-    public @NonNull Identifier getPluginUid() {
+    public @NotNull Identifier getPluginUid() {
         return CropariaIf.of("jei");
     }
 
     @Override
-    public void registerCategories(@NonNull IRecipeCategoryRegistration registration) {
+    public void registerCategories(@NotNull IRecipeCategoryRegistration registration) {
         for (JeiCategory<?> category : CATEGORIES) {
             registration.addRecipeCategories(category);
         }
     }
 
     @Override
-    public void registerRecipes(@NonNull IRecipeRegistration registration) {
+    public void registerRecipes(@NotNull IRecipeRegistration registration) {
         CATEGORIES.forEach(category -> registerRecipes(registration, category));
     }
 
-    private static <R extends DisplayableRecipe<?>> void registerRecipes(@NonNull IRecipeRegistration registration, JeiCategory<R> category) {
+    private static <R extends DisplayableRecipe<?>> void registerRecipes(@NotNull IRecipeRegistration registration, JeiCategory<R> category) {
         registration.addRecipes(category.getRecipeType(), category.getTypedSerializer().find());
     }
 
     @Override
-    public void registerRecipeCatalysts(@NonNull IRecipeCatalystRegistration registration) {
+    public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
         for (JeiCategory<?> category : CATEGORIES) {
             for (Mappable<ItemStack> stack : category.getTypedSerializer().getStations()) {
                 registration.addCraftingStation(category.getRecipeType(), stack.get());
@@ -90,5 +90,13 @@ public class JeiClient implements IModPlugin {
     @Override
     public void registerVanillaCategoryExtensions(IVanillaCategoryExtensionRegistration registration) {
         registration.getCraftingCategory().addExtension(CropMaterialRecipe.class, new CropMaterialCategoryExtension());
+    }
+
+    @Override
+    public void registerItemSubtypes(ISubtypeRegistration registration) {
+        registration.registerFromDataComponentTypes(CropariaItems.CROP_SEED.get(), CropariaComponents.CROP_ID.get());
+        registration.registerFromDataComponentTypes(CropariaItems.CROP_FRUIT.get(), CropariaComponents.CROP_ID.get());
+        registration.registerFromDataComponentTypes(CropariaItems.MELON_SEED.get(), CropariaComponents.CROP_ID.get());
+        registration.registerFromDataComponentTypes(CropariaItems.MELON_ITEM.get(), CropariaComponents.CROP_ID.get());
     }
 }

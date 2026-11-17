@@ -15,7 +15,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -39,19 +39,19 @@ public class ItemOutput implements SlotDisplay {
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemOutput> STREAM_CODEC = CodecUtil.toStream(CODEC);
     public static final ItemOutput EMPTY = new ItemOutput();
 
-    public static ItemOutput of(@NonNull ItemStack stack) {
+    public static ItemOutput of(@NotNull ItemStack stack) {
         if (stack.isEmpty()) return EMPTY;
         return new ItemOutput(stack);
     }
 
-    @NonNull
+    @NotNull
     private final Identifier id;
-    @NonNull
+    @NotNull
     private final DataComponentPatch components;
     private final long amount;
-    @NonNull
+    @NotNull
     private final transient ItemSpec itemSpec;
-    @NonNull
+    @NotNull
     private final transient ItemStack displayStack;
 
     private ItemOutput() {
@@ -62,15 +62,15 @@ public class ItemOutput implements SlotDisplay {
         this.displayStack = this.toSpec().createStack(this.getAmount());
     }
 
-    public ItemOutput(@NonNull ItemStack stack) {
+    public ItemOutput(@NotNull ItemStack stack) {
         this(Objects.requireNonNull(stack.getItem().arch$registryName()), stack.getComponentsPatch(), stack.getCount());
     }
 
-    public ItemOutput(@NonNull Identifier id, int amount) {
+    public ItemOutput(@NotNull Identifier id, int amount) {
         this(id, DataComponentPatch.EMPTY, amount);
     }
 
-    public ItemOutput(@NonNull Identifier id, @NonNull DataComponentPatch components, long amount) {
+    public ItemOutput(@NotNull Identifier id, @NotNull DataComponentPatch components, long amount) {
         this.id = id;
         this.components = components;
         this.amount = amount;
@@ -80,16 +80,16 @@ public class ItemOutput implements SlotDisplay {
         this.displayStack = this.toSpec().createStack(this.getAmount());
     }
 
-    public @NonNull List<ItemStack> getDisplayStacks() {
+    public @NotNull List<ItemStack> getDisplayStacks() {
         return List.of(this.displayStack);
     }
 
-    @NonNull
+    @NotNull
     public Identifier getId() {
         return this.id;
     }
 
-    @NonNull
+    @NotNull
     public DataComponentPatch getComponentsPatch() {
         return this.components;
     }
@@ -98,7 +98,7 @@ public class ItemOutput implements SlotDisplay {
         return amount;
     }
 
-    public @NonNull ItemSpec toSpec() {
+    public @NotNull ItemSpec toSpec() {
         return itemSpec;
     }
 

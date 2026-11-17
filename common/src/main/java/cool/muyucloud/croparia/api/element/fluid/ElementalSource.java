@@ -4,12 +4,12 @@ import cool.muyucloud.croparia.api.element.Element;
 import cool.muyucloud.croparia.api.element.ElementAccess;
 import dev.architectury.core.fluid.ArchitecturyFlowingFluid;
 import dev.architectury.core.fluid.ArchitecturyFluidAttributes;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class ElementalSource extends ArchitecturyFlowingFluid.Source implements ElementAccess {
     private final Element element;
 
-    public ElementalSource(@NonNull Element element, @NonNull ArchitecturyFluidAttributes attributes) {
+    public ElementalSource(@NotNull Element element, @NotNull ArchitecturyFluidAttributes attributes) {
         super(attributes);
         if (element == Element.EMPTY) {
             throw new IllegalArgumentException("Element cannot be empty");
@@ -18,7 +18,7 @@ public class ElementalSource extends ArchitecturyFlowingFluid.Source implements 
     }
 
     @Override
-    public @NonNull Element getElement() {
+    public @NotNull Element getElement() {
         return this.element;
     }
 

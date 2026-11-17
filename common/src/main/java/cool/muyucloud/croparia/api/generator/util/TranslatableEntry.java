@@ -1,12 +1,14 @@
 package cool.muyucloud.croparia.api.generator.util;
 
+import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.placeholder.MapReader;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.TypeMapper;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 public interface TranslatableEntry extends DgEntry {
@@ -20,7 +22,18 @@ public interface TranslatableEntry extends DgEntry {
 
     String getTranslationKey();
 
-    @Nullable String translate(String lang);
+    default @Nullable String translate(String lang) {
+        return this.getTranslations().get(lang);
+    }
+
+    default String translate() {
+        AtomicReference<String> code = new AtomicReference<>();
+        CropariaIf.ifClientOrElse(
+            ref -> code.set(ref.get().getLanguageManager().getSelected()),
+            _ -> code.set("en_us")
+        );
+        return this.getTranslations().getOrDefault(code.get(), this.getTranslations().get("en_us"));
+    }
 
     Map<String, String> getTranslations();
 

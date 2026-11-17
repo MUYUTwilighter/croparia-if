@@ -8,7 +8,7 @@ import cool.muyucloud.croparia.api.core.item.relic.HornPlenty;
 import cool.muyucloud.croparia.api.core.item.relic.InfiniteApple;
 import cool.muyucloud.croparia.api.core.item.relic.MagicRope;
 import cool.muyucloud.croparia.api.core.item.relic.MidasHand;
-import cool.muyucloud.croparia.api.crop.item.Croparia;
+import cool.muyucloud.croparia.api.crop.item.*;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
@@ -18,7 +18,7 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Function;
@@ -119,19 +119,23 @@ public class CropariaItems {
     protected static final List<RegistrySupplier<BlockItem>> RITUAL_STANDS = List.of(
         RITUAL_STAND, RITUAL_STAND_2, RITUAL_STAND_3
     );
+    public static final RegistrySupplier<CropFruit> CROP_FRUIT = registerItem("crop_fruit", CropFruit::new);
+    public static final RegistrySupplier<CropSeed> CROP_SEED = registerItem("crop_seed", properties -> new CropSeed(CropariaBlocks.CROP_BLOCK, properties));
+    public static final RegistrySupplier<MelonItem> MELON_ITEM = registerItem("melon", properties -> new MelonItem(CropariaBlocks.MELON_BLOCK, properties));
+    public static final RegistrySupplier<MelonSeed> MELON_SEED = registerItem("melon_seed", properties -> new MelonSeed(CropariaBlocks.MELON_STEM, properties));
 
-    @NonNull
+    @NotNull
     public static <T extends Item> RegistrySupplier<T> registerItem(
-        @NonNull String name, @NonNull Function<Item.Properties, T> supplier
+        @NotNull String name, @NotNull Function<Item.Properties, T> supplier
     ) {
         return ITEMS.register(name, () -> supplier.apply(
             new Item.Properties().setId(ResourceKey.create(Registries.ITEM, CropariaIf.of(name)))
         ));
     }
 
-    @NonNull
+    @NotNull
     public static <T extends Item> RegistrySupplier<T> registerItem(
-        @NonNull Identifier id, @NonNull Function<Item.Properties, T> supplier
+        @NotNull Identifier id, @NotNull Function<Item.Properties, T> supplier
     ) {
         return ITEMS.register(id, () -> supplier.apply(
             new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id))
@@ -143,7 +147,7 @@ public class CropariaItems {
         ITEMS.register();
     }
 
-    public static @NonNull RegistrySupplier<Croparia> getCroparia(int tier) {
+    public static @NotNull RegistrySupplier<Croparia> getCroparia(int tier) {
         return CROPARIAS.get(tier - 1);
     }
 
@@ -155,7 +159,7 @@ public class CropariaItems {
         return CROPARIAS.size();
     }
 
-    public static @NonNull RegistrySupplier<BlockItem> getRitualStand(int tier) {
+    public static @NotNull RegistrySupplier<BlockItem> getRitualStand(int tier) {
         return RITUAL_STANDS.get(tier - 1);
     }
 }

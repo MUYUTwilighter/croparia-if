@@ -5,14 +5,14 @@ import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.PlaceholderAccess;
 import cool.muyucloud.croparia.api.placeholder.TypeMapper;
 import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public interface DgEntry extends PlaceholderAccess {
     Placeholder<DgEntry> PLACEHOLDER = Placeholder.build(node -> node.then(
         PatternKey.literal("id"), TypeMapper.of(DgEntry::getKey), Placeholder.ID
     ));
 
-    @NonNull
+    @NotNull
     Identifier getKey();
 
     default Placeholder<? extends DgEntry> placeholder() {

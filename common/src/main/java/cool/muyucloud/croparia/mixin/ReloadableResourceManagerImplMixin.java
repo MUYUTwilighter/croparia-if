@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Mixin(ReloadableResourceManager.class)
 public abstract class ReloadableResourceManagerImplMixin implements ResourceManager, AutoCloseable {
-    @ModifyVariable(method = "createReload", at = @At("HEAD"), argsOnly = true)
+    @ModifyVariable(method = "createReload", at = @At("HEAD"), argsOnly = true, name = "resourcePacks")
     public List<PackResources> onReload(List<PackResources> packs) {
         List<PackResources> newPacks = new LinkedList<>();
         for (ResourcePackHandler pack : ResourcePackHandler.REGISTRY.values()) {

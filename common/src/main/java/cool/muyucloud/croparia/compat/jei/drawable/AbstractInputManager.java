@@ -7,7 +7,7 @@ import mezz.jei.api.gui.widgets.IRecipeWidget;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -387,21 +387,21 @@ public abstract class AbstractInputManager<T extends AbstractInputManager<T>> im
     }
 
     @Override
-    public @NonNull ScreenRectangle getArea() {
+    public @NotNull ScreenRectangle getArea() {
         return area;
     }
 
     @Override
-    public @NonNull ScreenPosition getPosition() {
+    public @NotNull ScreenPosition getPosition() {
         return area.position();
     }
 
     @Override
-    public @NonNull ScreenRectangle getScreenRectangle() {
+    public @NotNull ScreenRectangle getScreenRectangle() {
         return area;
     }
 
-    public @NonNull T setPosition(int x, int y) {
+    public @NotNull T setPosition(int x, int y) {
         area = new ScreenRectangle(x, y, area.width(), area.height());
         return this.getSelf();
     }
@@ -414,7 +414,7 @@ public abstract class AbstractInputManager<T extends AbstractInputManager<T>> im
         return area.top();
     }
 
-    public @NonNull T setSize(int width, int height) {
+    public @NotNull T setSize(int width, int height) {
         area = new ScreenRectangle(area.left(), area.top(), width, height);
         return this.getSelf();
     }
@@ -432,7 +432,7 @@ public abstract class AbstractInputManager<T extends AbstractInputManager<T>> im
     }
 
     @Override
-    public void drawWidget(@NonNull GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void drawWidget(@NotNull GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
         if (containsLocal(mouseX, mouseY)) {
             if (!hovered) {
                 hovered = true;

@@ -22,7 +22,7 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -46,15 +46,15 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         .build();
 
     private final BlockInput ritual;
-    @NonNull
+    @NotNull
     private final BlockInput block;
-    @NonNull
+    @NotNull
     private final ItemInput ingredient;
-    @NonNull
+    @NotNull
     private final ItemOutput result;
 
     public RitualRecipe(
-        BlockInput ritual, @NonNull BlockInput state, @NonNull ItemInput ingredient, @NonNull ItemOutput result
+        BlockInput ritual, @NotNull BlockInput state, @NotNull ItemInput ingredient, @NotNull ItemOutput result
     ) {
         this.ritual = ritual;
         this.block = state;
@@ -75,24 +75,24 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
         this.result.getDisplayStacks().forEach(this::appendResultTooltip);
     }
 
-    public @NonNull ItemInput getIngredient() {
+    public @NotNull ItemInput getIngredient() {
         return ingredient;
     }
 
-    public @NonNull ItemOutput getResult() {
+    public @NotNull ItemOutput getResult() {
         return result;
     }
 
-    public @NonNull BlockInput getBlock() {
+    public @NotNull BlockInput getBlock() {
         return block;
     }
 
-    public @NonNull BlockInput getRitual() {
+    public @NotNull BlockInput getRitual() {
         return this.ritual;
     }
 
     @Override
-    public @NonNull List<List<ItemStack>> getInputs() {
+    public @NotNull List<List<ItemStack>> getInputs() {
         return List.of(
             this.getIngredient().getDisplayStacks(),
             this.getBlock().getDisplayStacks()
@@ -100,7 +100,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     }
 
     @Override
-    public @NonNull List<List<ItemStack>> getOutputs() {
+    public @NotNull List<List<ItemStack>> getOutputs() {
         return List.of(this.getResult().getDisplayStacks());
     }
 
@@ -140,7 +140,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     }
 
     @Override
-    public @NonNull ItemStack assemble(@NonNull RitualContainer matcher) {
+    public @NotNull ItemStack assemble(@NotNull RitualContainer matcher) {
         ItemStack result = this.getResult().createStack();
         // Handle enchanted book special case
         ItemEnchantments enchantments = result.get(DataComponents.STORED_ENCHANTMENTS);
@@ -187,10 +187,10 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
                 ItemEnchantments toCheck = stack.getEnchantments();
                 return enchantments.entrySet().stream().anyMatch(entry -> toCheck.getLevel(entry.getKey()) < entry.getIntValue())
                     && this.getIngredient().matches(stack);
-            }) && matcher.matched().getStates().stream().allMatch(state -> this.getBlock().matches(state));
+            }) && matcher.matched().getBlocks().stream().allMatch(this.getBlock()::matches);
         }
         // Handle common case
-        return this.getIngredient().matches(matcher) && matcher.matched().getStates().stream().allMatch(state -> this.getBlock().matches(state));
+        return this.getIngredient().matches(matcher) && matcher.matched().getBlocks().stream().allMatch(this.getBlock()::matches);
     }
 
     @Override
@@ -199,7 +199,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     }
 
     @Override
-    public @NonNull BlockInput craftingStation() {
+    public @NotNull BlockInput craftingStation() {
         return this.getRitual();
     }
 

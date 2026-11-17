@@ -1,5 +1,5 @@
 registry = "croparia:crops"
-path = "${id.namespace}/loot_table/blocks/${crop_block.path}.json"
+path = "croparia/loot_table/crop/${id.path}.json"
 template = """
 {
   "type": "minecraft:block",
@@ -9,7 +9,15 @@ template = """
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "${seed}"
+          "name": "croparia:crop_seed",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "croparia:crop": "${id}"
+              }
+            }
+          ]
         }
       ]
     },
@@ -18,11 +26,19 @@ template = """
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "${fruit}",
+          "name": "croparia:crop_fruit",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "croparia:crop": "${id}"
+              }
+            }
+          ],
           "conditions": [
             {
               "condition": "minecraft:block_state_property",
-              "block": "${crop_block}",
+              "block": "croparia:crop",
               "properties": {
                 "age": "7"
               }
@@ -36,11 +52,19 @@ template = """
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "${seed}",
+          "name": "croparia:crop_seed",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "croparia:crop": "${id}"
+              }
+            }
+          ],
           "conditions": [
             {
               "condition": "minecraft:block_state_property",
-              "block": "${crop_block}",
+              "block": "croparia:crop",
               "properties": {
                 "age": "7"
               }

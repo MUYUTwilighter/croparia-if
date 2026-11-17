@@ -1,0 +1,8 @@
+{
+  "croparia:wthit": {
+    "side": "client",
+    "entrypoints": {
+      "client": "cool.muyucloud.croparia.compat.wthit.CifWthit"
+    }
+  }
+}

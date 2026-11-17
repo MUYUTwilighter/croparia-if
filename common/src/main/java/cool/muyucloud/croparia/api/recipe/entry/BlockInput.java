@@ -16,7 +16,9 @@ import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.util.TagUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentExactPredicate;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -26,15 +28,16 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,27 +47,27 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
-public class BlockInput implements SlotDisplay, LootItemCondition {
+public class BlockInput implements SlotDisplay {
     public static final ItemStack STACK_UNKNOWN = Items.BEDROCK.getDefaultInstance();
     public static final ItemStack STACK_AIR = Items.BARRIER.getDefaultInstance();
     public static final ItemStack STACK_ANY = Items.LIGHT_GRAY_STAINED_GLASS_PANE.getDefaultInstance();
     public static final Supplier<ItemStack> STACK_PLACEHOLDER = () -> CropariaItems.PLACEHOLDER_BLOCK.get().getDefaultInstance();
     public static final BlockInput UNKNOWN = BlockInput.of(CropariaIf.of("unknown"));
-    public static final BlockInput ANY = new BlockInput(null, null, BlockProperties.EMPTY);
+    public static final BlockInput ANY = new BlockInput(null, null, BlockProperties.EMPTY, DataComponentExactPredicate.EMPTY);
     public static final MapCodec<BlockInput> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
         Identifier.CODEC.optionalFieldOf("id").forGetter(BlockInput::getId),
         TagKey.codec(Registries.BLOCK).optionalFieldOf("tag").forGetter(BlockInput::getTag),
-        BlockProperties.CODEC.optionalFieldOf("properties", BlockProperties.EMPTY).forGetter(BlockInput::getProperties)
-    ).apply(instance, (id, tag, properties) -> create(id.orElse(null), tag.orElse(null), properties)));
+        BlockProperties.CODEC.optionalFieldOf("properties", BlockProperties.EMPTY).forGetter(BlockInput::getProperties),
+        DataComponentExactPredicate.CODEC.optionalFieldOf("components", DataComponentExactPredicate.EMPTY).forGetter(BlockInput::getComponents)
+    ).apply(instance, (id, tag, properties, components) -> create(id.orElse(null), tag.orElse(null), properties, components)));
     public static final Codec<BlockInput> CODEC_STR = Codec.STRING.xmap(BlockInput::create, BlockInput::getTaggable);
     public static final MultiCodec<BlockInput> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
         if (toEncode.isAny()) return TestedCodec.fail(() -> "Can be encoded as empty string");
-        if (toEncode.getProperties().equals(BlockProperties.EMPTY))
+        if (toEncode.getProperties().isEmpty() && toEncode.getComponents().isEmpty())
             return TestedCodec.fail(() -> "Can be encoded as simple id or tag");
         return TestedCodec.success();
     }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockInput> STREAM_CODEC = CodecUtil.toStream(CODEC);
-    public static final LootItemConditionType CONDITION_TYPE = new LootItemConditionType(CODEC_COMP);
 
     static {
         STACK_UNKNOWN.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.unknown"));
@@ -84,8 +87,9 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
         }
     }
 
-    protected static BlockInput create(@Nullable Identifier id, @Nullable TagKey<Block> tag, @NonNull BlockProperties properties) {
-        BlockInput blockInput = new BlockInput(id, tag, properties);
+    protected static BlockInput create(@Nullable Identifier id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties,
+                                       @NotNull DataComponentExactPredicate components) {
+        BlockInput blockInput = new BlockInput(id, tag, properties, components);
         if (blockInput.isAny()) return ANY;
         else return blockInput;
     }
@@ -103,49 +107,79 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     }
 
     public static BlockInput ofTag(TagKey<Block> tag, BlockProperties properties) {
-        return new BlockInput(null, tag, properties);
+        return ofTag(tag, properties, DataComponentExactPredicate.EMPTY);
     }
 
-    public static BlockInput of(@NonNull Identifier id) {
+    public static BlockInput ofTag(TagKey<Block> tag, BlockProperties properties, DataComponentExactPredicate components) {
+        return new BlockInput(null, tag, properties, components);
+    }
+
+    public static BlockInput of(@NotNull Identifier id) {
         return of(id, BlockProperties.EMPTY);
     }
 
-    public static BlockInput of(@NonNull Identifier id, BlockProperties properties) {
-        return new BlockInput(id, null, properties);
+    public static BlockInput of(@NotNull Identifier id, BlockProperties properties) {
+        return of(id, properties, DataComponentExactPredicate.EMPTY);
     }
 
-    public static BlockInput of(@NonNull Block block) {
+    public static BlockInput of(@NotNull Identifier id, BlockProperties properties, DataComponentExactPredicate components) {
+        return new BlockInput(id, null, properties, components);
+    }
+
+    public static BlockInput of(@NotNull Block block) {
         return of(Objects.requireNonNull(block.arch$registryName()));
     }
 
-    public static BlockInput of(@NonNull BlockState state) {
-        return new BlockInput(Objects.requireNonNull(state.getBlock().arch$registryName()), null, BlockProperties.extract(state));
+    public static BlockInput of(@NotNull BlockState state) {
+        return of(Objects.requireNonNull(state.getBlock().arch$registryName()), BlockProperties.extract(state));
+    }
+
+    public static BlockInput of(LevelReader level, BlockPos pos) {
+        return of(new BlockInWorld(level, pos, false));
+    }
+
+    public static BlockInput of(BlockInWorld block) {
+        BlockState state = Objects.requireNonNull(block.getState());
+        BlockEntity be = block.getEntity();
+        return of(Objects.requireNonNull(state.getBlock().arch$registryName()), BlockProperties.extract(state),
+            be == null ? DataComponentExactPredicate.EMPTY : DataComponentExactPredicate.allOf(be.collectComponents()));
+    }
+
+    static ItemStack getBlockItem(Block block) {
+        // Attached stems have no direct BlockItem; use the seed that creates the stem.
+        return block == CropariaBlocks.MELON_ATTACH.get()
+            ? CropariaItems.MELON_SEED.get().getDefaultInstance()
+            : block.asItem().getDefaultInstance();
     }
 
     @Nullable
     private final Identifier id;
     @Nullable
     private final TagKey<Block> tag;
-    @NonNull
+    @NotNull
     private final BlockProperties properties;
+    @NotNull
+    private final DataComponentExactPredicate components;
     private transient OnLoadSupplier<ImmutableList<ItemStack>> displayStacks;
     private boolean virtualRender = false;
 
-    protected BlockInput(@Nullable Identifier id, @Nullable TagKey<Block> tag, @NonNull BlockProperties properties) {
+    protected BlockInput(@Nullable Identifier id, @Nullable TagKey<Block> tag, @NotNull BlockProperties properties, @NotNull DataComponentExactPredicate components) {
         this.id = id;
         this.tag = tag;
         if (this.id != null && this.tag != null)
             throw new IllegalArgumentException("id and tag cannot be set at the same time");
         this.properties = properties;
+        this.components = components;
         this.displayStacks = OnLoadSupplier.of(() -> {
             this.virtualRender = false;
             if (this.getId().isPresent()) {
                 ItemStack displayStack = BuiltInRegistries.BLOCK.getOptional(this.getId().get()).map(block -> {
-                    ItemStack stack = block.asItem().getDefaultInstance();
+                    ItemStack stack = getBlockItem(block);
                     if (stack.isEmpty()) {
                         stack = Texts.rename(STACK_PLACEHOLDER.get(), Texts.translatable(block.getDescriptionId()));
                         this.virtualRender = true;
                     }
+                    stack.applyComponents(this.getComponents().asPatch());
                     stack.set(BlockProperties.TYPE, this.getProperties());
                     return stack;
                 }).orElseGet(() -> {
@@ -158,11 +192,12 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
                 LinkedList<ItemStack> stacks = new LinkedList<>();
                 for (Holder<Block> holder : TagUtil.forEntries(this.getTag().get())) {
                     Block block = holder.value();
-                    ItemStack stack = block.asItem().getDefaultInstance();
+                    ItemStack stack = getBlockItem(block);
                     if (stack.isEmpty()) {
                         stack = Texts.rename(STACK_PLACEHOLDER.get(), Texts.translatable(block.getDescriptionId()));
                         this.virtualRender = true;
                     }
+                    stack.applyComponents(this.getComponents().asPatch());
                     stack.set(BlockProperties.TYPE, this.getProperties());
                     stacks.add(stack);
                 }
@@ -172,11 +207,12 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
                     stacks.add(Texts.tooltip(STACK_UNKNOWN.copy(), Texts.literal(this.getTaggable())));
                 }
                 return ImmutableList.copyOf(stacks);
-            } else if (this.getProperties().isEmpty()) {
+            } else if (this.isAny()) {
                 return ImmutableList.of(STACK_ANY);
             } else {
                 this.virtualRender = true;
                 ItemStack stack = STACK_PLACEHOLDER.get();
+                stack.applyComponents(this.getComponents().asPatch());
                 stack.set(BlockProperties.TYPE, this.getProperties());
                 return ImmutableList.of(stack);
             }
@@ -195,9 +231,18 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
         return Optional.ofNullable(tag);
     }
 
-    @NonNull
+    @NotNull
     protected BlockProperties getProperties() {
         return properties;
+    }
+
+    public @NonNull DataComponentExactPredicate getComponents() {
+        return components;
+    }
+
+    public void placeExample(Level level, BlockPos pos) {
+        BlockOutput.create(Objects.requireNonNull(this.getExampleState().getBlock().arch$registryName()),
+            this.getProperties(), this.getComponents()).setBlock(level, pos);
     }
 
     public BlockState getExampleState() {
@@ -217,7 +262,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
         return StateHolderAccess.apply(state, this.getProperties());
     }
 
-    @NonNull
+    @NotNull
     public ImmutableList<ItemStack> getDisplayStacks() {
         return displayStacks.get();
     }
@@ -238,7 +283,7 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
     }
 
     public boolean isAny() {
-        return this.getId().isEmpty() && this.getTag().isEmpty() && this.getProperties().isEmpty();
+        return this.getId().isEmpty() && this.getTag().isEmpty() && this.getProperties().isEmpty() && this.getComponents().isEmpty();
     }
 
     public boolean isUnknown() {
@@ -247,35 +292,38 @@ public class BlockInput implements SlotDisplay, LootItemCondition {
         return Objects.equals(stacks.getFirst().getItem(), Items.BEDROCK) && this.isVirtualRender();
     }
 
-    public boolean matches(@NonNull Block block) {
+    public boolean matches(@NotNull Block block) {
         if (this.getId().isPresent()) return Objects.equals(block.arch$registryName(), this.getId().get());
         else if (this.getTag().isPresent()) return TagUtil.isIn(this.getTag().get(), block);
         else return true;
     }
 
-    public boolean matches(@NonNull BlockState state) {
-        return this.matches(state.getBlock()) && this.getProperties().isSubsetOf(state);
+    public boolean matches(@NotNull BlockState state) {
+        return this.matches(state, null);
+    }
+
+    public boolean matches(LevelReader level, BlockPos pos) {
+        return this.matches(new BlockInWorld(level, pos, false));
+    }
+
+    public boolean matches(BlockInWorld block) {
+        return this.matches(block.getState(), this.getComponents().isEmpty() ? null : block.getEntity());
+    }
+
+    public boolean matches(@Nullable BlockState state, @Nullable BlockEntity be) {
+        return state != null && this.matches(state.getBlock()) && this.getProperties().isSubsetOf(state)
+            && (this.getComponents().isEmpty() || be != null && this.getComponents().test(be.collectComponents()));
     }
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof BlockInput that)) return false;
-        return Objects.equals(id, that.id) && Objects.equals(tag, that.tag) && Objects.equals(properties, that.properties);
+        return Objects.equals(id, that.id) && Objects.equals(tag, that.tag) && Objects.equals(properties, that.properties)
+            && Objects.equals(components, that.components);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, tag, properties);
-    }
-
-    @Override
-    public @NonNull LootItemConditionType getType() {
-        return CONDITION_TYPE;
-    }
-
-    @Override
-    public boolean test(LootContext lootContext) {
-        BlockState state = lootContext.getParameter(LootContextParams.BLOCK_STATE);
-        return this.matches(state);
+        return Objects.hash(id, tag, properties, components);
     }
 }

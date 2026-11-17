@@ -2,18 +2,24 @@ package cool.muyucloud.croparia.registry;
 
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.block.*;
+import cool.muyucloud.croparia.api.crop.block.CropariaCrop;
+import cool.muyucloud.croparia.api.crop.block.MelonAttach;
+import cool.muyucloud.croparia.api.crop.block.MelonBlock;
+import cool.muyucloud.croparia.api.crop.block.MelonStem;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DropExperienceBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -75,9 +81,25 @@ public class CropariaBlocks {
                 .sound(SoundType.DEEPSLATE)
         )
     );
+    public static final RegistrySupplier<CropariaCrop> CROP_BLOCK = registerBlock("crop", Blocks.WHEAT, CropariaCrop::new);
+    public static final RegistrySupplier<MelonBlock> MELON_BLOCK = registerBlock("melon", Blocks.MELON, MelonBlock::new);
+    public static final RegistrySupplier<MelonStem> MELON_STEM = registerBlock("melon_stem", Blocks.MELON_STEM, properties -> new MelonStem(
+        CropariaBlocks.MELON_BLOCK.getKey(), CropariaBlocks.MELON_ATTACH.getKey(), CropariaItems.MELON_SEED.getKey(),
+        BlockTags.SUPPORTS_MELON_STEM, BlockTags.SUPPORTS_MELON_STEM_FRUIT, properties.randomTicks()
+    ));
+    public static final RegistrySupplier<MelonAttach> MELON_ATTACH = registerBlock("melon_attach", Blocks.ATTACHED_MELON_STEM, properties -> new MelonAttach(
+        CropariaBlocks.MELON_STEM.getKey(), CropariaBlocks.MELON_BLOCK.getKey(), CropariaItems.MELON_SEED.getKey(),
+        BlockTags.SUPPORTS_MELON_STEM, properties
+    ));
+
+    public static <T extends Block> RegistrySupplier<T> registerBlock(String name, BlockBehaviour base, Function<BlockBehaviour.Properties, T> factory) {
+        return BLOCKS.register(name, () -> factory.apply(
+            BlockBehaviour.Properties.ofFullCopy(base).setId(ResourceKey.create(Registries.BLOCK, CropariaIf.of(name)))
+        ));
+    }
 
     public static <T extends Block> RegistrySupplier<T> registerBlock(
-        @NonNull String name, @NonNull Function<BlockBehaviour.Properties, T> supplier
+        @NotNull String name, @NotNull Function<BlockBehaviour.Properties, T> supplier
     ) {
         return BLOCKS.register(name, () -> supplier.apply(
             BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, CropariaIf.of(name)))
@@ -85,7 +107,7 @@ public class CropariaBlocks {
     }
 
     public static <T extends Block> RegistrySupplier<T> registerBlock(
-        @NonNull Identifier id, @NonNull Function<BlockBehaviour.Properties, T> supplier
+        @NotNull Identifier id, @NotNull Function<BlockBehaviour.Properties, T> supplier
     ) {
         return BLOCKS.register(id, () -> supplier.apply(
             BlockBehaviour.Properties.of().setId(ResourceKey.create(Registries.BLOCK, id))

@@ -38,6 +38,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
 
@@ -150,7 +151,7 @@ public class RecipeWizardGenerator {
                     Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(pos.toShortString())));
                     throw new ReplaceException();
                 }
-                return BlockOutput.of(state);
+                return BlockOutput.of(context.getLevel(), pos);
             }), Placeholder.BLOCK_OUTPUT, blockBuilder -> blockBuilder.then(
                 Pattern.compile("^offset\\((-?\\d+),(-?\\d+),(-?\\d+)\\)$"), (context, placeholder1, matcher) -> {
                     int x = Integer.parseInt(matcher.group(1));
@@ -163,7 +164,7 @@ public class RecipeWizardGenerator {
                         Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(pos.toShortString())));
                         throw new ReplaceException();
                     }
-                    return Optional.of(BlockOutput.of(state));
+                    return Optional.of(BlockOutput.of(context.getLevel(), pos));
                 }, Placeholder.BLOCK_OUTPUT
             ).then(PatternKey.literal("facing"), (context, placeholder1, matcher) -> {
                     Vec3i offset = context.getClickedFace().getUnitVec3i();
@@ -174,7 +175,7 @@ public class RecipeWizardGenerator {
                         Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(pos.toShortString())));
                         throw new ReplaceException();
                     }
-                    return Optional.of(BlockOutput.of(state));
+                    return Optional.of(BlockOutput.of(context.getLevel(), pos));
                 }, Placeholder.BLOCK_OUTPUT
             ).then(
                 PatternKey.literal("opposite"), (context, placeholder1, matcher) -> {
@@ -186,7 +187,7 @@ public class RecipeWizardGenerator {
                         Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(pos.toShortString())));
                         throw new ReplaceException();
                     }
-                    return Optional.of(BlockOutput.of(state));
+                    return Optional.of(BlockOutput.of(context.getLevel(), pos));
                 }, Placeholder.BLOCK_OUTPUT
             ).then(
                 PatternKey.literal("left"), (context, placeholder1, matcher) -> {
@@ -198,7 +199,7 @@ public class RecipeWizardGenerator {
                         Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(pos.toShortString())));
                         throw new ReplaceException();
                     }
-                    return Optional.of(BlockOutput.of(state));
+                    return Optional.of(BlockOutput.of(context.getLevel(), pos));
                 }, Placeholder.BLOCK_OUTPUT
             ).then(
                 PatternKey.literal("right"), (context, placeholder1, matcher) -> {
@@ -210,7 +211,7 @@ public class RecipeWizardGenerator {
                         Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(pos.toShortString())));
                         throw new ReplaceException();
                     }
-                    return Optional.of(BlockOutput.of(state));
+                    return Optional.of(BlockOutput.of(context.getLevel(), pos));
                 }, Placeholder.BLOCK_OUTPUT
             )
         ))
@@ -224,16 +225,17 @@ public class RecipeWizardGenerator {
                 Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block"));
                 throw new ReplaceException();
             }
-            return BlockOutput.of(block);
+            return BlockOutput.of(level, context.getClickedPos());
         }), Placeholder.BLOCK_OUTPUT
     );
     public static final Placeholder<UseOnContext> NEIGHBOR = register(Identifier.parse("default"), Pattern.compile("^neighbor$"), TypeMapper.of(context -> {
         Level level = context.getLevel();
         for (Direction direction : Direction.values()) {
             if (direction == Direction.UP || direction == Direction.DOWN) continue;
-            BlockState state = level.getBlockState(context.getClickedPos().offset(direction.getUnitVec3i()));
+            BlockPos pos = context.getClickedPos().offset(direction.getUnitVec3i());
+            BlockState state = level.getBlockState(pos);
             if (!state.isAir()) {
-                return BlockOutput.of(state);
+                return BlockOutput.of(level, pos);
             }
         }
         assert context.getPlayer() != null;
@@ -248,7 +250,7 @@ public class RecipeWizardGenerator {
             Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block"));
             throw new ReplaceException();
         }
-        return BlockOutput.of(state);
+        return BlockOutput.of(level, context.getClickedPos().below());
     }), Placeholder.BLOCK_OUTPUT);
     public static final Placeholder<UseOnContext> INFUSOR_ELEMENT = register(CropariaIf.of("infusor"), Pattern.compile("^infusor_element$"), TypeMapper.of(context -> {
         BlockState state = context.getLevel().getBlockState(context.getClickedPos());
@@ -267,9 +269,9 @@ public class RecipeWizardGenerator {
         BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof RitualStand) {
-            RitualStructureContainer container = new RitualStructureContainer(state);
+            RitualStructureContainer container = new RitualStructureContainer(new BlockInWorld(level, pos, false));
             Optional<RitualStructure> structure = Recipes.RITUAL_STRUCTURE.find(container, level);
-            Optional<BlockState> input = structure.flatMap(s -> s.validate(pos, level).getStates().stream().filter(candidate -> !candidate.isAir()).findFirst());
+            Optional<BlockInWorld> input = structure.flatMap(s -> s.validate(pos, level).getBlocks().stream().filter(candidate -> !candidate.getState().isAir()).findFirst());
             if (input.isPresent()) {
                 return BlockOutput.of(input.get());
             }
@@ -395,6 +397,10 @@ public class RecipeWizardGenerator {
 
     public boolean matches(BlockState state) {
         return this.getBlock().matches(state);
+    }
+
+    public boolean matches(BlockInWorld block) {
+        return this.getBlock().matches(block);
     }
 
     public void handle(UseOnContext context) {

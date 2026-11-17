@@ -4,21 +4,26 @@ import cool.muyucloud.croparia.api.element.Element;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jspecify.annotations.NonNull;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
+import org.jetbrains.annotations.NotNull;
 
 public class SoakContainer implements RecipeInput {
-    private final BlockState state;
+    private final BlockInWorld block;
     private final Element element;
     private final float random;
 
-    public SoakContainer(BlockState state, Element element, float random) {
-        this.state = state;
+    public SoakContainer(BlockInWorld block, Element element, float random) {
+        this.block = block;
         this.element = element;
         this.random = random;
     }
 
+    public BlockInWorld getBlock() {
+        return block;
+    }
+
     public BlockState getState() {
-        return state;
+        return block.getState();
     }
 
     public Element getElement() {
@@ -30,13 +35,13 @@ public class SoakContainer implements RecipeInput {
     }
 
     @Override
-    public @NonNull ItemStack getItem(int i) {
+    public @NotNull ItemStack getItem(int i) {
         return ItemStack.EMPTY;
     }
 
     @Override
     public boolean isEmpty() {
-        return state.isAir() || element == Element.EMPTY || random <= 0;
+        return this.getState() == null || this.getState().isAir() || element == Element.EMPTY || random <= 0;
     }
 
     @Override

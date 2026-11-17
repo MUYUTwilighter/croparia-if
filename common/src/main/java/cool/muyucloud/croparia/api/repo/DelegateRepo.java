@@ -2,28 +2,28 @@ package cool.muyucloud.croparia.api.repo;
 
 import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.TypedResource;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 public class DelegateRepo<T extends TypedResource<?>> implements Repo<T> {
-    private final @NonNull Repo<T> delegate;
+    private final @NotNull Repo<T> delegate;
     private final Set<Integer> lockAccept = new HashSet<>();
     private final Set<Integer> lockConsume = new HashSet<>();
 
-    public DelegateRepo(@NonNull Repo<T> repo) {
+    public DelegateRepo(@NotNull Repo<T> repo) {
         this.delegate = repo;
     }
 
-    public DelegateRepo(@NonNull Repo<T> repo, Collection<Integer> lockAccept, Collection<Integer> lockConsume) {
+    public DelegateRepo(@NotNull Repo<T> repo, Collection<Integer> lockAccept, Collection<Integer> lockConsume) {
         this.delegate = repo;
         this.lockAccept.addAll(lockAccept);
         this.lockConsume.addAll(lockConsume);
     }
 
-    public @NonNull Repo<T> get() {
+    public @NotNull Repo<T> get() {
         return delegate;
     }
 

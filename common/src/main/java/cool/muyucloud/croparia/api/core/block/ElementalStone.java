@@ -19,9 +19,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class ElementalStone extends Block {
     public ElementalStone(Properties properties) {
@@ -43,8 +44,7 @@ public class ElementalStone extends Block {
     }
 
     protected void trySoak(ServerLevel level, BlockPos pos, Element element, RandomSource source) {
-        BlockState state = level.getBlockState(pos);
-        SoakContainer container = new SoakContainer(state, element, source.nextFloat());
+        SoakContainer container = new SoakContainer(new BlockInWorld(level, pos, false), element, source.nextFloat());
         Recipes.SOAK.find(container, level).ifPresent(recipe -> {
             Vec3 particlePos = pos.getCenter();
             level.sendParticles(ParticleTypes.HAPPY_VILLAGER, particlePos.x, particlePos.y + 0.5, particlePos.z, 20, 0.5, 0.1, 0.5, 1);
@@ -54,7 +54,7 @@ public class ElementalStone extends Block {
     }
 
     @Override
-    protected @NonNull InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected @NotNull InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (stack.getItem() instanceof RecipeWizard && player.isCrouching()) {
             level.setBlock(pos.above(), CropariaBlocks.INFUSOR.get().defaultBlockState(), Block.UPDATE_ALL);
             return InteractionResult.SUCCESS;

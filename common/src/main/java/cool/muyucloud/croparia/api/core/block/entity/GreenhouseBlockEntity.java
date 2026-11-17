@@ -33,8 +33,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -143,14 +143,14 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    protected void loadAdditional(@NonNull ValueInput input) {
+    protected void loadAdditional(@NotNull ValueInput input) {
         super.loadAdditional(input);
         ContainerHelper.loadAllItems(input, this.inventory);
         this.tryHarvest();
     }
 
     @Override
-    protected void saveAdditional(@NonNull ValueOutput output) {
+    protected void saveAdditional(@NotNull ValueOutput output) {
         ContainerHelper.saveAllItems(output, this.inventory);
         super.saveAdditional(output);
     }
@@ -166,12 +166,12 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    public @NonNull ItemStack getItem(int slot) {
+    public @NotNull ItemStack getItem(int slot) {
         return this.inventory.get(slot);
     }
 
     @Override
-    public @NonNull ItemStack removeItem(int slot, int amount) {
+    public @NotNull ItemStack removeItem(int slot, int amount) {
         ItemStack removed = ContainerHelper.removeItem(this.inventory, slot, amount);
         if (!removed.isEmpty()) {
             this.setChanged();
@@ -181,12 +181,12 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    public @NonNull ItemStack removeItemNoUpdate(int slot) {
+    public @NotNull ItemStack removeItemNoUpdate(int slot) {
         return ContainerHelper.takeItem(this.inventory, slot);
     }
 
     @Override
-    public void setItem(int slot, @NonNull ItemStack stack) {
+    public void setItem(int slot, @NotNull ItemStack stack) {
         ItemStack stored = this.getItem(slot);
         if (ItemStack.isSameItemSameComponents(stored, stack) && stored.getCount() == stack.getCount()) {
             return;
@@ -196,7 +196,7 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    public boolean stillValid(@NonNull Player player) {
+    public boolean stillValid(@NotNull Player player) {
         if (this.level == null || this.level.getBlockEntity(this.worldPosition) != this) {
             return false;
         } else {
@@ -212,12 +212,12 @@ public class GreenhouseBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
-    public @NonNull Component getDisplayName() {
+    public @NotNull Component getDisplayName() {
         return Texts.translatable("container.croparia.greenhouse");
     }
 
     @Override
-    public AbstractContainerMenu createMenu(int syncId, @NonNull Inventory inv, @NonNull Player player) {
+    public AbstractContainerMenu createMenu(int syncId, @NotNull Inventory inv, @NotNull Player player) {
         return new DispenserMenu(syncId, inv, this);
     }
 

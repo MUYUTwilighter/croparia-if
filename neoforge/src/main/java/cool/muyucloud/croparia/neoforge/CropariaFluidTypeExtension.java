@@ -1,7 +1,7 @@
 package cool.muyucloud.croparia.neoforge;
 
 import cool.muyucloud.croparia.access.SimpleArchitecturyFluidAttributesAccess;
-import cool.muyucloud.croparia.api.crop.util.Color;
+import cool.muyucloud.croparia.api.crop.asset.Color;
 import dev.architectury.core.fluid.ArchitecturyFluidAttributes;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;

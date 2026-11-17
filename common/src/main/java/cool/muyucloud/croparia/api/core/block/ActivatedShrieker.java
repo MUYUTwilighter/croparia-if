@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.entity.SculkShriekerBlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.vibrations.VibrationSystem;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class ActivatedShrieker extends SculkShriekerBlock {
     public ActivatedShrieker(BlockBehaviour.Properties properties) {

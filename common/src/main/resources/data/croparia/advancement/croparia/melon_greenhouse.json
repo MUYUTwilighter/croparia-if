@@ -11,8 +11,12 @@
             }
           },
           {
-            "condition": "croparia:block_input",
-            "tag": "croparia:stem"
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "croparia:melon_stem"
+              }
+            }
           }
         ]
       },

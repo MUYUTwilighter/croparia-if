@@ -23,7 +23,7 @@ side = "BOTH"
 [[dependencies.croparia]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21,1.22)"
+versionRange = "[26.1.2,26.2)"
 ordering = "NONE"
 side = "BOTH"
 
@@ -47,6 +47,20 @@ type = "optional"
 versionRange = "*"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies.croparia]]
+modId = "jade"
+type = "optional"
+versionRange = "*"
+ordering = "AFTER"
+side = "CLIENT"
+
+[[dependencies.croparia]]
+modId = "wthit"
+type = "optional"
+versionRange = "*"
+ordering = "AFTER"
+side = "CLIENT"
 
 [[mixins]]
 config = "croparia-if-common.mixins.json"

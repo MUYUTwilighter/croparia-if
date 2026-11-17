@@ -1,6 +1,6 @@
 package cool.muyucloud.croparia.access;
 
-import cool.muyucloud.croparia.api.crop.util.Color;
+import cool.muyucloud.croparia.api.crop.asset.Color;
 import dev.architectury.core.fluid.SimpleArchitecturyFluidAttributes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;

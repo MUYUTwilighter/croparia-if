@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Function;
@@ -50,7 +50,7 @@ public class DynamicSlot extends AbstractInputManager<DynamicSlot> {
     }
 
     @Override
-    public void getTooltip(@NonNull ITooltipBuilder tooltip, double mouseX, double mouseY) {
+    public void getTooltip(@NotNull ITooltipBuilder tooltip, double mouseX, double mouseY) {
         ItemStack stack = this.getCurrentStack();
         if (stack.isEmpty()) return;
         tooltip.addAll(stack.getTooltipLines(

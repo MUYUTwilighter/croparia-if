@@ -1,10 +1,8 @@
 package cool.muyucloud.croparia.registry;
 
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.crop.Crop;
-import cool.muyucloud.croparia.api.crop.util.Color;
+import cool.muyucloud.croparia.api.crop.asset.Color;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
 import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
 import cool.muyucloud.croparia.api.element.Element;
@@ -13,21 +11,19 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
+import java.util.Set;
 
 /**
  * @see DgRegistries#CROPS
  */
 @SuppressWarnings("unused")
 public class Crops {
-    public static CompletableFuture<Suggestions> cropSuggestions(SuggestionsBuilder builder) {
-        DgRegistries.CROPS.forEach(crop -> builder.suggest(crop.getKey().toString()));
-        return builder.buildFuture();
-    }
+    public static final Set<Crop> BUILTIN = new HashSet<>();
 
     /**
      * Add a crop for croparia material with specified translation key.
@@ -39,12 +35,12 @@ public class Crops {
      * @param type           crop type that specifies the textures. See also {@link Crop#PRESET_TYPES}
      * @param translationKey translation key for the crop, used for formatting item & block names.
      */
-    protected static @NonNull Crop croparia(
-        @NonNull String name, @NonNull RegistrySupplier<? extends Item> material, int color, int tier, @NonNull String type,
-        @NonNull String translationKey
+    protected static @NotNull Crop croparia(
+        @NotNull String name, @NotNull RegistrySupplier<? extends Item> material, int color, int tier, @NotNull String type,
+        @NotNull String translationKey
     ) {
         Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material.getId().toString(), DataComponentPatch.EMPTY, CropariaIf.CONFIG.getCropYield()), new Color(color), tier, type, null, new CropDependencies("croparia", translationKey));
-        DgRegistries.CROPS.register(crop);
+        BUILTIN.add(crop);
         return crop;
     }
 
@@ -63,14 +59,14 @@ public class Crops {
      * @param tier     tier
      * @param type     crop type that specifies the textures. See also {@link Crop}
      */
-    public static @NonNull Crop vanilla(
-        @NonNull String name, Item material, int color, int tier, @NonNull String type
+    public static @NotNull Crop vanilla(
+        @NotNull String name, Item material, int color, int tier, @NotNull String type
     ) {
         Crop crop = new Crop(
             CropariaIf.of(name), new ItemMaterial(Objects.requireNonNull(material.arch$registryName()).toString(), DataComponentPatch.EMPTY, CropariaIf.CONFIG.getCropYield()),
             new Color(color), tier, type, null, new CropDependencies("minecraft", material.getDescriptionId())
         );
-        DgRegistries.CROPS.register(crop);
+        BUILTIN.add(crop);
         return crop;
     }
 
@@ -200,11 +196,11 @@ public class Crops {
      *                        The translation key for the first available mod dependency will be used.
      * @return the intermediate data entity of the crop
      */
-    public static @NonNull Crop compat(
-        String name, String material, int color, int tier, String type, @NonNull Map<String, String> translationKeys
+    public static @NotNull Crop compat(
+        String name, String material, int color, int tier, String type, @NotNull Map<String, String> translationKeys
     ) {
         Crop crop = new Crop(CropariaIf.of(name), new ItemMaterial(material, DataComponentPatch.EMPTY, CropariaIf.CONFIG.getCropYield()), new Color(color), tier, type, null, new CropDependencies(translationKeys));
-        DgRegistries.CROPS.register(crop);
+        BUILTIN.add(crop);
         return crop;
     }
 
@@ -529,9 +525,4 @@ public class Crops {
         "techreborn", "item.techreborn.zinc_ingot",
         "create", "item.create.zinc_ingot"
     ));
-
-    public static void register() {
-        CropariaIf.LOGGER.info("Loading custom crops from file definitions");
-        DgRegistries.CROPS.readCrops();
-    }
 }

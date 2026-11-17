@@ -10,10 +10,10 @@ import cool.muyucloud.croparia.api.generator.util.ItemDgRegistry;
 
 public class DgRegistries {
     public static final CropRegistry<Crop> CROPS = DgRegistry.register(
-        CropariaIf.of("crops"), new CropRegistry<>(CropariaIf.CONFIG.getFilePath().resolve("crops"), Crop.CODEC.codec())
+        CropariaIf.of("crops"), new CropRegistry<>(CropariaIf.CONFIG.getFilePath().resolve("crops"), Crop.CODEC.codec()).withExternal(() -> Crops.BUILTIN)
     );
     public static final CropRegistry<Melon> MELONS = DgRegistry.register(
-        CropariaIf.of("melons"), new CropRegistry<>(CropariaIf.CONFIG.getFilePath().resolve("melons"), Melon.CODEC.codec())
+        CropariaIf.of("melons"), new CropRegistry<>(CropariaIf.CONFIG.getFilePath().resolve("melons"), Melon.CODEC.codec()).withExternal(() -> Melons.BUILTIN)
     );
     @SuppressWarnings("unused")
     public static final DgRegistry.EnumRegistry<Element> ELEMENTS = DgRegistry.register(

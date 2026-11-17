@@ -6,14 +6,16 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
+import java.util.Optional;
 
 @SuppressWarnings("unused")
 public class Texts {
@@ -49,22 +51,31 @@ public class Texts {
         return Component.translatable(key, args);
     }
 
-    public static MutableComponent forStyles(@NonNull MutableComponent component, Style... styles) {
+    /**
+     * Based on {@link Language}, please make sure the instance is available or only {@code Optional.empty()} would be
+     * returned.
+     */
+    public static Optional<MutableComponent> mayTranslatable(String key, Object... args) {
+        if (Language.getInstance().has(key)) return Optional.of(translatable(key, args));
+        return Optional.empty();
+    }
+
+    public static MutableComponent forStyles(@NotNull MutableComponent component, Style... styles) {
         for (Style style : styles) {
             component.withStyle(style);
         }
         return component;
     }
 
-    public static void chat(@NonNull Player player, Component message) {
+    public static void chat(@NotNull Player player, Component message) {
         player.displayClientMessage(message, false);
     }
 
-    public static void chat(@NonNull CommandSourceStack source, Component msg) {
+    public static void chat(@NotNull CommandSourceStack source, Component msg) {
         source.sendSystemMessage(msg);
     }
 
-    public static void overlay(@NonNull Player player, Component message) {
+    public static void overlay(@NotNull Player player, Component message) {
         player.displayClientMessage(message, true);
     }
 

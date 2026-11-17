@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.api.codec;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -59,7 +59,7 @@ public class OptionalMultiFieldCodec<T> extends MapCodec<Optional<T>> implements
     }
 
     @Override
-    public @NonNull Iterator<Map.Entry<String, TestedCodec<? extends T>>> iterator() {
+    public @NotNull Iterator<Map.Entry<String, TestedCodec<? extends T>>> iterator() {
         return this.codecs.entrySet().iterator();
     }
 }

@@ -15,8 +15,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -51,8 +51,8 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> {
      * @param syncFilter  A predicate that determines which recipes will be synced to client
      * @param stations    Stations where the recipe would work on
      */
-    protected TypedSerializer(@NonNull Identifier id, @NonNull Class<? extends R> recipeClass, final @NonNull RecipeSerializer<R> serializer,
-                              final @Nullable RecipeType<?> recipeType, @NonNull Boolean registerType,
+    protected TypedSerializer(@NotNull Identifier id, @NotNull Class<? extends R> recipeClass, final @NotNull RecipeSerializer<R> serializer,
+                              final @Nullable RecipeType<?> recipeType, @NotNull Boolean registerType,
                               final Predicate<RecipeHolder<?>> syncFilter, List<Mappable<ItemStack>> stations) {
         this.id = id;
         this.stations = stations;
@@ -136,15 +136,15 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> {
         return holder.value().getTypedSerializer() == this && this.syncFilter.test(holder);
     }
 
-    public @NonNull RecipeSerializer<R> getSerializer() {
+    public @NotNull RecipeSerializer<R> getSerializer() {
         return this.serializer;
     }
 
-    public @NonNull MapCodec<R> codec() {
+    public @NotNull MapCodec<R> codec() {
         return this.getSerializer().codec();
     }
 
-    @NonNull
+    @NotNull
     @SuppressWarnings("deprecation")
     public StreamCodec<RegistryFriendlyByteBuf, R> streamCodec() {
         return this.getSerializer().streamCodec();
@@ -160,12 +160,12 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> {
 
     public static class Builder<R extends DisplayableRecipe<?>> {
         private Identifier id;
-        private final @NonNull List<Mappable<ItemStack>> stations = new ArrayList<>();
+        private final @NotNull List<Mappable<ItemStack>> stations = new ArrayList<>();
         private Class<? extends R> recipeClass;
         private RecipeType<?> recipeType;
         private Boolean registerType;
         private RecipeSerializer<R> serializer;
-        private @NonNull Predicate<RecipeHolder<?>> syncFilter = NEVER;
+        private @NotNull Predicate<RecipeHolder<?>> syncFilter = NEVER;
 
         public TypedSerializer<R> build() {
             assert id != null;
@@ -176,12 +176,12 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> {
             return new TypedSerializer<>(id, recipeClass, serializer, recipeType, registerType, syncFilter, stations);
         }
 
-        public Builder<R> id(@NonNull Identifier id) {
+        public Builder<R> id(@NotNull Identifier id) {
             this.id = id;
             return this;
         }
 
-        public Builder<R> recipeClass(@NonNull Class<? extends R> recipeClass) {
+        public Builder<R> recipeClass(@NotNull Class<? extends R> recipeClass) {
             this.recipeClass = recipeClass;
             return this;
         }

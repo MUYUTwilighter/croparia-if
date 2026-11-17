@@ -14,6 +14,9 @@ dependencies {
     // Architectury API. This is optional, and you can comment it out if you don't need it.
     implementation "dev.architectury:architectury:$architectury_api_version"
 
+    // JetBrains annotations (type-use nullability)
+    compileOnly "org.jetbrains:annotations:26.1.0"
+
     // JToml
     implementation "io.github.wasabithumb:jtoml:$jtoml_version"
     implementation "io.github.wasabithumb:jtoml-serializer-gson:$jtoml_version"
@@ -24,6 +27,10 @@ dependencies {
 
     // JEI: only the public API; internal modules must not be referenced
     compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+
+    // Optional tooltip integrations: reference only the public APIs.
+    compileOnly "maven.modrinth:jade:$jade_fabric_version"
+    compileOnly "mcp.mobius.waila:wthit-api:mojmap-$wthit_version"
 
     testImplementation platform("org.junit:junit-bom:5.10.2")
     testImplementation "org.junit.jupiter:junit-jupiter"

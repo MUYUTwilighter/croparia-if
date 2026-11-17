@@ -6,7 +6,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
@@ -22,15 +22,15 @@ public class HolderSupplier<T> implements DeferredSupplier<T> {
         return new HolderSupplier<>(value, ResourceKey.create(registry, location));
     }
 
-    @NonNull
+    @NotNull
     private final ResourceKey<? super T> key;
-    @NonNull
+    @NotNull
     private final Registry<? super T> registry;
-    @NonNull
+    @NotNull
     private final LazySupplier<T> value;
 
     @SuppressWarnings("unchecked")
-    public HolderSupplier(@NonNull Supplier<T> value, @NonNull ResourceKey<? super T> key) {
+    public HolderSupplier(@NotNull Supplier<T> value, @NotNull ResourceKey<? super T> key) {
         this.value = LazySupplier.of(value);
         this.key = key;
         this.registry = (Registry<T>) BuiltInRegistries.REGISTRY.getValue(this.getRegistryId());
@@ -39,7 +39,7 @@ public class HolderSupplier<T> implements DeferredSupplier<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public @NonNull ResourceKey<T> getKey() {
+    public @NotNull ResourceKey<T> getKey() {
         return (ResourceKey<T>) this.key;
     }
 
@@ -48,7 +48,7 @@ public class HolderSupplier<T> implements DeferredSupplier<T> {
         return (ResourceKey<S>) this.key;
     }
 
-    public @NonNull Registry<? super T> getRegistry() {
+    public @NotNull Registry<? super T> getRegistry() {
         return this.registry;
     }
 

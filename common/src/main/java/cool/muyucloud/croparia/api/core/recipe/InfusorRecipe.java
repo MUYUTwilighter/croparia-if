@@ -18,8 +18,8 @@ import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -41,7 +41,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     protected final ItemInput ingredient;
     protected final ItemOutput result;
 
-    public InfusorRecipe(@NonNull Element element, @NonNull ItemInput ingredient, @NonNull ItemOutput result) {
+    public InfusorRecipe(@NotNull Element element, @NotNull ItemInput ingredient, @NotNull ItemOutput result) {
         if (element == Element.EMPTY) throw new IllegalArgumentException("Element cannot be EMPTY");
         this.element = element;
         this.ingredient = ingredient;
@@ -69,7 +69,7 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     }
 
     @Override
-    public @NonNull ItemStack assemble(@NonNull InfusorContainer container) {
+    public @NotNull ItemStack assemble(@NotNull InfusorContainer container) {
         if (matches(container)) {
             this.getIngredient().consume(container);
             return getResult().createStack();
@@ -83,29 +83,29 @@ public class InfusorRecipe implements DisplayableRecipe<InfusorContainer> {
     }
 
     @Override
-    public @NonNull List<List<ItemStack>> getInputs() {
+    public @NotNull List<List<ItemStack>> getInputs() {
         return List.of(
             this.getIngredient().getDisplayStacks(),
             List.of(this.getPotion())
         );
     }
 
-    public @NonNull List<List<ItemStack>> getOutputs() {
+    public @NotNull List<List<ItemStack>> getOutputs() {
         return List.of(this.getResult().getDisplayStacks());
     }
 
     @Override
-    public boolean matches(@NonNull InfusorContainer container, @Nullable Level level) {
+    public boolean matches(@NotNull InfusorContainer container, @Nullable Level level) {
         return matches(container);
     }
 
-    @NonNull
+    @NotNull
     public ItemOutput result() {
         return this.getResult();
     }
 
     @Override
-    @NonNull
+    @NotNull
     public SlotDisplay craftingStation() {
         return new ItemOutput(CropariaItems.INFUSOR.get().getDefaultInstance());
     }

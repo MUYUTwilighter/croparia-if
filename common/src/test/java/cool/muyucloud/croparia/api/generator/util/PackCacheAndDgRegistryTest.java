@@ -2,7 +2,7 @@ package cool.muyucloud.croparia.api.generator.util;
 
 import com.mojang.serialization.JsonOps;
 import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -18,12 +18,12 @@ class PackCacheAndDgRegistryTest {
         DummyEntry two = new DummyEntry("two");
         DgRegistry<DummyEntry> mapRegistry = DgRegistry.ofMap(Map.of(one.getKey(), one, two.getKey(), two));
 
-        assertEquals(Optional.of(one), mapRegistry.forName(one.getKey()));
-        assertFalse(mapRegistry.forName(Identifier.fromNamespaceAndPath("croparia_test", "none")).isPresent());
+        assertEquals(Optional.of(one), mapRegistry.getById(one.getKey()));
+        assertFalse(mapRegistry.getById(Identifier.fromNamespaceAndPath("croparia_test", "none")).isPresent());
 
         DgRegistry<DummyEnumEntry> enumRegistry = DgRegistry.ofEnum(DummyEnumEntry.class);
-        assertTrue(enumRegistry.forName(DummyEnumEntry.A.getKey()).isPresent());
-        assertTrue(enumRegistry.forName(DummyEnumEntry.B.getKey()).isPresent());
+        assertTrue(enumRegistry.getById(DummyEnumEntry.A.getKey()).isPresent());
+        assertTrue(enumRegistry.getById(DummyEnumEntry.B.getKey()).isPresent());
     }
 
     @Test
@@ -51,7 +51,7 @@ class PackCacheAndDgRegistryTest {
         }
 
         @Override
-        public @NonNull Identifier getKey() {
+        public @NotNull Identifier getKey() {
             return key;
         }
 
@@ -71,7 +71,7 @@ class PackCacheAndDgRegistryTest {
         }
 
         @Override
-        public @NonNull Identifier getKey() {
+        public @NotNull Identifier getKey() {
             return key;
         }
 

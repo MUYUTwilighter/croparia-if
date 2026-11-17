@@ -9,15 +9,18 @@
     "AbstractFurnaceBlockEntityMixin",
     "ArgumentTypeInfosMixin",
     "BlockMixin",
+    "CreativeModeTabsAccessor",
     "CropBlockMixin",
     "DropperBlockMixin",
     "ItemStackMixin",
-    "MinecraftServerMixin",
     "PackRepositoryMixin",
     "RecipeManagerMixin",
     "ReloadableResourceManagerImplMixin",
+    "ReloadableServerResourcesMixin",
+    "ServerConfigurationPacketListenerImplMixin",
     "SimpleArchitecturyFluidAttributesMixin",
-    "StateHolderMixin"
+    "StateHolderMixin",
+    "WorldLoaderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

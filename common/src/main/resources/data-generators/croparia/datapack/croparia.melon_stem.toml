@@ -1,15 +1,23 @@
 registry = "croparia:melons"
-path = "${stem.namespace}/loot_table/blocks/${stem.path}.json"
+path = "croparia/loot_table/melon_stem/${id.path}.json"
 template = """
 {
   "type": "minecraft:block",
   "pools": [
     {
-      "rolls": 1,
+      "rolls": 1.0,
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "${seed}"
+          "name": "croparia:melon_seed",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "croparia:crop": "${id}"
+              }
+            }
+          ]
         }
       ]
     },
@@ -18,11 +26,19 @@ template = """
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "${seed}",
+          "name": "croparia:melon_seed",
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "croparia:crop": "${id}"
+              }
+            }
+          ],
           "conditions": [
             {
               "condition": "minecraft:block_state_property",
-              "block": "${stem}",
+              "block": "croparia:melon_stem",
               "properties": {
                 "age": "7"
               }

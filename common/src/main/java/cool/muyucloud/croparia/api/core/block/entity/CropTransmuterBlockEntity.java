@@ -2,6 +2,7 @@ package cool.muyucloud.croparia.api.core.block.entity;
 
 import cool.muyucloud.croparia.api.core.block.CropTransmuter;
 import cool.muyucloud.croparia.api.core.menu.CropTransmuterMenu;
+import cool.muyucloud.croparia.api.crop.AbstractCrop;
 import cool.muyucloud.croparia.api.crop.AbstractFruit;
 import cool.muyucloud.croparia.api.crop.util.Material;
 import cool.muyucloud.croparia.api.repo.ContainerRepo;
@@ -28,15 +29,14 @@ import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -97,8 +97,8 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     public Optional<Material<?>> readInputMaterial() {
-        Item input = this.getItem(INPUT_SLOT).getItem();
-        if (input instanceof AbstractFruit<?> fruit) return Optional.of(fruit.getCrop().getMaterial());
+        ItemStack input = this.getItem(INPUT_SLOT);
+        if (input.getItem() instanceof AbstractFruit<?>) return AbstractCrop.readCrop(input).map(AbstractCrop::getMaterial);
         return Optional.empty();
     }
 
@@ -152,7 +152,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public @NonNull CompoundTag getUpdateTag(HolderLookup.Provider provider) {
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.Provider provider) {
         return this.saveWithoutMetadata(provider);
     }
 
@@ -172,12 +172,12 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public @NonNull ItemStack getItem(int slot) {
+    public @NotNull ItemStack getItem(int slot) {
         return this.inventory.get(slot);
     }
 
     @Override
-    public @NonNull ItemStack removeItem(int slot, int amount) {
+    public @NotNull ItemStack removeItem(int slot, int amount) {
         ItemStack removed = ContainerHelper.removeItem(this.inventory, slot, amount);
         if (!removed.isEmpty()) {
             this.setChanged();
@@ -186,7 +186,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public @NonNull ItemStack removeItemNoUpdate(int slot) {
+    public @NotNull ItemStack removeItemNoUpdate(int slot) {
         return ContainerHelper.takeItem(this.inventory, slot);
     }
 
@@ -206,7 +206,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public int @NonNull [] getSlotsForFace(@NonNull Direction side) {
+    public int @NotNull [] getSlotsForFace(@NotNull Direction side) {
         if (side == Direction.DOWN) {
             return new int[]{OUTPUT_SLOT};
         }
@@ -214,12 +214,12 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public boolean canPlaceItemThroughFace(int slot, @NonNull ItemStack stack, @Nullable Direction direction) {
+    public boolean canPlaceItemThroughFace(int slot, @NotNull ItemStack stack, @Nullable Direction direction) {
         return direction != Direction.DOWN && slot == INPUT_SLOT && stack.getItem() instanceof AbstractFruit<?>;
     }
 
     @Override
-    public boolean canTakeItemThroughFace(int slot, @NonNull ItemStack stack, @NonNull Direction direction) {
+    public boolean canTakeItemThroughFace(int slot, @NotNull ItemStack stack, @NotNull Direction direction) {
         return direction == Direction.DOWN && slot == OUTPUT_SLOT;
     }
 
@@ -243,7 +243,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public @NonNull Component getDisplayName() {
+    public @NotNull Component getDisplayName() {
         return Texts.translatable("container.croparia.crop_transmuter");
     }
 

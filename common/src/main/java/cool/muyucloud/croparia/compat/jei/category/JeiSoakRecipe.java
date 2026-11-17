@@ -10,7 +10,7 @@ import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.network.chat.FormattedText;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class JeiSoakRecipe extends JeiCategory<SoakRecipe> {
     public static final JeiSoakRecipe INSTANCE = new JeiSoakRecipe();
@@ -21,7 +21,7 @@ public class JeiSoakRecipe extends JeiCategory<SoakRecipe> {
     }
 
     @Override
-    public void setRecipe(@NonNull IRecipeLayoutBuilder builder, @NonNull SoakRecipe recipe, @NonNull IFocusGroup focuses) {
+    public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull SoakRecipe recipe, @NotNull IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 40).addItemStacks(recipe.craftingStation().getDisplayStacks());
         builder.addSlot(RecipeIngredientRole.CRAFTING_STATION, 72, 8).add(Texts.tooltip(CropariaItems.INFUSOR.get().getDefaultInstance(), Constants.SOAK_INFUSOR));
         builder.addInputSlot(40, 40).addItemStacks(recipe.getInput().getDisplayStacks());
@@ -30,7 +30,7 @@ public class JeiSoakRecipe extends JeiCategory<SoakRecipe> {
     }
 
     @Override
-    public void createRecipeExtras(@NonNull IRecipeExtrasBuilder builder, @NonNull SoakRecipe recipe, @NonNull IFocusGroup focuses) {
+    public void createRecipeExtras(@NotNull IRecipeExtrasBuilder builder, @NotNull SoakRecipe recipe, @NotNull IFocusGroup focuses) {
         builder.addRecipeArrowWidget().setPosition(88, 40);
         builder.addDrawableWidget(BLOCK_PLACE_UPON).setPosition(72, 24);
         builder.addDrawableWidget(BLOCK_PLACE).setPosition(56, 40);

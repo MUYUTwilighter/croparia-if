@@ -5,7 +5,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.crop.AbstractCrop;
-import cool.muyucloud.croparia.api.crop.CropAccess;
 import cool.muyucloud.croparia.api.crop.CropRegistry;
 import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
@@ -16,8 +15,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,50 +39,50 @@ public class CropMaterialRecipe extends CustomRecipe implements DisplayableRecip
         .cancelRegisterType()
         .build();
 
+    @SuppressWarnings("unchecked")
     public static Optional<AbstractCrop<?>> readCrop(CraftingInput input) {
         final Optional<AbstractCrop<?>> empty = Optional.empty();
         if (input.isEmpty()) return empty;
         List<ItemStack> stacks = input.items();
         if (stacks.size() != 1) return empty;
-        if (!(stacks.getFirst().getItem() instanceof CropAccess<?> access)) return empty;
-        return Optional.of(access.getCrop());
+        return (Optional<AbstractCrop<?>>) (Object) AbstractCrop.readCrop(stacks.getFirst());
     }
 
-    private final @NonNull CropRegistry<?> registry;
-    private final @NonNull AbstractCrop<?> crop;
+    private final @NotNull CropRegistry<?> registry;
+    private final @NotNull AbstractCrop<?> crop;
     private final @Nullable ItemOutput output;
 
-    public CropMaterialRecipe(@NonNull Identifier registryId, @NonNull Identifier cropId, @Nullable ItemOutput output) {
+    public CropMaterialRecipe(@NotNull Identifier registryId, @NotNull Identifier cropId, @Nullable ItemOutput output) {
         DgRegistry<?> reg = DgRegistry.REGISTRY.get(registryId);
         if (!(reg instanceof CropRegistry<? extends AbstractCrop<?>> cropReg)) {
             throw new IllegalArgumentException("Registry %s is either absent or not a crop registry".formatted(registryId));
         }
-        Optional<? extends AbstractCrop<?>> mayCrop = cropReg.forName(cropId);
+        Optional<? extends AbstractCrop<?>> mayCrop = cropReg.getById(cropId);
         if (mayCrop.isEmpty()) {
             throw new IllegalArgumentException("Crop %s is not found in registry %s".formatted(cropId, registryId));
         }
         this(cropReg, mayCrop.get(), output);
     }
 
-    public CropMaterialRecipe(@NonNull CropRegistry<?> registry, @NonNull AbstractCrop<?> crop, @Nullable ItemOutput output) {
+    public CropMaterialRecipe(@NotNull CropRegistry<?> registry, @NotNull AbstractCrop<?> crop, @Nullable ItemOutput output) {
         this.registry = registry;
         this.crop = crop;
         this.output = output;
     }
 
-    public @NonNull Identifier getRegistryId() {
+    public @NotNull Identifier getRegistryId() {
         return this.getRegistry().getId();
     }
 
-    public @NonNull CropRegistry<?> getRegistry() {
+    public @NotNull CropRegistry<?> getRegistry() {
         return registry;
     }
 
-    public @NonNull Identifier getCropId() {
+    public @NotNull Identifier getCropId() {
         return this.getCrop().getKey();
     }
 
-    public @NonNull AbstractCrop<?> getCrop() {
+    public @NotNull AbstractCrop<?> getCrop() {
         return crop;
     }
 
@@ -92,12 +91,12 @@ public class CropMaterialRecipe extends CustomRecipe implements DisplayableRecip
     }
 
     @Override
-    public boolean matches(@NonNull CraftingInput input, @NonNull Level level) {
+    public boolean matches(@NotNull CraftingInput input, @NotNull Level level) {
         return readCrop(input).isPresent();
     }
 
     @Override
-    public @NonNull ItemStack assemble(@NonNull CraftingInput input) {
+    public @NotNull ItemStack assemble(@NotNull CraftingInput input) {
         Optional<AbstractCrop<?>> mayCrop = readCrop(input);
         if (mayCrop.isEmpty()) return ItemStack.EMPTY;
         if (this.getOutput().isPresent()) {
@@ -113,24 +112,24 @@ public class CropMaterialRecipe extends CustomRecipe implements DisplayableRecip
     }
 
     @Override
-    public @NonNull PlacementInfo placementInfo() {
-        return PlacementInfo.create(Ingredient.of(crop.getFruitItem()));
+    public @NotNull PlacementInfo placementInfo() {
+        return PlacementInfo.create(Ingredient.of(crop.getFruit().getItem()));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public @NonNull RecipeType<CraftingRecipe> getType() {
+    public @NotNull RecipeType<CraftingRecipe> getType() {
         return (RecipeType<CraftingRecipe>) DisplayableRecipe.super.getType();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public @NonNull RecipeSerializer<CropMaterialRecipe> getSerializer() {
+    public @NotNull RecipeSerializer<CropMaterialRecipe> getSerializer() {
         return (RecipeSerializer<CropMaterialRecipe>) DisplayableRecipe.super.getSerializer();
     }
 
     @Override
-    public @NonNull RecipeBookCategory recipeBookCategory() {
+    public @NotNull RecipeBookCategory recipeBookCategory() {
         return RecipeBookCategories.CRAFTING_MISC;
     }
 }

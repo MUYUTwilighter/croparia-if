@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.registry;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.core.network.CropTransmuterRedstoneModePacket;
 import cool.muyucloud.croparia.api.core.network.CropTransmuterSelectPacket;
+import cool.muyucloud.croparia.api.crop.network.CropSyncHandler;
 import cool.muyucloud.croparia.api.network.NetworkHandler;
 import cool.muyucloud.croparia.api.network.NetworkHandlerType;
 import dev.architectury.networking.NetworkManager;
@@ -14,6 +15,9 @@ public class NetworkHandlers {
     );
     public static final NetworkHandlerType<CropTransmuterRedstoneModePacket> CROP_TRANSMUTER_REDSTONE_MODE = register(
         CropTransmuterRedstoneModePacket.TYPE
+    );
+    public static final NetworkHandlerType<CropSyncHandler> CROP_SYNC = register(
+        CropSyncHandler.TYPE
     );
 
     public static <T extends NetworkHandler> NetworkHandlerType<T> register(NetworkHandlerType<T> type) {

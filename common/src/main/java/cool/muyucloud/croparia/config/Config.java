@@ -1,9 +1,10 @@
 package cool.muyucloud.croparia.config;
 
+import cool.muyucloud.croparia.api.crop.Crop;
 import dev.architectury.platform.Platform;
 import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public class Config {
-    public static @NonNull Optional<Path> parsePath(@Nullable String path) {
+    public static @NotNull Optional<Path> parsePath(@Nullable String path) {
         if (path == null) {
             return Optional.empty();
         }
@@ -25,7 +26,7 @@ public class Config {
         }
     }
 
-    public static @NonNull String resolvePath(@NonNull Path path) {
+    public static @NotNull String resolvePath(@NotNull Path path) {
         Path normalizedPath = path.normalize();
         try {
             Path basePath = Platform.getGameFolder();
@@ -40,30 +41,33 @@ public class Config {
         return normalizedPath.toAbsolutePath().toString();
     }
 
-    @NonNull
+    @NotNull
     private Path filePath;
-    @NonNull
+    @NotNull
     private Path recipeWizard;
-    @NonNull
+    @NotNull
     private Boolean override;
-    @NonNull
+    @NotNull
     private Boolean infusor;
-    @NonNull
+    @NotNull
     private Boolean ritual;
-    @NonNull
+    @NotNull
     private Boolean fruitUse;
-    @NonNull
+    @NotNull
     private Boolean breakEffect;
-    @NonNull
+    @NotNull
     private Integer autoReload;
-    @NonNull
+    @NotNull
     private Integer soakAttempts;
-    @NonNull
+    @NotNull
     private Integer cropYield;
-    @NonNull
+    @NotNull
     private Integer melonYield;
-    @NonNull
+    @NotNull
+    private final List<String> cropTypes;
+    @NotNull
     private final List<Identifier> cropBlackList;
+    @NotNull
     private final List<String> modBlackList;
 
     /**
@@ -81,6 +85,7 @@ public class Config {
         this.soakAttempts = 1;
         this.cropYield = 2;
         this.melonYield = 2;
+        this.cropTypes = List.of(Crop.DEFAULT_TYPE, Crop.ANIMAL, Crop.FOOD, Crop.MONSTER, Crop.NATURE);
         this.cropBlackList = new ArrayList<>();
         this.modBlackList = new ArrayList<>();
     }
@@ -101,108 +106,113 @@ public class Config {
         this.cropYield = raw.cropYield() != null && raw.cropYield() > 0 ? raw.cropYield() : 2;
         this.melonYield = raw.melonYield() != null && raw.melonYield() > 0 ? raw.melonYield() : 2;
         this.melonYield = 2;
+        this.cropTypes = raw.cropTypes() != null && !raw.cropTypes().isEmpty() ? raw.cropTypes() : List.of(Crop.DEFAULT_TYPE, Crop.ANIMAL, Crop.FOOD, Crop.MONSTER, Crop.NATURE);
         this.cropBlackList = new ArrayList<>();
         this.modBlackList = new ArrayList<>();
         this.setBlackList(raw.blacklist());
     }
 
     public RawConfig toRaw() {
-        return new RawConfig(resolvePath(filePath), resolvePath(recipeWizard), override, infusor, ritual, fruitUse, breakEffect, autoReload, soakAttempts, cropYield, melonYield, this.getBlacklist());
+        return new RawConfig(resolvePath(filePath), resolvePath(recipeWizard), override, infusor, ritual, fruitUse, breakEffect, autoReload, soakAttempts, cropYield, melonYield, cropTypes, this.getBlacklist());
     }
 
-    public @NonNull Integer getCropYield() {
+    public @NotNull Integer getCropYield() {
         return cropYield;
     }
 
-    public void setCropYield(@NonNull Integer cropYield) {
+    public void setCropYield(@NotNull Integer cropYield) {
         this.cropYield = cropYield;
     }
 
-    public @NonNull Integer getMelonYield() {
+    public @NotNull Integer getMelonYield() {
         return melonYield;
     }
 
-    public void setMelonYield(@NonNull Integer melonYield) {
+    public void setMelonYield(@NotNull Integer melonYield) {
         this.melonYield = melonYield;
     }
 
-    public @NonNull Path getFilePath() {
+    public @NotNull Path getFilePath() {
         return filePath;
     }
 
-    public void setFilePath(@NonNull Path filePath) {
+    public void setFilePath(@NotNull Path filePath) {
         this.filePath = filePath;
     }
 
-    public @NonNull Path getRecipeWizard() {
+    public @NotNull Path getRecipeWizard() {
         return recipeWizard;
     }
 
-    public void setRecipeWizard(@NonNull Path recipeWizard) {
+    public void setRecipeWizard(@NotNull Path recipeWizard) {
         this.recipeWizard = recipeWizard;
     }
 
-    public @NonNull Integer getAutoReload() {
+    public @NotNull Integer getAutoReload() {
         return autoReload;
     }
 
-    public void setAutoReload(@NonNull Integer autoReload) {
+    public void setAutoReload(@NotNull Integer autoReload) {
         this.autoReload = autoReload;
     }
 
-    public @NonNull Boolean getOverride() {
+    public @NotNull Boolean getOverride() {
         return override;
     }
 
-    public void setOverride(@NonNull Boolean override) {
+    public void setOverride(@NotNull Boolean override) {
         this.override = override;
     }
 
-    public @NonNull Boolean getFruitUse() {
+    public @NotNull Boolean getFruitUse() {
         return fruitUse;
     }
 
-    public void setFruitUse(@NonNull Boolean fruitUse) {
+    public void setFruitUse(@NotNull Boolean fruitUse) {
         this.fruitUse = fruitUse;
     }
 
-    public @NonNull Boolean getInfusor() {
+    public @NotNull Boolean getInfusor() {
         return infusor;
     }
 
-    public void setInfusor(@NonNull Boolean infusor) {
+    public void setInfusor(@NotNull Boolean infusor) {
         this.infusor = infusor;
     }
 
-    public @NonNull Integer getSoakAttempts() {
+    public @NotNull Integer getSoakAttempts() {
         return soakAttempts;
     }
 
-    public void setSoakAttempts(@NonNull Integer soakAttempts) {
+    public void setSoakAttempts(@NotNull Integer soakAttempts) {
         this.soakAttempts = soakAttempts;
     }
 
-    public @NonNull Boolean getRitual() {
+    public @NotNull Boolean getRitual() {
         return ritual;
     }
 
-    public void setRitual(@NonNull Boolean ritual) {
+    public void setRitual(@NotNull Boolean ritual) {
         this.ritual = ritual;
     }
 
-    public @NonNull Boolean getBreakEffect() {
+    public @NotNull Boolean getBreakEffect() {
         return breakEffect;
     }
 
-    public void setBreakEffect(@NonNull Boolean breakEffect) {
+    public void setBreakEffect(@NotNull Boolean breakEffect) {
         this.breakEffect = breakEffect;
     }
 
-    public @NonNull List<Identifier> getCropBlackList() {
+    public @NotNull List<String> getCropTypes() {
+        return cropTypes;
+    }
+
+    public @NotNull List<Identifier> getCropBlackList() {
         return cropBlackList;
     }
 
-    public @NonNull List<String> getModBlackList() {
+    public @NotNull List<String> getModBlackList() {
         return modBlackList;
     }
 
@@ -217,7 +227,7 @@ public class Config {
         return blacklist;
     }
 
-    public void setBlackList(@NonNull List<String> blacklist) {
+    public void setBlackList(@NotNull List<String> blacklist) {
         this.getCropBlackList().clear();
         this.getModBlackList().clear();
         for (String token : blacklist) {

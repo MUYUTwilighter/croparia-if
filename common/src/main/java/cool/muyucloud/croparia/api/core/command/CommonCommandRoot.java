@@ -15,6 +15,7 @@ import static net.minecraft.commands.CommandSourceStack.ERROR_NOT_PLAYER;
 public class CommonCommandRoot {
     private static final LiteralArgumentBuilder<CommandSourceStack> ROOT = Commands.literal("cropariaServer")
         .requires(s -> s.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
+        .then(new SyncCommand<CommandSourceStack>(false).build())
         .then(CropCommand.buildCrop(false))
         .then(CropCommand.buildMelon(false))
         .then(GeneratorCommand.buildGenerator(false))

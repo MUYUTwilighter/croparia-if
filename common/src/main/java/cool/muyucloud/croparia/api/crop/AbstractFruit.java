@@ -1,4 +1,4 @@
 package cool.muyucloud.croparia.api.crop;
 
-public interface AbstractFruit<C extends AbstractCrop<?>> extends CropAccess<C> {
+public interface AbstractFruit<C extends AbstractCrop<?>> {
 }

@@ -9,14 +9,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class GreenhouseItem extends BlockItem {
     public GreenhouseItem(Block block, Item.Properties settings) {
         super(block, settings);
     }
 
-    public @NonNull InteractionResult useOn(@NonNull UseOnContext context) {
+    public @NotNull InteractionResult useOn(@NotNull UseOnContext context) {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
         ItemStack stack = context.getItemInHand();

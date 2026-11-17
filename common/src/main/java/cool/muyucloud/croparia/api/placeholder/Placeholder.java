@@ -16,8 +16,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 
 import java.util.Collections;
@@ -143,7 +143,7 @@ public class Placeholder<T> implements RegexParser<T> {
      * If no matching sub-node is found, it throws a PlaceholderException.
      */
     @Override
-    public Optional<JsonElement> parse(@NonNull T entry, @NonNull String placeholder, @NonNull Matcher matcher) throws PlaceholderException {
+    public Optional<JsonElement> parse(@NotNull T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws PlaceholderException {
         String forwarded = RegexParser.forward(placeholder);
         String next = RegexParser.next(placeholder);
         for (Map.Entry<PatternKey, RegexParser<T>> subEntry : subNodes.entrySet()) {
@@ -187,7 +187,7 @@ public class Placeholder<T> implements RegexParser<T> {
         }
 
         @Override
-        public Optional<JsonElement> parse(@NonNull T entry, @NonNull String placeholder, @NonNull Matcher matcher) throws PlaceholderException {
+        public Optional<JsonElement> parse(@NotNull T entry, @NotNull String placeholder, @NotNull Matcher matcher) throws PlaceholderException {
             return this.delegate().parse(entry, placeholder, matcher);
         }
 
@@ -218,6 +218,7 @@ public class Placeholder<T> implements RegexParser<T> {
         private static final LazySupplier<Placeholder<BlockOutput>> BLOCK_OUTPUT_IMPL = LazySupplier.of(() -> build(BlockOutput.CODEC, builder -> builder
             .then(PatternKey.literal("id"), TypeMapper.of(BlockOutput::getId), ID)
             .thenMap(PatternKey.literal("properties"), TypeMapper.of(block -> MapReader.map(block.getProperties().getProperties())), Placeholder.STRING)
+            .then(PatternKey.literal("components"), TypeMapper.of(block -> block.getComponents().asPatch()), Placeholder.DATA_COMPONENTS)
         ));
         private static final LazySupplier<Placeholder<ItemOutput>> ITEM_OUTPUT_IMPL = LazySupplier.of(() -> build(
             ItemOutput.CODEC, builder -> builder
@@ -229,7 +230,7 @@ public class Placeholder<T> implements RegexParser<T> {
         private static final LazySupplier<Placeholder<Item>> ITEM_IMPL = LazySupplier.of(() -> ID.map(TypeMapper.of(Item::arch$registryName)));
         private static final LazySupplier<Placeholder<ItemStack>> ITEM_STACK_IMPL = LazySupplier.of(() -> ITEM_OUTPUT.map(TypeMapper.of(ItemOutput::of)));
         private static final LazySupplier<Placeholder<Block>> BLOCK_IMPL = LazySupplier.of(() -> ID.map(TypeMapper.of(Block::arch$registryName)));
-        private static final LazySupplier<Placeholder<BlockState>> BLOCK_STATE_IMPL = LazySupplier.of(() -> BLOCK_OUTPUT.map(TypeMapper.of(BlockOutput::of)));
+        private static final LazySupplier<Placeholder<BlockState>> BLOCK_STATE_IMPL = LazySupplier.of(() -> BLOCK_OUTPUT.map(TypeMapper.of((BlockState state) -> BlockOutput.of(state))));
 
         private static Placeholder<DataComponentPatch> dataComponents() {
             return DATA_COMPONENTS_IMPL.get();

@@ -26,10 +26,11 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class RitualStand extends Block implements ItemPlaceable {
     }
 
     @Override
-    protected @NonNull InteractionResult useItemOn(ItemStack itemStack, BlockState blockState, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult blockHitResult) {
+    protected @NotNull InteractionResult useItemOn(ItemStack itemStack, BlockState blockState, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult blockHitResult) {
         if (hand == InteractionHand.MAIN_HAND) {
             if (itemStack.getItem() == CropariaItems.RECIPE_WIZARD.get()) {
                 return InteractionResult.TRY_WITH_EMPTY_HAND;
@@ -58,11 +59,12 @@ public class RitualStand extends Block implements ItemPlaceable {
         if (entity instanceof ItemEntity itemEntity && CropariaIf.CONFIG.getRitual() && world instanceof ServerLevel level) {
             if (DropsCache.isQueried(world, pos, CRAFT_INTERVAL)) return;
             DropsCache.mark(level, pos);
-            Recipes.RITUAL_STRUCTURE.find(new RitualStructureContainer(level.getBlockState(pos)), level).map(
+            BlockInWorld ritualBlock = new BlockInWorld(level, pos, false);
+            Recipes.RITUAL_STRUCTURE.find(new RitualStructureContainer(ritualBlock), level).map(
                 structure -> structure.validate(pos, level)
             ).ifPresentOrElse(
                 r -> r.ifSuccessOrElse(matched -> {
-                    RitualContainer matcher = RitualContainer.of(level.getBlockState(pos), DropsCache.queryStacks(world, pos), matched);
+                    RitualContainer matcher = RitualContainer.of(ritualBlock, DropsCache.queryStacks(world, pos), matched);
                     Recipes.RITUAL.find(matcher, level).ifPresentOrElse(ritual -> {
                         ItemStack result = ritual.assemble(matcher);
                         if (result.getItem() instanceof SpawnEggItem) { // Use all spawn eggs at once
@@ -93,15 +95,15 @@ public class RitualStand extends Block implements ItemPlaceable {
         }
     }
 
-    protected void playSound(@NonNull ServerLevel level, @NonNull BlockPos pos) {
+    protected void playSound(@NotNull ServerLevel level, @NotNull BlockPos pos) {
         level.playSound(null, pos, SoundEvent.createVariableRangeEvent(CropariaIf.of("block.ritual.craft")), SoundSource.BLOCKS);
     }
 
-    public @NonNull VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public @NotNull VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 
-    public @NonNull VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public @NotNull VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return SHAPE;
     }
 }

@@ -21,8 +21,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -51,7 +51,7 @@ public class JeiRitualStructure extends JeiCategory<RitualStructure> {
     }
 
     @Override
-    public void setRecipe(@NonNull IRecipeLayoutBuilder builder, @NonNull RitualStructure recipe, @NonNull IFocusGroup focuses) {
+    public void setRecipe(@NotNull IRecipeLayoutBuilder builder, @NotNull RitualStructure recipe, @NotNull IFocusGroup focuses) {
         builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStacks(recipe.getRitual().getDisplayStacks());
         for (int x = 0; x < recipe.size().getX(); x++) {
             for (int y = 0; y < recipe.size().getY(); y++) {
@@ -67,7 +67,7 @@ public class JeiRitualStructure extends JeiCategory<RitualStructure> {
     }
 
     @Override
-    public void createRecipeExtras(@NonNull IRecipeExtrasBuilder builder, @NonNull RitualStructure recipe, @NonNull IFocusGroup focuses) {
+    public void createRecipeExtras(@NotNull IRecipeExtrasBuilder builder, @NotNull RitualStructure recipe, @NotNull IFocusGroup focuses) {
         Vec3i displaySize = new Vec3i(
             Math.min(recipe.size().getX(), MAX_DISPLAY_SIZE.x()),
             recipe.size().getY(),

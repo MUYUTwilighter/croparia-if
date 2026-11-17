@@ -10,7 +10,7 @@ import net.neoforged.neoforge.transfer.TransferPreconditions;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.RootCommitJournal;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -20,7 +20,7 @@ public class FluidRepoProxy extends RepoProxy<FluidSpec> implements ResourceHand
     }
 
     @Override
-    public @NonNull FluidResource getResource(int index) {
+    public @NotNull FluidResource getResource(int index) {
         Objects.checkIndex(index, this.size());
         return FluidResource.of(ForgeFluidSpec.of(this.resourceFor(index), ForgeFluidSpec.toInternalAmount(FluidType.BUCKET_VOLUME)));
     }
@@ -39,14 +39,14 @@ public class FluidRepoProxy extends RepoProxy<FluidSpec> implements ResourceHand
     }
 
     @Override
-    public boolean isValid(int index, @NonNull FluidResource resource) {
+    public boolean isValid(int index, @NotNull FluidResource resource) {
         Objects.checkIndex(index, this.size());
         TransferPreconditions.checkNonEmpty(resource);
         return this.capacityFor(index, ForgeFluidSpec.from(resource.toStack(FluidType.BUCKET_VOLUME))) > 0;
     }
 
     @Override
-    public int insert(int index, @NonNull FluidResource resource, int amount, @NonNull TransactionContext transaction) {
+    public int insert(int index, @NotNull FluidResource resource, int amount, @NotNull TransactionContext transaction) {
         Objects.checkIndex(index, this.size());
         TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
         FluidSpec fluid = ForgeFluidSpec.from(resource.toStack(FluidType.BUCKET_VOLUME));
@@ -58,7 +58,7 @@ public class FluidRepoProxy extends RepoProxy<FluidSpec> implements ResourceHand
     }
 
     @Override
-    public int extract(int index, @NonNull FluidResource resource, int amount, @NonNull TransactionContext transaction) {
+    public int extract(int index, @NotNull FluidResource resource, int amount, @NotNull TransactionContext transaction) {
         Objects.checkIndex(index, this.size());
         TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
         FluidSpec fluid = ForgeFluidSpec.from(resource.toStack(FluidType.BUCKET_VOLUME));

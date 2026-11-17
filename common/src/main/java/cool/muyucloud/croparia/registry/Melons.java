@@ -2,17 +2,21 @@ package cool.muyucloud.croparia.registry;
 
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.crop.Melon;
+import cool.muyucloud.croparia.api.crop.asset.Color;
 import cool.muyucloud.croparia.api.crop.util.BlockMaterial;
-import cool.muyucloud.croparia.api.crop.util.Color;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @SuppressWarnings("unused")
 public class Melons {
+    public static final Set<Melon> BUILTIN = new HashSet<>();
+
     /**
      * Add a crop for vanilla material with specified translation key.
      *
@@ -21,14 +25,14 @@ public class Melons {
      * @param color    int value of color
      * @param tier     tier
      */
-    public static @NonNull Melon vanilla(
-        @NonNull String name, Block material, int color, int tier
+    public static @NotNull Melon vanilla(
+        @NotNull String name, Block material, int color, int tier
     ) {
         Melon melon = new Melon(
             CropariaIf.of(name), new BlockMaterial(Objects.requireNonNull(material.arch$registryName()).toString(), CropariaIf.CONFIG.getMelonYield()),
             new Color(color), tier, null, new CropDependencies("minecraft", material.getDescriptionId())
         );
-        DgRegistries.MELONS.register(melon);
+        BUILTIN.add(melon);
         return melon;
     }
 
@@ -68,8 +72,7 @@ public class Melons {
     public static final Melon MOSS_BLOCK = vanilla("moss_block", Blocks.MOSS_BLOCK, 0x6CA66C, 2);
     public static final Melon MYCELIUM = vanilla("mycelium", Blocks.MYCELIUM, 0x7F6A93, 2);
     public static final Melon OBSIDIAN = vanilla("obsidian", Blocks.OBSIDIAN, 0x1C1C2A, 2);
-    // Pale Moss Block only in 1.21.4+
-    // public static final Melon PALE_MOSS_BLOCK = vanilla("pale_moss_block", Blocks.PALE_MOSS_BLOCK, 0xA2C5A2, 2);
+    public static final Melon PALE_MOSS_BLOCK = vanilla("pale_moss_block", Blocks.PALE_MOSS_BLOCK, 0xA2C5A2, 2);
     public static final Melon PODZOL = vanilla("podzol", Blocks.PODZOL, 0x8B5A2B, 2);
     public static final Melon SCULK = vanilla("sculk", Blocks.SCULK, 0x0B3B2E, 2);
     public static final Melon WARPED_NYLIUM = vanilla("warped_nylium", Blocks.WARPED_NYLIUM, 0x2E7C7A, 2);
@@ -90,10 +93,4 @@ public class Melons {
     public static final Melon ZOMBIE_HEAD = vanilla("zombie_head", Blocks.ZOMBIE_HEAD, 0x00AA00, 5);
     public static final Melon PIGLIN_HEAD = vanilla("piglin_head", Blocks.PIGLIN_HEAD, 0xFFD700, 5);
     public static final Melon PLAYER_HEAD = vanilla("player_head", Blocks.PLAYER_HEAD, 0xFFDAB9, 5);
-
-
-    public static void register() {
-        CropariaIf.LOGGER.info("Loading custom crops from file definitions");
-        DgRegistries.MELONS.readCrops();
-    }
 }

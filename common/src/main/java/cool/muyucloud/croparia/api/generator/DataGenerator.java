@@ -17,7 +17,7 @@ import cool.muyucloud.croparia.api.generator.util.DgRegistry;
 import cool.muyucloud.croparia.api.placeholder.Template;
 import cool.muyucloud.croparia.util.Dependencies;
 import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
@@ -173,7 +173,7 @@ public class DataGenerator implements DgListener {
                 }
             } else {
                 for (Identifier id : this.getWhitelist()) {
-                    this.getRegistry().forName(id).ifPresent(e -> this.generate(e, pack));
+                    this.getRegistry().getById(id).ifPresent(e -> this.generate(e, pack));
                 }
             }
         }

@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.Codec;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -55,7 +55,7 @@ public class PlaceholderBuilder<T> {
      * @return A new PlaceholderBuilder instance for the map type.
      * @apiNote The builder supports Json Object Querier.
      */
-    public static <T, V> PlaceholderBuilder<T> ofMap(TypeMapper<T, @NonNull MapReader<String, V>> mapper, Placeholder<V> valueParser) {
+    public static <T, V> PlaceholderBuilder<T> ofMap(TypeMapper<T, @NotNull MapReader<String, V>> mapper, Placeholder<V> valueParser) {
         return PlaceholderBuilder.of(parser -> parser.self((entry, placeholder, matcher) -> {
             if (entry instanceof JsonObject obj) {
                 return Optional.of(obj);
@@ -162,7 +162,7 @@ public class PlaceholderBuilder<T> {
     }
 
     private static <T, V> Optional<MapReader<String, V>> filterMapByParsedValue(
-        TypeMapper<T, @NonNull MapReader<String, V>> mapper,
+        TypeMapper<T, @NotNull MapReader<String, V>> mapper,
         Placeholder<V> valueParser,
         T entry,
         String placeholder,
@@ -183,7 +183,7 @@ public class PlaceholderBuilder<T> {
     }
 
     private static <T, V> Optional<MapReader<String, V>> remapMapKeysByParsedValue(
-        TypeMapper<T, @NonNull MapReader<String, V>> mapper,
+        TypeMapper<T, @NotNull MapReader<String, V>> mapper,
         Placeholder<V> valueParser,
         T entry,
         String placeholder,
@@ -206,7 +206,7 @@ public class PlaceholderBuilder<T> {
     }
 
     private static <T, V> Optional<ListReader<V>> mapValuesAsList(
-        TypeMapper<T, @NonNull MapReader<String, V>> mapper,
+        TypeMapper<T, @NotNull MapReader<String, V>> mapper,
         T entry,
         String placeholder,
         Matcher matcher
@@ -215,7 +215,7 @@ public class PlaceholderBuilder<T> {
     }
 
     private static <T, V> Optional<ListReader<String>> mapKeysAsList(
-        TypeMapper<T, @NonNull MapReader<String, V>> mapper,
+        TypeMapper<T, @NotNull MapReader<String, V>> mapper,
         T entry,
         String placeholder,
         Matcher matcher
@@ -319,11 +319,11 @@ public class PlaceholderBuilder<T> {
      * @param parser The parser to use for the entry itself.
      * @return The current builder instance for chaining.
      */
-    protected @NonNull PlaceholderBuilder<T> self(@NonNull RegexParser<T> parser) {
+    protected @NotNull PlaceholderBuilder<T> self(@NotNull RegexParser<T> parser) {
         return then(PatternKey.EMPTY, parser);
     }
 
-    public @NonNull <F> PlaceholderBuilder<T> self(TypeMapper<T, F> mapper, @NonNull Placeholder<F> parser) {
+    public @NotNull <F> PlaceholderBuilder<T> self(TypeMapper<T, F> mapper, @NotNull Placeholder<F> parser) {
         return then(PatternKey.EMPTY, (entry, placeholder, matcher) -> {
             var mayF = mapper.map(entry, placeholder, matcher);
             if (mayF.isEmpty()) return Optional.empty();
@@ -332,20 +332,20 @@ public class PlaceholderBuilder<T> {
         });
     }
 
-    public @NonNull <F> PlaceholderBuilder<T> self(TypeMapper<T, F> mapper, @NonNull Codec<F> codec) {
+    public @NotNull <F> PlaceholderBuilder<T> self(TypeMapper<T, F> mapper, @NotNull Codec<F> codec) {
         return then(PatternKey.EMPTY, mapper, codec);
     }
 
-    protected @NonNull PlaceholderBuilder<T> then(@NonNull Pattern key, @NonNull RegexParser<T> parser) {
+    protected @NotNull PlaceholderBuilder<T> then(@NotNull Pattern key, @NotNull RegexParser<T> parser) {
         this.subNodes.put(PatternKey.of(key), parser);
         return this;
     }
 
-    public @NonNull <O> PlaceholderBuilder<T> then(@NonNull Pattern key, TypeMapper<T, O> mapper, @NonNull Placeholder<O> parser) {
+    public @NotNull <O> PlaceholderBuilder<T> then(@NotNull Pattern key, TypeMapper<T, O> mapper, @NotNull Placeholder<O> parser) {
         return then(key, mapper, parser, PlaceholderFactory.identity());
     }
 
-    public @NonNull <O> PlaceholderBuilder<T> then(@NonNull Pattern key, TypeMapper<T, O> mapper, @NonNull Placeholder<O> parser, PlaceholderFactory<T> factory) {
+    public @NotNull <O> PlaceholderBuilder<T> then(@NotNull Pattern key, TypeMapper<T, O> mapper, @NotNull Placeholder<O> parser, PlaceholderFactory<T> factory) {
         PlaceholderBuilder<T> sub = parser.toBuilder().map(mapper);
         factory.apply(sub);
         return then(key, sub.build());
@@ -362,7 +362,7 @@ public class PlaceholderBuilder<T> {
      * @return The current builder instance for chaining.
      * @apiNote This is a shorthand for then(key, t -> CodecUtil.encodeJson(mapper.apply(t), codec).getOrThrow(PlaceholderException::new))
      */
-    public @NonNull <O> PlaceholderBuilder<T> then(@NonNull Pattern key, @NonNull TypeMapper<T, O> mapper, @NonNull Codec<O> codec) {
+    public @NotNull <O> PlaceholderBuilder<T> then(@NotNull Pattern key, @NotNull TypeMapper<T, O> mapper, @NotNull Codec<O> codec) {
         return then(key, (entry, placeholder, matcher) -> {
             var mayO = mapper.map(entry, placeholder, matcher);
             if (mayO.isEmpty()) return Optional.empty();
@@ -380,7 +380,7 @@ public class PlaceholderBuilder<T> {
      * @apiNote If you want to parse the entry into Json, you should use {@code then(key, mapper, Placeholder.JSON)} so
      * that the parser would support auto-casting and Json Querier.
      */
-    public @NonNull PlaceholderBuilder<T> then(@NonNull Pattern key, @NonNull Placeholder<T> parser) {
+    public @NotNull PlaceholderBuilder<T> then(@NotNull Pattern key, @NotNull Placeholder<T> parser) {
         subNodes.put(new PatternKey(key), parser);
         return this;
     }
@@ -397,7 +397,7 @@ public class PlaceholderBuilder<T> {
      * @apiNote This is a shorthand for {@code then(key, mapper, ofMap(mapper, valueParser))}.
      * @see #ofMap(TypeMapper, Placeholder)
      */
-    public @NonNull <V> PlaceholderBuilder<T> thenMap(@NonNull Pattern key, @NonNull TypeMapper<T, MapReader<String, V>> mapper, @NonNull Placeholder<V> valueParser) {
+    public @NotNull <V> PlaceholderBuilder<T> thenMap(@NotNull Pattern key, @NotNull TypeMapper<T, MapReader<String, V>> mapper, @NotNull Placeholder<V> valueParser) {
         return this.then(key, ofMap(mapper, valueParser).build());
     }
 
@@ -406,14 +406,14 @@ public class PlaceholderBuilder<T> {
      * then parses the elements using the provided element parser.
      */
     @SuppressWarnings("unused")
-    public @NonNull <E> PlaceholderBuilder<T> thenList(@NonNull Pattern key, @NonNull TypeMapper<T, ListReader<E>> mapper, @NonNull Placeholder<E> elemParser) {
+    public @NotNull <E> PlaceholderBuilder<T> thenList(@NotNull Pattern key, @NotNull TypeMapper<T, ListReader<E>> mapper, @NotNull Placeholder<E> elemParser) {
         return this.then(key, ofList(mapper, elemParser).build());
     }
 
     /**
      * Overwrite the sub-nodes of this builder with the sub-nodes of another placeholder.
      */
-    public @NonNull <O> PlaceholderBuilder<T> overwrite(@NonNull Placeholder<O> other, @NonNull TypeMapper<T, O> mapper) {
+    public @NotNull <O> PlaceholderBuilder<T> overwrite(@NotNull Placeholder<O> other, @NotNull TypeMapper<T, O> mapper) {
         for (var entry : other.getSubNodes().entrySet()) {
             subNodes.put(entry.getKey(), (t, p, m) -> {
                 var mayO = mapper.map(t, p, m);
@@ -425,7 +425,7 @@ public class PlaceholderBuilder<T> {
         return this;
     }
 
-    public @NonNull <O> PlaceholderBuilder<T> concat(@NonNull Placeholder<O> other, @NonNull TypeMapper<T, O> mapper) {
+    public @NotNull <O> PlaceholderBuilder<T> concat(@NotNull Placeholder<O> other, @NotNull TypeMapper<T, O> mapper) {
         for (var entry : other.getSubNodes().entrySet()) {
             this.subNodes.putIfAbsent(entry.getKey(), (t, s, m) -> {
                 var mayO = mapper.map(t, s, m);
@@ -437,7 +437,7 @@ public class PlaceholderBuilder<T> {
         return this;
     }
 
-    public @NonNull PlaceholderBuilder<T> remove(@NonNull Pattern key) {
+    public @NotNull PlaceholderBuilder<T> remove(@NotNull Pattern key) {
         this.subNodes.remove(new PatternKey(key));
         return this;
     }
@@ -452,7 +452,7 @@ public class PlaceholderBuilder<T> {
      * the entry type from O to T before passing it to the original parsers.<br/>
      * The original builder remains unchanged.
      */
-    public <O> PlaceholderBuilder<O> map(@NonNull TypeMapper<O, T> mapper) {
+    public <O> PlaceholderBuilder<O> map(@NotNull TypeMapper<O, T> mapper) {
         PlaceholderBuilder<O> mapped = new PlaceholderBuilder<>();
         for (Map.Entry<PatternKey, RegexParser<T>> entry : this.subNodes.entrySet()) {
             PatternKey key = entry.getKey();

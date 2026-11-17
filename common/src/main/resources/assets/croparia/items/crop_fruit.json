@@ -1,0 +1,60 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "croparia:crop_type",
+    "cases": [
+      {
+        "when": "animal",
+        "model": {
+          "type": "minecraft:model",
+          "model": "croparia:item/fruit_animal",
+          "tints": [
+            { "type": "minecraft:constant", "value": -1 },
+            { "type": "croparia:crop" }
+          ]
+        }
+      },
+      {
+        "when": "food",
+        "model": {
+          "type": "minecraft:model",
+          "model": "croparia:item/fruit_food",
+          "tints": [
+            { "type": "minecraft:constant", "value": -1 },
+            { "type": "croparia:crop" }
+          ]
+        }
+      },
+      {
+        "when": "monster",
+        "model": {
+          "type": "minecraft:model",
+          "model": "croparia:item/fruit_monster",
+          "tints": [
+            { "type": "minecraft:constant", "value": -1 },
+            { "type": "croparia:crop" }
+          ]
+        }
+      },
+      {
+        "when": "nature",
+        "model": {
+          "type": "minecraft:model",
+          "model": "croparia:item/fruit_nature",
+          "tints": [
+            { "type": "minecraft:constant", "value": -1 },
+            { "type": "croparia:crop" }
+          ]
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "croparia:item/crop_fruit",
+      "tints": [
+        { "type": "minecraft:constant", "value": -1 },
+        { "type": "croparia:crop" }
+      ]
+    }
+  }
+}

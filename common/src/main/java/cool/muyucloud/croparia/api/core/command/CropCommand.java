@@ -6,15 +6,21 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import cool.muyucloud.croparia.CropariaIf;
-import cool.muyucloud.croparia.api.crop.*;
-import cool.muyucloud.croparia.api.crop.block.CropariaCropBlock;
-import cool.muyucloud.croparia.api.crop.block.MelonStem;
+import cool.muyucloud.croparia.api.crop.AbstractCrop;
+import cool.muyucloud.croparia.api.crop.Crop;
+import cool.muyucloud.croparia.api.crop.CropRegistry;
+import cool.muyucloud.croparia.api.crop.Melon;
+import cool.muyucloud.croparia.api.crop.asset.Color;
 import cool.muyucloud.croparia.api.crop.item.Croparia;
-import cool.muyucloud.croparia.api.crop.util.*;
+import cool.muyucloud.croparia.api.crop.util.BlockMaterial;
+import cool.muyucloud.croparia.api.crop.util.CropDependencies;
+import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
+import cool.muyucloud.croparia.api.crop.util.Material;
+import cool.muyucloud.croparia.registry.CropariaComponents;
 import cool.muyucloud.croparia.registry.CropariaItems;
 import cool.muyucloud.croparia.registry.DgRegistries;
 import cool.muyucloud.croparia.util.CifUtil;
-import cool.muyucloud.croparia.util.ResourceLocationArgument;
+import cool.muyucloud.croparia.util.IdentifierArgument;
 import cool.muyucloud.croparia.util.text.DelegateSource;
 import cool.muyucloud.croparia.util.text.SuccessMessenger;
 import cool.muyucloud.croparia.util.text.Texts;
@@ -26,14 +32,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+// TODO: adapt new crop api
 public abstract class CropCommand<C extends AbstractCrop<?>> {
     public static final CropCommand<Crop> CROP = new CropCommand<>("crop", DgRegistries.CROPS) {
         @Override
@@ -46,14 +52,13 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
             MutableComponent type = Texts.translatable(
                 "commands.croparia.crop.query.type", Texts.literal(crop.getType(), Texts.copyText(crop.getType()))
             );
-            MutableComponent seed = reportSeed(crop.getSeedId());
-            MutableComponent fruit = reportFruit(crop.getFruitId());
+            MutableComponent seed = reportSeed(crop.getSeed());
+            MutableComponent fruit = reportFruit(crop.getFruit());
 
             MutableComponent cropBlock = Texts.translatable(
                 "commands.croparia.crop.query.cropBlock",
-                Texts.literal(crop.getBlockId().toString(),
-                    Texts.suggestCommand("setblock ~ ~ ~", crop.getBlockId() + "[age=7]"),
-                    Texts.hoverText(crop.getCropBlock().map(CropariaCropBlock::getName).orElse(Texts.literal("error"))),
+                Texts.literal("croparia:crop",
+                    Texts.suggestCommand("setblock ~ ~ ~", "croparia:crop[age=7]{components:{\"croparia:crop\":\"%s\"}}".formatted(crop.getKey())),
                     Texts.inlineMouseBehavior())
             );
             MutableComponent status = diagnose(crop);
@@ -77,13 +82,12 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
             MutableComponent material = CropCommand.reportMaterial(melon);
             MutableComponent tier = CropCommand.reportTier(melon.getTier());
             MutableComponent color = CropCommand.reportColor(melon.getColor());
-            MutableComponent seed = CropCommand.reportSeed(melon.getSeed().getId());
-            MutableComponent fruit = CropCommand.reportFruit(melon.getMelon().getId());
+            MutableComponent seed = CropCommand.reportSeed(melon.getSeed());
+            MutableComponent fruit = CropCommand.reportFruit(melon.getFruit());
             MutableComponent stem = Texts.translatable(
                 "commands.croparia.crop.query.cropBlock",
-                Texts.literal(melon.getStem().getId().toString(),
-                    Texts.suggestCommand("setblock ~ ~ ~", melon.getStem().getId() + "[age=7]"),
-                    Texts.hoverText(melon.getStem().toOptional().map(MelonStem::getName).orElse(Texts.literal("error"))),
+                Texts.literal("croparia:melon_stem",
+                    Texts.suggestCommand("setblock ~ ~ ~", "croparia:melon_stem[age=7]{components:{\"croparia:crop\":\"%s\"}}".formatted(melon.getKey())),
                     Texts.inlineMouseBehavior())
             );
             MutableComponent status = diagnose(melon);
@@ -101,7 +105,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
 
     public static <S> LiteralArgumentBuilder<S> buildCrop(boolean client) {
         LiteralArgumentBuilder<S> create = LiteralArgumentBuilder.literal("create");
-        RequiredArgumentBuilder<S, Identifier> id = RequiredArgumentBuilder.argument("id", ResourceLocationArgument.id());
+        RequiredArgumentBuilder<S, Identifier> id = RequiredArgumentBuilder.argument("id", IdentifierArgument.id());
         id.executes(context -> createCrop(context, client, false));
         RequiredArgumentBuilder<S, String> color = RequiredArgumentBuilder.argument("color", StringArgumentType.word());
         color.executes(context -> createCrop(context, client, false));
@@ -121,7 +125,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
 
     public static <S> LiteralArgumentBuilder<S> buildMelon(boolean client) {
         LiteralArgumentBuilder<S> create = LiteralArgumentBuilder.literal("create");
-        RequiredArgumentBuilder<S, Identifier> id = RequiredArgumentBuilder.argument("id", ResourceLocationArgument.id());
+        RequiredArgumentBuilder<S, Identifier> id = RequiredArgumentBuilder.argument("id", IdentifierArgument.id());
         id.executes(context -> createMelon(context, client, false));
         RequiredArgumentBuilder<S, String> color = RequiredArgumentBuilder.argument("color", StringArgumentType.word());
         color.executes(context -> createMelon(context, client, false));
@@ -134,11 +138,14 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         return crop;
     }
 
-    private static @NonNull MutableComponent reportFruit(Identifier fruit) {
+    private static @NotNull MutableComponent reportFruit(ItemStack fruit) {
+        Identifier id = fruit.getItem().arch$registryName();
+        Identifier cropId = fruit.get(CropariaComponents.CROP_ID.get());
+        assert id != null;
         return Texts.translatable(
             "commands.croparia.crop.query.fruit",
-            Texts.literal(fruit.toString(),
-                Texts.suggestCommand("give @s", fruit.toString()),
+            Texts.literal(id.toString(),
+                Texts.suggestCommand("give @s", "%s[croparia:crop=%s]".formatted(id, cropId)),
                 Texts.hoverItem(fruit),
                 Texts.inlineMouseBehavior())
         );
@@ -162,13 +169,13 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
             DelegateSource<S> source = DelegateSource.of(context);
             return reportForPlayer(source);
         });
-        RequiredArgumentBuilder<S, Identifier> id = RequiredArgumentBuilder.argument("id", ResourceLocationArgument.id());
+        RequiredArgumentBuilder<S, Identifier> id = RequiredArgumentBuilder.argument("id", IdentifierArgument.id());
         id.suggests((context, builder) -> {
             this.getRegistry().forEach(crop -> builder.suggest(crop.getKey().toString()));
             return builder.buildFuture();
         });
         id.executes(context -> {
-            Identifier idVal = ResourceLocationArgument.getId(context, "id");
+            Identifier idVal = IdentifierArgument.getId(context, "id");
             return this.reportSingular(idVal, DelegateSource.of(context));
         });
         return query.then(id);
@@ -177,13 +184,13 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
     public <S> LiteralArgumentBuilder<S> buildDump(boolean openFile) {
         LiteralArgumentBuilder<S> dump = LiteralArgumentBuilder.literal("dump");
         dump.executes(context -> this.dumpAll(DelegateSource.of(context), openFile));
-        RequiredArgumentBuilder<S, Identifier> id = RequiredArgumentBuilder.argument("id", ResourceLocationArgument.id());
+        RequiredArgumentBuilder<S, Identifier> id = RequiredArgumentBuilder.argument("id", IdentifierArgument.id());
         id.suggests((context, builder) -> {
             this.getRegistry().forEach(crop -> builder.suggest(crop.getKey().toString()));
             return builder.buildFuture();
         });
         id.executes(context -> {
-            Identifier idVal = ResourceLocationArgument.getId(context, "id");
+            Identifier idVal = IdentifierArgument.getId(context, "id");
             return this.dump(idVal, DelegateSource.of(context), openFile);
         });
         return dump.then(id);
@@ -199,7 +206,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
 
     /* QUERIES */
     public <S> int reportSingular(Identifier id, DelegateSource<S> source) {
-        Optional<C> mayCrop = registry.forName(id);
+        Optional<C> mayCrop = registry.getById(id);
         if (mayCrop.isEmpty()) {
             source.failure(Texts.translatable("commands.croparia.crop.query.absent", id.toString()));
             return 0;
@@ -213,12 +220,8 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
     public <S> int reportForPlayer(DelegateSource<S> source) throws CommandSyntaxException {
         Player player = source.getPlayerOrException();
         Level world = source.getLevel();
-        C crop = null;
-        if (player.getWeaponItem().getItem() instanceof CropAccess<?> access) {
-            crop = CropAccess.tryGet(access);
-        } else if (world.getBlockState(CifUtil.lookingAt(player)).getBlock() instanceof CropAccess<?> access) {
-            crop = CropAccess.tryGet(access);
-        }
+        @SuppressWarnings("unchecked")
+        C crop = (C) AbstractCrop.readCrop(player.getWeaponItem()).orElseGet(() -> AbstractCrop.readCrop(world, CifUtil.lookingAt(player)).orElse(null));
         if (crop == null) {
             source.failure(Texts.translatable("commands.croparia.crop.query.no_crop"));
             return 0;
@@ -230,24 +233,26 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
 
     public abstract MutableComponent buildReport(C crop);
 
-    private static @NonNull MutableComponent reportSeed(Identifier seed) {
+    private static @NotNull MutableComponent reportSeed(ItemStack seed) {
+        Identifier id = seed.getItem().arch$registryName();
+        Identifier cropId = seed.get(CropariaComponents.CROP_ID.get());
+        assert id != null;
         return Texts.translatable(
             "commands.croparia.crop.query.seed",
-            Texts.literal(seed.toString(),
-                Texts.suggestCommand("give @s", seed.toString()),
-                Texts.hoverItem(seed),
-                Texts.inlineMouseBehavior())
-        );
+            Texts.literal(id.toString()),
+            Texts.suggestCommand("give @s ", "%s[croparia:crop=%s]".formatted(id, cropId)),
+            Texts.hoverItem(seed),
+            Texts.inlineMouseBehavior());
     }
 
-    private static @NonNull MutableComponent reportColor(Color color) {
+    private static @NotNull MutableComponent reportColor(Color color) {
         return Texts.translatable(
             "commands.croparia.crop.query.color",
             Texts.literal(color.toString(), Texts.copyText(color.toString())).withColor(color.getValue())
         );
     }
 
-    private static @NonNull MutableComponent reportTier(int tier) {
+    private static @NotNull MutableComponent reportTier(int tier) {
         return Texts.forStyles(Texts.translatable(
             "commands.croparia.crop.query.tier", Texts.literal(tier + "",
                 Texts.suggestCommand("give @s", CropariaItems.getCroparia(tier).getId().toString()),
@@ -256,7 +261,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         ));
     }
 
-    private static @NonNull <T> MutableComponent reportMaterial(AbstractCrop<T> crop) {
+    private static @NotNull <T> MutableComponent reportMaterial(AbstractCrop<T> crop) {
         Material<T> material = crop.getMaterial();
         MutableComponent name = Texts.literal(material.getName(), Texts.copyText(material.getName()), Texts.inlineMouseBehavior());
         if (material.isEmpty()) {
@@ -269,8 +274,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         }
     }
 
-    private static @NonNull MutableComponent reportTranslation(AbstractCrop<?> crop) {
-        @Nullable
+    private static @NotNull MutableComponent reportTranslation(AbstractCrop<?> crop) {
         String key = crop.getTranslationKey();
         MutableComponent keyComp;
         if (key == null) keyComp = Texts.literal("not loaded");
@@ -280,11 +284,11 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         return Texts.translatable("commands.croparia.crop.query.translationKey", keyComp);
     }
 
-    private static @NonNull MutableComponent reportName(AbstractCrop<?> crop) {
+    private static @NotNull MutableComponent reportName(AbstractCrop<?> crop) {
         return Texts.translatable("commands.croparia.crop.query.id", crop.getKey().toString());
     }
 
-    public static MutableComponent diagnose(@NonNull AbstractCrop<?> crop) {
+    public static MutableComponent diagnose(@NotNull AbstractCrop<?> crop) {
         if (!crop.shouldLoad()) {
             return Texts.translatable("commands.croparia.crop.query.status.unavailable").withStyle(ChatFormatting.YELLOW);
         }
@@ -310,7 +314,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
     }
 
     public <S> int dump(Identifier id, DelegateSource<S> messenger, boolean openFile) {
-        Optional<C> optional = this.getRegistry().forName(id);
+        Optional<C> optional = this.getRegistry().getById(id);
         if (optional.isEmpty()) {
             MutableComponent component = Texts.translatable("commands.croparia.crop.dump.singular.absent", id);
             messenger.failure(component);
@@ -448,7 +452,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
     }
 
     public static <S> Identifier testId(CommandContext<S> context, String key) throws IllegalArgumentException {
-        Identifier id = ResourceLocationArgument.getId(context, key);
+        Identifier id = IdentifierArgument.getId(context, key);
         if (id != null && id.getNamespace().equals("minecraft")) {
             DelegateSource<S> source = DelegateSource.of(context);
             source.failure(Texts.translatable("commands.croparia.crop.create.namespace"));

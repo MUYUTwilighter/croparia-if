@@ -1,0 +1,11 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "croparia:item/crop_seed",
+    "tints": [
+      {
+        "type": "croparia:crop"
+      }
+    ]
+  }
+}

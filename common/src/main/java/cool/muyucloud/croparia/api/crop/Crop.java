@@ -6,31 +6,29 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import cool.muyucloud.croparia.CropariaIf;
 import cool.muyucloud.croparia.api.codec.CodecUtil;
-import cool.muyucloud.croparia.api.crop.block.CropariaCropBlock;
-import cool.muyucloud.croparia.api.crop.item.CropFruit;
-import cool.muyucloud.croparia.api.crop.item.CropSeed;
-import cool.muyucloud.croparia.api.crop.util.Color;
+import cool.muyucloud.croparia.api.crop.asset.Color;
+import cool.muyucloud.croparia.api.crop.asset.ColorAccess;
+import cool.muyucloud.croparia.api.crop.block.CropariaCrop;
 import cool.muyucloud.croparia.api.crop.util.CropDependencies;
 import cool.muyucloud.croparia.api.crop.util.ItemMaterial;
 import cool.muyucloud.croparia.api.crop.util.TierAccess;
 import cool.muyucloud.croparia.api.placeholder.PatternKey;
 import cool.muyucloud.croparia.api.placeholder.Placeholder;
 import cool.muyucloud.croparia.api.placeholder.TypeMapper;
+import cool.muyucloud.croparia.registry.CropariaComponents;
 import cool.muyucloud.croparia.registry.CropariaItems;
-import cool.muyucloud.croparia.util.CifUtil;
-import cool.muyucloud.croparia.util.supplier.HolderSupplier;
 import cool.muyucloud.croparia.util.supplier.LazySupplier;
 import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 @SuppressWarnings("unused")
-public class Crop extends AbstractCrop<Item> implements TierAccess {
+public class Crop extends AbstractCrop<Item> implements TierAccess, ColorAccess {
     public static final Set<String> PRESET_TYPES = new HashSet<>();
     public static final String ANIMAL = addType("animal");
     public static final String CROP = addType("crop");
@@ -61,9 +59,6 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         .then(PatternKey.literal("type"), TypeMapper.of(Crop::getType), Placeholder.STRING)
         .then(PatternKey.literal("material"), TypeMapper.of(Crop::getMaterial), ItemMaterial.PLACEHOLDER)
         .then(PatternKey.literal("tier"), TypeMapper.of(Crop::getTier), Placeholder.NUMBER)
-        .then(PatternKey.literal("seed"), TypeMapper.of(Crop::getSeedId), Placeholder.ID)
-        .then(PatternKey.literal("fruit"), TypeMapper.of(Crop::getFruitId), Placeholder.ID)
-        .then(PatternKey.literal("crop_block"), TypeMapper.of(Crop::getBlockId), Placeholder.ID)
         .then(PatternKey.literal("croparia"), TypeMapper.of(crop -> CropariaItems.getCroparia(crop.getTier()).getId()), Placeholder.ID)
         .concat(AbstractCrop.PLACEHOLDER, TypeMapper.of(crop -> crop))
     );
@@ -72,25 +67,19 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return "crop.%s.%s".formatted(id.getNamespace(), id.getPath());
     }
 
-    @NonNull
+    @NotNull
     private final Identifier id;
-    @NonNull
+    @NotNull
     private final ItemMaterial material;
-    @NonNull
+    @NotNull
     private final Color color;
     private final int tier;
-    @NonNull
+    @NotNull
     private final String type;
-    @NonNull
+    @NotNull
     private final ImmutableMap<String, String> translations;
-    @NonNull
+    @NotNull
     private final CropDependencies dependencies;
-    @NonNull
-    private final transient HolderSupplier<CropariaCropBlock> block;
-    @NonNull
-    private final transient HolderSupplier<CropSeed> seed;
-    @NonNull
-    private final transient HolderSupplier<CropFruit> fruit;
     private transient final String defaultTranslation;
     private transient final String defaultTranslationKey;
     private transient final LazySupplier<Boolean> load = LazySupplier.of(
@@ -98,10 +87,10 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
     );
 
     public Crop(
-        @NonNull Identifier id, @NonNull ItemMaterial material, @NonNull Color color, int tier, @Nullable String type,
-        @Nullable Map<String, String> translations, @NonNull CropDependencies dependencies
+        @NotNull Identifier id, @NotNull ItemMaterial material, @NotNull Color color, int tier, @Nullable String type,
+        @Nullable Map<String, String> translations, @NotNull CropDependencies dependencies
     ) {
-        this.id = id;
+        this.id = CropariaIf.of(id.getPath());
         this.material = material;
         this.color = color;
         this.tier = tier;
@@ -113,18 +102,15 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         builder.putAll(translations == null ? Collections.emptyMap() : translations);
         this.translations = ImmutableMap.copyOf(builder);
         this.type = type == null ? DEFAULT_TYPE : type;
-        this.block = HolderSupplier.of(() -> new CropariaCropBlock(this), CifUtil.formatId("block_crop_%s", this.getKey()), Registries.BLOCK);
-        this.seed = HolderSupplier.of(() -> new CropSeed(this), CifUtil.formatId("crop_seed_%s", this.getKey()), Registries.ITEM);
-        this.fruit = HolderSupplier.of(() -> new CropFruit(this), CifUtil.formatId("fruit_%s", this.getKey()), Registries.ITEM);
     }
 
     @Override
-    public @NonNull Identifier getKey() {
+    public @NotNull Identifier getKey() {
         return this.id;
     }
 
     @Override
-    public @NonNull ItemMaterial getMaterial() {
+    public @NotNull ItemMaterial getMaterial() {
         return material;
     }
 
@@ -132,7 +118,8 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return this.getMaterial().getComponents();
     }
 
-    public @NonNull Color getColor() {
+    @Override
+    public @NotNull Color getColor() {
         return color;
     }
 
@@ -150,7 +137,7 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return this.getTranslations().keySet();
     }
 
-    public @NonNull String getTranslationKey() {
+    public @NotNull String getTranslationKey() {
         return dependencies.getChosen();
     }
 
@@ -163,14 +150,8 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
     }
 
     @Override
-    public @NonNull ImmutableMap<String, String> getTranslations() {
+    public @NotNull ImmutableMap<String, String> getTranslations() {
         return translations;
-    }
-
-    @Override
-    @Nullable
-    public String translate(String lang) {
-        return this.getTranslations().get(lang);
     }
 
     public Optional<Map<String, String>> getTranslationsOptional() {
@@ -182,7 +163,10 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         }
     }
 
-    public @NonNull String getType() {
+    /**
+     * This does not invalidate whether the return value is possible values for {@link CropariaCrop#TYPE}
+     */
+    public @NotNull String getType() {
         return type;
     }
 
@@ -190,37 +174,8 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
         return this.getType().equals(DEFAULT_TYPE) ? Optional.empty() : Optional.of(this.getType());
     }
 
-    public @NonNull CropDependencies getDependencies() {
+    public @NotNull CropDependencies getDependencies() {
         return this.dependencies;
-    }
-
-    public @NonNull Identifier getBlockId() {
-        return block.getId();
-    }
-
-    public Optional<CropariaCropBlock> getCropBlock() {
-        return block.toOptional();
-    }
-
-    public @NonNull Identifier getSeedId() {
-        return seed.getId();
-    }
-
-    public Optional<CropSeed> getCropSeed() {
-        return seed.toOptional();
-    }
-
-    public @NonNull Identifier getFruitId() {
-        return fruit.getId();
-    }
-
-    @Override
-    public Item getFruitItem() {
-        return this.fruit.get();
-    }
-
-    public Optional<CropFruit> getCropFruit() {
-        return fruit.toOptional();
     }
 
     public String getDefaultTranslation() {
@@ -242,9 +197,18 @@ public class Crop extends AbstractCrop<Item> implements TierAccess {
     }
 
     @Override
+    public ItemStack getFruit() {
+        ItemStack stack = CropariaItems.CROP_FRUIT.get().getDefaultInstance();
+        stack.set(CropariaComponents.CROP_ID.get(), this.getKey());
+        return stack;
+    }
+
+    public ItemStack getSeed() {
+        return CropariaItems.CROP_SEED.get().getCropItem(this.getKey());
+    }
+
+    @Override
     public void onRegister() {
-        this.block.tryRegister();
-        this.seed.tryRegister();
-        this.fruit.tryRegister();
+        // TODO: Add CreativeTab Content
     }
 }

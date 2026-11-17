@@ -3,23 +3,28 @@ package cool.muyucloud.croparia.api.core.recipe.container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import org.jetbrains.annotations.ApiStatus;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Experimental
 public class RitualStructureContainer implements RecipeInput {
-    private final BlockState state;
+    private final BlockInWorld block;
 
-    public RitualStructureContainer(BlockState state) {
-        this.state = state;
+    public RitualStructureContainer(BlockInWorld block) {
+        this.block = block;
+    }
+
+    public BlockInWorld getBlock() {
+        return block;
     }
 
     public BlockState getState() {
-        return state;
+        return block.getState();
     }
 
     @Override
-    public @NonNull ItemStack getItem(int i) {
+    public @NotNull ItemStack getItem(int i) {
         return ItemStack.EMPTY;
     }
 
@@ -30,6 +35,6 @@ public class RitualStructureContainer implements RecipeInput {
 
     @Override
     public boolean isEmpty() {
-        return state.isAir();
+        return this.getState() == null || this.getState().isAir();
     }
 }

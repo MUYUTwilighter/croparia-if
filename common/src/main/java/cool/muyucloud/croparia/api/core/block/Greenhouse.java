@@ -28,8 +28,8 @@ import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class Greenhouse extends BaseEntityBlock {
     public static final MapCodec<Greenhouse> CODEC = simpleCodec(Greenhouse::new);
@@ -53,16 +53,16 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
-    protected void onPlace(@NonNull BlockState state, @NonNull Level level, @NonNull BlockPos pos, @NonNull BlockState oldState, boolean movedByPiston) {
+    protected void onPlace(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
         tryHarvest(level, pos);
     }
 
     @Override
-    protected @NonNull BlockState updateShape(
-        @NonNull BlockState state, @NonNull LevelReader level, @NonNull ScheduledTickAccess scheduledTickAccess,
-        @NonNull BlockPos pos, @NonNull Direction direction, @NonNull BlockPos neighborPos,
-        @NonNull BlockState neighborState, @NonNull RandomSource random
+    protected @NotNull BlockState updateShape(
+        @NotNull BlockState state, @NotNull LevelReader level, @NotNull ScheduledTickAccess scheduledTickAccess,
+        @NotNull BlockPos pos, @NotNull Direction direction, @NotNull BlockPos neighborPos,
+        @NotNull BlockState neighborState, @NotNull RandomSource random
     ) {
         super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
         if (level instanceof Level iLevel) {
@@ -73,7 +73,7 @@ public class Greenhouse extends BaseEntityBlock {
 
     @Override
     protected void neighborChanged(
-        @NonNull BlockState state, @NonNull Level level, @NonNull BlockPos pos, @NonNull Block neighborBlock,
+        @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Block neighborBlock,
         @Nullable Orientation orientation, boolean movedByPiston
     ) {
         super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
@@ -81,15 +81,15 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
-    public void randomTick(@Nullable BlockState state, ServerLevel world, BlockPos pos, @NonNull RandomSource random) {
+    public void randomTick(@Nullable BlockState state, ServerLevel world, BlockPos pos, @NotNull RandomSource random) {
         world.getBlockState(pos.below()).randomTick(world, pos.below(), random);
         tryHarvest(world, pos);
     }
 
     @Override
-    protected @NonNull InteractionResult useItemOn(
-        @NonNull ItemStack itemStack, @NonNull BlockState state, Level world, @NonNull BlockPos pos,
-        @NonNull Player player, @NonNull InteractionHand interactionHand, @NonNull BlockHitResult blockHitResult
+    protected @NotNull InteractionResult useItemOn(
+        @NotNull ItemStack itemStack, @NotNull BlockState state, Level world, @NotNull BlockPos pos,
+        @NotNull Player player, @NotNull InteractionHand interactionHand, @NotNull BlockHitResult blockHitResult
     ) {
         if (!world.isClientSide()) {
             MenuProvider screenHandlerFactory = state.getMenuProvider(world, pos);
@@ -102,37 +102,37 @@ public class Greenhouse extends BaseEntityBlock {
     }
 
     @Override
-    protected @NonNull MapCodec<? extends BaseEntityBlock> codec() {
+    protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
 
     @Override
-    public @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
+    public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context) {
         return this.SHAPE;
     }
 
     @Override
-    public @NonNull VoxelShape getCollisionShape(@NonNull BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos, @NonNull CollisionContext context) {
+    public @NotNull VoxelShape getCollisionShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context) {
         return this.SHAPE;
     }
 
     @Override
-    public boolean isCollisionShapeFullBlock(@NonNull BlockState state, @NonNull BlockGetter world, @NonNull BlockPos pos) {
+    public boolean isCollisionShapeFullBlock(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos) {
         return false;
     }
 
     @Override
-    public @Nullable BlockEntity newBlockEntity(@NonNull BlockPos pos, @NonNull BlockState state) {
+    public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
         return new GreenhouseBlockEntity(pos, state);
     }
 
     @Override
-    public @NonNull RenderShape getRenderShape(@NonNull BlockState state) {
+    public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
         return RenderShape.MODEL;
     }
 
     @Override
-    public @NonNull Item asItem() {
+    public @NotNull Item asItem() {
         return CropariaItems.GREENHOUSE.get();
     }
 }

@@ -33,6 +33,9 @@
     ],
     "rei_client": [
       "cool.muyucloud.croparia.compat.rei.ReiClient"
+    ],
+    "jade": [
+      "cool.muyucloud.croparia.compat.jade.CifJade"
     ]
   },
   "mixins": [
@@ -41,11 +44,13 @@
   ],
   "depends": {
     "fabric": "*",
-    "minecraft": "~1.21",
+    "minecraft": "~26.1.2",
     "architectury": "*"
   },
   "suggests": {
     "rei": "*",
-    "jei": "*"
+    "jei": "*",
+    "jade": "*",
+    "wthit": "*"
   }
 }
