@@ -95,12 +95,15 @@ processResources {
 }
 
 jar {
-    archiveClassifier = 'dev'
+    archiveClassifier = ''
+    // Loom adds nested dependencies and manifest attributes to the final jar.
+    from(shadowJar.archiveFile.map { zipTree(it) })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 shadowJar {
     configurations.set([project.configurations.shadowBundle])
-    archiveClassifier = null
+    archiveClassifier = 'dev-shadow'
 }
 
 base {
@@ -113,7 +116,7 @@ modrinth {
     versionName = "$archives_name-fabric-$mod_version"
     versionNumber = mod_version
     versionType = release_state
-    uploadFile = shadowJar
+    uploadFile = jar
     gameVersions = [minecraft_version]
     loaders = ["fabric"]
     File changelogFile = rootProject.file("changelog.md")
@@ -130,7 +133,7 @@ modrinth {
 tasks.register('curseforge', TaskPublishCurseForge) {
     apiToken = System.getenv("CURSEFORGE_MOD_PUBLISH")
     group = 'publishing'
-    def mainFile = upload('971004', shadowJar)
+    def mainFile = upload('971004', jar)
     mainFile.displayName = "$archives_name-fabric-$mod_version"
     mainFile.releaseType = release_state
     File changelogFile = rootProject.file("changelog.md")

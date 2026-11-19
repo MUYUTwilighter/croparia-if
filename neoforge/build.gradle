@@ -106,36 +106,15 @@ processResources {
 }
 
 jar {
-    archiveClassifier = 'dev'
+    archiveClassifier = ''
+    // Loom adds nested dependencies and manifest attributes to the final jar.
+    from(shadowJar.archiveFile.map { zipTree(it) })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 shadowJar {
     configurations.set([project.configurations.shadowBundle])
     archiveClassifier = 'dev-shadow'
-}
-
-assemble.dependsOn shadowJar
-
-configurations {
-    apiElements {
-        outgoing.artifacts.clear()
-        outgoing.artifact(shadowJar)
-    }
-    runtimeElements {
-        outgoing.artifacts.clear()
-        outgoing.artifact(shadowJar)
-    }
-}
-
-configurations {
-    apiElements {
-        outgoing.artifacts.clear()
-        outgoing.artifact(shadowJar)
-    }
-    runtimeElements {
-        outgoing.artifacts.clear()
-        outgoing.artifact(shadowJar)
-    }
 }
 
 base {
@@ -148,7 +127,7 @@ modrinth {
     versionName = "$archives_name-neoforge-$mod_version"
     versionNumber = mod_version
     versionType = release_state
-    uploadFile = shadowJar
+    uploadFile = jar
     gameVersions = [minecraft_version]
     loaders = ["neoforge"]
     File changelogFile = rootProject.file("changelog.md")
@@ -164,7 +143,7 @@ modrinth {
 tasks.register('curseforge', TaskPublishCurseForge) {
     apiToken = System.getenv("CURSEFORGE_MOD_PUBLISH")
     group = 'publishing'
-    def mainFile = upload('971004', shadowJar)
+    def mainFile = upload('971004', jar)
     mainFile.displayName = "$archives_name-neoforge-$mod_version"
     mainFile.releaseType = release_state
     File changelogFile = rootProject.file("changelog.md")
