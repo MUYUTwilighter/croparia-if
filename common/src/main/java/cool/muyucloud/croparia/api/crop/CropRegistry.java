@@ -20,7 +20,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Supplier;
 
-// TODO: sync and cache crop data, add data reload listener
 public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
     public static final Codec<CropRegistry<?>> CODEC_BY_NAME = DgRegistry.CODEC_BY_NAME.xmap(dgReg -> {
         if (dgReg instanceof CropRegistry) {

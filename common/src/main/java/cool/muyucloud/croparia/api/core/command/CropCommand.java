@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-// TODO: adapt new crop api
 public abstract class CropCommand<C extends AbstractCrop<?>> {
     public static final CropCommand<Crop> CROP = new CropCommand<>("crop", DgRegistries.CROPS) {
         @Override

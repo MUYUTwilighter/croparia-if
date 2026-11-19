@@ -27,7 +27,7 @@ public class CommonCommandRoot {
         .then(ConfigCommand.buildAutoReload())
         .then(ConfigCommand.buildOverride())
         .then(ConfigCommand.buildSoakAttempts())
-        .then(ConfigCommand.buildReset());
+        .then(ConfigCommand.buildReset(false));
 
     public static void register() {
         CropariaIf.LOGGER.debug("Registering commands");
