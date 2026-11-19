@@ -38,11 +38,9 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
     private final Map<Identifier, C> crops = new HashMap<>();
     private final SemiSupplier<List<CompoundTag>> nbtCache = SemiSupplier.of(() -> {
         ArrayList<CompoundTag> tags = new ArrayList<>();
-        crops.forEach((id, crop) -> {
-            getCropCodec().encodeStart(NbtOps.INSTANCE, crop).ifError(
-                e -> CropariaIf.LOGGER.error("Failed to decode crop {}: {}", id, e.message())
-            ).ifSuccess(tag -> tags.add((CompoundTag) tag));
-        });
+        crops.forEach((id, crop) -> getCropCodec().encodeStart(NbtOps.INSTANCE, crop).ifError(
+            e -> CropariaIf.LOGGER.error("Failed to decode crop {}: {}", id, e.message())
+        ).ifSuccess(tag -> tags.add((CompoundTag) tag)));
         tags.trimToSize();
         return tags;
     });
@@ -135,11 +133,11 @@ public class CropRegistry<C extends AbstractCrop<?>> implements DgRegistry<C> {
                 GSON.toJson(json, writer);
                 FileUtil.write(cropPath.toFile(), result.toString(), true);
             } catch (IOException e) {
-                CropariaIf.LOGGER.error("Failed to dump crop \"%s\"".formatted(crop.getKey()), e);
+                CropariaIf.LOGGER.error("Failed to dump crop \"{}\"", crop.getKey(), e);
             }
             return null;
         }, e -> {
-            CropariaIf.LOGGER.error("Failed to dump crop \"%s\": %s".formatted(crop.getKey(), e.message()));
+            CropariaIf.LOGGER.error("Failed to dump crop \"{}\": {}", crop.getKey(), e.message());
             return null;
         });
         return cropPath;

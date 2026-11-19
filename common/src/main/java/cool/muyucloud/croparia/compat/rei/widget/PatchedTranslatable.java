@@ -1,11 +1,11 @@
 package cool.muyucloud.croparia.compat.rei.widget;
 
 import me.shedaniel.math.Rectangle;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 import me.shedaniel.rei.api.client.gui.widgets.DelegateWidget;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.WidgetWithBounds;
 import me.shedaniel.rei.api.client.util.MatrixUtils;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;

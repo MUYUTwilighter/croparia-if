@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import cool.muyucloud.croparia.access.SimpleArchitecturyFluidAttributesAccess;
 import cool.muyucloud.croparia.api.element.block.ElementalLiquidBlock;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.Lightmap;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -34,8 +34,8 @@ public abstract class ScreenEffectRendererMixin {
     private MultiBufferSource bufferSource;
 
     @Inject(method = "renderScreenEffect", at = @At("TAIL"))
-    private void cif$renderFluidOverlay(boolean sleeping, float partialTick, SubmitNodeCollector nodeCollector, CallbackInfo ci) {
-        if (sleeping || this.minecraft.player == null || this.minecraft.player.isSpectator()) return;
+    private void cif$renderFluidOverlay(boolean isFirstPerson, boolean isSleeping, float partialTicks, SubmitNodeCollector submitNodeCollector, boolean hideGui, CallbackInfo ci) {
+        if (!isFirstPerson || isSleeping || this.minecraft.player == null || this.minecraft.player.isSpectator()) return;
 
         Block block = this.minecraft.player.level().getBlockState(BlockPos.containing(this.minecraft.player.getEyePosition())).getBlock();
         if (!(block instanceof ElementalLiquidBlock eBlock)) return;
@@ -49,14 +49,16 @@ public abstract class ScreenEffectRendererMixin {
 
     @Unique
     private static void cif$renderOverlay(Minecraft minecraft, MultiBufferSource bufferSource, Identifier texture) {
-        BlockPos blockPos = BlockPos.containing(minecraft.player.getX(), minecraft.player.getEyeY(), minecraft.player.getZ());
-        float brightness = LightTexture.getBrightness(
-                minecraft.player.level().dimensionType(),
-                minecraft.player.level().getMaxLocalRawBrightness(blockPos)
+        var player = minecraft.player;
+        if (player == null) return;
+        BlockPos blockPos = BlockPos.containing(player.getX(), player.getEyeY(), player.getZ());
+        float brightness = Lightmap.getBrightness(
+                player.level().dimensionType(),
+                player.level().getMaxLocalRawBrightness(blockPos)
         );
         int color = ARGB.colorFromFloat(0.1F, brightness, brightness, brightness);
-        float yawOffset = -minecraft.player.getYRot() / 64.0F;
-        float pitchOffset = minecraft.player.getXRot() / 64.0F;
+        float yawOffset = -player.getYRot() / 64.0F;
+        float pitchOffset = player.getXRot() / 64.0F;
         PoseStack poseStack = new PoseStack();
         Matrix4f matrix4f = poseStack.last().pose();
         VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderTypes.blockScreenEffect(texture));

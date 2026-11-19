@@ -19,8 +19,8 @@ class MultiCodecTest {
         MultiCodec<String> codec = new MultiCodec<>();
         codec.add(CodecUtil.of(
             Codec.STRING,
-            value -> TestedCodec.fail(() -> "first-encode-fail"),
-            (ops, input) -> TestedCodec.fail(() -> "first-decode-fail")
+            _ -> TestedCodec.fail(() -> "first-encode-fail"),
+            (_, _) -> TestedCodec.fail(() -> "first-decode-fail")
         ));
         codec.add(CodecUtil.of(Codec.STRING));
 
@@ -33,13 +33,13 @@ class MultiCodecTest {
         MultiCodec<String> codec = new MultiCodec<>();
         codec.add(CodecUtil.of(
             Codec.STRING,
-            value -> TestedCodec.fail(() -> "encode-fail-1"),
-            (ops, input) -> TestedCodec.fail(() -> "decode-fail-1")
+            _ -> TestedCodec.fail(() -> "encode-fail-1"),
+            (_, _) -> TestedCodec.fail(() -> "decode-fail-1")
         ));
         codec.add(CodecUtil.of(
             Codec.STRING,
-            value -> TestedCodec.fail(() -> "encode-fail-2"),
-            (ops, input) -> TestedCodec.fail(() -> "decode-fail-2")
+            _ -> TestedCodec.fail(() -> "encode-fail-2"),
+            (_, _) -> TestedCodec.fail(() -> "decode-fail-2")
         ));
 
         var decodeError = codec.parse(JsonOps.INSTANCE, new JsonPrimitive("x")).error().orElseThrow().message();
@@ -57,8 +57,8 @@ class MultiCodecTest {
         Map<String, TestedCodec<? extends String>> codecs = new LinkedHashMap<>();
         codecs.put("a", CodecUtil.of(
             Codec.STRING,
-            value -> TestedCodec.fail(() -> "a-encode-fail"),
-            (ops, input) -> TestedCodec.fail(() -> "a-decode-fail")
+            _ -> TestedCodec.fail(() -> "a-encode-fail"),
+            (_, _) -> TestedCodec.fail(() -> "a-decode-fail")
         ));
         codecs.put("b", CodecUtil.of(Codec.STRING));
         MultiFieldCodec<String> codec = new MultiFieldCodec<>(codecs);
@@ -96,8 +96,8 @@ class MultiCodecTest {
     @Test
     void multiFieldCodecReturnsErrorWhenNoFieldCanDecode() {
         Map<String, TestedCodec<? extends String>> codecs = new LinkedHashMap<>();
-        codecs.put("a", CodecUtil.of(Codec.STRING, (ops, input) -> TestedCodec.fail(() -> "a-decode-fail")));
-        codecs.put("b", CodecUtil.of(Codec.STRING, (ops, input) -> TestedCodec.fail(() -> "b-decode-fail")));
+        codecs.put("a", CodecUtil.of(Codec.STRING, (_, _) -> TestedCodec.fail(() -> "a-decode-fail")));
+        codecs.put("b", CodecUtil.of(Codec.STRING, (_, _) -> TestedCodec.fail(() -> "b-decode-fail")));
         MultiFieldCodec<String> codec = new MultiFieldCodec<>(codecs);
 
         JsonObject json = new JsonObject();
@@ -110,7 +110,7 @@ class MultiCodecTest {
     @Test
     void optionalMultiFieldCodecReturnsErrorForPresentButInvalidValue() {
         Map<String, TestedCodec<? extends Integer>> codecs = new LinkedHashMap<>();
-        codecs.put("id", CodecUtil.of(Codec.INT, (ops, input) -> TestedCodec.fail(() -> "id-invalid")));
+        codecs.put("id", CodecUtil.of(Codec.INT, (_, _) -> TestedCodec.fail(() -> "id-invalid")));
         OptionalMultiFieldCodec<Integer> codec = new OptionalMultiFieldCodec<>(codecs);
 
         JsonObject json = new JsonObject();
@@ -122,7 +122,7 @@ class MultiCodecTest {
     @Test
     void optionalMultiFieldCodecReturnsEncodeErrorWhenAllFieldsRejectValue() {
         Map<String, TestedCodec<? extends Integer>> codecs = new LinkedHashMap<>();
-        codecs.put("id", CodecUtil.of(Codec.INT, value -> TestedCodec.fail(() -> "id-encode-fail")));
+        codecs.put("id", CodecUtil.of(Codec.INT, _ -> TestedCodec.fail(() -> "id-encode-fail")));
         OptionalMultiFieldCodec<Integer> codec = new OptionalMultiFieldCodec<>(codecs);
 
         var error = codec.codec().encodeStart(JsonOps.INSTANCE, Optional.of(8)).error().orElseThrow().message();

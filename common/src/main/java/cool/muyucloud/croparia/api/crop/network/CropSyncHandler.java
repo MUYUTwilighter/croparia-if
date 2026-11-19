@@ -100,10 +100,11 @@ public class CropSyncHandler implements NetworkHandler, Iterable<CropSyncHandler
         CreativeModeTabsAccessor.cif$setCachedParams(null);
         if (this.shouldReload()) CropariaIf.ifClient(ref -> {
             var client = ref.get();
-            if (client.isLocalServer()) {
+            if (client.isLocalServer() || CropariaIf.CONFIG.getAutoReload()) {
                 client.reloadResourcePacks();
             } else {
                 String command = "/%s sync all".formatted(CommonCommandRoot.commandRoot(true));
+                // TODO: Add /croparia autoReload true suggestion
                 client.gui.getChat().addClientSystemMessage(Texts.translatable("chat.croparia.sync.reload",
                     Texts.literal(command, Texts.runCommand(command), Texts.inlineMouseBehavior())
                 ));

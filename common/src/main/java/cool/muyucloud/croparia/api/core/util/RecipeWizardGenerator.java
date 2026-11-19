@@ -222,7 +222,7 @@ public class RecipeWizardGenerator {
             BlockState block = level.getBlockState(context.getClickedPos());
             if (block.isAir()) {
                 assert context.getPlayer() != null;
-                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block"));
+                Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(context.getClickedPos().toShortString())));
                 throw new ReplaceException();
             }
             return BlockOutput.of(level, context.getClickedPos());
@@ -247,7 +247,7 @@ public class RecipeWizardGenerator {
         BlockState state = level.getBlockState(context.getClickedPos().below());
         if (state.isAir()) {
             assert context.getPlayer() != null;
-            Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block"));
+            Texts.overlay(context.getPlayer(), Texts.translatable("overlay.croparia.recipe_wizard.default.missing.block", Texts.literal(context.getClickedPos().below().toShortString())));
             throw new ReplaceException();
         }
         return BlockOutput.of(level, context.getClickedPos().below());

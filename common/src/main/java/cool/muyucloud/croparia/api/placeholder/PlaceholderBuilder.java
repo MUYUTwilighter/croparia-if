@@ -178,7 +178,7 @@ public class PlaceholderBuilder<T> {
                     mapped.put(mapEntry.getKey(), mapEntry.getValue());
                 }
             }
-            return MapReader.<String, V>map(mapped);
+            return MapReader.map(mapped);
         });
     }
 
@@ -201,7 +201,7 @@ public class PlaceholderBuilder<T> {
                     mapped.put(key, mapEntry.getValue());
                 }
             }
-            return MapReader.<String, V>map(mapped);
+            return MapReader.map(mapped);
         });
     }
 
@@ -265,7 +265,7 @@ public class PlaceholderBuilder<T> {
                 }
                 i++;
             }
-            return MapReader.<String, E>map(mapped);
+            return MapReader.map(mapped);
         });
     }
 

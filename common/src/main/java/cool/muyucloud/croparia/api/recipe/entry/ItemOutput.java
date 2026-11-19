@@ -8,6 +8,7 @@ import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
+import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class ItemOutput implements SlotDisplay {
@@ -52,14 +54,14 @@ public class ItemOutput implements SlotDisplay {
     @NotNull
     private final transient ItemSpec itemSpec;
     @NotNull
-    private final transient ItemStack displayStack;
+    private transient OnLoadSupplier<List<ItemStack>> displayStacks;
 
     private ItemOutput() {
         this.id = BuiltInRegistries.ITEM.getKey(Items.AIR);
         this.components = DataComponentPatch.EMPTY;
         this.amount = 0;
-        this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.getValue(this.id), this.components);
-        this.displayStack = this.toSpec().createStack(this.getAmount());
+        this.itemSpec = ItemSpec.EMPTY;
+        this.displayStacks = OnLoadSupplier.of(() -> List.of(this.createStack()));
     }
 
     public ItemOutput(@NotNull ItemStack stack) {
@@ -77,11 +79,15 @@ public class ItemOutput implements SlotDisplay {
         if (this.amount <= 0) CropariaIf.LOGGER.warn("Creating ItemOutput with non-positive amount: {}", this.amount);
         this.itemSpec = new ItemSpec(BuiltInRegistries.ITEM.getValue(id), components);
         if (this.itemSpec.isEmpty()) throw new IllegalArgumentException("Unknown or invalid item: " + id);
-        this.displayStack = this.toSpec().createStack(this.getAmount());
+        this.displayStacks = OnLoadSupplier.of(() -> List.of(this.createStack()));
     }
 
     public @NotNull List<ItemStack> getDisplayStacks() {
-        return List.of(this.displayStack);
+        return this.displayStacks.get();
+    }
+
+    public void mapStacks(Function<List<ItemStack>, List<ItemStack>> mapper) {
+        this.displayStacks = this.displayStacks.map(mapper);
     }
 
     @NotNull

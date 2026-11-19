@@ -8,11 +8,11 @@ import cool.muyucloud.croparia.api.codec.CodecUtil;
 import cool.muyucloud.croparia.api.codec.MultiCodec;
 import cool.muyucloud.croparia.api.codec.TestedCodec;
 import cool.muyucloud.croparia.api.core.component.BlockProperties;
+import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentExactPredicate;
 import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public class BlockOutput implements SlotDisplay {
@@ -46,12 +47,8 @@ public class BlockOutput implements SlotDisplay {
         return TestedCodec.success();
     }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockOutput> STREAM_CODEC = CodecUtil.toStream(CODEC);
-    public static final ItemStack STACK_UNKNOWN = Items.BEDROCK.getDefaultInstance();
-    public static final ItemStack STACK_AIR = Items.BARRIER.getDefaultInstance();
-
-    static {
-        STACK_AIR.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.air"));
-    }
+    public static final Supplier<ItemStack> STACK_UNKNOWN = Items.BEDROCK::getDefaultInstance;
+    public static final Supplier<ItemStack> STACK_AIR = BlockInput.STACK_AIR;
 
     @NotNull
     private final Identifier id;
@@ -59,7 +56,7 @@ public class BlockOutput implements SlotDisplay {
     private final BlockProperties properties;
     @NotNull
     private final DataComponentExactPredicate components;
-    private final transient ItemStack displayStack;
+    private final transient OnLoadSupplier<ItemStack> displayStack;
 
     public static BlockOutput create(@NotNull Identifier id) {
         return create(id, BlockProperties.EMPTY);
@@ -92,19 +89,21 @@ public class BlockOutput implements SlotDisplay {
         this.id = id;
         this.properties = properties;
         this.components = components;
-        this.displayStack = BuiltInRegistries.BLOCK.getOptional(this.getId()).map(block -> {
-            if (!components.isEmpty() && !block.defaultBlockState().hasBlockEntity()) {
-                throw new IllegalArgumentException("Block cannot store components without a block entity: " + id);
-            }
+        Block block = BuiltInRegistries.BLOCK.getOptional(id)
+            .orElseThrow(() -> new IllegalArgumentException("Unknown block: " + id));
+        if (!components.isEmpty() && !block.defaultBlockState().hasBlockEntity()) {
+            throw new IllegalArgumentException("Block cannot store components without a block entity: " + id);
+        }
+        this.displayStack = OnLoadSupplier.of(() -> {
             ItemStack stack = BlockInput.getBlockItem(block);
             if (stack.isEmpty()) {
-                stack = block.defaultBlockState().isAir() ? STACK_AIR.copy()
+                stack = block.defaultBlockState().isAir() ? STACK_AIR.get()
                     : Texts.rename(BlockInput.STACK_PLACEHOLDER.get(), Texts.translatable(block.getDescriptionId()));
             }
             stack.applyComponents(this.getComponents().asPatch());
             stack.set(BlockProperties.TYPE, this.getProperties());
             return stack;
-        }).orElseThrow(() -> new IllegalArgumentException("Unknown block: " + id));
+        });
     }
 
     public @NotNull Identifier getId() {
@@ -120,13 +119,13 @@ public class BlockOutput implements SlotDisplay {
         return properties;
     }
 
-    public DataComponentExactPredicate getComponents() {
+    public @NotNull DataComponentExactPredicate getComponents() {
         return components;
     }
 
     @NotNull
     public List<ItemStack> getDisplayStacks() {
-        return List.of(displayStack);
+        return List.of(this.displayStack.get());
     }
 
     public boolean matches(@NotNull Block block) {
@@ -141,6 +140,8 @@ public class BlockOutput implements SlotDisplay {
         return this.matches(new BlockInWorld(level, pos, false));
     }
 
+    // BlockInWorld can return null for an unloaded chunk when loadChunks is false.
+    @SuppressWarnings("ConstantValue")
     public boolean matches(BlockInWorld block) {
         BlockState state = block.getState();
         if (state == null || !this.matches(state.getBlock()) || !this.getProperties().isSubsetOf(state)) return false;

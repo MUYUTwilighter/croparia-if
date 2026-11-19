@@ -11,6 +11,8 @@ import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import java.util.Optional;
 
+// Keep this public proxy extensible and preserve identity-based equality.
+@SuppressWarnings("ClassCanBeRecord")
 public class PlatformItemProxyImpl implements PlatformItemProxy {
     public static PlatformItemProxyImpl of(ResourceHandler<ItemResource> handler) {
         return new PlatformItemProxyImpl(handler);

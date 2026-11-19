@@ -4,10 +4,11 @@ import cool.muyucloud.croparia.api.core.menu.CropTransmuterMenu;
 import cool.muyucloud.croparia.api.core.network.CropTransmuterRedstoneModePacket;
 import cool.muyucloud.croparia.api.core.network.CropTransmuterSelectPacket;
 import cool.muyucloud.croparia.api.crop.util.Material;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
@@ -15,7 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Optional;
 
 public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuterMenu> {
     private static final Identifier TEXTURE = Identifier.withDefaultNamespace(
@@ -38,8 +38,8 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     private static final int PANEL_CELL_SELECTED = 0xCCFFD54F;
     private static final int SLOT_BORDER = 0xFF8B6B43;
     private static final int SLOT_BACKGROUND = 0xFF2A2017;
-    private static final int PANEL_TEXT = 0xE8D9C2;
-    private static final int PANEL_TEXT_MUTED = 0xBFAF96;
+    private static final int PANEL_TEXT = 0xFFE8D9C2;
+    private static final int PANEL_TEXT_MUTED = 0xFFBFAF96;
 
     private int page = 0;
     private Button prevButton;
@@ -48,9 +48,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     private boolean localPositiveRedstone;
 
     public CropTransmuterScreen(CropTransmuterMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
-        this.imageWidth = 176;
-        this.imageHeight = 166;
+        super(menu, inventory, title, 176, 166);
         this.localPositiveRedstone = menu.isPositiveRedstone();
     }
 
@@ -75,25 +73,24 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
     }
 
     @Override
-    protected void renderBg(@NotNull GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+    public void extractBackground(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(graphics, mouseX, mouseY, partialTick);
         int left = this.leftPos;
         int top = this.topPos;
-        graphics.blit(TEXTURE, left, top, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
-        renderMachineSlots(graphics);
-        renderSelectionPanel(graphics, mouseX, mouseY);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, left, top, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
+        extractMachineSlots(graphics);
+        extractSelectionPanel(graphics, mouseX, mouseY);
     }
 
     @Override
-    public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.render(graphics, mouseX, mouseY, partialTick);
-        this.renderTooltip(graphics, mouseX, mouseY);
-        renderSelectionTooltip(graphics, mouseX, mouseY);
+    protected void extractTooltip(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        super.extractTooltip(graphics, mouseX, mouseY);
+        extractSelectionTooltip(graphics, mouseX, mouseY);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-        graphics.drawString(this.font, this.title, 8, 6, 0x404040, false);
-        graphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 94, 0x404040, false);
+    protected void extractLabels(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+        super.extractLabels(graphics, mouseX, mouseY);
         drawPanelFooter(graphics);
     }
 
@@ -133,7 +130,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         updatePageButtons();
     }
 
-    private void renderSelectionPanel(GuiGraphics graphics, int mouseX, int mouseY) {
+    private void extractSelectionPanel(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         int left = this.leftPos + SELECTION_X;
         int top = this.topPos + SELECTION_Y;
         int width = PANEL_COLS * PANEL_CELL;
@@ -152,7 +149,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         int hovered = getHoveredCandidateIndex(mouseX, mouseY, candidates.size());
         int start = getVisibleStart();
         int end = Math.min(start + PANEL_COLS * PANEL_ROWS, candidates.size());
-        Identifier selected = this.getSelectedStack().getItem().arch$registryName();
+        int selected = Math.min(candidates.size() - 1, this.menu.getBlockEntity().getSelectedIndex());
         for (int local = 0; local < PANEL_COLS * PANEL_ROWS; local++) {
             int col = local % PANEL_COLS;
             int row = local / PANEL_COLS;
@@ -170,16 +167,15 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
             if (hovered == i) {
                 graphics.fill(x, y, x + PANEL_CELL - 1, y + PANEL_CELL - 1, PANEL_CELL_HOVER);
             }
-            graphics.renderItem(stack, x + 1, y + 1);
-            graphics.renderItemDecorations(this.font, stack, x + 1, y + 1);
-            Identifier id = stack.getItem().arch$registryName();
-            if (selected != null && selected.equals(id)) {
-                graphics.renderOutline(x, y, PANEL_CELL, PANEL_CELL, PANEL_CELL_SELECTED);
+            graphics.item(stack, x + 1, y + 1);
+            graphics.itemDecorations(this.font, stack, x + 1, y + 1);
+            if (selected == i) {
+                graphics.outline(x, y, PANEL_CELL, PANEL_CELL, PANEL_CELL_SELECTED);
             }
         }
     }
 
-    private void renderSelectionTooltip(GuiGraphics graphics, int mouseX, int mouseY) {
+    private void extractSelectionTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (this.getMenu().getBlockEntity().readInputMaterial().isEmpty()) return;
         List<ItemStack> candidates = getCandidates();
         if (candidates.isEmpty()) return;
@@ -229,7 +225,7 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         );
     }
 
-    private void drawPanelFooter(GuiGraphics graphics) {
+    private void drawPanelFooter(GuiGraphicsExtractor graphics) {
         List<ItemStack> candidates = getCandidates();
         if (candidates.size() <= 1) {
             return;
@@ -237,24 +233,24 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
         Component footer = Component.literal((page + 1) + "/" + getPageCount());
         int x = SELECTION_X + (PANEL_COLS * PANEL_CELL - this.font.width(footer)) / 2;
         int y = SELECTION_Y + PANEL_ROWS * PANEL_CELL + 10;
-        graphics.drawString(this.font, footer, x, y, PANEL_TEXT, false);
+        graphics.text(this.font, footer, x, y, PANEL_TEXT, false);
     }
 
-    private void drawPanelMessage(GuiGraphics graphics, Component message, int left, int top, int width, int height) {
+    private void drawPanelMessage(GuiGraphicsExtractor graphics, Component message, int left, int top, int width, int height) {
         int textX = left + (width - this.font.width(message)) / 2;
         int textY = top + height / 2 - 4;
-        graphics.drawString(this.font, message, textX, textY, PANEL_TEXT_MUTED, false);
+        graphics.text(this.font, message, textX, textY, PANEL_TEXT_MUTED, false);
     }
 
-    private void renderMachineSlots(GuiGraphics graphics) {
+    private void extractMachineSlots(GuiGraphicsExtractor graphics) {
         drawSlotFrame(graphics, this.leftPos + INPUT_SLOT_X, this.topPos + INPUT_SLOT_Y);
         drawSlotFrame(graphics, this.leftPos + OUTPUT_SLOT_X, this.topPos + OUTPUT_SLOT_Y);
     }
 
-    private void drawSlotFrame(GuiGraphics graphics, int x, int y) {
+    private void drawSlotFrame(GuiGraphicsExtractor graphics, int x, int y) {
         graphics.fill(x - 1, y - 1, x + SLOT_SIZE + 1, y + SLOT_SIZE + 1, SLOT_BORDER);
         graphics.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, SLOT_BACKGROUND);
-        graphics.renderOutline(x - 1, y - 1, SLOT_SIZE + 2, SLOT_SIZE + 2, SLOT_BORDER);
+        graphics.outline(x - 1, y - 1, SLOT_SIZE + 2, SLOT_SIZE + 2, SLOT_BORDER);
     }
 
     private int getVisibleStart() {
@@ -275,12 +271,5 @@ public class CropTransmuterScreen extends AbstractContainerScreen<CropTransmuter
 
     private List<ItemStack> getCandidates() {
         return menu.getBlockEntity().readInputMaterial().map(Material::asItems).orElse(List.of());
-    }
-
-    private ItemStack getSelectedStack() {
-        Optional<Material<?>> mayMaterial = this.getMenu().getBlockEntity().readInputMaterial();
-        if (mayMaterial.isEmpty()) return ItemStack.EMPTY;
-        List<ItemStack> stacks = mayMaterial.get().asItems();
-        return stacks.get(Math.min(stacks.size() - 1, this.getMenu().getBlockEntity().getSelectedIndex()));
     }
 }

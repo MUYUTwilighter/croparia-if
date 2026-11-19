@@ -107,7 +107,7 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> {
         List<RecipeHolder<R>> holders = new ArrayList<>();
         CropariaIf.ifServerOrElse(server -> holders.addAll(
             ((RecipeManagerAccess) server.getRecipeManager()).cif$byType((RecipeType) this.adapt().getRecipeType())
-                .stream().map(holder -> (RecipeHolder<R>) holder).toList()
+                .stream().filter(recipe -> recipe instanceof DisplayableRecipe<?> displayableRecipe && displayableRecipe.getTypedSerializer() == this).toList()
         ), () -> {
             if (this.syncCache != null) {
                 holders.addAll(this.syncCache);
@@ -132,8 +132,8 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> {
         return this.syncFilter != NEVER;
     }
 
-    public <I extends RecipeInput, R1 extends DisplayableRecipe<I>> boolean shouldSync(RecipeHolder<R1> holder) {
-        return holder.value().getTypedSerializer() == this && this.syncFilter.test(holder);
+    public <I extends RecipeInput, R1 extends Recipe<I>> boolean shouldSync(RecipeHolder<R1> holder) {
+        return holder.value() instanceof DisplayableRecipe<?> displayableRecipe && displayableRecipe.getTypedSerializer() == this && this.syncFilter.test(holder);
     }
 
     public @NotNull RecipeSerializer<R> getSerializer() {
@@ -172,7 +172,6 @@ public class TypedSerializer<R extends DisplayableRecipe<?>> {
             assert recipeClass != null;
             assert recipeType != null;
             assert serializer != null;
-            assert syncFilter != null;
             return new TypedSerializer<>(id, recipeClass, serializer, recipeType, registerType, syncFilter, stations);
         }
 

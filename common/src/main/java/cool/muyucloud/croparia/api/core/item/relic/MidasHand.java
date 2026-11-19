@@ -3,6 +3,7 @@ package cool.muyucloud.croparia.api.core.item.relic;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.Constants;
 import cool.muyucloud.croparia.util.PostConstants;
+import cool.muyucloud.croparia.util.TagUtil;
 import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -74,7 +75,7 @@ public class MidasHand extends Item {
         }
         player.giveExperiencePoints(-xpConsume);
         ServerLevel world = (ServerLevel) entity.level();
-        if (!entity.getType().is(PostConstants.MIDAS_HAND_IMMUNE_ENTITIES)) {
+        if (!TagUtil.isIn(PostConstants.MIDAS_HAND_IMMUNE_ENTITIES, entity.getType())) {
             world.destroyBlock(entity.blockPosition(), true);
             world.setBlock(entity.blockPosition(), Blocks.GOLD_BLOCK.defaultBlockState(), 2);
             entity.remove(RemovalReason.KILLED);

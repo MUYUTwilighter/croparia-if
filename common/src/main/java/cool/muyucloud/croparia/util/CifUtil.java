@@ -131,7 +131,6 @@ public class CifUtil {
         return new ItemEntity(world, (double) pos.getX() + 0.5, (double) pos.getY() + 0.6, (double) pos.getZ() + 0.5, stack, 0, 0, 0);
     }
 
-    @SuppressWarnings("unchecked")
     public static DataComponentPatch extractPatch(DataComponentPatch patch) {
         return patch;
     }

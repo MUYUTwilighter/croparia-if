@@ -19,7 +19,6 @@ import cool.muyucloud.croparia.util.text.Texts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentExactPredicate;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -48,9 +47,13 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public class BlockInput implements SlotDisplay {
-    public static final ItemStack STACK_UNKNOWN = Items.BEDROCK.getDefaultInstance();
-    public static final ItemStack STACK_AIR = Items.BARRIER.getDefaultInstance();
-    public static final ItemStack STACK_ANY = Items.LIGHT_GRAY_STAINED_GLASS_PANE.getDefaultInstance();
+    // JEI/REI loads recipe codecs before item components are bound.
+    public static final Supplier<ItemStack> STACK_UNKNOWN = () -> Texts.rename(
+        Items.BEDROCK.getDefaultInstance(), Texts.translatable("tooltip.croparia.unknown"));
+    public static final Supplier<ItemStack> STACK_AIR = () -> Texts.rename(
+        Items.BARRIER.getDefaultInstance(), Texts.translatable("tooltip.croparia.air"));
+    public static final Supplier<ItemStack> STACK_ANY = () -> Texts.rename(
+        Items.LIGHT_GRAY_STAINED_GLASS_PANE.getDefaultInstance(), Texts.translatable("tooltip.croparia.any"));
     public static final Supplier<ItemStack> STACK_PLACEHOLDER = () -> CropariaItems.PLACEHOLDER_BLOCK.get().getDefaultInstance();
     public static final BlockInput UNKNOWN = BlockInput.of(CropariaIf.of("unknown"));
     public static final BlockInput ANY = new BlockInput(null, null, BlockProperties.EMPTY, DataComponentExactPredicate.EMPTY);
@@ -68,12 +71,6 @@ public class BlockInput implements SlotDisplay {
         return TestedCodec.success();
     }), CODEC_STR);
     public static final StreamCodec<RegistryFriendlyByteBuf, BlockInput> STREAM_CODEC = CodecUtil.toStream(CODEC);
-
-    static {
-        STACK_UNKNOWN.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.unknown"));
-        STACK_AIR.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.air"));
-        STACK_ANY.set(DataComponents.CUSTOM_NAME, Texts.translatable("tooltip.croparia.any"));
-    }
 
     public static BlockInput create(String s) {
         if (s.startsWith("#")) {
@@ -204,11 +201,11 @@ public class BlockInput implements SlotDisplay {
                 if (stacks.isEmpty()) {
                     DisplayableRecipe.LOGGER.error("Block tag '{}' is empty, using placeholder", this.getTag().get().location());
                     this.virtualRender = true;
-                    stacks.add(Texts.tooltip(STACK_UNKNOWN.copy(), Texts.literal(this.getTaggable())));
+                    stacks.add(Texts.tooltip(STACK_UNKNOWN.get(), Texts.literal(this.getTaggable())));
                 }
                 return ImmutableList.copyOf(stacks);
             } else if (this.isAny()) {
-                return ImmutableList.of(STACK_ANY);
+                return ImmutableList.of(STACK_ANY.get());
             } else {
                 this.virtualRender = true;
                 ItemStack stack = STACK_PLACEHOLDER.get();

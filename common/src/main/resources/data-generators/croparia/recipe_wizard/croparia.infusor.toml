@@ -6,6 +6,6 @@ template = """
   "type": "croparia:infusor",
   "element": "${infusor_element}",
   "ingredient": ${item._qis},
-  "result": ${off_hand._qis},
+  "result": ${off_hand._qis}
 }
 """

@@ -1,11 +1,13 @@
 package cool.muyucloud.croparia.api.generator.util;
 
+import cool.muyucloud.croparia.api.generator.DataGenerator;
 import cool.muyucloud.croparia.api.placeholder.Template;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,9 +27,11 @@ class TranslatableAndPackCacheEntryTest {
 
     @Test
     void packCacheEntryEqualityDependsOnPathOnly() {
-        PackCacheEntry<String> a = new PackCacheEntry<>(null, "path/a.json", "v1");
-        PackCacheEntry<String> b = new PackCacheEntry<>(null, "path/a.json", "v2");
-        PackCacheEntry<String> c = new PackCacheEntry<>(null, "path/c.json", "v1");
+        DataGenerator owner = new DataGenerator(false, false, List.of(),
+            Template.EMPTY, DgRegistry.ofMap(Map.of()), Template.EMPTY);
+        PackCacheEntry<String> a = new PackCacheEntry<>(owner, "path/a.json", "v1");
+        PackCacheEntry<String> b = new PackCacheEntry<>(owner, "path/a.json", "v2");
+        PackCacheEntry<String> c = new PackCacheEntry<>(owner, "path/c.json", "v1");
 
         assertEquals(a, b);
         assertNotEquals(a, c);

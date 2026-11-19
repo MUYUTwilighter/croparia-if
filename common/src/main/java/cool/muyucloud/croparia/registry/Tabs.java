@@ -20,38 +20,35 @@ public class Tabs {
     @SuppressWarnings("UnstableApiUsage")
     public static final RegistrySupplier<CreativeModeTab> CROPS = registerTab(
         "crops",
-        () -> {
-            CreativeTabRegistry.modify(Tabs.CROPS, (_, output, _) -> DgRegistries.CROPS.forEach(crop -> {
+        () -> CreativeTabRegistry.create(builder -> builder
+            .title(Texts.translatable("tab." + CropariaIf.MOD_ID + ".crops"))
+            .icon(() -> {
+                ItemStack stack = CropariaItems.CROP_FRUIT.get().getDefaultInstance();
+                stack.set(CropariaComponents.CROP_ID.get(), Crops.ELEMENTAL.getKey());
+                return stack;
+            })
+            .displayItems((_, output) -> DgRegistries.CROPS.forEach(crop -> {
                 output.accept(crop.getFruit());
                 output.accept(crop.getSeed());
-            }));
-            return CreativeTabRegistry.create(
-                Texts.translatable("tab." + CropariaIf.MOD_ID + ".crops"),
-                () -> {
-                    ItemStack stack = CropariaItems.CROP_FRUIT.get().getDefaultInstance();
-                    stack.set(CropariaComponents.CROP_ID.get(), Crops.ELEMENTAL.getKey());
-                    return stack;
-                }
-            );
-        }
+            }))
+        )
     );
-    @SuppressWarnings("UnstableApiUsage")
+    // The initializer registers this tab even without a direct Java reference.
+    @SuppressWarnings({"unused", "UnstableApiUsage"})
     public static final RegistrySupplier<CreativeModeTab> MELONS = registerTab(
         "melons",
-        () -> {
-            CreativeTabRegistry.modify(Tabs.MELONS, (_, output, _) -> DgRegistries.MELONS.forEach(melon -> {
+        () -> CreativeTabRegistry.create(builder -> builder
+            .title(Texts.translatable("tab." + CropariaIf.MOD_ID + ".melons"))
+            .icon(() -> {
+                ItemStack stack = CropariaItems.MELON_ITEM.get().getDefaultInstance();
+                stack.set(CropariaComponents.CROP_ID.get(), Melons.COBBLESTONE.getKey());
+                return stack;
+            })
+            .displayItems((_, output) -> DgRegistries.MELONS.forEach(melon -> {
                 output.accept(melon.getFruit());
                 output.accept(melon.getSeed());
-            }));
-            return CreativeTabRegistry.create(
-                Texts.translatable("tab." + CropariaIf.MOD_ID + ".melons"),
-                () -> {
-                    ItemStack stack = CropariaItems.MELON_ITEM.get().getDefaultInstance();
-                    stack.set(CropariaComponents.CROP_ID.get(), Melons.COBBLESTONE.getKey());
-                    return stack;
-                }
-            );
-        }
+            }))
+        )
     );
     public static final RegistrySupplier<CreativeModeTab> MAIN = registerTab(
         "main",

@@ -1,3 +1,4 @@
+startup = true
 registry = "croparia:elements"
 path = "thermal/recipe/croparia/crucible/fluid/${name}.json"
 dependencies = "thermal_expansion"

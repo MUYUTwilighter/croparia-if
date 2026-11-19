@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(FogRenderer.class)
 public abstract class FogRendererMixin {
@@ -25,14 +25,15 @@ public abstract class FogRendererMixin {
     @Unique
     private static final float CIF_FOG_BLUE_MULTIPLIER = 0.9F;
 
-    @Inject(method = "computeFogColor", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "computeFogColor", at = @At("RETURN"))
     private void cif$computeFogColor(
             Camera camera,
-            float partialTick,
+            float partialTicks,
             ClientLevel level,
             int renderDistance,
             float darkenWorldAmount,
-            CallbackInfoReturnable<Vector4f> cir
+            Vector4f dest,
+            CallbackInfo ci
     ) {
         ElementalLiquidBlock block = cif$getElementalLiquidBlock(camera, level);
         if (block == null) return;
@@ -40,12 +41,12 @@ public abstract class FogRendererMixin {
         Color color = SimpleArchitecturyFluidAttributesAccess.getFogColor(block.getElement().getFluidAttr());
         if (color == null) return;
 
-        cir.setReturnValue(new Vector4f(
+        dest.set(
                 ((color.getValue() >> 16) & 0xFF) / 255.0F * CIF_FOG_RED_MULTIPLIER,
                 ((color.getValue() >> 8) & 0xFF) / 255.0F * CIF_FOG_GREEN_MULTIPLIER,
                 (color.getValue() & 0xFF) / 255.0F * CIF_FOG_BLUE_MULTIPLIER,
                 1.0F
-        ));
+        );
     }
 
     @Unique
@@ -53,7 +54,8 @@ public abstract class FogRendererMixin {
     private static ElementalLiquidBlock cif$getElementalLiquidBlock(Camera camera, @Nullable ClientLevel level) {
         ClientLevel actualLevel = level;
         if (actualLevel == null) {
-            if (!(camera.entity().level() instanceof ClientLevel clientLevel)) return null;
+            var entity = camera.entity();
+            if (entity == null || !(entity.level() instanceof ClientLevel clientLevel)) return null;
             actualLevel = clientLevel;
         }
 

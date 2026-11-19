@@ -110,8 +110,11 @@ public enum Element implements DgEntry, StringRepresentable, Comparable<Element>
         this.fluidSource = CropariaFluids.registerFluid(parseId("fluid_%s"), () -> new ElementalSource(this, fluidAttr));
         this.fluidFlowing = CropariaFluids.registerFluid(parseId("fluid_%s_flow"), () -> new ElementalFlowing(this, fluidAttr));
         this.fluidBlock = CropariaBlocks.registerBlock(parseId("fluid_%s"),
-            properties -> new ElementalLiquidBlock(this, BlockBehaviour.Properties.of().replaceable()
-                .lightLevel(state -> 8).noCollision().strength(100.0F).noLootTable().setId(ResourceKey.create(Registries.BLOCK, this.getKey()))
+            properties -> new ElementalLiquidBlock(this, properties.replaceable()
+                .lightLevel(_ -> 8)
+                .noCollision()
+                .strength(100.0F)
+                .noLootTable()
             ));
         this.bucket = CropariaItems.registerItem(parseId("bucket_%s"), properties -> new ElementalBucket(
             this, this.getFluidSource(),

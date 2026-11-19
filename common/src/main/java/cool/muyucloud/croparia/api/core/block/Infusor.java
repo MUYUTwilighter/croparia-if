@@ -23,6 +23,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -80,7 +81,9 @@ public class Infusor extends Block implements ItemPlaceable {
             return true;
         }
         stack.shrink(1);
-        ItemStack returnStack = potion.getCraftingRemainder();
+        ItemStackTemplate template = potion.getCraftingRemainder();
+        assert template != null;
+        ItemStack returnStack = template.create();
         if (returnStack.isEmpty()) returnStack = Items.AIR.getDefaultInstance();
         CifUtil.exportItem(world, pos, returnStack, player);
         return true;

@@ -12,6 +12,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
@@ -68,7 +69,7 @@ public class Texts {
     }
 
     public static void chat(@NotNull Player player, Component message) {
-        player.displayClientMessage(message, false);
+        player.sendSystemMessage(message);
     }
 
     public static void chat(@NotNull CommandSourceStack source, Component msg) {
@@ -76,7 +77,7 @@ public class Texts {
     }
 
     public static void overlay(@NotNull Player player, Component message) {
-        player.displayClientMessage(message, true);
+        player.sendOverlayMessage(message);
     }
 
     public static Style suggestCommand(String... words) {
@@ -124,7 +125,7 @@ public class Texts {
     }
 
     public static Style hoverItem(ItemStack stack) {
-        return stack.isEmpty() ? Style.EMPTY : Style.EMPTY.withHoverEvent(new HoverEvent.ShowItem(stack));
+        return stack.isEmpty() ? Style.EMPTY : Style.EMPTY.withHoverEvent(new HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(stack)));
     }
 
     public static Style hoverText(String text) {

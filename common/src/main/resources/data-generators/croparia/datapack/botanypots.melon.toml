@@ -1,3 +1,9 @@
+# Recipe/display fields: BotanyPots 1.21.1, commit 335c997dc456f6ea2b9bc3ff13319dfb791803e6.
+# Component ingredients use the installed 26.1.2 loader APIs; BP has no public 26.1.2 branch yet.
+# Fabric reads fabric:type/base; NeoForge reads type/items. Both preserve extra stack components.
+# BP does not supply crop BE data to displays; show a stem growing into the explicitly colored melon.
+startup = true
+enabled = true
 registry = "croparia:melons"
 path = "botanypots/recipe/${id.namespace}/melon/${id.path}.json"
 dependencies = "botanypots"
@@ -5,15 +11,26 @@ template = """
 {
   "type": "botanypots:crop",
   "input": {
-    "item": "${seed}"
+    "type": "neoforge:components",
+    "fabric:type": "fabric:components",
+    "items": ["croparia:melon_seed"],
+    "base": "croparia:melon_seed",
+    "components": { "croparia:crop": "${id}" },
+    "strict": false
   },
-  "categories": [
-    "crop", "farmland"
-  ],
-  "growthTicks": 600,
+  "grow_time": 600,
   "display": {
-    "type": "botanypots:aging",
-    "block": "${stem}"
+    "type": "botanypots:transitional",
+    "phases": [
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:melon_stem", "properties": { "age": "0" } } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:melon_stem", "properties": { "age": "1" } } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:melon_stem", "properties": { "age": "2" } } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:melon_stem", "properties": { "age": "3" } } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:melon_stem", "properties": { "age": "4" } } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:melon_stem", "properties": { "age": "5" } } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:melon_stem", "properties": { "age": "6" } } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:melon" }, "options": { "color": "#${color.rgb}" } }
+    ]
   },
   "drops": [
     {
@@ -21,13 +38,15 @@ template = """
       "items": [
         {
           "result": {
-            "id": "${seed}"
+            "id": "croparia:melon_seed",
+            "components": { "croparia:crop": "${id}" }
           },
           "chance": 0.01
         },
         {
           "result": {
-            "id": "${melon}"
+            "id": "croparia:melon",
+            "components": { "croparia:crop": "${id}" }
           },
           "chance": 1.00
         }

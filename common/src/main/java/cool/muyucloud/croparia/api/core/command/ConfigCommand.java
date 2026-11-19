@@ -84,12 +84,8 @@ public class ConfigCommand {
         DelegateSource<CommandSourceStack> source = DelegateSource.of(context);
         source.success(Texts.translatable("commands.croparia.config.autoReload", CropariaIf.CONFIG.getAutoReload().toString()), false);
         return 1;
-    }).then(Commands.argument("value", IntegerArgumentType.integer()).suggests((context, builder) -> {
-        builder.suggest("-1");
-        builder.suggest("20");
-        return builder.buildFuture();
-    }).executes(context -> {
-        CropariaIf.CONFIG.setAutoReload(IntegerArgumentType.getInteger(context, "value"));
+    }).then(Commands.argument("value", BoolArgumentType.bool()).executes(context -> {
+        CropariaIf.CONFIG.setAutoReload(BoolArgumentType.getBool(context, "value"));
         DelegateSource<CommandSourceStack> source = DelegateSource.of(context);
         source.success(Texts.translatable("commands.croparia.config.autoReload", CropariaIf.CONFIG.getAutoReload().toString()), false);
         return 1;

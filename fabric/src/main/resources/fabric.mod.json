@@ -31,6 +31,9 @@
     "jei_mod_plugin": [
       "cool.muyucloud.croparia.compat.jei.JeiClient"
     ],
+    "rei_common": [
+      "cool.muyucloud.croparia.compat.rei.ReiCommon"
+    ],
     "rei_client": [
       "cool.muyucloud.croparia.compat.rei.ReiClient"
     ],
@@ -43,7 +46,7 @@
     "croparia-if-fabric.mixins.json"
   ],
   "depends": {
-    "fabric": "*",
+    "fabric-api": "*",
     "minecraft": "~26.1.2",
     "architectury": "*"
   },

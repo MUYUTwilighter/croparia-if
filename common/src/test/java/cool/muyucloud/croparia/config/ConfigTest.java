@@ -12,30 +12,36 @@ class ConfigTest {
     @Test
     void rawConfigDeserializationAndBlacklistFilteringWork() {
         String base = Path.of(System.getProperty("java.io.tmpdir"), "croparia_config_test").toAbsolutePath().toString();
+        Path dataPath = Path.of(base, "data");
+        Path wizardPath = Path.of(base, "wizard");
         RawConfig raw = new RawConfig(
-            Path.of(base, "data").toString(),
-            Path.of(base, "wizard").toString(),
+            dataPath.toString(),
+            wizardPath.toString(),
             false,
             true,
             false,
             true,
-            42,
+            false,
+            true,
             3,
             2,
             2,
+            List.of("resource", "custom"),
             List.of("minecraft:wheat", "@fabric.*", "not a resource location")
         );
 
         Config config = new Config(raw);
 
-        assertEquals(Path.of(base, "data"), config.getFilePath());
-        assertEquals(Path.of(base, "wizard"), config.getRecipeWizard());
-        assertEquals(42, config.getAutoReload());
+        assertEquals(dataPath, config.getFilePath());
+        assertEquals(wizardPath, config.getRecipeWizard());
+        assertTrue(config.getAutoReload());
         assertEquals(3, config.getSoakAttempts());
         assertFalse(config.getOverride());
         assertTrue(config.getInfusor());
         assertFalse(config.getRitual());
         assertTrue(config.getFruitUse());
+        assertFalse(config.getBreakEffect());
+        assertEquals(List.of("resource", "custom"), config.getCropTypes());
         assertEquals(1, config.getCropBlackList().size());
         assertEquals(1, config.getModBlackList().size());
         assertFalse(config.isCropValid(Identifier.fromNamespaceAndPath("minecraft", "wheat")));
@@ -53,10 +59,12 @@ class ConfigTest {
             true,
             true,
             true,
-            20,
+            true,
+            true,
             1,
             2,
             2,
+            List.of(),
             List.of()
         ));
 

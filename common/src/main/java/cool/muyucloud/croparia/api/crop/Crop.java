@@ -29,13 +29,13 @@ import java.util.*;
 
 @SuppressWarnings("unused")
 public class Crop extends AbstractCrop<Item> implements TierAccess, ColorAccess {
-    public static final Set<String> PRESET_TYPES = new HashSet<>();
-    public static final String ANIMAL = addType("animal");
-    public static final String CROP = addType("crop");
-    public static final String FOOD = addType("food");
-    public static final String MONSTER = addType("monster");
-    public static final String NATURE = addType("nature");
+    public static final String ANIMAL = "animal";
+    public static final String CROP = "crop";
+    public static final String FOOD = "food";
+    public static final String MONSTER = "monster";
+    public static final String NATURE = "nature";
     public static final String DEFAULT_TYPE = CROP;
+    public static final Set<String> PRESET_TYPES = new HashSet<>(List.of(ANIMAL, CROP, FOOD, MONSTER, NATURE));
 
     public static String addType(String type) {
         PRESET_TYPES.add(type);
@@ -205,10 +205,5 @@ public class Crop extends AbstractCrop<Item> implements TierAccess, ColorAccess 
 
     public ItemStack getSeed() {
         return CropariaItems.CROP_SEED.get().getCropItem(this.getKey());
-    }
-
-    @Override
-    public void onRegister() {
-        // TODO: Add CreativeTab Content
     }
 }

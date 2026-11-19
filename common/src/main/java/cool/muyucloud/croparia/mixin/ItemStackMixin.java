@@ -21,12 +21,14 @@ import java.util.function.Consumer;
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
     @Shadow
-    public abstract <T extends TooltipProvider> void addToTooltip(DataComponentType<?> component, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag);
+    public abstract <T extends TooltipProvider> void addToTooltip(DataComponentType<T> component, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag);
 
     @Inject(method = "addDetailsToTooltip", at = @At(
         value = "INVOKE", ordinal = 0,
         target = "Lnet/minecraft/world/item/Item;appendHoverText(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/Item$TooltipContext;Lnet/minecraft/world/item/component/TooltipDisplay;Ljava/util/function/Consumer;Lnet/minecraft/world/item/TooltipFlag;)V"))
     public void onTooltips(Item.TooltipContext context, TooltipDisplay tooltipDisplay, @Nullable Player player, TooltipFlag tooltipFlag, Consumer<Component> tooltipAdder, CallbackInfo ci) {
-        CropariaComponents.forEach(type -> this.addToTooltip(type, context, tooltipDisplay, tooltipAdder, tooltipFlag));
+        this.addToTooltip(CropariaComponents.TEXT.get(), context, tooltipDisplay, tooltipAdder, tooltipFlag);
+        this.addToTooltip(CropariaComponents.BLOCK_PROPERTIES.get(), context, tooltipDisplay, tooltipAdder, tooltipFlag);
+        this.addToTooltip(CropariaComponents.TARGET_POS.get(), context, tooltipDisplay, tooltipAdder, tooltipFlag);
     }
 }

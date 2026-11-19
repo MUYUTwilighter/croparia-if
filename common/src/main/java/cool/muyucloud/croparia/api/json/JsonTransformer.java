@@ -25,7 +25,7 @@ public interface JsonTransformer {
 
     static JsonElement parseToml(String raw) {
         try {
-            return GsonTomlSerializer.instance().serialize(JToml.jToml().readFromString(raw));
+            return GsonTomlSerializer.instance().fromToml(JToml.jToml().readFromString(raw));
         } catch (TomlException e) {
             throw new JsonSyntaxException("Failed to parse TOML", e);
         }

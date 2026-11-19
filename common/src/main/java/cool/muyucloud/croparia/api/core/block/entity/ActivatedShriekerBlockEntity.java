@@ -154,9 +154,9 @@ public class ActivatedShriekerBlockEntity extends BlockEntity implements GameEve
         SoundEvent soundEvent = SOUND_BY_LEVEL.get(4);
         if (soundEvent != null) {
             BlockPos blockPos = this.getBlockPos();
-            int i = blockPos.getX() + Mth.randomBetweenInclusive(level.random, -10, 10);
-            int j = blockPos.getY() + Mth.randomBetweenInclusive(level.random, -10, 10);
-            int k = blockPos.getZ() + Mth.randomBetweenInclusive(level.random, -10, 10);
+            int i = blockPos.getX() + Mth.randomBetweenInclusive(level.getRandom(), -10, 10);
+            int j = blockPos.getY() + Mth.randomBetweenInclusive(level.getRandom(), -10, 10);
+            int k = blockPos.getZ() + Mth.randomBetweenInclusive(level.getRandom(), -10, 10);
             level.playSound(null, i, j, k, soundEvent, SoundSource.HOSTILE, 5.0F, 1.0F);
         }
 

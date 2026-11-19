@@ -39,13 +39,12 @@ public class CropMaterialRecipe extends CustomRecipe implements DisplayableRecip
         .cancelRegisterType()
         .build();
 
-    @SuppressWarnings("unchecked")
     public static Optional<AbstractCrop<?>> readCrop(CraftingInput input) {
         final Optional<AbstractCrop<?>> empty = Optional.empty();
         if (input.isEmpty()) return empty;
         List<ItemStack> stacks = input.items();
         if (stacks.size() != 1) return empty;
-        return (Optional<AbstractCrop<?>>) (Object) AbstractCrop.readCrop(stacks.getFirst());
+        return AbstractCrop.readCrop(stacks.getFirst());
     }
 
     private final @NotNull CropRegistry<?> registry;

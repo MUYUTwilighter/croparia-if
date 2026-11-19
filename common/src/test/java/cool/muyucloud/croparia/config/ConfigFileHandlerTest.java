@@ -31,7 +31,7 @@ class ConfigFileHandlerTest {
         assertTrue(Files.exists(configPath));
         assertEquals(tempDir.resolve("croparia"), loaded.getFilePath());
         assertEquals(tempDir.resolve("croparia/recipe_wizard/dump"), loaded.getRecipeWizard());
-        assertEquals(20, loaded.getAutoReload());
+        assertFalse(loaded.getAutoReload());
         assertEquals(1, loaded.getSoakAttempts());
         assertTrue(loaded.getOverride());
     }
@@ -42,8 +42,8 @@ class ConfigFileHandlerTest {
         Config source = new Config(new RawConfig(
             tempDir.resolve("custom/data").toString(),
             tempDir.resolve("custom/wizard").toString(),
-            false, true, false, true, 33, 6, 2, 2,
-            List.of("minecraft:wheat", "@fabric.*")
+            false, true, false, true, false, true, 6, 2, 2,
+            List.of("resource", "custom"), List.of("minecraft:wheat", "@fabric.*")
         ));
 
         ConfigFileHandler.save(source);
@@ -55,7 +55,9 @@ class ConfigFileHandlerTest {
         assertTrue(loaded.getInfusor());
         assertFalse(loaded.getRitual());
         assertTrue(loaded.getFruitUse());
-        assertEquals(33, loaded.getAutoReload());
+        assertFalse(loaded.getBreakEffect());
+        assertEquals(List.of("resource", "custom"), loaded.getCropTypes());
+        assertTrue(loaded.getAutoReload());
         assertEquals(6, loaded.getSoakAttempts());
         assertEquals(List.of("minecraft:wheat", "@fabric.*"), loaded.getBlacklist());
     }
@@ -66,12 +68,12 @@ class ConfigFileHandlerTest {
         Config target = new Config(new RawConfig(
             tempDir.resolve("old/data").toString(),
             tempDir.resolve("old/wizard").toString(),
-            true, true, true, true, 20, 1, 2, 2, List.of()
+            true, true, true, true, true, false, 1, 2, 2, List.of(), List.of()
         ));
         Config source = new Config(new RawConfig(
             tempDir.resolve("new/data").toString(),
             tempDir.resolve("new/wizard").toString(),
-            false, false, false, false, 9, 2, 2, 2, List.of("minecraft:carrot", "@neo.*")
+            false, false, false, false, true, true, 2, 2, 2, List.of(), List.of("minecraft:carrot", "@neo.*")
         ));
         ConfigFileHandler.save(source);
 
@@ -83,7 +85,7 @@ class ConfigFileHandlerTest {
         assertFalse(target.getInfusor());
         assertFalse(target.getRitual());
         assertFalse(target.getFruitUse());
-        assertEquals(9, target.getAutoReload());
+        assertTrue(target.getAutoReload());
         assertEquals(2, target.getSoakAttempts());
         assertEquals(List.of("minecraft:carrot", "@neo.*"), target.getBlacklist());
     }

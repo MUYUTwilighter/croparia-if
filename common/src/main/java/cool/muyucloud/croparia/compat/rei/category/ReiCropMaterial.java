@@ -35,7 +35,7 @@ public class ReiCropMaterial extends ReiCategory<CropMaterialRecipe> {
         for (int y = 0; y < 3; y++)
             for (int x = 0; x < 3; x++)
                 slots.add(Widgets.createSlot(new Point(startPoint.x + 1 + x * 18, startPoint.y + 1 + y * 18)).markInput());
-        slots.getFirst().entries(ReiUtil.toIngredient(recipe.getCrop().getFruit().asItem()));
+        slots.getFirst().entries(ReiUtil.toIngredient(recipe.getCrop().getFruit()));
         widgets.addAll(slots);
         widgets.add(Widgets.createSlot(new Point(startPoint.x + 95, startPoint.y + 19)).entries(
             ReiUtil.toIngredient(recipe.getOutput().map(ItemOutput::createStack).orElse(Items.AIR.getDefaultInstance()))

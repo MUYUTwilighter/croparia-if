@@ -144,9 +144,4 @@ public class Melon extends AbstractCrop<Block> implements ColorAccess {
     public Placeholder<Melon> placeholder() {
         return PLACEHOLDER;
     }
-
-    @Override
-    public void onRegister() {
-        // TODO: Add CreativeTab Content
-    }
 }

@@ -18,7 +18,7 @@ public class ConfigFileHandler {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static Supplier<Path> gameFolderSupplier = Platform::getGameFolder;
 
-    private static Path gameFolder() {
+    static Path gameFolder() {
         try {
             Path path = gameFolderSupplier.get();
             if (path != null) return path;

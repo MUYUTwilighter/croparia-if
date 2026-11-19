@@ -110,7 +110,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         RequiredArgumentBuilder<S, String> color = RequiredArgumentBuilder.argument("color", StringArgumentType.word());
         color.executes(context -> createCrop(context, client, false));
         RequiredArgumentBuilder<S, String> type = RequiredArgumentBuilder.argument("type", StringArgumentType.word());
-        type.suggests((context, builder) -> {
+        type.suggests((_, builder) -> {
             Crop.PRESET_TYPES.forEach(builder::suggest);
             return builder.buildFuture();
         }).executes(context -> createCrop(context, client, false));
@@ -170,7 +170,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
             return reportForPlayer(source);
         });
         RequiredArgumentBuilder<S, Identifier> id = RequiredArgumentBuilder.argument("id", IdentifierArgument.id());
-        id.suggests((context, builder) -> {
+        id.suggests((_, builder) -> {
             this.getRegistry().forEach(crop -> builder.suggest(crop.getKey().toString()));
             return builder.buildFuture();
         });
@@ -185,7 +185,7 @@ public abstract class CropCommand<C extends AbstractCrop<?>> {
         LiteralArgumentBuilder<S> dump = LiteralArgumentBuilder.literal("dump");
         dump.executes(context -> this.dumpAll(DelegateSource.of(context), openFile));
         RequiredArgumentBuilder<S, Identifier> id = RequiredArgumentBuilder.argument("id", IdentifierArgument.id());
-        id.suggests((context, builder) -> {
+        id.suggests((_, builder) -> {
             this.getRegistry().forEach(crop -> builder.suggest(crop.getKey().toString()));
             return builder.buildFuture();
         });

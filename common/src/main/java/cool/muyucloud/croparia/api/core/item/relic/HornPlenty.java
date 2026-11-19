@@ -30,7 +30,7 @@ public class HornPlenty extends Item {
         ItemStack food = null;
         int xp = 0;
         for (int i = 0; i < MAX_ATTEMPT; ++i) {
-            int index = context.getLevel().random.nextInt(PostConstants.FOODS.size());
+            int index = context.getLevel().getRandom().nextInt(PostConstants.FOODS.size());
             food = PostConstants.FOODS.get(index).getDefaultInstance();
             FoodProperties properties = Objects.requireNonNull(CifUtil.getFoodProperties(food));
             xp = properties.nutrition();

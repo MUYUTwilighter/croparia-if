@@ -1,7 +1,10 @@
 package cool.muyucloud.croparia.api.core.recipe.container;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +26,13 @@ class RecipeContainerNeoForgeTest {
     @Test
     void soakContainerAirBranchIsEmpty() {
         Assumptions.assumeTrue(runtimeReady(), "Requires initialized NeoForge runtime");
-        SoakContainer air = new SoakContainer(Blocks.AIR.defaultBlockState(), null, 1.0f);
+        BlockInWorld block = new BlockInWorld(null, BlockPos.ZERO, false) {
+            @Override
+            public BlockState getState() {
+                return Blocks.AIR.defaultBlockState();
+            }
+        };
+        SoakContainer air = new SoakContainer(block, null, 1.0f);
         assertTrue(air.isEmpty());
         assertEquals(0, air.size());
         assertSame(ItemStack.EMPTY, air.getItem(0));

@@ -4,7 +4,7 @@ This project currently supports three testing layers:
 
 1. JVM unit tests in `common`
 2. Fabric loader-backed tests in `fabric` (dependency scaffold only)
-3. NeoForge GameTest samples in `neoforge`
+3. NeoForge JVM smoke tests in `neoforge`; GameTest integration remains pending
 
 ## 1) JVM Unit Tests (common)
 
@@ -37,19 +37,9 @@ Note:
 
 ## 3) NeoForge GameTest (integration)
 
-Sample class:
-
-- `neoforge/src/main/java/cool/muyucloud/croparia/neoforge/gametest/CropariaNeoForgeGameTests.java`
-
-Current sample:
-
-- `sanity` test with `@GameTest(template = "minecraft:empty")`
-
-To expand:
-
-1. Add more `@GameTest` methods
-2. Add/choose proper structure templates if required by your scenarios
-3. Launch dev server (for example `:neoforge:runServer`) and run tests with `/test runall croparia`
+No GameTest cases are currently registered. The empty placeholder class was removed.
+Add tests using the Minecraft 26.1.2 / NeoForge GameTest API before using the dev
+server to run integration scenarios.
 
 ## 4) NeoForge JUnit (module smoke tests)
 

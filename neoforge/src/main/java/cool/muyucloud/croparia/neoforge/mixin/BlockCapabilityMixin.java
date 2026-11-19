@@ -41,7 +41,7 @@ public abstract class BlockCapabilityMixin<T, C extends @Nullable Object> extend
         }
         for (Block block : blocks) {
             //noinspection unchecked
-            this.providers.computeIfAbsent(block, k -> new ArrayList<>()).add(
+            this.providers.computeIfAbsent(block, _ -> new ArrayList<>()).add(
                 (world, pos, state, be, direction) -> (T) provider.visit(world, pos, state, be, (Direction) direction)
             );
         }
@@ -56,7 +56,7 @@ public abstract class BlockCapabilityMixin<T, C extends @Nullable Object> extend
         }
         for (Block block : blocks) {
             //noinspection unchecked
-            this.providers.computeIfAbsent(block, k -> new ArrayList<>()).add(
+            this.providers.computeIfAbsent(block, _ -> new ArrayList<>()).add(
                 (world, pos, state, be, direction) -> (T) provider.visit(world, pos, state, be, (Direction) direction)
             );
         }

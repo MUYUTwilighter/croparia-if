@@ -2,7 +2,7 @@ archives_name = "$archives_name-$minecraft_version"
 apply plugin: 'jacoco'
 
 architectury {
-    common rootProject.enabled_platforms.split(',')
+    common rootProject.enabled_platforms.toString().split(',').toList()
 }
 
 dependencies {

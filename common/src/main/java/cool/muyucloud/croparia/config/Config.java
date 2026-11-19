@@ -1,7 +1,6 @@
 package cool.muyucloud.croparia.config;
 
 import cool.muyucloud.croparia.api.crop.Crop;
-import dev.architectury.platform.Platform;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,19 +21,16 @@ public class Config {
         if (p.isAbsolute()) {
             return Optional.of(p);
         } else {
-            return Optional.of(Platform.getGameFolder().resolve(path));
+            return Optional.of(ConfigFileHandler.gameFolder().resolve(path));
         }
     }
 
     public static @NotNull String resolvePath(@NotNull Path path) {
         Path normalizedPath = path.normalize();
         try {
-            Path basePath = Platform.getGameFolder();
-            if (basePath != null) {
-                Path normalizedBasePath = basePath.normalize();
-                if (normalizedPath.startsWith(normalizedBasePath)) {
-                    return normalizedBasePath.relativize(normalizedPath).toString();
-                }
+            Path normalizedBasePath = ConfigFileHandler.gameFolder().normalize();
+            if (normalizedPath.startsWith(normalizedBasePath)) {
+                return normalizedBasePath.relativize(normalizedPath).toString();
             }
         } catch (Throwable ignored) {
         }
@@ -56,7 +52,7 @@ public class Config {
     @NotNull
     private Boolean breakEffect;
     @NotNull
-    private Integer autoReload;
+    private Boolean autoReload;
     @NotNull
     private Integer soakAttempts;
     @NotNull
@@ -74,9 +70,9 @@ public class Config {
      * Default config
      */
     public Config() {
-        this.filePath = Platform.getGameFolder().resolve("croparia");
-        this.recipeWizard = Platform.getGameFolder().resolve("croparia/recipe_wizard/dump");
-        this.autoReload = 20;
+        this.filePath = ConfigFileHandler.gameFolder().resolve("croparia");
+        this.recipeWizard = ConfigFileHandler.gameFolder().resolve("croparia/recipe_wizard/dump");
+        this.autoReload = false;
         this.override = true;
         this.fruitUse = true;
         this.infusor = true;
@@ -94,9 +90,9 @@ public class Config {
      * Deserialize config
      */
     public Config(RawConfig raw) {
-        this.filePath = parsePath(raw.filePath()).orElseGet(() -> Platform.getGameFolder().resolve("croparia"));
-        this.recipeWizard = parsePath(raw.recipeWizard()).orElseGet(() -> Platform.getGameFolder().resolve("croparia/recipe_wizard/dump"));
-        this.autoReload = raw.autoReload() != null ? raw.autoReload() : 20;
+        this.filePath = parsePath(raw.filePath()).orElseGet(() -> ConfigFileHandler.gameFolder().resolve("croparia"));
+        this.recipeWizard = parsePath(raw.recipeWizard()).orElseGet(() -> ConfigFileHandler.gameFolder().resolve("croparia/recipe_wizard/dump"));
+        this.autoReload = raw.autoReload() != null ? raw.autoReload() : false;
         this.override = raw.override() != null ? raw.override() : true;
         this.fruitUse = raw.fruitUse() != null ? raw.fruitUse() : true;
         this.infusor = raw.infusor() != null ? raw.infusor() : true;
@@ -105,7 +101,6 @@ public class Config {
         this.soakAttempts = raw.soakAttempts() != null ? raw.soakAttempts() : 1;
         this.cropYield = raw.cropYield() != null && raw.cropYield() > 0 ? raw.cropYield() : 2;
         this.melonYield = raw.melonYield() != null && raw.melonYield() > 0 ? raw.melonYield() : 2;
-        this.melonYield = 2;
         this.cropTypes = raw.cropTypes() != null && !raw.cropTypes().isEmpty() ? raw.cropTypes() : List.of(Crop.DEFAULT_TYPE, Crop.ANIMAL, Crop.FOOD, Crop.MONSTER, Crop.NATURE);
         this.cropBlackList = new ArrayList<>();
         this.modBlackList = new ArrayList<>();
@@ -148,11 +143,11 @@ public class Config {
         this.recipeWizard = recipeWizard;
     }
 
-    public @NotNull Integer getAutoReload() {
+    public @NotNull Boolean getAutoReload() {
         return autoReload;
     }
 
-    public void setAutoReload(@NotNull Integer autoReload) {
+    public void setAutoReload(@NotNull Boolean autoReload) {
         this.autoReload = autoReload;
     }
 

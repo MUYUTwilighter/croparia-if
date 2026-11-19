@@ -31,7 +31,7 @@ public class CropariaIfNeoForge {
 
     @SubscribeEvent
     public static void onRecipeReceived(RecipesReceivedEvent event) {
-        Recipes.forEach(typedSerializer -> receiveRecipe(event.getRecipeMap(), typedSerializer));
+        Recipes.forEach(typedSerializer -> receiveRecipe(event.getRecipeMap(), typedSerializer.adapt()));
     }
 
     @SubscribeEvent
@@ -46,6 +46,8 @@ public class CropariaIfNeoForge {
                 context.disconnect(
                     Texts.literal("Failed to apply crop definitions")
                 );
+                // A Void future recovers with null after the failed connection is closed.
+                //noinspection DataFlowIssue
                 return null;
             })
         ).configurationToServer(

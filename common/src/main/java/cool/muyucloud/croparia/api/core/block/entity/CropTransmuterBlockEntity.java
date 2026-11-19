@@ -63,16 +63,16 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, CropTransmuterBlockEntity blockEntity) {
-        if (!(level instanceof ServerLevel serverLevel)) return;
+        if (!(level instanceof ServerLevel)) return;
         boolean powered = level.hasNeighborSignal(pos);
         if (state.getValue(CropTransmuter.POWERED) != powered) {
             level.setBlock(pos, state.setValue(CropTransmuter.POWERED, powered), 3);
         }
         if (powered != blockEntity.isPositiveRedstone()) return;
-        blockEntity.tryProcess(serverLevel);
+        blockEntity.tryProcess();
     }
 
-    public void tryProcess(ServerLevel level) {
+    public void tryProcess() {
         ItemStack input = this.getItem(INPUT_SLOT);
         /* Get Output Stack */
         Optional<Material<?>> mayMaterial = this.readInputMaterial();
@@ -98,7 +98,8 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
 
     public Optional<Material<?>> readInputMaterial() {
         ItemStack input = this.getItem(INPUT_SLOT);
-        if (input.getItem() instanceof AbstractFruit<?>) return AbstractCrop.readCrop(input).map(AbstractCrop::getMaterial);
+        if (input.getItem() instanceof AbstractFruit<?>)
+            return AbstractCrop.readCrop(input).map(AbstractCrop::getMaterial);
         return Optional.empty();
     }
 
@@ -136,7 +137,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
+    protected void loadAdditional(@NotNull ValueInput input) {
         super.loadAdditional(input);
         ContainerHelper.loadAllItems(input, this.inventory);
         this.selectedIndex = Math.max(0, input.getIntOr(NBT_SELECTED_INDEX, 0));
@@ -144,7 +145,7 @@ public class CropTransmuterBlockEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
+    protected void saveAdditional(@NotNull ValueOutput output) {
         ContainerHelper.saveAllItems(output, this.inventory);
         output.putInt(NBT_SELECTED_INDEX, this.selectedIndex);
         output.putBoolean(NBT_POSITIVE_REDSTONE, this.positiveRedstone);

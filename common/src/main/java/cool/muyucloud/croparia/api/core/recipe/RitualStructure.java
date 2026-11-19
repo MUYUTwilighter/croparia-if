@@ -10,6 +10,7 @@ import cool.muyucloud.croparia.api.core.recipe.container.RitualStructureContaine
 import cool.muyucloud.croparia.api.recipe.DisplayableRecipe;
 import cool.muyucloud.croparia.api.recipe.TypedSerializer;
 import cool.muyucloud.croparia.api.recipe.entry.BlockInput;
+import cool.muyucloud.croparia.api.recipe.entry.ItemInput;
 import cool.muyucloud.croparia.api.recipe.entry.SlotDisplay;
 import cool.muyucloud.croparia.api.recipe.structure.Char3D;
 import cool.muyucloud.croparia.api.recipe.structure.MarkedChar3D;
@@ -159,10 +160,10 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
 
     public List<ItemStack> displaySlot(int x, int y, int z) {
         return switch (this.getPattern().get(x, y, z)) {
-            case ' ' -> List.of(BlockInput.STACK_ANY);
+            case ' ' -> List.of(BlockInput.STACK_ANY.get());
             case '$' -> List.of(STACK_INPUT.get());
             case '*' -> this.getRitual().getDisplayStacks();
-            case '.' -> List.of(BlockInput.STACK_AIR);
+            case '.' -> List.of(BlockInput.STACK_AIR.get());
             default -> {
                 BlockInput input = this.keys.get(this.getPattern().get(x, y, z));
                 if (input != null) yield input.getDisplayStacks();
@@ -201,7 +202,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
 
     @Override
     public @NotNull SlotDisplay craftingStation() {
-        return null;
+        return ItemInput.EMPTY;
     }
 
     @Override
@@ -210,7 +211,7 @@ public class RitualStructure implements DisplayableRecipe<RitualStructureContain
     }
 
     @Override
-    public boolean matches(RitualStructureContainer matcher, Level level) {
+    public boolean matches(RitualStructureContainer matcher, @NotNull Level level) {
         return this.getRitual().matches(matcher.getBlock());
     }
 

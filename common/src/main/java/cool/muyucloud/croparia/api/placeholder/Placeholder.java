@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
  * To create a new parser, use {@code #build(...)}.
  * @see PlaceholderBuilder
  */
+@SuppressWarnings("unused")
 public class Placeholder<T> implements RegexParser<T> {
     public static final Logger LOGGER = LogUtils.getLogger();
 

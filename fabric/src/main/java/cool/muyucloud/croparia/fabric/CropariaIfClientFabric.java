@@ -24,9 +24,8 @@ public class CropariaIfClientFabric implements ClientModInitializer {
     public void onInitializeClient() {
         CropariaIfClient.init();
         CropariaIfClient.registerBlockTintSources(BlockColorRegistry::register);
-        ClientRecipeSynchronizedEvent.EVENT.register((_, recipes) -> {
-            Recipes.forEach(serializer -> receiveRecipes(recipes, serializer));
-        });
+        ClientRecipeSynchronizedEvent.EVENT.register((_, recipes) ->
+            Recipes.forEach(serializer -> receiveRecipes(recipes, serializer.adapt())));
         ItemTintSources.ID_MAPPER.put(CropariaIf.of("crop"), CropItemTintSource.CODEC);
         SelectItemModelProperties.ID_MAPPER.put(CropariaIf.of("crop_type"), CropItemSelectProperty.TYPE);
         ClientConfigurationNetworking.registerGlobalReceiver(CropSyncHandler.TYPE.type(), (handler, context) -> context.client().submit(() -> {
@@ -37,6 +36,8 @@ public class CropariaIfClientFabric implements ClientModInitializer {
             context.responseSender().disconnect(
                 Texts.literal("Failed to apply crop definitions")
             );
+            // A Void future recovers with null after the failed connection is closed.
+            //noinspection DataFlowIssue
             return null;
         }));
     }

@@ -2,12 +2,12 @@ package cool.muyucloud.croparia.compat.rei.widget;
 
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
+import me.shedaniel.rei.api.client.gui.compat.GuiGraphics;
 import me.shedaniel.rei.api.client.gui.widgets.Slot;
 import me.shedaniel.rei.api.client.gui.widgets.WidgetWithBounds;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;

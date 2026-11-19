@@ -18,6 +18,7 @@ public class Color {
     public static final Placeholder<Color> PLACEHOLDER = Placeholder.build(node -> node
         .self(TypeMapper.of(Color::toString), Placeholder.STRING)
         .then(PatternKey.literal("hex"), TypeMapper.of(Color::toHexString), Placeholder.STRING)
+        .then(PatternKey.literal("rgb"), TypeMapper.of(color -> String.format("%06X", color.getValue() & 0xFFFFFF)), Placeholder.STRING)
         .then(PatternKey.literal("dec"), TypeMapper.of(Color::toDecString), Placeholder.STRING)
     );
 

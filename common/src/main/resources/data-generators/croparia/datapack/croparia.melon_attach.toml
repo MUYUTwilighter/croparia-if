@@ -1,3 +1,4 @@
+startup = true
 registry = "croparia:melons"
 path = "croparia/loot_table/melon_attach/${id.path}.json"
 template = """
@@ -22,7 +23,13 @@ template = """
       ]
     },
     {
-      "rolls": 0.01,
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.01
+        }
+      ],
       "entries": [
         {
           "type": "minecraft:item",

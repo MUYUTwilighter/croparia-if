@@ -86,7 +86,7 @@ public class RecipeWizard extends Item {
                 while (iterator.hasNext()) {
                     Element tmp = iterator.next();
                     if (tmp == state.getValue(Infusor.ELEMENT)) {
-                        Element next = iterator.hasNext() ? iterator.next() : Infusor.ELEMENT.getPossibleValues().iterator().next();
+                        Element next = iterator.hasNext() ? iterator.next() : Infusor.ELEMENT.getPossibleValues().getFirst();
                         context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(Infusor.ELEMENT, next));
                         return InteractionResult.SUCCESS;
                     }

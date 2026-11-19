@@ -5,6 +5,8 @@ import cool.muyucloud.croparia.api.repo.RepoProxy;
 import cool.muyucloud.croparia.api.resource.type.FluidSpec;
 import cool.muyucloud.croparia.api.resource.type.ItemSpec;
 
+// Architectury resolves this implementation by package and class name.
+@SuppressWarnings("unused")
 public class RepoProxyImpl {
     public static RepoProxy<FluidSpec> fluid(Repo<FluidSpec> repo) {
         return new FluidRepoProxy(repo);

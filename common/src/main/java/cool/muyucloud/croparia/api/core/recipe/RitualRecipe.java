@@ -72,7 +72,10 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
             stacks.forEach(stack -> Texts.tooltip(stack, Constants.BLOCK_PLACE_TOOLTIP));
             return stacks;
         });
-        this.result.getDisplayStacks().forEach(this::appendResultTooltip);
+        this.result.mapStacks(stacks -> {
+            stacks.forEach(this::appendResultTooltip);
+            return stacks;
+        });
     }
 
     public @NotNull ItemInput getIngredient() {
@@ -194,7 +197,7 @@ public class RitualRecipe implements DisplayableRecipe<RitualContainer> {
     }
 
     @Override
-    public boolean matches(RitualContainer container, Level level) {
+    public boolean matches(@NotNull RitualContainer container, @NotNull Level level) {
         return matches(container);
     }
 

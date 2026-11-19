@@ -1,3 +1,9 @@
+# Recipe/display fields: BotanyPots 1.21.1, commit 335c997dc456f6ea2b9bc3ff13319dfb791803e6.
+# Component ingredients use the installed 26.1.2 loader APIs; BP has no public 26.1.2 branch yet.
+# Fabric reads fabric:type/base; NeoForge reads type/items. Both preserve extra stack components.
+# BP does not supply crop BE data to displays. Its explicit color tints the whole mature model.
+startup = true
+enabled = true
 registry = "croparia:crops"
 path = "botanypots/recipe/${id.namespace}/crop/${id.path}.json"
 dependencies = "botanypots"
@@ -5,15 +11,26 @@ template = """
 {
   "type": "botanypots:crop",
   "input": {
-    "item": "${seed}"
+    "type": "neoforge:components",
+    "fabric:type": "fabric:components",
+    "items": ["croparia:crop_seed"],
+    "base": "croparia:crop_seed",
+    "components": { "croparia:crop": "${id}" },
+    "strict": false
   },
-  "categories": [
-    "crop", "farmland"
-  ],
-  "growthTicks": 1200,
+  "grow_time": 1200,
   "display": {
-    "type": "botanypots:aging",
-    "block": "${crop_block}"
+    "type": "botanypots:transitional",
+    "phases": [
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:crop", "properties": { "age": "0", "type": "${type}" } } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:crop", "properties": { "age": "1", "type": "${type}" } } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:crop", "properties": { "age": "2", "type": "${type}" } } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:crop", "properties": { "age": "3", "type": "${type}" } } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:crop", "properties": { "age": "4", "type": "${type}" } } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:crop", "properties": { "age": "5", "type": "${type}" } }, "options": { "color": "#${color.rgb}" } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:crop", "properties": { "age": "6", "type": "${type}" } }, "options": { "color": "#${color.rgb}" } },
+      { "type": "botanypots:simple", "block_state": { "block": "croparia:crop", "properties": { "age": "7", "type": "${type}" } }, "options": { "color": "#${color.rgb}" } }
+    ]
   },
   "drops": [
     {
@@ -21,13 +38,15 @@ template = """
       "items": [
         {
           "result": {
-            "id": "${seed}"
+            "id": "croparia:crop_seed",
+            "components": { "croparia:crop": "${id}" }
           },
           "chance": 0.01
         },
         {
           "result": {
-            "id": "${fruit}"
+            "id": "croparia:crop_fruit",
+            "components": { "croparia:crop": "${id}" }
           },
           "chance": 1.00
         }

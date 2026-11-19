@@ -246,7 +246,7 @@ public class GeneratorCommand {
 
     public static <S> RequiredArgumentBuilder<S, Identifier> buildPack() {
         RequiredArgumentBuilder<S, Identifier> pack = RequiredArgumentBuilder.argument("pack", IdentifierArgument.id());
-        pack.suggests((context, builder) -> {
+        pack.suggests((_, builder) -> {
             PackHandler.suggestPacks(builder);
             return builder.buildFuture();
         });

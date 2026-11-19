@@ -72,7 +72,7 @@ public class BlockProperties implements TooltipProvider, Iterable<Map.Entry<Stri
     }
 
     @Override
-    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter componentGetter) {
+    public void addToTooltip(@NotNull Item.TooltipContext tooltipContext, @NotNull Consumer<Component> consumer, @NotNull TooltipFlag tooltipFlag, @NotNull DataComponentGetter componentGetter) {
         if (this.getProperties().isEmpty()) return;
         consumer.accept(TITLE);
         this.getProperties().forEach((key, value) -> consumer.accept(Texts.literal("%s=%s".formatted(key, value))));

@@ -12,6 +12,6 @@ import java.util.List;
 public class CropMaterialCategoryExtension implements ICraftingCategoryExtension<CropMaterialRecipe> {
     @Override
     public @NotNull List<SlotDisplay> getIngredients(@NotNull RecipeHolder<CropMaterialRecipe> holder) {
-        return List.of((SlotDisplay) ItemInput.of(holder.value().getCrop().getFruit().getDefaultInstance()));
+        return List.of((SlotDisplay) ItemInput.of(holder.value().getCrop().getFruit()));
     }
 }

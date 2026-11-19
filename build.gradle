@@ -4,8 +4,15 @@ plugins {
     id 'com.gradleup.shadow' version '9.4.3' apply false
 }
 
-if (!(tooltip_mod in ['jade', 'wthit', 'none'])) {
-    throw new GradleException("Invalid tooltip_mod '${tooltip_mod}'; expected jade, wthit or none.")
+// Local development runtime overrides; missing keys retain the shared defaults.
+ext.runtimeMods = [rei: true, jei: true, jade: true, wthit: false]
+def runtimeModsFile = rootProject.file('runtime-mods.properties')
+if (runtimeModsFile.isFile()) {
+    def runtimeModProperties = new Properties()
+    runtimeModsFile.withInputStream { runtimeModProperties.load(it) }
+    runtimeMods.replaceAll { String mod, Boolean enabled ->
+        runtimeModProperties.getProperty(mod, enabled.toString()).toBoolean()
+    }
 }
 
 archives_name = "$archives_name-$minecraft_version"
@@ -71,6 +78,7 @@ subprojects {
 
     dependencies {
         minecraft "net.minecraft:minecraft:$minecraft_version"
+        testRuntimeOnly "org.junit.platform:junit-platform-launcher"
     }
 
     java {

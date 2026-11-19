@@ -11,7 +11,6 @@ import cool.muyucloud.croparia.api.resource.TypeToken;
 import cool.muyucloud.croparia.api.resource.TypedResource;
 import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.TagUtil;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -26,15 +25,12 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
     public static final MapCodec<ItemSpec> CODEC_COMP = RecordCodecBuilder.mapCodec(instance -> instance.group(
-        Identifier.CODEC.fieldOf("id").forGetter(itemSpec -> itemSpec.getResource().arch$registryName()),
+        BuiltInRegistries.ITEM.byNameCodec().fieldOf("id").forGetter(ItemSpec::getResource),
         CodecUtil.optionalFieldsOf(DataComponentPatch.CODEC, DataComponentPatch.EMPTY, "components", "nbt").forGetter(ItemSpec::getComponentsPatch)
-    ).apply(instance, (id, components) -> new ItemSpec(BuiltInRegistries.ITEM.getValue(id), components)));
-    public static final Codec<ItemSpec> CODEC_STR = Identifier.CODEC.xmap(
-        id -> new ItemSpec(BuiltInRegistries.ITEM.getValue(id), DataComponentPatch.EMPTY),
-        itemSpec -> itemSpec.getResource().arch$registryName()
-    );
+    ).apply(instance, ItemSpec::new));
+    public static final Codec<ItemSpec> CODEC_STR = BuiltInRegistries.ITEM.byNameCodec().xmap(ItemSpec::of, ItemSpec::getResource);
     public static final MultiCodec<ItemSpec> CODEC = CodecUtil.of(CodecUtil.of(CODEC_COMP.codec(), toEncode -> {
-        if (toEncode.getComponents().isEmpty()) return TestedCodec.fail(() -> "Can be encoded as string");
+        if (toEncode.getComponentsPatch().isEmpty()) return TestedCodec.fail(() -> "Can be encoded as string");
         return TestedCodec.success();
     }), CODEC_STR);
     public static final ItemSpec EMPTY = ItemSpec.of(Items.AIR);
@@ -42,8 +38,9 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
 
     @NotNull
     private final Item resource;
+    // Recipe decoding runs before item defaults are bound; retain only explicit overrides here.
     @NotNull
-    private final PatchedDataComponentMap components;
+    private final DataComponentPatch components;
 
     @NotNull
     public static ItemSpec of(@NotNull ItemStack stack) {
@@ -61,13 +58,11 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
 
     public ItemSpec(@NotNull Item item, @NotNull DataComponentPatch components) {
         this.resource = item;
-        this.components = PatchedDataComponentMap.fromPatch(item.components(), components);
+        this.components = components;
     }
 
     public ItemSpec(@NotNull Item item, @NotNull DataComponentMap components) {
-        this.resource = item;
-        this.components = new PatchedDataComponentMap(item.components());
-        components.forEach(typed -> typed.applyTo(this.components));
+        this(item, DataComponentPatch.builder().set(components).build());
     }
 
     @NotNull
@@ -77,28 +72,28 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
 
     @NotNull
     public ItemSpec with(@NotNull Item item) {
-        return new ItemSpec(item, this.getComponents());
+        return new ItemSpec(item, this.getComponentsPatch());
     }
 
     @NotNull
     public ItemSpec with(@NotNull DataComponentPatch components) {
-        PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
-        patched.applyPatch(components);
-        return new ItemSpec(this.getResource(), patched);
+        DataComponentPatch.SplitResult existing = this.getComponentsPatch().split();
+        DataComponentPatch.SplitResult incoming = components.split();
+        DataComponentPatch.Builder builder = DataComponentPatch.builder().set(existing.added());
+        existing.removed().forEach(builder::remove);
+        builder.set(incoming.added());
+        incoming.removed().forEach(builder::remove);
+        return new ItemSpec(this.getResource(), builder.build());
     }
 
     @NotNull
     public ItemSpec with(@NotNull DataComponentMap components) {
-        PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
-        patched.setAll(components);
-        return new ItemSpec(this.getResource(), patched);
+        return this.with(DataComponentPatch.builder().set(components).build());
     }
 
     @NotNull
     public ItemSpec with(@NotNull TypedDataComponent<?> component) {
-        PatchedDataComponentMap patched = new PatchedDataComponentMap(this.getComponents());
-        component.applyTo(patched);
-        return new ItemSpec(this.getResource(), patched);
+        return this.with(DataComponentPatch.builder().set(component).build());
     }
 
     @NotNull
@@ -113,14 +108,13 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
 
     @NotNull
     public ItemStack createStack(long amount) {
-        return new ItemStack(Holder.direct(this.getResource()), CifUtil.toIntSafe(amount), this.getComponentsPatch());
+        if (this.isEmpty() || amount <= 0) return ItemStack.EMPTY;
+        return new ItemStack(BuiltInRegistries.ITEM.wrapAsHolder(this.getResource()), CifUtil.toIntSafe(amount), this.getComponentsPatch());
     }
 
     @NotNull
     public ItemStack createStack() {
-        ItemStack stack = this.getResource().getDefaultInstance();
-        stack.applyComponents(this.getComponents());
-        return stack;
+        return this.createStack(1);
     }
 
     public boolean is(@NotNull ItemStack stack) {
@@ -150,12 +144,13 @@ public class ItemSpec implements DataComponentHolder, TypedResource<Item> {
     @Override
     @NotNull
     public DataComponentMap getComponents() {
-        return this.components;
+        DataComponentMap defaults = this.resource == Items.AIR ? DataComponentMap.EMPTY : this.resource.components();
+        return PatchedDataComponentMap.fromPatch(defaults, this.components);
     }
 
     @NotNull
     public DataComponentPatch getComponentsPatch() {
-        return this.components.asPatch();
+        return this.components;
     }
 
     @Override

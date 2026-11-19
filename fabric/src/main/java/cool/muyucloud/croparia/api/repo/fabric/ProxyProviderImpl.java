@@ -17,6 +17,8 @@ import net.minecraft.world.level.block.Block;
 
 import java.util.Optional;
 
+// Architectury resolves this implementation by package and class name.
+@SuppressWarnings("unused")
 public class ProxyProviderImpl {
     public static Optional<PlatformItemProxy> findItem(Level world, BlockPos pos, Direction direction) {
         Storage<ItemVariant> storage = ItemStorage.SIDED.find(world, pos, direction);

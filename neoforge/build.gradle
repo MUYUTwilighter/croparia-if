@@ -11,11 +11,11 @@ archives_name = "$archives_name-$minecraft_version"
 loom {
     runs {
         client {
-            property "neoforge.warnings.onlyin.hide", "true"
+            systemProperties.put("neoforge.warnings.onlyin.hide", "true")
         }
         server {
-            property "neoforge.warnings.onlyin.hide", "true"
-            source sourceSets.test
+            systemProperties.put("neoforge.warnings.onlyin.hide", "true")
+            sourceSet.set("test")
         }
     }
 }
@@ -62,18 +62,23 @@ dependencies {
     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
 
     // REI
-    localRuntime "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
     compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:$rei_version"
     compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:$rei_version"
+    if (rootProject.runtimeMods.rei) {
+        localRuntime "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
+    }
 
     // JEI
     compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
-    localRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
+    if (rootProject.runtimeMods.jei) {
+        localRuntime("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
+    }
 
-    // Select one overlay for development; WTHIT brings Bad Packets transitively.
-    if (tooltip_mod == 'jade') {
+    // Optional development overlays; WTHIT brings Bad Packets transitively.
+    if (rootProject.runtimeMods.jade) {
         localRuntime "maven.modrinth:jade:$jade_neoforge_version"
-    } else if (tooltip_mod == 'wthit') {
+    }
+    if (rootProject.runtimeMods.wthit) {
         localRuntime "mcp.mobius.waila:wthit:neo-$wthit_version"
     }
 
@@ -105,7 +110,7 @@ jar {
 }
 
 shadowJar {
-    configurations = [project.configurations.shadowBundle]
+    configurations.set([project.configurations.shadowBundle])
     archiveClassifier = 'dev-shadow'
 }
 

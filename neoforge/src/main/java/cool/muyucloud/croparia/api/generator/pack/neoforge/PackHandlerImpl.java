@@ -14,7 +14,7 @@ public class PackHandlerImpl {
             try {
                 consumer.accept(mod.getOwningFile().getFile().getFilePath().toFile(), mod.getModId());
             } catch (UnsupportedOperationException e) {
-                CropariaIf.LOGGER.debug("Cannot scan generators from mod %s".formatted(modId));
+                CropariaIf.LOGGER.debug("Cannot scan generators from mod {}", modId);
             }
         });
     }

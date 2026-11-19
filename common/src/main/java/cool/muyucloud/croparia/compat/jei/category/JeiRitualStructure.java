@@ -78,17 +78,17 @@ public class JeiRitualStructure extends JeiCategory<RitualStructure> {
             recipe.size().getX() - displaySize.getX(), recipe.size().getY() - 1,
             recipe.size().getZ() - displaySize.getZ()));
         InputManager inputManager = new InputManager().setSize(this.getWidth(), this.getHeight());
-        inputManager.onScrolledUp("y-", (manager, mouseX, mouseY, scrollDeltaX, scrollDeltaY) -> {
+        inputManager.onScrolledUp("y-", (_, _, _, _, _) -> {
             return anchor.mapAndCompare(RangedVec3i::below);
-        }).onScrolledDown("y+", (manager, mouseX, mouseY, scrollDeltaX, scrollDeltaY) -> {
+        }).onScrolledDown("y+", (_, _, _, _, _) -> {
             return anchor.mapAndCompare(RangedVec3i::above);
-        }).onKeyPressed("z-", InputConstants.KEY_W, (manager, mouseX, mouseY, keyCode, scanCode, modifiers) -> {
+        }).onKeyPressed("z-", InputConstants.KEY_W, (_, _, _, _, _, _) -> {
             return anchor.mapAndCompare(RangedVec3i::north);
-        }).onKeyPressed("z+", InputConstants.KEY_S, (manager, mouseX, mouseY, keyCode, scanCode, modifiers) -> {
+        }).onKeyPressed("z+", InputConstants.KEY_S, (_, _, _, _, _, _) -> {
             return anchor.mapAndCompare(RangedVec3i::south);
-        }).onKeyPressed("x-", InputConstants.KEY_A, (manager, mouseX, mouseY, keyCode, scanCode, modifiers) -> {
+        }).onKeyPressed("x-", InputConstants.KEY_A, (_, _, _, _, _, _) -> {
             return anchor.mapAndCompare(RangedVec3i::west);
-        }).onKeyPressed("x+", InputConstants.KEY_D, (manager, mouseX, mouseY, keyCode, scanCode, modifiers) -> {
+        }).onKeyPressed("x+", InputConstants.KEY_D, (_, _, _, _, _, _) -> {
             return anchor.mapAndCompare(RangedVec3i::east);
         });
         InputManager yDown = add(builder, InputManager.createButton(LEFT_WHITE, LEFT_DARK)).setSize(BUTTON_SIZE, BUTTON_SIZE)

@@ -38,11 +38,13 @@ public class CropariaIf {
 
     public static void init() {
         OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
-        CropariaIf.LOGGER.info("=== Croparia common setup on %s ===".formatted(Platform.getEnvironment()));
+        CropariaIf.LOGGER.info("=== Croparia common setup on {} ===", Platform.getEnvironment());
         LOGGER.info("Croparia IF customize registration");
         DgRegistries.register();
         DataGenerators.register();
         PackHandlers.register();
+        // Initialize the enum to register its element-backed fluids and types.
+        //noinspection ResultOfMethodCallIgnored
         Element.EMPTY.name();
         LOGGER.info("Croparia IF vanilla registration");
         ArgumentTypes.register();
@@ -63,17 +65,8 @@ public class CropariaIf {
             DgRegistries.MELONS.loadCrops();
         });
         LifecycleEvent.SERVER_BEFORE_START.register(server -> SERVER = server);
-        LifecycleEvent.SERVER_STARTING.register(_ -> {
-            ConfigFileHandler.reload(CONFIG);
-        });
-        LifecycleEvent.SERVER_STARTED.register(server -> {
-            SERVER_STARTED = true;
-            OnLoadSupplier.LAST_DATA_LOAD = System.currentTimeMillis();
-            if (CONFIG.getAutoReload() >= 0) {
-                LOGGER.info("Croparia IF is performing a datapack reload to apply data generators");
-                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), "schedule function croparia:auto_reload %s".formatted(CONFIG.getAutoReload()));
-            }
-        });
+        LifecycleEvent.SERVER_STARTING.register(_ -> ConfigFileHandler.reload(CONFIG));
+        LifecycleEvent.SERVER_STARTED.register(_ -> SERVER_STARTED = true);
         PlayerEvent.PLAYER_JOIN.register(player -> {
             if ((INSTANCE.get().getVersion().contains("a") || INSTANCE.get().getVersion().contains("alpha")) && player.level().getServer().isSingleplayer()) {
                 player.sendSystemMessage(Texts.forStyles(

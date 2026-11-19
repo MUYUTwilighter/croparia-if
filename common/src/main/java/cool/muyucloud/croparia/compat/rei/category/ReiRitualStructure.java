@@ -90,13 +90,13 @@ public class ReiRitualStructure extends ReiCategory<RitualStructure> {
             layers.add(Item2DWidget.create().items((posX, posZ) -> {
                 char c = recipe.getPattern().get(posX, finalI, posZ);
                 if (c == '.') {
-                    return Collections.singleton(EntryStacks.of(BlockInput.STACK_AIR));
+                    return Collections.singleton(EntryStacks.of(BlockInput.STACK_AIR.get()));
                 } else if (c == '$') {
                     return Collections.singleton(EntryStacks.of(INPUT.get()));
                 } else if (c == '*') {
                     return ReiUtil.toIngredient(recipe.getRitual());
                 } else if (c == ' ') {
-                    return Collections.singleton(EntryStacks.of(BlockInput.STACK_ANY));
+                    return Collections.singleton(EntryStacks.of(BlockInput.STACK_ANY.get()));
                 } else {
                     return ReiUtil.toIngredient(recipe.getKeys().get(c));
                 }

@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,7 +24,7 @@ abstract class AbstractFabricRepoProxy<T extends TypedResource<?>, V> extends Re
     protected abstract V toVariant(T resource);
 
     @Override
-    public final long insert(V resource, long maxAmount, TransactionContext context) {
+    public final long insert(@NotNull V resource, long maxAmount, @Nullable TransactionContext context) {
         T typedResource = this.fromVariant(resource);
         if (context == null) {
             return this.accept(typedResource, maxAmount);
@@ -39,7 +40,7 @@ abstract class AbstractFabricRepoProxy<T extends TypedResource<?>, V> extends Re
     }
 
     @Override
-    public final long extract(V resource, long maxAmount, TransactionContext context) {
+    public final long extract(@NotNull V resource, long maxAmount, @Nullable TransactionContext context) {
         T typedResource = this.fromVariant(resource);
         if (context == null) {
             return this.consume(typedResource, maxAmount);
@@ -91,7 +92,7 @@ abstract class AbstractFabricRepoProxy<T extends TypedResource<?>, V> extends Re
         }
 
         @Override
-        public long extract(V resource, long maxAmount, TransactionContext context) {
+        public long extract(@NotNull V resource, long maxAmount, @Nullable TransactionContext context) {
             T typedResource = AbstractFabricRepoProxy.this.fromVariant(resource);
             if (context == null) {
                 return AbstractFabricRepoProxy.this.consume(this.i, typedResource, maxAmount);
@@ -112,7 +113,7 @@ abstract class AbstractFabricRepoProxy<T extends TypedResource<?>, V> extends Re
         }
 
         @Override
-        public V getResource() {
+        public @NotNull V getResource() {
             return AbstractFabricRepoProxy.this.toVariant(AbstractFabricRepoProxy.this.resourceFor(this.i));
         }
 

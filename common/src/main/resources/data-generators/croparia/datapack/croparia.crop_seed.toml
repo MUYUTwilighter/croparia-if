@@ -1,3 +1,4 @@
+startup = true
 registry = "croparia:crops"
 path = "croparia/recipe/crafting/crop/seeds/${id.namespace}/${id.path}.json"
 template = """
@@ -14,8 +15,11 @@ template = """
     "MSM"
   ],
   "result": {
-    "id": "${seed}",
-    "count": 1
+    "id": "croparia:crop_seed",
+    "count": 1,
+    "components": {
+      "croparia:crop": "${id}"
+    }
   }
 }
 """

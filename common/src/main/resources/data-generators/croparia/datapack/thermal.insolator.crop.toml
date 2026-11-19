@@ -1,3 +1,10 @@
+startup = true
+# Blocked by upstream, not by Ingredient alone: the latest public 1.20.x branches target MC 1.20.4.
+# ThermalCore cc7c230146a71d177767a8f9d6b26f0a52e9aeed: MachineRecipeSerializer -> RecipeJsonUtils.
+# CoFHCore dcd7bd6703418ee2e8eb2185957de83925fa89fe: parseItemStack reads item/count/nbt, never components.
+# The Insolator also indexes recipes with old NBT comparables. Custom-component seeds/outputs cannot round-trip.
+# Keep this target-format draft disabled until upstream supports both component IO and component-aware lookup.
+enabled = false
 registry = "croparia:crops"
 path = "thermal/recipe/croparia/insolator_crop/${id.namespace}/${id.path}.json"
 dependencies = "thermal_expansion"
@@ -5,15 +12,17 @@ template = """
 {
   "type": "thermal:insolator",
   "ingredient": {
-    "item": "${seed}"
+    "item": "croparia:crop_seed"
   },
   "result": [
     {
-      "item": "${seed}",
+      "item": "croparia:crop_seed",
+      "components": { "croparia:crop": "${id}" },
       "chance": 0.01
     },
     {
-      "item": "${fruit}",
+      "item": "croparia:crop_fruit",
+      "components": { "croparia:crop": "${id}" },
       "chance": 1.0
     }
   ],

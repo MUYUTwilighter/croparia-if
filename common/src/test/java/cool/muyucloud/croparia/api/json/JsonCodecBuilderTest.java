@@ -44,7 +44,7 @@ class JsonCodecBuilderTest {
     void mapBuilderWithCodecReturnsErrorWhenEncodingFails() {
         Codec<Integer> failCodec = CodecUtil.of(
             Codec.INT,
-            value -> TestedCodec.fail(() -> "always fail")
+            _ -> TestedCodec.fail(() -> "always fail")
         );
         var result = new MapBuilder().with("n", 7, failCodec);
         assertTrue(result.isError());

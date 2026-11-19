@@ -9,14 +9,14 @@ public class FabricFluidSpec {
     }
 
     public static FluidSpec from(FluidVariant fluid) {
-        return new FluidSpec(fluid.getFluid(), fluid.getComponents());
+        return new FluidSpec(fluid.getFluid(), fluid.getComponentsPatch());
     }
 
     public static boolean matches(FluidVariant a, FluidSpec b) {
-        return a.getFluid() == b.getResource() && b.getComponentsPatch().equals(a.getComponents());
+        return a.getFluid() == b.getResource() && b.getComponentsPatch().equals(a.getComponentsPatch());
     }
 
     public static boolean matches(FluidSpec a, FluidVariant b) {
-        return b.getFluid() == a.getResource() && a.getComponentsPatch().equals(b.getComponents());
+        return b.getFluid() == a.getResource() && a.getComponentsPatch().equals(b.getComponentsPatch());
     }
 }

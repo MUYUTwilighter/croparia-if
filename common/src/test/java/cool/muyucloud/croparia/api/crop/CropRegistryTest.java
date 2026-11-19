@@ -18,14 +18,13 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class CropRegistryTest {
     @Test
-    void registerTriggersOnRegisterOnlyWhenTransitioningToLoaded(@TempDir Path tempDir) {
+    void registerReplacesDefinitionsAndRemovesDisabledCrops(@TempDir Path tempDir) {
         CropRegistry<DummyCrop> registry = new CropRegistry<>(tempDir, DummyCrop.CODEC);
         Identifier id = Identifier.fromNamespaceAndPath("croparia_test", "alpha");
 
@@ -35,13 +34,15 @@ class CropRegistryTest {
         DummyCrop loadedAgain = new DummyCrop(id, true, "k", Map.of("en_us", "D"));
 
         registry.register(firstLoaded);
+        assertSame(firstLoaded, registry.getById(id).orElseThrow());
         registry.register(secondLoaded);
+        assertSame(secondLoaded, registry.getById(id).orElseThrow());
+        assertEquals(1, registry.size());
         registry.register(unloaded);
+        assertFalse(registry.exists(id));
+        assertEquals(0, registry.size());
         registry.register(loadedAgain);
 
-        assertEquals(1, firstLoaded.registeredCount());
-        assertEquals(0, secondLoaded.registeredCount());
-        assertEquals(1, loadedAgain.registeredCount());
         assertSame(loadedAgain, registry.getById(id).orElseThrow());
 
         List<DummyCrop> loaded = registryLoaded(registry);
@@ -63,9 +64,9 @@ class CropRegistryTest {
 
         registry.readCrops();
 
-        assertEquals(2, registry.size());
+        assertEquals(1, registry.size());
         assertTrue(registry.exists(Identifier.fromNamespaceAndPath("croparia_test", "a")));
-        assertTrue(registry.exists(Identifier.fromNamespaceAndPath("croparia_test", "b")));
+        assertFalse(registry.exists(Identifier.fromNamespaceAndPath("croparia_test", "b")));
         assertFalse(registry.exists(Identifier.fromNamespaceAndPath("croparia_test", "x")));
 
         List<String> loadedIds = registryLoaded(registry).stream()
@@ -95,7 +96,7 @@ class CropRegistryTest {
     }
 
     @Test
-    void dumpCropWritesNamespacedPath(@TempDir Path tempDir) throws IOException {
+    void dumpCropWritesDefinitionAtRegistryRelativePath(@TempDir Path tempDir) throws IOException {
         CropRegistry<DummyCrop> registry = new CropRegistry<>(tempDir, DummyCrop.CODEC);
         DummyCrop crop = new DummyCrop(
             Identifier.fromNamespaceAndPath("croparia_test", "dump_target"),
@@ -105,7 +106,7 @@ class CropRegistryTest {
         );
 
         Path dumped = registry.dumpCrop(crop);
-        assertEquals(tempDir.resolve("croparia_test/dump_target.json"), dumped);
+        assertEquals(tempDir.resolve("dump_target.json"), dumped);
         assertTrue(Files.exists(dumped));
 
         String content = Files.readString(dumped, StandardCharsets.UTF_8);
@@ -123,13 +124,13 @@ class CropRegistryTest {
 
         registry.dumpCrops();
 
-        assertTrue(Files.exists(tempDir.resolve("croparia_test/a.json")));
-        assertTrue(Files.exists(tempDir.resolve("croparia_test/b.json")));
+        assertTrue(Files.exists(tempDir.resolve("a.json")));
+        assertFalse(Files.exists(tempDir.resolve("b.json")));
     }
 
     private static List<DummyCrop> registryLoaded(CropRegistry<DummyCrop> registry) {
         java.util.ArrayList<DummyCrop> loaded = new java.util.ArrayList<>();
-        registry.forActive(loaded::add);
+        registry.forEach(loaded::add);
         return loaded;
     }
 
@@ -162,7 +163,6 @@ class CropRegistryTest {
         private final boolean load;
         private final String translationKey;
         private final ImmutableMap<String, String> translations;
-        private final AtomicInteger registerCalls = new AtomicInteger(0);
 
         private DummyCrop(Identifier id, boolean load, String translationKey, Map<String, String> translations) {
             this.id = id;
@@ -207,12 +207,8 @@ class CropRegistryTest {
         }
 
         @Override
-        public void onRegister() {
-            registerCalls.incrementAndGet();
-        }
-
-        private int registeredCount() {
-            return registerCalls.get();
+        public ItemStack getFruit() {
+            return ItemStack.EMPTY;
         }
     }
 }

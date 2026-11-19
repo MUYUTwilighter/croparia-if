@@ -24,22 +24,38 @@ Technical:
 - Convenient crop definition.
 - Highly customizable.
 
+## Local development mods
+
+Create an optional `runtime-mods.properties` in the project root to select the mods loaded by local Fabric and NeoForge runs:
+
+```properties
+rei=true
+jei=true
+jade=true
+wthit=false
+```
+
+Each switch is independent: set it to `false` to disable that mod at runtime. All integration APIs remain available for
+compilation. This file is ignored by Git; a fresh clone builds without it. Missing files or keys keep the shared defaults:
+REI, JEI and Jade enabled, WTHIT disabled. Reload the Gradle project after editing.
+
 ## Support Plan
 
 ### Long Term Support
 
 Long term support means they are continuously updated and maintained, no matter what the latest version of Minecraft is.
 
-- _1.16.5 in plan_
-- 1.18.2
 - 1.20.1
 - 1.21.1
+- 1.21.11
+- 26.1.2
 
 ### Short Term Support
 
 Short term support means that they are only maintained when they are latest supported version of minecraft, and would no
 **longer receive further updates** when Croparia IF is ported to even newer versions of Minecraft.
 
+- 1.18.2
 - 1.21 _You may try Croparia IF for 1.21.1_
 - 1.21.2 _Only Dalarion-styled_
 - 1.21.3

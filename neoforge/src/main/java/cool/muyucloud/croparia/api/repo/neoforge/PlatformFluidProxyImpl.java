@@ -12,6 +12,8 @@ import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 import java.util.Optional;
 
+// Keep this public proxy extensible and preserve identity-based equality.
+@SuppressWarnings("ClassCanBeRecord")
 public class PlatformFluidProxyImpl implements PlatformFluidProxy {
     public static PlatformFluidProxyImpl of(ResourceHandler<FluidResource> handler) {
         return new PlatformFluidProxyImpl(handler);

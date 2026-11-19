@@ -98,7 +98,7 @@ public class Crops {
     public static final Crop TWISTING_VINES = vanilla("twisting_vines", Items.TWISTING_VINES, 0x14b283, 1, Crop.NATURE);
     public static final Crop LILY_PAD = vanilla("lilypad", Items.LILY_PAD, 0xc5f14, 1, Crop.NATURE);
     public static final Crop BUSH = vanilla("bush", Items.DEAD_BUSH, 0x946428, 1, Crop.NATURE);
-    public static final Crop GRASS = vanilla("grass", Items.SHORT_GRASS, 0x820510b, 1, Crop.NATURE);
+    public static final Crop GRASS = vanilla("grass", Items.SHORT_GRASS, 0x20510b, 1, Crop.NATURE);
     public static final Crop LARGE_FERN = vanilla("large_fern", Items.LARGE_FERN, 0x4a7240, 1, Crop.NATURE);
     public static final Crop TALL_GRASS = vanilla("tall_grass", Items.TALL_GRASS, 0x2f4728, 1, Crop.NATURE);
     public static final Crop FERN = vanilla("fern", Items.FERN, 0x1b4509, 1, Crop.NATURE);

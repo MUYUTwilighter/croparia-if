@@ -14,7 +14,6 @@ import cool.muyucloud.croparia.util.CifUtil;
 import cool.muyucloud.croparia.util.TagUtil;
 import cool.muyucloud.croparia.util.supplier.OnLoadSupplier;
 import cool.muyucloud.croparia.util.text.Texts;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -107,11 +106,11 @@ public class ItemInput implements SlotDisplay {
         this.amount = amount;
         this.displayStacks = OnLoadSupplier.of(() -> {
             if (this.getId().isPresent()) {
-                ItemStack stack = new ItemStack(Holder.direct(BuiltInRegistries.ITEM.getValue(this.getId().get())),
+                ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.wrapAsHolder(BuiltInRegistries.ITEM.getValue(this.getId().get())),
                     CifUtil.toIntSafe(this.getAmount()), this.getComponentsPatch());
                 if (stack.isEmpty()) {
                     DisplayableRecipe.LOGGER.error("Item with id '{}' not found, using placeholder", this.getId().get());
-                    return ImmutableList.of(Texts.tooltip(BlockInput.STACK_UNKNOWN.copy(), Texts.literal(this.getTaggable())));
+                    return ImmutableList.of(Texts.tooltip(BlockInput.STACK_UNKNOWN.get(), Texts.literal(this.getTaggable())));
                 }
                 return ImmutableList.of(stack);
             } else if (this.getTag().isPresent()) {
@@ -123,11 +122,11 @@ public class ItemInput implements SlotDisplay {
                 });
                 if (stacks.isEmpty()) {
                     DisplayableRecipe.LOGGER.error("Item tag with id '{}' is empty, using placeholder", this.getTag().get().location());
-                    return ImmutableList.of(Texts.tooltip(BlockInput.STACK_UNKNOWN.copy(), Texts.literal(this.getTaggable())));
+                    return ImmutableList.of(Texts.tooltip(BlockInput.STACK_UNKNOWN.get(), Texts.literal(this.getTaggable())));
                 }
                 return ImmutableList.copyOf(stacks);
             } else {
-                ItemStack stack = new ItemStack(Holder.direct(CropariaItems.PLACEHOLDER.get()),
+                ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.wrapAsHolder(CropariaItems.PLACEHOLDER.get()),
                     CifUtil.toIntSafe(this.getAmount()),
                     this.getComponentsPatch());
                 return ImmutableList.of(stack);
