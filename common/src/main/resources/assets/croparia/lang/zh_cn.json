@@ -235,5 +235,6 @@
   "tooltip.croparia.bounded_position": "绑定到 %s: %s, %s, %s",
   "tooltip.croparia.soak.infusor": "将注魔台放置在元素石上",
   "tooltip.croparia.soak.input": "将输入方块放置在元素石旁边",
-  "tooltip.croparia.spawn_egg": "合成后直接召唤生物"
+  "tooltip.croparia.spawn_egg": "合成后直接召唤生物",
+  "unit.croparia.half_droplet": "半滴"
 }

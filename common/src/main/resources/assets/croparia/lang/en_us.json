@@ -235,5 +235,6 @@
   "tag.item.croparia.ritual_stands": "Croparia Ritual Stands",
   "tag.item.croparia.ritual_stands_2": "Croparia Ritual Stands T2",
   "tag.item.croparia.ritual_stands_3": "Croparia Ritual Stands T3",
-  "tag.item.croparia.seed_ingredient": "Seeds that can craft Croparia Seeds"
+  "tag.item.croparia.seed_ingredient": "Seeds that can craft Croparia Seeds",
+  "unit.croparia.half_droplet": "Half Droplet"
 }

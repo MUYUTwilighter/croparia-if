@@ -235,5 +235,6 @@
   "tag.item.croparia.ritual_stands": "Atriles rituales de Croparia",
   "tag.item.croparia.ritual_stands_2": "Atriles rituales T2 de Croparia",
   "tag.item.croparia.ritual_stands_3": "Atriles rituales T3 de Croparia",
-  "tag.item.croparia.seed_ingredient": "Semillas que pueden crear Semillas de Croparia"
+  "tag.item.croparia.seed_ingredient": "Semillas que pueden crear Semillas de Croparia",
+  "unit.croparia.half_droplet": "Media gota"
 }
